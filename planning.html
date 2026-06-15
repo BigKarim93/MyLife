@@ -283,7 +283,7 @@
     <button class="btn" id="btn-sleep">⚙️ Réglages</button>
     <button class="btn" id="btn-edit-mode" title="Supprimer rapidement sans confirmation">✏️ Modifier</button>
     <button class="btn primary" id="btn-add">＋ Ajouter</button>
-    <button class="btn danger" id="btn-reset" title="Revenir au planning par défaut">↺ Réinitialiser</button>
+    <button class="btn danger" id="btn-reset" title="Annuler les modifications ponctuelles de cette semaine">↺ Réinitialiser la semaine</button>
   </div>
 </div>
 
@@ -408,8 +408,14 @@
           <option value="">Toutes les semaines</option>
           <option value="A">Semaine A uniquement</option>
           <option value="B">Semaine B uniquement</option>
-          <option value="once" id="ev-week-once">Cette semaine seulement</option>
+          <option value="once">Une seule date</option>
         </select>
+      </div>
+    </div>
+    <div class="field-row" id="ev-once-row" style="display:none;">
+      <div class="field">
+        <label for="ev-once-date">Date précise</label>
+        <input type="date" id="ev-once-date">
       </div>
     </div>
     <div class="field-row">
@@ -536,6 +542,10 @@
       </div>
     </div>
     <button class="btn" id="theme-default" style="margin-bottom:6px;">↺ Couleurs par défaut</button>
+
+    <h3 style="margin-top:14px;">⚠️ Zone dangereuse</h3>
+    <p class="hint" style="margin-bottom:10px;">Efface tout (cours, exceptions, réglages, couleurs) et recommence avec le planning d'origine. Concerne toutes les semaines.</p>
+    <button class="btn danger" id="btn-factory-reset">Réinitialiser tout le planning</button>
 
     <div class="modal-actions">
       <span></span>
@@ -890,7 +900,7 @@ function renderEventsInColumn(col, events, opts){
     delBtn.addEventListener('pointerdown', e=>e.stopPropagation());
     delBtn.addEventListener('click', e=>{
       e.stopPropagation();
-      deleteEventQuick(ev);
+      deleteEventQuick(ev, opts.date);
     });
     div.appendChild(delBtn);
 
@@ -947,17 +957,26 @@ document.getElementById('btn-edit-mode').addEventListener('click', ()=>{
   document.getElementById('btn-edit-mode').classList.toggle('active', editMode);
   document.body.classList.toggle('edit-mode', editMode);
 });
-function deleteEventQuick(ev){
+function deleteEventQuick(ev, dateStr){
   const doDelete = ()=>{
-    state.events = state.events.filter(e=>e.id!==ev.id);
-    removeExceptionsForEvent(ev.id);
+    if(ev.onlyDate){
+      // Évènement ponctuel : il n'existe que ce jour-là, on le retire complètement
+      state.events = state.events.filter(e=>e.id!==ev.id);
+      removeExceptionsForEvent(ev.id);
+    } else {
+      // Évènement récurrent : on ne l'annule que pour cette date précise
+      addException(ev.id, dateStr);
+    }
     saveState();
     renderAll();
   };
   if(editMode){
     doDelete();
+  } else if(ev.onlyDate){
+    showConfirm('Supprimer "'+ev.title+'" ?', doDelete, 'Supprimer');
   } else {
-    showConfirm('Supprimer définitivement "'+ev.title+'" pour toutes les semaines ?', doDelete, 'Supprimer');
+    const label = fmtDateShort(new Date(dateStr+'T00:00:00'));
+    showConfirm('Annuler "'+ev.title+'" uniquement le '+label+' ? (les autres semaines restent inchangées)', doDelete, 'Annuler ce jour');
   }
 }
 
@@ -1132,8 +1151,8 @@ function openEventModal(ev, dateStr){
   document.getElementById('ev-week').value = ev ? (ev.onlyDate ? 'once' : (ev.week||'')) : '';
   document.getElementById('ev-start').value = ev ? ev.start : '09:00';
   document.getElementById('ev-end').value = ev ? ev.end : '10:00';
-  document.getElementById('ev-week-once').textContent =
-    'Cette semaine seulement ('+fmtDateShort(new Date(editingDate+'T00:00:00'))+')';
+  document.getElementById('ev-once-date').value = (ev && ev.onlyDate) ? ev.onlyDate : editingDate;
+  updateOnceRowVisibility();
 
   const group = document.getElementById('ev-delete-group');
   const onceBtn = document.getElementById('ev-delete-once');
@@ -1154,6 +1173,13 @@ function openEventModal(ev, dateStr){
 }
 function closeEventModal(){ eventOverlay.classList.remove('open'); editingId=null; editingDate=null; }
 
+function updateOnceRowVisibility(){
+  const isOnce = document.getElementById('ev-week').value==='once';
+  document.getElementById('ev-once-row').style.display = isOnce ? 'flex' : 'none';
+  document.getElementById('ev-day').disabled = isOnce;
+}
+document.getElementById('ev-week').addEventListener('change', updateOnceRowVisibility);
+
 document.getElementById('ev-cancel').addEventListener('click', closeEventModal);
 document.getElementById('ev-save').addEventListener('click', ()=>{
   const title = document.getElementById('ev-title').value.trim();
@@ -1165,6 +1191,7 @@ document.getElementById('ev-save').addEventListener('click', ()=>{
   if(timeToMin(end)<=timeToMin(start)) end = minToTime(timeToMin(start)+30);
 
   const weekVal = document.getElementById('ev-week').value;
+  let onceDate = document.getElementById('ev-once-date').value || editingDate;
   const data = {
     title,
     sub: document.getElementById('ev-sub').value.trim(),
@@ -1172,7 +1199,7 @@ document.getElementById('ev-save').addEventListener('click', ()=>{
     type: document.getElementById('ev-type').value,
     day: Number(document.getElementById('ev-day').value),
     week: weekVal==='once' ? '' : weekVal,
-    onlyDate: weekVal==='once' ? editingDate : null,
+    onlyDate: weekVal==='once' ? onceDate : null,
     start, end
   };
   // Pour un évènement ponctuel, le jour doit correspondre à la date choisie
@@ -1182,7 +1209,16 @@ document.getElementById('ev-save').addEventListener('click', ()=>{
 
   if(editingId){
     const idx = state.events.findIndex(e=>e.id===editingId);
-    if(idx>-1) state.events[idx] = Object.assign({id:editingId}, data);
+    const original = idx>-1 ? state.events[idx] : null;
+    if(original && data.onlyDate && !original.onlyDate){
+      // Le cours d'origine est récurrent : on ne le modifie pas pour toutes les semaines,
+      // on l'annule juste ce jour-là et on crée une version ponctuelle à part.
+      addException(editingId, data.onlyDate);
+      data.id = 'e'+Date.now();
+      state.events.push(data);
+    } else if(idx>-1){
+      state.events[idx] = Object.assign({id:editingId}, data);
+    }
   } else {
     data.id = 'e'+Date.now();
     state.events.push(data);
@@ -1233,6 +1269,17 @@ document.getElementById('btn-sleep').addEventListener('click', ()=>{
 });
 document.getElementById('theme-default').addEventListener('click', ()=>{
   fillThemeInputs(DEFAULT_THEME);
+});
+document.getElementById('btn-factory-reset').addEventListener('click', ()=>{
+  showConfirm('Tout effacer et revenir au planning d\u2019origine ? Cette action est irréversible et concerne TOUTES les semaines.', ()=>{
+    state = defaultState();
+    state.weekFilter = letterForOffset(0);
+    saveState();
+    applyTheme(state.theme);
+    updateWeekNav();
+    sleepOverlay.classList.remove('open');
+    renderAll();
+  }, 'Tout réinitialiser');
 });
 document.getElementById('sleep-cancel').addEventListener('click', ()=>sleepOverlay.classList.remove('open'));
 document.getElementById('sleep-save').addEventListener('click', ()=>{
@@ -1449,14 +1496,19 @@ document.querySelectorAll('.tab').forEach(tab=>{
 document.getElementById('btn-add').addEventListener('click', ()=>openEventModal(null));
 
 document.getElementById('btn-reset').addEventListener('click', ()=>{
-  showConfirm('Revenir au planning par défaut ? Tes modifications seront perdues.', ()=>{
-    state = defaultState();
-    state.weekFilter = letterForOffset(0);
+  const monday = mondayForOffset(state.weekNavOffset);
+  const weekDates = [];
+  for(let i=0;i<7;i++) weekDates.push(dateKey(addDays(monday,i)));
+  const label = fmtDateShort(monday)+'–'+fmtDateShort(addDays(monday,6));
+  showConfirm('Annuler toutes les modifications ponctuelles de la semaine du '+label+' (cours annulés ou ajoutés juste pour ces jours) ? Le reste du planning n\u2019est pas affecté.', ()=>{
+    state.exceptions = state.exceptions.filter(k=>{
+      const d = k.split('@')[1];
+      return !weekDates.includes(d);
+    });
+    state.events = state.events.filter(e=> !(e.onlyDate && weekDates.includes(e.onlyDate)));
     saveState();
-    applyTheme(state.theme);
-    updateWeekNav();
     renderAll();
-  }, 'Réinitialiser');
+  }, 'Réinitialiser la semaine');
 });
 
 document.getElementById('day-date-picker').addEventListener('change', renderDay);
