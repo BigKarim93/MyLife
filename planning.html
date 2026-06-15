@@ -54,6 +54,29 @@
     letter-spacing:.5px;white-space:nowrap;
   }
   .topbar h1 span{color:var(--chalk-dim);font-family:'Work Sans';font-weight:500;font-size:.75rem;display:block;margin-top:-2px;}
+  #btn-mylife{font-size:1.1rem;padding:7px 11px;text-decoration:none;}
+  .sync-status{
+    font-size:1rem;opacity:.6;cursor:default;display:inline-flex;align-items:center;
+    padding:0 2px;transition:.2s;
+  }
+  .sync-status.saving{opacity:1;animation:pulse 1s infinite;}
+  .sync-status.error{opacity:1;color:#ff9a9a;}
+  @keyframes pulse{0%,100%{opacity:.4;}50%{opacity:1;}}
+
+  /* ---------- Loading screen ---------- */
+  .loading-screen{
+    position:fixed;inset:0;background:var(--bg);z-index:500;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .loading-screen.hidden{display:none;}
+  .loading-box{text-align:center;color:var(--chalk-dim);}
+  .loading-box p{margin-top:14px;font-size:.9rem;}
+  .spinner{
+    width:34px;height:34px;border-radius:50%;
+    border:3px solid var(--line-strong);border-top-color:var(--accent);
+    margin:0 auto;animation:spin .8s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
   .tabs{display:flex;gap:6px;margin-left:8px;flex-wrap:wrap;}
   .tab{
     background:transparent;border:1px solid var(--line);color:var(--chalk-dim);
@@ -222,7 +245,15 @@
 </head>
 <body>
 
+<div class="loading-screen" id="loading-screen">
+  <div class="loading-box">
+    <div class="spinner"></div>
+    <p id="loading-text">Connexion à MyLife…</p>
+  </div>
+</div>
+
 <div class="topbar">
+  <a href="index.html" class="btn" id="btn-mylife" title="Retour à MyLife">🏠</a>
   <h1>📋 Mon Planning<span>Collège &amp; sommeil — édition perso</span></h1>
   <div class="tabs">
     <button class="tab active" data-view="week">Semaine</button>
@@ -231,6 +262,7 @@
   </div>
   <div class="topbar-date" id="topbar-date"></div>
   <div class="top-actions">
+    <span class="sync-status" id="sync-status" title="État de la synchronisation">☁️</span>
     <button class="btn" id="btn-today" title="Revenir à aujourd'hui">Aujourd'hui</button>
     <div class="segmented" id="week-nav">
       <button id="week-prev" title="Semaine précédente">◀</button>
@@ -502,6 +534,12 @@
   </div>
 </div>
 
+<!-- Firebase -->
+<script src="firebase-config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
 <script>
 /* ====================================================================
    DONNÉES
@@ -603,31 +641,14 @@ const FERIES = [
 const RENTREE = '2025-09-01';
 
 /* ====================================================================
-   STOCKAGE
+   STOCKAGE (Firestore + cache locale)
 ==================================================================== */
 const STORAGE_KEY = 'planning-perso-v1';
-let state = loadState();
+let state = null;
+let currentUser = null;
+let planningDocRef = null;
 
-function loadState(){
-  try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(raw){
-      const parsed = JSON.parse(raw);
-      if(parsed && Array.isArray(parsed.events) && parsed.sleep){
-        if(typeof parsed.gridStartHour!=='number') parsed.gridStartHour = DEFAULT_GRID_START_HOUR;
-        if(!parsed.theme) parsed.theme = Object.assign({}, DEFAULT_THEME);
-        else parsed.theme = Object.assign({}, DEFAULT_THEME, parsed.theme);
-        if(typeof parsed.weekNavOffset!=='number') parsed.weekNavOffset = 0;
-        if(!Array.isArray(parsed.exceptions)) parsed.exceptions = [];
-        const firstRun = !parsed.weekAnchor;
-        if(!parsed.weekAnchor) parsed.weekAnchor = {monday: dateKey(mondayOf(new Date())), letter:'A'};
-        if(firstRun || !parsed.weekFilter || parsed.weekFilter==='all'){
-          parsed.weekFilter = null; // calculé après init via letterForOffset
-        }
-        return parsed;
-      }
-    }
-  }catch(e){ console.warn('Lecture localStorage impossible', e); }
+function defaultState(){
   return {
     events: defaultEvents(), sleep: defaultSleep(),
     weekFilter: null, gridStartHour: DEFAULT_GRID_START_HOUR,
@@ -637,9 +658,66 @@ function loadState(){
     exceptions: []
   };
 }
-function saveState(){
+// Complète/corrige un objet état (qu'il vienne de Firestore ou de localStorage)
+function normalizeState(parsed){
+  if(!parsed || !Array.isArray(parsed.events) || !parsed.sleep) return defaultState();
+  if(typeof parsed.gridStartHour!=='number') parsed.gridStartHour = DEFAULT_GRID_START_HOUR;
+  if(!parsed.theme) parsed.theme = Object.assign({}, DEFAULT_THEME);
+  else parsed.theme = Object.assign({}, DEFAULT_THEME, parsed.theme);
+  if(typeof parsed.weekNavOffset!=='number') parsed.weekNavOffset = 0;
+  if(!Array.isArray(parsed.exceptions)) parsed.exceptions = [];
+  const firstRun = !parsed.weekAnchor;
+  if(!parsed.weekAnchor) parsed.weekAnchor = {monday: dateKey(mondayOf(new Date())), letter:'A'};
+  if(firstRun || !parsed.weekFilter || parsed.weekFilter==='all'){
+    parsed.weekFilter = null; // calculé après init via letterForOffset
+  }
+  return parsed;
+}
+function readLocalCache(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){ console.warn('Lecture cache locale impossible', e); }
+  return null;
+}
+function writeLocalCache(){
   try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-  catch(e){ console.warn('Sauvegarde impossible', e); }
+  catch(e){ console.warn('Écriture cache locale impossible', e); }
+}
+
+// Récupère l'état depuis Firestore. Si aucun document n'existe encore,
+// reprend les données locales existantes (migration) ou les valeurs par défaut,
+// puis crée le document.
+async function loadStateFromFirestore(){
+  const snap = await planningDocRef.get();
+  if(snap.exists){
+    return normalizeState(snap.data());
+  }
+  const local = readLocalCache();
+  const initial = local ? normalizeState(local) : defaultState();
+  await planningDocRef.set(initial);
+  return initial;
+}
+
+let saveTimer = null;
+function setSyncStatus(s){
+  const el = document.getElementById('sync-status');
+  if(!el) return;
+  el.classList.remove('saving','error');
+  if(s==='saving'){ el.classList.add('saving'); el.textContent='☁️'; el.title='Enregistrement…'; }
+  else if(s==='error'){ el.classList.add('error'); el.textContent='⚠️'; el.title='Erreur de synchronisation (sauvegardé localement)'; }
+  else { el.textContent='☁️'; el.title='Synchronisé'; }
+}
+function saveState(){
+  writeLocalCache();
+  if(!planningDocRef) return;
+  setSyncStatus('saving');
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(()=>{
+    planningDocRef.set(state)
+      .then(()=>setSyncStatus('ok'))
+      .catch(e=>{ console.warn('Sync Firestore impossible', e); setSyncStatus('error'); });
+  }, 800);
 }
 
 /* ====================================================================
@@ -789,7 +867,6 @@ function renderEventsInColumn(col, events, opts){
 
     div.innerHTML =
       '<span class="ev-title">'+escapeHtml(ev.title)+'</span>'+
-      (ev.room?('<span class="ev-sub">📍 '+escapeHtml(ev.room)+' · '+ev.start+'–'+ev.end+'</span>'):('<span class="ev-sub">'+ev.start+'–'+ev.end+'</span>'))+
       (ev.week?('<span class="ev-meta">'+ev.week+'</span>'):'');
     col.appendChild(div);
     attachDrag(div, ev, opts);
@@ -1315,12 +1392,7 @@ document.getElementById('btn-add').addEventListener('click', ()=>openEventModal(
 
 document.getElementById('btn-reset').addEventListener('click', ()=>{
   showConfirm('Revenir au planning par défaut ? Tes modifications seront perdues.', ()=>{
-    state = {
-      events: defaultEvents(), sleep: defaultSleep(), weekFilter:null,
-      gridStartHour: DEFAULT_GRID_START_HOUR, theme: Object.assign({}, DEFAULT_THEME),
-      weekAnchor: {monday: dateKey(mondayOf(new Date())), letter:'A'}, weekNavOffset: 0,
-      exceptions: []
-    };
+    state = defaultState();
     state.weekFilter = letterForOffset(0);
     saveState();
     applyTheme(state.theme);
@@ -1345,7 +1417,7 @@ function renderAll(){
   setupColumnClicks();
 }
 
-(function init(){
+function startApp(){
   applyTheme(state.theme);
   if(state.weekFilter===null || state.weekFilter===undefined){
     state.weekFilter = letterForOffset(state.weekNavOffset);
@@ -1356,7 +1428,39 @@ function renderAll(){
   updateTopbarDate();
   updateWeekNav();
   updateTodayButton();
-})();
+  document.getElementById('loading-screen').classList.add('hidden');
+}
+
+/* ====================================================================
+   FIREBASE — AUTHENTIFICATION + SYNCHRONISATION
+==================================================================== */
+firebase.initializeApp(window.FIREBASE_CONFIG);
+const auth = firebase.auth();
+const db = firebase.firestore();
+try{
+  db.enablePersistence({synchronizeTabs:true}).catch(e=>{
+    console.warn('Persistance hors-ligne non disponible', e);
+  });
+}catch(e){ /* persistance non disponible */ }
+
+auth.onAuthStateChanged(async user=>{
+  if(!user){
+    window.location.href = 'index.html';
+    return;
+  }
+  currentUser = user;
+  planningDocRef = db.collection('users').doc(user.uid).collection('modules').doc('planning');
+  document.getElementById('loading-text').textContent = 'Chargement de ton planning…';
+  try{
+    state = await loadStateFromFirestore();
+  }catch(e){
+    console.warn('Firestore indisponible, utilisation de la copie locale', e);
+    state = normalizeState(readLocalCache());
+    setSyncStatus('error');
+  }
+  startApp();
+});
+
 </script>
 </body>
 </html>
