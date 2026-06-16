@@ -5,42 +5,45 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MyLife</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@700&family=Scheherazade+New:wght@400;700&family=Work+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#16261e;--bg2:#1f3a2c;--bg3:#274a37;
   --line:rgba(238,241,234,.09);--line-strong:rgba(238,241,234,.18);
   --chalk:#f1efe4;--chalk-dim:#aebcb1;--accent:#f2c14e;
+  --green:#4ade80;--green-l:rgba(74,222,128,.13);
+  --red:#f87171;--red-l:rgba(248,113,113,.13);
+  --teal:#2dd4bf;--teal-l:rgba(45,212,191,.12);
   --radius:12px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Work Sans',system-ui,sans-serif;background:var(--bg);color:var(--chalk);min-height:100vh;
   background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.04),transparent 60%),
-    radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.03),transparent 60%);}
+  radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.03),transparent 60%);}
+h1,h2,h3{font-family:'Kalam',cursive;}
 
 /* TOPBAR */
-.topbar{
-  position:sticky;top:0;z-index:50;
+.topbar{position:sticky;top:0;z-index:50;
   background:linear-gradient(180deg,var(--bg2),rgba(31,58,44,.92));
   border-bottom:2px solid var(--line-strong);
   padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
-  backdrop-filter:blur(4px);
-}
-.topbar h1{font-family:'Kalam',cursive;font-size:1.5rem;color:var(--accent);margin:0;}
+  backdrop-filter:blur(4px);}
+.topbar h1{font-size:1.4rem;color:var(--accent);}
 .topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
 .user-email{font-size:.8rem;color:var(--chalk-dim);}
 
-.btn{background:var(--bg3);border:1px solid var(--line);color:var(--chalk);padding:8px 14px;border-radius:8px;font-size:.88rem;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s;display:inline-flex;align-items:center;gap:6px;}
+.btn{background:var(--bg3);border:1px solid var(--line);color:var(--chalk);padding:8px 14px;border-radius:8px;font-size:.88rem;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s;display:inline-flex;align-items:center;gap:6px;text-decoration:none;}
 .btn:hover{border-color:var(--accent);}
 .btn.primary{background:var(--accent);color:#21321f;border-color:var(--accent);}
 .btn.active{background:var(--accent);color:#21321f;border-color:var(--accent);}
 .btn.danger{background:#5a2b2b;border-color:#7a3a3a;}
+.btn.full{width:100%;justify-content:center;}
 
 /* AUTH */
 .auth-wrap{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 60px);padding:20px;}
 .auth-card{background:var(--bg2);border:1px solid var(--line-strong);border-radius:var(--radius);padding:28px;width:100%;max-width:380px;}
-.auth-card h2{font-family:'Kalam',cursive;color:var(--accent);margin-bottom:6px;}
-.auth-card .sub{color:var(--chalk-dim);font-size:.85rem;margin-bottom:18px;}
+.auth-card h2{color:var(--accent);margin-bottom:6px;}
+.auth-sub{color:var(--chalk-dim);font-size:.85rem;margin-bottom:18px;}
 .google-btn{justify-content:center;gap:10px;background:#fff;color:#3c4043;border-color:#dadce0;padding:12px 16px;font-size:.95rem;width:100%;margin-bottom:14px;}
 .google-btn:hover{box-shadow:0 1px 4px rgba(0,0,0,.25);border-color:#dadce0;}
 .auth-divider{display:flex;align-items:center;gap:10px;color:var(--chalk-dim);font-size:.8rem;margin-bottom:14px;}
@@ -48,75 +51,147 @@ body{font-family:'Work Sans',system-ui,sans-serif;background:var(--bg);color:var
 .field{margin-bottom:10px;display:flex;flex-direction:column;gap:4px;}
 .field label{font-size:.78rem;color:var(--chalk-dim);font-weight:600;}
 .field input{background:var(--bg);border:1px solid var(--line);color:var(--chalk);border-radius:6px;padding:9px 12px;font-size:.9rem;font-family:inherit;}
-.auth-error{color:#ffb3b3;background:rgba(255,80,80,.1);border:1px solid rgba(255,80,80,.3);border-radius:6px;padding:8px 10px;font-size:.82rem;margin-bottom:10px;display:none;}
+.auth-error{color:#ffb3b3;background:rgba(255,80,80,.1);border:1px solid rgba(255,80,80,.3);border-radius:6px;padding:8px;font-size:.82rem;margin-bottom:10px;display:none;}
 .auth-switch{margin-top:12px;text-align:center;font-size:.85rem;color:var(--chalk-dim);}
-.auth-switch a{color:var(--accent);text-decoration:none;cursor:pointer;font-weight:600;}
+.auth-switch a{color:var(--accent);cursor:pointer;font-weight:600;}
 
-/* HUB FREEFORM */
-main{padding:16px;min-height:calc(100vh - 60px);}
-.hub-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
-.hub-toolbar h2{font-family:'Kalam',cursive;font-size:1.2rem;flex:1;}
+/* LAYOUT */
+.layout{display:flex;gap:16px;padding:16px;align-items:flex-start;min-height:calc(100vh - 62px);}
 
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
-  gap:14px;
-}
+/* LEFT COLUMN — modules */
+.col-left{width:220px;flex-shrink:0;display:flex;flex-direction:column;gap:10px;}
+.col-left-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;}
+.col-left-header h2{font-size:1rem;}
 
-/* TILE */
-.tile{
+/* MODULE TILES */
+.module-tile{
   background:var(--bg2);border:1px solid var(--line-strong);border-radius:var(--radius);
-  padding:20px;text-decoration:none;color:var(--chalk);
-  display:flex;flex-direction:column;gap:8px;min-height:120px;
+  padding:14px;text-decoration:none;color:var(--chalk);
+  display:flex;align-items:center;gap:12px;
   position:relative;transition:.15s;cursor:pointer;
 }
-.tile:hover{border-color:var(--accent);transform:translateY(-2px);}
-.tile .icon{font-size:2rem;line-height:1;}
-.tile h3{font-family:'Kalam',cursive;font-size:1.1rem;margin:0;}
-.tile p{font-size:.8rem;color:var(--chalk-dim);margin:0;}
-.tile .badge{position:absolute;top:8px;right:8px;font-size:.65rem;background:var(--bg3);border:1px solid var(--line);border-radius:4px;padding:2px 6px;color:var(--chalk-dim);}
-.tile.disabled{opacity:.4;pointer-events:none;}
-
-/* EDIT MODE */
-.tile .tile-del{
-  position:absolute;top:-8px;right:-8px;width:22px;height:22px;border-radius:50%;
+.module-tile:hover{border-color:var(--accent);}
+.module-tile .micon{font-size:1.5rem;line-height:1;flex-shrink:0;}
+.module-tile .minfo h3{font-family:'Kalam',cursive;font-size:.95rem;}
+.module-tile .minfo p{font-size:.72rem;color:var(--chalk-dim);}
+.module-tile .tile-del{
+  position:absolute;top:-8px;right:-8px;width:20px;height:20px;border-radius:50%;
   background:#c0392b;color:#fff;border:2px solid var(--bg);
-  font-size:12px;display:none;align-items:center;justify-content:center;
-  cursor:pointer;z-index:5;line-height:1;
-}
-body.edit-mode .tile .tile-del{display:flex;}
-body.edit-mode .tile{cursor:grab;}
-body.edit-mode .tile:hover{border-color:var(--accent);}
-.tile.drag-over{border-color:var(--accent);background:rgba(242,193,78,.08);}
-.tile.dragging{opacity:.5;}
-
-/* ADD TILE */
-.tile-add{
+  font-size:11px;display:none;align-items:center;justify-content:center;
+  cursor:pointer;z-index:5;}
+body.edit-mode .module-tile .tile-del{display:flex;}
+body.edit-mode .module-tile{cursor:grab;}
+.module-tile.drag-over{border-color:var(--accent);background:rgba(242,193,78,.08);}
+.module-tile.dragging{opacity:.4;}
+.module-tile.disabled{opacity:.45;}
+.add-module{
   background:transparent;border:2px dashed var(--line);border-radius:var(--radius);
-  padding:20px;min-height:120px;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:8px;cursor:pointer;
-  color:var(--chalk-dim);font-size:.9rem;font-weight:600;transition:.15s;
+  padding:12px;display:flex;align-items:center;justify-content:center;gap:8px;
+  cursor:pointer;color:var(--chalk-dim);font-size:.85rem;font-weight:600;
+  transition:.15s;width:100%;font-family:inherit;
 }
-.tile-add:hover{border-color:var(--accent);color:var(--accent);}
+.add-module:hover{border-color:var(--accent);color:var(--accent);}
+
+/* RIGHT AREA */
+.col-right{flex:1;display:flex;flex-direction:column;gap:14px;min-width:0;}
+
+/* QCM WIDGET */
+.qcm-widget{background:var(--bg2);border:1px solid var(--line-strong);border-radius:var(--radius);overflow:hidden;}
+.qcm-header{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;}
+.qcm-header h2{font-size:1.05rem;flex:1;}
+.qcm-body{padding:16px;}
+
+/* GAUGE */
+.gauge-section{margin-bottom:14px;}
+.gauge-labels{display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:4px;}
+.gauge-labels .g{color:var(--green);}
+.gauge-labels .r{color:var(--red);}
+.gauge-bar{height:10px;border-radius:5px;overflow:hidden;background:var(--line);display:flex;}
+.gauge-green{background:var(--green);transition:width .5s;}
+.gauge-red{background:var(--red);transition:width .5s;}
+
+/* QCM HOME */
+.qcm-config{display:flex;flex-direction:column;gap:12px;}
+.cfg-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.cfg-label{font-size:.78rem;color:var(--chalk-dim);font-weight:600;width:100%;}
+.cfg-btn{background:var(--bg3);border:1px solid var(--line);color:var(--chalk-dim);border-radius:7px;padding:6px 14px;font-size:.82rem;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s;}
+.cfg-btn.active{background:var(--accent);color:#21321f;border-color:var(--accent);}
+.cfg-btn:hover:not(.active){border-color:var(--accent);color:var(--chalk);}
+.dir-select{display:flex;gap:6px;flex-wrap:wrap;}
+.dir-btn{flex:1;min-width:90px;background:var(--bg3);border:1px solid var(--line);color:var(--chalk-dim);border-radius:7px;padding:6px 10px;font-size:.78rem;font-weight:600;cursor:pointer;font-family:inherit;text-align:center;transition:.15s;}
+.dir-btn.active{background:var(--accent);color:#21321f;border-color:var(--accent);}
+.dir-btn:hover:not(.active){border-color:var(--accent);color:var(--chalk);}
+.mode-pills{display:flex;gap:6px;flex-wrap:wrap;}
+.mode-pill{flex:1;min-width:80px;background:var(--bg3);border:1px solid var(--line);color:var(--chalk-dim);border-radius:7px;padding:6px 10px;font-size:.78rem;font-weight:600;cursor:pointer;font-family:inherit;text-align:center;transition:.15s;}
+.mode-pill.active{border-color:var(--teal);color:var(--teal);background:var(--teal-l);}
+
+/* QCM QUIZ */
+.q-progress-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.q-pbar-wrap{flex:1;height:6px;background:var(--line);border-radius:3px;overflow:hidden;}
+.q-pbar{height:100%;background:linear-gradient(90deg,var(--teal),#0ea5e9);border-radius:3px;transition:width .3s;}
+.q-counter{font-size:.78rem;color:var(--chalk-dim);white-space:nowrap;}
+.q-streak{font-size:.82rem;font-weight:700;color:var(--accent);}
+
+.q-card{background:var(--bg3);border:1px solid var(--line);border-radius:var(--radius);padding:16px;text-align:center;margin-bottom:12px;}
+.q-label{font-size:.7rem;color:var(--chalk-dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;}
+.q-main{font-family:'Scheherazade New',serif;font-size:2rem;direction:rtl;color:var(--teal);line-height:2;}
+.q-main.fr{font-family:'Work Sans',sans-serif;font-size:1.3rem;direction:ltr;color:var(--chalk);}
+.q-lesson{font-size:.7rem;color:var(--chalk-dim);margin-top:4px;}
+
+.q-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.q-opt{background:var(--bg3);border:2px solid var(--line);border-radius:9px;padding:10px 8px;text-align:center;cursor:pointer;transition:.15s;font-family:'Scheherazade New',serif;font-size:1.2rem;direction:rtl;line-height:1.8;position:relative;}
+.q-opt.fr-opt{font-family:'Work Sans',sans-serif;font-size:.85rem;direction:ltr;line-height:1.4;}
+.q-opt:hover:not(.locked){border-color:var(--teal);background:var(--teal-l);}
+.q-opt.correct{border-color:var(--green);background:var(--green-l);}
+.q-opt.wrong{border-color:var(--red);background:var(--red-l);}
+.q-opt.locked{cursor:default;}
+
+.q-feedback{border-radius:8px;padding:10px 12px;font-size:.82rem;line-height:1.5;margin-bottom:10px;display:none;}
+.q-feedback.ok{background:var(--green-l);border:1px solid var(--green);color:var(--green);}
+.q-feedback.ko{background:var(--red-l);border:1px solid var(--red);color:var(--red);}
+.q-next{width:100%;}
+
+/* QCM RESULTS */
+.res-card{background:var(--bg3);border:1px solid var(--line);border-radius:var(--radius);padding:16px;text-align:center;margin-bottom:12px;}
+.res-emoji{font-size:2.5rem;display:block;margin-bottom:6px;}
+.res-score{font-size:1.6rem;font-weight:700;font-family:'Kalam',cursive;}
+.res-pct{font-size:.85rem;color:var(--chalk-dim);margin-top:2px;}
+.res-row{display:flex;gap:10px;justify-content:center;margin-top:12px;flex-wrap:wrap;}
+.res-item strong{display:block;font-size:1.1rem;font-weight:700;}
+.res-item{font-size:.78rem;color:var(--chalk-dim);text-align:center;}
+.res-item strong.g{color:var(--green);}
+.res-item strong.r{color:var(--red);}
+.res-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.missed-list{background:var(--bg3);border:1px solid var(--line);border-radius:9px;overflow:hidden;max-height:200px;overflow-y:auto;}
+.missed-list h4{padding:8px 12px;font-size:.82rem;border-bottom:1px solid var(--line);font-family:'Kalam',cursive;color:var(--red);}
+.missed-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--line);font-size:.82rem;}
+.missed-item:last-child{border-bottom:none;}
+.missed-ar{font-family:'Scheherazade New',serif;font-size:1.1rem;direction:rtl;color:var(--teal);min-width:60px;text-align:right;}
+.missed-fr{color:var(--chalk-dim);}
 
 /* MODAL */
 .overlay{position:fixed;inset:0;background:rgba(10,16,12,.7);display:none;align-items:center;justify-content:center;z-index:100;padding:16px;}
 .overlay.open{display:flex;}
-.modal{background:var(--bg2);border:1px solid var(--line-strong);border-radius:var(--radius);padding:20px;width:100%;max-width:400px;max-height:90vh;overflow:auto;}
-.modal h3{font-family:'Kalam',cursive;color:var(--accent);margin-bottom:12px;}
-.emoji-grid{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px;}
-.emoji-opt{background:var(--bg3);border:1px solid var(--line);border-radius:6px;padding:4px 6px;font-size:1.3rem;cursor:pointer;}
+.modal{background:var(--bg2);border:1px solid var(--line-strong);border-radius:var(--radius);padding:20px;width:100%;max-width:380px;max-height:90vh;overflow:auto;}
+.modal h3{color:var(--accent);margin-bottom:12px;}
+.emoji-grid{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px;}
+.emoji-opt{background:var(--bg3);border:1px solid var(--line);border-radius:6px;padding:3px 6px;font-size:1.2rem;cursor:pointer;}
 .emoji-opt:hover{border-color:var(--accent);}
 .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;}
 
-.hidden{display:none;}
+.hidden{display:none !important;}
 .loading-screen{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;align-items:center;justify-content:center;}
 .loading-screen.hidden{display:none;}
 .loading-box{text-align:center;color:var(--chalk-dim);}
-.loading-box p{margin-top:14px;font-size:.9rem;}
-.spinner{width:34px;height:34px;border-radius:50%;border:3px solid var(--line-strong);border-top-color:var(--accent);margin:0 auto;animation:spin .8s linear infinite;}
+.loading-box p{margin-top:12px;font-size:.9rem;}
+.spinner{width:32px;height:32px;border-radius:50%;border:3px solid var(--line-strong);border-top-color:var(--accent);margin:0 auto;animation:spin .8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
-footer{text-align:center;color:var(--chalk-dim);font-size:.75rem;padding:16px;}
+
+@media(max-width:640px){
+  .layout{flex-direction:column;}
+  .col-left{width:100%;}
+  .q-options{grid-template-columns:1fr;}
+}
 </style>
 </head>
 <body>
@@ -129,6 +204,7 @@ footer{text-align:center;color:var(--chalk-dim);font-size:.75rem;padding:16px;}
   <h1>🏠 MyLife</h1>
   <div class="topbar-right hidden" id="topbar-right">
     <span class="user-email" id="user-email"></span>
+    <button class="btn active" id="btn-edit" style="display:none">✏️ Modifier</button>
     <button class="btn" id="btn-logout">Déconnexion</button>
   </div>
 </div>
@@ -137,7 +213,7 @@ footer{text-align:center;color:var(--chalk-dim);font-size:.75rem;padding:16px;}
 <div class="auth-wrap hidden" id="auth-wrap">
   <div class="auth-card">
     <h2>MyLife</h2>
-    <p class="sub">Connecte-toi pour accéder à tes modules.</p>
+    <p class="auth-sub">Connecte-toi pour accéder à tes modules.</p>
     <div class="auth-error" id="auth-error"></div>
     <button class="btn google-btn" id="auth-google">
       <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20.4H24v7.2h11.3C33.7 32 29.3 35 24 35c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l5.1-5.1C33.6 5.3 29.1 3.5 24 3.5 12.7 3.5 3.5 12.7 3.5 24S12.7 44.5 24 44.5 44.5 35.3 44.5 24c0-1.2-.1-2.4-.3-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l5.9 4.3C13.7 15.6 18.5 12.5 24 12.5c3.1 0 5.8 1.1 8 3l5.1-5.1C33.6 7.3 29.1 5.5 24 5.5 16.2 5.5 9.5 9.9 6.3 14.7z"/><path fill="#4CAF50" d="M24 44.5c5.1 0 9.6-1.7 12.8-4.7l-5.9-5c-1.6 1.2-3.7 1.9-6.9 1.9-5.3 0-9.7-3-11.4-7.2l-5.9 4.6C9.4 39.9 16.2 44.5 24 44.5z"/><path fill="#1976D2" d="M43.6 20.5H42V20.4H24v7.2h11.3c-.8 2.3-2.3 4.2-4.3 5.6l5.9 5C40.9 35 44.5 30.1 44.5 24c0-1.2-.1-2.4-.3-3.5z"/></svg>
@@ -146,58 +222,164 @@ footer{text-align:center;color:var(--chalk-dim);font-size:.75rem;padding:16px;}
     <div class="auth-divider"><span>ou</span></div>
     <div class="field"><label>Email</label><input type="email" id="auth-email" autocomplete="email"></div>
     <div class="field"><label>Mot de passe</label><input type="password" id="auth-password" autocomplete="current-password"></div>
-    <button class="btn primary" style="width:100%;justify-content:center;" id="auth-submit">Se connecter</button>
+    <button class="btn primary full" id="auth-submit">Se connecter</button>
     <div class="auth-switch"><span id="auth-sw-txt">Pas encore de compte ?</span> <a id="auth-sw-link">Créer un compte</a></div>
   </div>
 </div>
 
-<!-- HUB -->
-<main class="hidden" id="hub">
-  <div class="hub-toolbar">
-    <h2>Mes modules</h2>
-    <button class="btn" id="btn-edit">✏️ Modifier</button>
-  </div>
-  <div class="grid" id="grid"></div>
-</main>
+<!-- MAIN LAYOUT -->
+<div class="layout hidden" id="layout">
 
-<!-- MODAL: ajouter/modifier une tuile -->
-<div class="overlay" id="tile-overlay">
+  <!-- COL GAUCHE : modules -->
+  <div class="col-left" id="col-left">
+    <div class="col-left-header">
+      <h2>Modules</h2>
+      <button class="btn" id="btn-edit" style="font-size:.75rem;padding:5px 10px;">✏️ Modifier</button>
+    </div>
+    <div id="modules-list"></div>
+    <button class="add-module" id="btn-add-module">＋ Ajouter</button>
+  </div>
+
+  <!-- COL DROITE : QCM + autres widgets futurs -->
+  <div class="col-right">
+
+    <!-- QCM ARABE WIDGET -->
+    <div class="qcm-widget">
+      <div class="qcm-header">
+        <span style="font-size:1.4rem;">🧠</span>
+        <h2>QCM Arabe — Médine</h2>
+        <span id="qcm-sync" style="font-size:.9rem;opacity:.5;margin-left:auto;">☁️</span>
+      </div>
+      <div class="qcm-body">
+
+        <!-- ACCUEIL QCM -->
+        <div id="qcm-home">
+          <div class="gauge-section">
+            <div class="gauge-labels">
+              <span class="g" id="g-stat-green">0 maîtrisés ✅</span>
+              <span style="color:var(--chalk-dim);font-size:.72rem;" id="g-stat-total">463 mots</span>
+              <span class="r" id="g-stat-red">0 à revoir ❌</span>
+            </div>
+            <div class="gauge-bar">
+              <div class="gauge-green" id="g-gauge-green" style="width:0%"></div>
+              <div class="gauge-red" id="g-gauge-red" style="width:0%"></div>
+            </div>
+          </div>
+
+          <div class="qcm-config">
+            <div>
+              <div class="cfg-label">Nombre de questions</div>
+              <div class="cfg-row">
+                <button class="cfg-btn" onclick="selCount(10)">10</button>
+                <button class="cfg-btn active" onclick="selCount(15)">15</button>
+                <button class="cfg-btn" onclick="selCount(20)">20</button>
+                <button class="cfg-btn" onclick="selCount(30)">30</button>
+              </div>
+            </div>
+            <div>
+              <div class="cfg-label">Mode</div>
+              <div class="mode-pills">
+                <button class="mode-pill active" onclick="selMode('all')">🎲 Tout</button>
+                <button class="mode-pill" onclick="selMode('errors')">❌ Erreurs</button>
+                <button class="mode-pill" onclick="selMode('srs')">🧠 Intelligent</button>
+              </div>
+            </div>
+            <div>
+              <div class="cfg-label">Sens</div>
+              <div class="dir-select">
+                <button class="dir-btn active" onclick="selDir('ar2fr')">🇸🇦→🇫🇷</button>
+                <button class="dir-btn" onclick="selDir('fr2ar')">🇫🇷→🇸🇦</button>
+                <button class="dir-btn" onclick="selDir('mix')">🔀 Mix</button>
+              </div>
+            </div>
+            <div id="qcm-start-info" style="font-size:.75rem;color:var(--chalk-dim);"></div>
+            <button class="btn primary full" onclick="startQcm()">▶ Lancer le QCM</button>
+            <button class="btn full" style="margin-top:4px;" onclick="showQcmMissed()">Voir mes erreurs (<span id="g-err-count">0</span>)</button>
+          </div>
+        </div>
+
+        <!-- QUIZ QCM -->
+        <div id="qcm-quiz" class="hidden">
+          <div class="q-progress-row">
+            <div class="q-pbar-wrap"><div class="q-pbar" id="g-pbar" style="width:0%"></div></div>
+            <div class="q-counter" id="g-counter">1/15</div>
+            <div class="q-streak" id="g-streak"></div>
+          </div>
+          <div class="q-card">
+            <div class="q-label" id="g-qlabel">Que signifie ce mot ?</div>
+            <div class="q-main" id="g-qmain"></div>
+            <div class="q-lesson" id="g-qlesson"></div>
+          </div>
+          <div class="q-options" id="g-opts"></div>
+          <div class="q-feedback" id="g-fb"></div>
+          <button class="btn primary full hidden" id="g-next" onclick="nextQ()">Suivant →</button>
+          <button class="btn full" style="margin-top:8px;" onclick="showQcmHome()">✕ Arrêter</button>
+        </div>
+
+        <!-- RÉSULTATS QCM -->
+        <div id="qcm-results" class="hidden">
+          <div class="res-card">
+            <span class="res-emoji" id="g-remoji">🌟</span>
+            <div class="res-score" id="g-rscore">12 / 15</div>
+            <div class="res-pct" id="g-rpct">80%</div>
+            <div class="res-row">
+              <div class="res-item"><strong class="g" id="g-rgood">12</strong>Bon</div>
+              <div class="res-item"><strong class="r" id="g-rbad">3</strong>Erreur</div>
+              <div class="res-item"><strong id="g-rstreak">0</strong>Série</div>
+            </div>
+          </div>
+          <div class="res-actions">
+            <button class="btn primary" onclick="startQcm()">🔁 Rejouer</button>
+            <button class="btn" onclick="selMode('errors');startQcm()">❌ Réviser erreurs</button>
+            <button class="btn" onclick="showQcmHome()">🏠 Accueil</button>
+          </div>
+          <div class="missed-list hidden" id="g-missed-wrap">
+            <h4>Mots manqués cette session</h4>
+            <div id="g-missed-list"></div>
+          </div>
+        </div>
+
+        <!-- LISTE ERREURS -->
+        <div id="qcm-missed" class="hidden">
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;">
+            <button class="btn" onclick="showQcmHome()">← Retour</button>
+            <span style="font-size:.9rem;font-weight:600;">Mes erreurs</span>
+          </div>
+          <div class="missed-list" id="g-all-missed-list"></div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL module -->
+<div class="overlay" id="mod-overlay">
   <div class="modal">
-    <h3 id="tile-modal-title">Ajouter un module</h3>
+    <h3 id="mod-title">Ajouter un module</h3>
     <div class="field"><label>Emoji</label>
       <div class="emoji-grid">
-        <button type="button" class="emoji-opt" onclick="setTileEmoji('📋')">📋</button>
-        <button type="button" class="emoji-opt" onclick="setTileEmoji('📖')">📖</button>
-        <button type="button" class="emoji-opt" onclick="setTileEmoji('✈️')">✈️</button>
-        <button type="button" class="emoji-opt" onclick="setTileEmoji('🏋️')">🏋️</button>
-        <button type="button" class="emoji-opt" onclick="setTileEmoji('🎵')">🎵</button>
-        <button type="button" class="emoji-opt" onclick="setTileEmoji('🏥')">🏥</button>
-        <button type="button" class="emoji-opt" onclick="setTileEmoji('💊')">💊</button>
-        <button type="button" class="emoji-opt" onclick="setTileEmoji('🎮')">🎮</button>
-        <button type="button" class="emoji-opt" onclick="setTileEmoji('📷')">📷</button>
-        <button type="button" class="emoji-opt" onclick="setTileEmoji('🌍')">🌍</button>
-        <button type="button" class="emoji-opt" onclick="setTileEmoji('🧠')">🧠</button>
-        <button type="button" class="emoji-opt" onclick="setTileEmoji('⭐')">⭐</button>
+        <button type="button" class="emoji-opt" onclick="setME('📋')">📋</button>
+        <button type="button" class="emoji-opt" onclick="setME('📖')">📖</button>
+        <button type="button" class="emoji-opt" onclick="setME('✈️')">✈️</button>
+        <button type="button" class="emoji-opt" onclick="setME('🏋️')">🏋️</button>
+        <button type="button" class="emoji-opt" onclick="setME('🎵')">🎵</button>
+        <button type="button" class="emoji-opt" onclick="setME('🏥')">🏥</button>
+        <button type="button" class="emoji-opt" onclick="setME('🎮')">🎮</button>
+        <button type="button" class="emoji-opt" onclick="setME('📷')">📷</button>
+        <button type="button" class="emoji-opt" onclick="setME('🌍')">🌍</button>
+        <button type="button" class="emoji-opt" onclick="setME('⭐')">⭐</button>
       </div>
-      <input type="text" id="tile-emoji" maxlength="4" style="width:60px;font-size:1.3rem;text-align:center;margin-top:6px;">
+      <input type="text" id="mod-emoji" maxlength="4" style="width:50px;font-size:1.2rem;text-align:center;margin-top:6px;">
     </div>
-    <div class="field"><label>Nom</label><input type="text" id="tile-name" maxlength="30" placeholder="Mon module"></div>
-    <div class="field"><label>Description (optionnel)</label><input type="text" id="tile-desc" maxlength="60" placeholder="Courte description…"></div>
-    <div class="field"><label>Lien (fichier .html ou URL)</label><input type="text" id="tile-url" placeholder="planning.html ou https://…"></div>
-    <div class="field"><label>Couleur de fond</label>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button type="button" class="btn" style="background:#16261e;" onclick="setTileColor('#16261e')">Défaut</button>
-        <button type="button" class="btn" style="background:#1a2744;" onclick="setTileColor('#1a2744')">Bleu nuit</button>
-        <button type="button" class="btn" style="background:#2a1a44;" onclick="setTileColor('#2a1a44')">Violet</button>
-        <button type="button" class="btn" style="background:#442a1a;" onclick="setTileColor('#442a1a')">Brique</button>
-        <button type="button" class="btn" style="background:#1a3a2a;" onclick="setTileColor('#1a3a2a')">Forêt</button>
-        <input type="color" id="tile-color" style="width:36px;height:36px;border-radius:6px;border:1px solid var(--line);background:var(--bg);cursor:pointer;padding:2px;">
-      </div>
-    </div>
+    <div class="field"><label>Nom</label><input type="text" id="mod-name" maxlength="30"></div>
+    <div class="field"><label>Description</label><input type="text" id="mod-desc" maxlength="60"></div>
+    <div class="field"><label>Lien (fichier .html)</label><input type="text" id="mod-url" placeholder="planning.html"></div>
     <div class="modal-actions">
-      <button class="btn danger hidden" id="tile-delete">Supprimer</button>
-      <button class="btn" id="tile-cancel">Annuler</button>
-      <button class="btn primary" id="tile-save">Enregistrer</button>
+      <button class="btn danger hidden" id="mod-del">Supprimer</button>
+      <button class="btn" id="mod-cancel">Annuler</button>
+      <button class="btn primary" id="mod-save">Enregistrer</button>
     </div>
   </div>
 </div>
@@ -208,25 +390,29 @@ footer{text-align:center;color:var(--chalk-dim);font-size:.75rem;padding:16px;}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
-// ─── DEFAULT TILES ───
-const DEFAULT_TILES = [
-  {id:'t1', icon:'📋', name:'Mon Planning', desc:'Emploi du temps, semaine A/B, sommeil.', url:'planning.html', color:'#16261e'},
-  {id:'t2', icon:'📖', name:'Arabe — Médine', desc:'Leçons, vocabulaire, exercices et examens.', url:'arabe.html', color:'#16261e'},
-  {id:'t3', icon:'🧠', name:'QCM Arabe', desc:'463 mots — entraîne-toi au vocabulaire !', url:'qcm-arabe.html', color:'#16261e'},
-  {id:'t4', icon:'✈️', name:'PPL — Aviation', desc:'Bientôt disponible.', url:'', color:'#16261e', disabled:true},
+
+const VOCAB =
+[{"ar": "أَنَا", "fr": "Je / Moi", "type": "pronom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "أَنْتَ", "fr": "Tu (masc.)", "type": "pronom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "أَنْتِ", "fr": "Tu (fém.)", "type": "pronom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "هُوَ", "fr": "Il", "type": "pronom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "هِيَ", "fr": "Elle", "type": "pronom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "نَحْنُ", "fr": "Nous", "type": "pronom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "اسْمِي", "fr": "Mon nom est / Je m\\", "type": "mot", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "اَلسَّلَامُ عَلَيْكُمْ", "fr": "Paix sur vous (salutation)", "type": "formule", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "وَعَلَيْكُمُ السَّلَامُ", "fr": "Et sur vous la paix (réponse)", "type": "formule", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "كَيْفَ حَالُكَ؟", "fr": "Comment vas-tu ? (masc.)", "type": "question", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "بِخَيْرٍ", "fr": "Bien", "type": "réponse", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "طَالِبٌ", "fr": "Étudiant (masc.)", "type": "nom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "طَالِبَةٌ", "fr": "Étudiante (fém.)", "type": "nom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "مُعَلِّمٌ", "fr": "Enseignant (masc.)", "type": "nom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "مُعَلِّمَةٌ", "fr": "Enseignante (fém.)", "type": "nom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "طَبِيبٌ / طَبِيبَةٌ", "fr": "Médecin (masc./fém.)", "type": "métier", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "مُهَنْدِسٌ", "fr": "Ingénieur", "type": "métier", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "مُحَامٍ", "fr": "Avocat", "type": "métier", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "أُسْتَاذٌ / أُسْتَاذَةٌ", "fr": "Professeur (masc./fém.)", "type": "métier", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "هُمْ", "fr": "Ils", "type": "pronom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "أَنْتُمْ", "fr": "Vous", "type": "pronom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "تَعَارُفٌ", "fr": "Présentation / Connaissance mutuelle", "type": "nom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "اَلْكِتَابُ", "fr": "Le livre", "type": "nom masc.", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "اَلْبَيْتُ", "fr": "La maison", "type": "nom masc.", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "اَلْوَلَدُ", "fr": "Le garçon", "type": "nom masc.", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "اَلْبِنْتُ", "fr": "La fille", "type": "nom fém.", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "الشَّمْسُ", "fr": "Le soleil (lettre solaire)", "type": "nom fém.", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "الْقَمَرُ", "fr": "La lune (lettre lunaire)", "type": "nom masc.", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "الرَّجُلُ", "fr": "L\\", "type": "mot", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "الْمَرْأَةُ", "fr": "La femme", "type": "nom fém.", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "الْمَدْرَسَةُ", "fr": "L\\", "type": "mot", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "الْقَلَمُ", "fr": "Le stylo", "type": "nom masc.", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "الطَّاوِلَةُ", "fr": "La table (lettre solaire)", "type": "nom fém.", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "الْبَابُ", "fr": "La porte", "type": "nom masc.", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "تَعْرِيفٌ", "fr": "Définition / Article défini", "type": "grammaire", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "حَرْفٌ شَمْسِيٌّ", "fr": "Lettre solaire", "type": "grammaire", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "حَرْفٌ قَمَرِيٌّ", "fr": "Lettre lunaire", "type": "grammaire", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "تَنْوِينٌ", "fr": "Tanwin (nunation)", "type": "grammaire", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "الْعَلَمُ", "fr": "Le drapeau", "type": "nom", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "النَّجْمُ", "fr": "L\\", "type": "mot", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "السَّمَاءُ", "fr": "Le ciel", "type": "nom", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "النُّورُ", "fr": "La lumière", "type": "nom", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "الْغُرْفَةُ", "fr": "La chambre", "type": "nom", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "السَّرِيرُ", "fr": "Le lit", "type": "nom", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "الْمَكْتَبُ", "fr": "Le bureau", "type": "nom", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "الْكُرْسِيُّ", "fr": "La chaise", "type": "nom", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "النَّافِذَةُ", "fr": "La fenêtre", "type": "nom", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "الْحَقِيبَةُ", "fr": "Le sac", "type": "nom", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "فِي", "fr": "Dans / En", "type": "préposition", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "عَلَى", "fr": "Sur", "type": "préposition", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "تَحْتَ", "fr": "Sous", "type": "préposition", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "فَوْقَ", "fr": "Au-dessus de", "type": "préposition", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "أَمَامَ", "fr": "Devant", "type": "préposition", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "وَرَاءَ", "fr": "Derrière", "type": "préposition", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "الْمَطْبَخُ", "fr": "La cuisine", "type": "pièce", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "الْحَمَّامُ", "fr": "La salle de bain", "type": "pièce", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "الصَّالُونُ", "fr": "Le salon", "type": "pièce", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "الْفِنَاءُ", "fr": "La cour", "type": "pièce", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "الدَّرَجُ", "fr": "Les escaliers", "type": "nom", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "الْجَارُ", "fr": "Le voisin", "type": "nom", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "الشَّارِعُ", "fr": "La rue", "type": "nom", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "كَتَبَ", "fr": "Il écrivit / a écrit", "type": "verbe", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "قَرَأَ", "fr": "Il lut / a lu", "type": "verbe", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "ذَهَبَ", "fr": "Il alla / est allé", "type": "verbe", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "أَكَلَ", "fr": "Il mangea / a mangé", "type": "verbe", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "شَرِبَ", "fr": "Il but / a bu", "type": "verbe", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "دَرَسَ", "fr": "Il étudia / a étudié", "type": "verbe", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "جَلَسَ", "fr": "Il s\\", "type": "mot", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "خَرَجَ", "fr": "Il sortit", "type": "verbe", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "دَخَلَ", "fr": "Il entra", "type": "verbe", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "فَهِمَ", "fr": "Il comprit", "type": "verbe", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "سَمِعَ", "fr": "Il entendit", "type": "verbe", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "فَتَحَ", "fr": "Il ouvrit", "type": "verbe", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "أَغْلَقَ", "fr": "Il ferma", "type": "verbe passé", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "وَصَلَ", "fr": "Il arriva", "type": "verbe passé", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "رَجَعَ", "fr": "Il retourna", "type": "verbe passé", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "بَدَأَ", "fr": "Il commença", "type": "verbe passé", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "انْتَهَى", "fr": "Il finit / Il termina", "type": "verbe passé", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "جَاءَ", "fr": "Il vint", "type": "verbe passé", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "أَخَذَ", "fr": "Il prit", "type": "verbe passé", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "أَبٌ / أَبِي", "fr": "Père / Mon père", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "أُمٌّ / أُمِّي", "fr": "Mère / Ma mère", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "أَخٌ / أَخِي", "fr": "Frère / Mon frère", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "أُخْتٌ / أُخْتِي", "fr": "Sœur / Ma sœur", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "جَدٌّ / جَدِّي", "fr": "Grand-père / Mon grand-père", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "جَدَّةٌ / جَدَّتِي", "fr": "Grand-mère / Ma grand-mère", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "ابْنٌ / ابْنِي", "fr": "Fils / Mon fils", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "بِنْتٌ / بِنْتِي", "fr": "Fille / Ma fille", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "زَوْجٌ / زَوْجِي", "fr": "Mari / Mon mari", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "عَمٌّ / عَمِّي", "fr": "Oncle paternel / Mon oncle", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "خَالٌ / خَالِي", "fr": "Oncle maternel / Mon oncle", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "عَائِلَةٌ / عَائِلَتِي", "fr": "Famille / Ma famille", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "خَالَةٌ / خَالَتِي", "fr": "Tante maternelle / Ma tante", "type": "famille", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "عَمَّةٌ / عَمَّتِي", "fr": "Tante paternelle / Ma tante", "type": "famille", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "ابْنُ عَمٍّ", "fr": "Cousin (fils d\\", "type": "mot", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "حَفِيدٌ / حَفِيدَةٌ", "fr": "Petit-fils / Petite-fille", "type": "famille", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "أَصْغَرُ / الصَّغِيرُ", "fr": "Le plus jeune / Cadet", "type": "famille", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "أَكْبَرُ / الْكَبِيرُ", "fr": "Le plus âgé / Aîné", "type": "famille", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "عَائِلَةٌ كَبِيرَةٌ", "fr": "Grande famille", "type": "expression", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "أَبُو", "fr": "Père de... (dans un nom)", "type": "grammaire", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "كَبِيرٌ / كَبِيرَةٌ", "fr": "Grand(e)", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "صَغِيرٌ / صَغِيرَةٌ", "fr": "Petit(e)", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "جَمِيلٌ / جَمِيلَةٌ", "fr": "Beau / Belle", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "جَدِيدٌ / جَدِيدَةٌ", "fr": "Nouveau / Nouvelle", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "قَدِيمٌ / قَدِيمَةٌ", "fr": "Ancien(ne) / Vieux", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "طَوِيلٌ / طَوِيلَةٌ", "fr": "Grand(e) / Long(ue)", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "قَصِيرٌ / قَصِيرَةٌ", "fr": "Court(e) / Petit(e)", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "حَسَنٌ / حَسَنَةٌ", "fr": "Bon(ne) / Bien", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "ذَكِيٌّ / ذَكِيَّةٌ", "fr": "Intelligent(e)", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "مَفْتُوحٌ / مَفْتُوحَةٌ", "fr": "Ouvert(e)", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "مُغْلَقٌ / مُغْلَقَةٌ", "fr": "Fermé(e)", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "كَرِيمٌ / كَرِيمَةٌ", "fr": "Généreux / Généreuse", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "قَبِيحٌ / قَبِيحَةٌ", "fr": "Laid(e)", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "سَرِيعٌ / سَرِيعَةٌ", "fr": "Rapide", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "بَطِيءٌ / بَطِيئَةٌ", "fr": "Lent(e)", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "قَرِيبٌ / قَرِيبَةٌ", "fr": "Proche", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "بَعِيدٌ / بَعِيدَةٌ", "fr": "Loin / Éloigné(e)", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "نَظِيفٌ / نَظِيفَةٌ", "fr": "Propre", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "وَسِخٌ / وَسِخَةٌ", "fr": "Sale", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "طَالِبٌ → طُلَّابٌ", "fr": "Étudiant → Étudiants", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "كِتَابٌ → كُتُبٌ", "fr": "Livre → Livres", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "وَلَدٌ → أَوْلَادٌ", "fr": "Garçon → Garçons", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "بَيْتٌ → بُيُوتٌ", "fr": "Maison → Maisons", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "قَلَمٌ → أَقْلَامٌ", "fr": "Stylo → Stylos", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "رَجُلٌ → رِجَالٌ", "fr": "Homme → Hommes", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "مُعَلِّمٌ → مُعَلِّمُونَ", "fr": "Enseignant → Enseignants", "type": "pluriel sain masc.", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "مُعَلِّمَةٌ → مُعَلِّمَاتٌ", "fr": "Enseignante → Enseignantes", "type": "pluriel sain fém.", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "مُسْلِمٌ → مُسْلِمُونَ", "fr": "Musulman → Musulmans", "type": "pluriel sain masc.", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "طَالِبَةٌ → طَالِبَاتٌ", "fr": "Étudiante → Étudiantes", "type": "pluriel sain fém.", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "مَدْرَسَةٌ → مَدَارِسُ", "fr": "École → Écoles", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "غُرْفَةٌ → غُرَفٌ", "fr": "Chambre → Chambres", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "دُرُوسٌ", "fr": "Leçons (pl. de دَرْسٌ)", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "بُيُوتٌ", "fr": "Maisons (pl. de بَيْتٌ)", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "رِجَالٌ", "fr": "Hommes (pl. de رَجُلٌ)", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "نِسَاءٌ", "fr": "Femmes (pl. de امْرَأَةٌ)", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "أَطْفَالٌ", "fr": "Enfants (pl. de طِفْلٌ)", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "مَسَاجِدُ", "fr": "Mosquées (pl. de مَسْجِدٌ)", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "أَصْدِقَاءُ", "fr": "Amis (pl. de صَدِيقٌ)", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "أَسْمَاءُ", "fr": "Noms (pl. de اسْمٌ)", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "هَذَا", "fr": "Ceci / Ce ...-ci (masc.)", "type": "démonstratif proche", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "هَذِهِ", "fr": "Ceci / Cette ...-ci (fém.)", "type": "démonstratif proche", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "ذَلِكَ", "fr": "Cela / Ce ...-là (masc.)", "type": "démonstratif lointain", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "تِلْكَ", "fr": "Cela / Cette ...-là (fém.)", "type": "démonstratif lointain", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "مَنْ هَذَا؟", "fr": "Qui est-ce ?", "type": "question", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "مَا هَذَا؟", "fr": "Qu\\", "type": "mot", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "مَا هَذِهِ؟", "fr": "Qu\\", "type": "mot", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "هَذَا هُوَ", "fr": "C\\", "type": "mot", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "هَذَا الْكِتَابُ", "fr": "Ce livre-ci", "type": "groupe nominal", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "تِلْكَ الْمَدْرَسَةُ", "fr": "Cette école-là", "type": "groupe nominal", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "هَؤُلَاءِ", "fr": "Ceux-ci / Ces gens (pl. proche)", "type": "démonstratif", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "أُولَئِكَ", "fr": "Ceux-là (pl. lointain)", "type": "démonstratif", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "هَذَانِ / هَاتَانِ", "fr": "Ces deux-ci (masc./fém.)", "type": "démonstratif duel", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "السَّيَّارَةُ", "fr": "La voiture", "type": "nom", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "الطَّائِرَةُ", "fr": "L\\", "type": "mot", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "الْقِطَارُ", "fr": "Le train", "type": "nom", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "الْحَقِيبَةُ", "fr": "Le sac / La valise", "type": "nom", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "الْهَاتِفُ", "fr": "Le téléphone", "type": "nom", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "الْحَاسُوبُ", "fr": "L\\", "type": "mot", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "الْمِفْتَاحُ", "fr": "La clé", "type": "nom", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "مَنْ؟", "fr": "Qui ?", "type": "interrogatif", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "مَا؟ / مَاذَا؟", "fr": "Quoi ? / Qu\\", "type": "mot", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "أَيْنَ؟", "fr": "Où ?", "type": "interrogatif", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "مَتَى؟", "fr": "Quand ?", "type": "interrogatif", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "كَيْفَ؟", "fr": "Comment ?", "type": "interrogatif", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "كَمْ؟", "fr": "Combien ?", "type": "interrogatif", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "لِمَاذَا؟", "fr": "Pourquoi ?", "type": "interrogatif", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "هَلْ؟", "fr": "Est-ce que ? (oui/non)", "type": "interrogatif", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "نَعَمْ", "fr": "Oui", "type": "réponse", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "لَا", "fr": "Non", "type": "réponse", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "بَلَى", "fr": "Si ! (réponse à négation)", "type": "réponse", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "مَا اسْمُكَ؟", "fr": "Quel est ton nom ?", "type": "expression", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "كَمْ عُمْرُكَ؟", "fr": "Quel âge as-tu ?", "type": "expression", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "مِنْ أَيْنَ أَنْتَ؟", "fr": "D\\", "type": "mot", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "مَاذَا تُرِيدُ؟", "fr": "Que veux-tu ?", "type": "expression", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "كَيْفَ ذَلِكَ؟", "fr": "Comment ça ?", "type": "expression", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "مَتَى وَصَلْتَ؟", "fr": "Quand es-tu arrivé ?", "type": "expression", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "لِمَاذَا لَا؟", "fr": "Pourquoi pas ?", "type": "expression", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "هَلْ تَفْهَمُ؟", "fr": "Tu comprends ?", "type": "expression", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "نَعَمْ، أَفْهَمُ", "fr": "Oui, je comprends", "type": "expression", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "وَاحِدٌ / وَاحِدَةٌ", "fr": "Un / Une", "type": "cardinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "اثْنَانِ / اثْنَتَانِ", "fr": "Deux (masc./fém.)", "type": "cardinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "ثَلَاثَةٌ / ثَلَاثٌ", "fr": "Trois", "type": "cardinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "أَرْبَعَةٌ / أَرْبَعٌ", "fr": "Quatre", "type": "cardinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "خَمْسَةٌ / خَمْسٌ", "fr": "Cinq", "type": "cardinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "سِتَّةٌ / سِتٌّ", "fr": "Six", "type": "cardinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "سَبْعَةٌ / سَبْعٌ", "fr": "Sept", "type": "cardinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "ثَمَانِيَةٌ / ثَمَانٍ", "fr": "Huit", "type": "cardinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "تِسْعَةٌ / تِسْعٌ", "fr": "Neuf", "type": "cardinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "عَشَرَةٌ / عَشْرٌ", "fr": "Dix", "type": "cardinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "الْأَوَّلُ / الْأُولَى", "fr": "Premier / Première", "type": "ordinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "الثَّانِي / الثَّانِيَةُ", "fr": "Deuxième", "type": "ordinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "عِنْدِي", "fr": "J\\", "type": "mot", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "عِشْرُونَ", "fr": "Vingt", "type": "nombre", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "ثَلَاثُونَ", "fr": "Trente", "type": "nombre", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "مِئَةٌ", "fr": "Cent", "type": "nombre", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "أَلْفٌ", "fr": "Mille", "type": "nombre", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "نِصْفٌ", "fr": "Moitié / Demi", "type": "nombre", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "رُبْعٌ", "fr": "Quart", "type": "nombre", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "الثَّالِثُ عَشَرَ", "fr": "Treizième", "type": "ordinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "الْعِشْرُونَ", "fr": "Vingtième", "type": "ordinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "أَحْمَرُ / حَمْرَاءُ", "fr": "Rouge", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "أَخْضَرُ / خَضْرَاءُ", "fr": "Vert(e)", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "أَزْرَقُ / زَرْقَاءُ", "fr": "Bleu(e)", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "أَصْفَرُ / صَفْرَاءُ", "fr": "Jaune", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "أَبْيَضُ / بَيْضَاءُ", "fr": "Blanc / Blanche", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "أَسْوَدُ / سَوْدَاءُ", "fr": "Noir(e)", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "بُنِّيٌّ", "fr": "Marron / Brun", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "بُرْتُقَالِيٌّ", "fr": "Orange", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "رَمَادِيٌّ", "fr": "Gris(e)", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "وَرْدِيٌّ", "fr": "Rose", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "مَا لَوْنُهُ؟", "fr": "De quelle couleur est-il ?", "type": "question", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "لَوْنٌ", "fr": "Couleur", "type": "nom", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "بَنَفْسَجِيٌّ", "fr": "Violet", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "زَيْتُونِيٌّ", "fr": "Kaki / Vert olive", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "فَاتِحٌ", "fr": "Clair (couleur)", "type": "adjectif couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "غَامِقٌ", "fr": "Foncé (couleur)", "type": "adjectif couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "أَزْرَقُ فَاتِحٌ", "fr": "Bleu clair", "type": "expression couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "أَخْضَرُ غَامِقٌ", "fr": "Vert foncé", "type": "expression couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "مُلَوَّنٌ", "fr": "Coloré / Multicolore", "type": "adjectif", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "يَكْتُبُ", "fr": "Il écrit", "type": "présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَقْرَأُ", "fr": "Il lit", "type": "présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَذْهَبُ", "fr": "Il va", "type": "présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَدْرُسُ", "fr": "Il étudie", "type": "présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَأْكُلُ", "fr": "Il mange", "type": "présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَشْرَبُ", "fr": "Il boit", "type": "présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَعْمَلُ", "fr": "Il travaille", "type": "présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَسْكُنُ", "fr": "Il habite", "type": "présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يُحِبُّ", "fr": "Il aime", "type": "présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَفْهَمُ", "fr": "Il comprend", "type": "présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَتَكَلَّمُ", "fr": "Il parle", "type": "présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "كُلَّ يَوْمٍ", "fr": "Chaque jour", "type": "expression", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "الْآنَ", "fr": "Maintenant", "type": "adverbe", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "دَائِمًا", "fr": "Toujours", "type": "adverbe", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَذْهَبُ إِلَى", "fr": "Il va à", "type": "expression", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَرْجِعُ مِنْ", "fr": "Il revient de", "type": "expression", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يُرِيدُ", "fr": "Il veut", "type": "verbe présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَسْتَطِيعُ", "fr": "Il peut", "type": "verbe présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَعْرِفُ", "fr": "Il sait / Il connaît", "type": "verbe présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَظُنُّ", "fr": "Il pense / Il croit", "type": "verbe présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَقُولُ", "fr": "Il dit", "type": "verbe présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَسْأَلُ", "fr": "Il demande", "type": "verbe présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "لَا", "fr": "Ne... pas (présent)", "type": "négation", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "لَمْ", "fr": "Ne... pas (passé) + apocopé", "type": "négation", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "لَيْسَ / لَيْسَتْ", "fr": "N\\", "type": "mot", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "لَنْ", "fr": "Ne... pas (futur)", "type": "négation", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "لَا أَفْهَمُ", "fr": "Je ne comprends pas", "type": "expression", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "لَمْ أَذْهَبْ", "fr": "Je ne suis pas allé", "type": "expression", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "لَيْسَ هُنَا", "fr": "Il n\\", "type": "mot", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "أَمْسِ", "fr": "Hier", "type": "adverbe", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "غَدًا", "fr": "Demain", "type": "adverbe", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "أَبَدًا", "fr": "Jamais", "type": "adverbe", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "لَا شَيْءَ", "fr": "Rien", "type": "expression négative", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "لَا أَحَدَ", "fr": "Personne", "type": "expression négative", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "مَا زَالَ", "fr": "Il est encore / Il continue", "type": "expression", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "لَمْ يَعُدْ", "fr": "Il n\\", "type": "mot", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "بَعِيدًا عَنْ", "fr": "Loin de", "type": "expression", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "لَيْسَ فَقَطْ", "fr": "Pas seulement", "type": "expression", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "غَيْرُ", "fr": "Non / Pas / Autre que", "type": "négation", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "بِدُونَ", "fr": "Sans", "type": "préposition", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "الْيَوْمَ", "fr": "Aujourd\\", "type": "mot", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "أَحْيَانًا", "fr": "Parfois", "type": "adv. fréquence", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "هُنَا", "fr": "Ici", "type": "adv. lieu", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "هُنَاكَ", "fr": "Là-bas", "type": "adv. lieu", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "جَيِّدًا", "fr": "Bien (adv.)", "type": "adv. manière", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "كَثِيرًا", "fr": "Beaucoup", "type": "adv. quantité", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "قَلِيلًا", "fr": "Peu", "type": "adv. quantité", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "سَرِيعًا", "fr": "Vite", "type": "adv. manière", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "بَعْدَ", "fr": "Après", "type": "préposition temps", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "قَبْلَ", "fr": "Avant", "type": "préposition temps", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "مُنْذُ", "fr": "Depuis", "type": "préposition temps", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "خِلَالَ", "fr": "Pendant / Durant", "type": "préposition temps", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "فِي الْبِدَايَةِ", "fr": "Au début", "type": "expression", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "فِي النِّهَايَةِ", "fr": "À la fin", "type": "expression", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "فَجْأَةً", "fr": "Soudainement", "type": "adverbe", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "أَحْيَانًا مَا", "fr": "Quelquefois", "type": "adverbe", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "وَ", "fr": "Et (collé)", "type": "conjonction", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "فَ", "fr": "Et puis / Donc", "type": "conjonction", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "ثُمَّ", "fr": "Puis / Ensuite", "type": "conjonction", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "أَوْ", "fr": "Ou", "type": "conjonction", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "لَكِنْ", "fr": "Mais", "type": "conjonction", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "بَلْ", "fr": "Mais au contraire", "type": "conjonction", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "لِأَنَّ", "fr": "Parce que", "type": "subordination", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "إِذَا", "fr": "Si / Quand (futur)", "type": "subordination", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "عِنْدَمَا", "fr": "Quand / Lorsque", "type": "subordination", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "مَسْرُورٌ", "fr": "Content / Heureux", "type": "adjectif", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "لِأَنَّهُ", "fr": "Parce qu\\", "type": "mot", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "كَسُولٌ", "fr": "Paresseux", "type": "adjectif", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "إِذَنْ", "fr": "Donc / Alors", "type": "conjonction", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "لِذَلِكَ", "fr": "C\\", "type": "mot", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "وَمَعَ ذَلِكَ", "fr": "Cependant / Néanmoins", "type": "conjonction", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "عَلَى الرَّغْمِ مِنْ", "fr": "Malgré", "type": "préposition", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "طَالَمَا", "fr": "Tant que / Aussi longtemps que", "type": "subordination", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "كُلَّمَا", "fr": "Chaque fois que / Plus... plus", "type": "subordination", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "بِحَيْثُ", "fr": "De telle sorte que", "type": "subordination", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "مَعَ أَنَّ", "fr": "Bien que / Quoique", "type": "subordination", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "كِتَابَانِ", "fr": "Deux livres", "type": "duel masc.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "طَالِبَانِ", "fr": "Deux étudiants", "type": "duel masc.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "طَالِبَتَانِ", "fr": "Deux étudiantes", "type": "duel fém.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "يَوْمَانِ", "fr": "Deux jours", "type": "duel masc.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "سَاعَتَانِ", "fr": "Deux heures", "type": "duel fém.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "وَلَدَانِ", "fr": "Deux garçons", "type": "duel masc.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "بِنْتَانِ", "fr": "Deux filles", "type": "duel fém.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "أَخَوَانِ", "fr": "Deux frères", "type": "duel masc.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "يَدَانِ", "fr": "Deux mains", "type": "duel fém.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "عَيْنَانِ", "fr": "Deux yeux", "type": "duel fém.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "رِجْلَانِ", "fr": "Deux jambes", "type": "duel fém.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "بَيْتَانِ", "fr": "Deux maisons", "type": "duel masc.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "الْفَمُ / فَمِي", "fr": "La bouche / Ma bouche", "type": "corps (duel possible)", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "الْأُذُنَانِ", "fr": "Les deux oreilles", "type": "duel", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "الرُّكْبَتَانِ", "fr": "Les deux genoux", "type": "duel", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "الْكَتِفَانِ", "fr": "Les deux épaules", "type": "duel", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "صَدِيقَانِ", "fr": "Deux amis", "type": "duel", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "طَالِبَانِ مُجْتَهِدَانِ", "fr": "Deux étudiants studieux", "type": "exemple duel", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "كِلَاهُمَا", "fr": "Tous les deux (masc.)", "type": "pronom duel", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "كِلْتَاهُمَا", "fr": "Toutes les deux (fém.)", "type": "pronom duel", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "اُكْتُبْ", "fr": "Écris ! (masc.)", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "اِقْرَأْ", "fr": "Lis ! (masc.)", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "اِذْهَبْ", "fr": "Va ! (masc.)", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "اِجْلِسْ", "fr": "Assieds-toi ! (masc.)", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "تَعَالَ", "fr": "Viens ! (masc.)", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "اِسْمَعْ", "fr": "Écoute ! (masc.)", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "اُنْظُرْ", "fr": "Regarde ! (masc.)", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "قُلْ", "fr": "Dis ! (masc.)", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "لَا تَذْهَبْ", "fr": "Ne pars pas !", "type": "interdiction", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "لَا تَتَكَلَّمْ", "fr": "Ne parle pas !", "type": "interdiction", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "اُكْتُبِي", "fr": "Écris ! (fém.)", "type": "impératif fém.", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "اُكْتُبُوا", "fr": "Écrivez ! (plur.)", "type": "impératif plur.", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "اِسْمَعْ / اِسْمَعِي", "fr": "Écoute ! (masc./fém.)", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "اِنْتَبِهْ", "fr": "Fais attention !", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "اِفْتَحْ / اِفْتَحِي", "fr": "Ouvre ! (masc./fém.)", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "أَغْلِقْ", "fr": "Ferme !", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "اِجْلِسُوا", "fr": "Asseyez-vous !", "type": "impératif plur.", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "قُومُوا", "fr": "Levez-vous !", "type": "impératif plur.", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "لَا تَتَأَخَّرْ", "fr": "Ne sois pas en retard !", "type": "interdiction", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "لَا تَنْسَ", "fr": "N\\", "type": "mot", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "كِتَابَةٌ", "fr": "Écriture / Écrire", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "دِرَاسَةٌ", "fr": "Étude / Étudier", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "قِرَاءَةٌ", "fr": "Lecture / Lire", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "ذَهَابٌ", "fr": "Action d\\", "type": "mot", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "أَكْلٌ", "fr": "Action de manger", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "شُرْبٌ", "fr": "Action de boire", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "عَمَلٌ", "fr": "Travail / Action", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "فَهْمٌ", "fr": "Compréhension", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "تَكَلُّمٌ", "fr": "Parole / Le fait de parler", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "مُهِمٌّ", "fr": "Important(e)", "type": "adjectif", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "سَهْلٌ", "fr": "Facile", "type": "adjectif", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "صَعْبٌ", "fr": "Difficile", "type": "adjectif", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "تَعْلِيمٌ", "fr": "Enseignement / Éducation", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "تَدْرِيسٌ", "fr": "L\\", "type": "mot", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "سَفَرٌ", "fr": "Voyage", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "تَفْكِيرٌ", "fr": "Réflexion / Pensée", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "صَلَاةٌ", "fr": "Prière", "type": "masdar/nom", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "صِيَامٌ / صَوْمٌ", "fr": "Jeûne", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "حُبٌّ", "fr": "Amour", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "كَرَاهِيَةٌ", "fr": "Haine", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "صَبْرٌ", "fr": "Patience", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "شُكْرٌ", "fr": "Gratitude / Remerciement", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "كَاتِبٌ / كَاتِبَةٌ", "fr": "Écrivain(e)", "type": "participe actif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "دَارِسٌ / دَارِسَةٌ", "fr": "Étudiant(e)/studieux", "type": "participe actif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مُسَافِرٌ / مُسَافِرَةٌ", "fr": "Voyageur/euse", "type": "participe actif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مَكْتُوبٌ / مَكْتُوبَةٌ", "fr": "Écrit(e)", "type": "participe passif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مَعْرُوفٌ / مَعْرُوفَةٌ", "fr": "Connu(e)", "type": "participe passif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مَشْهُورٌ / مَشْهُورَةٌ", "fr": "Célèbre", "type": "adjectif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "نَاجِحٌ / نَاجِحَةٌ", "fr": "Qui réussit", "type": "participe actif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "رِسَالَةٌ", "fr": "Lettre / Message", "type": "nom", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مُسَافِرٌ", "fr": "Voyageur (participe actif)", "type": "participe actif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مُقِيمٌ", "fr": "Résident (qui réside)", "type": "participe actif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مَسْمُوعٌ", "fr": "Entendu / Audible", "type": "participe passif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مَفْهُومٌ", "fr": "Compris / Compréhensible", "type": "participe passif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مَشْرُوبٌ", "fr": "Boisson / Ce qui est bu", "type": "participe passif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مَأْكُولٌ", "fr": "Nourriture / Ce qui est mangé", "type": "participe passif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مَحْبُوبٌ", "fr": "Aimé / Bien-aimé", "type": "participe passif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مَذْكُورٌ", "fr": "Mentionné / Cité", "type": "participe passif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مَعْلُومٌ", "fr": "Connu / Notoire", "type": "participe passif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مَجْهُولٌ", "fr": "Inconnu / Ignoré", "type": "participe passif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "الْأَحَدُ", "fr": "Dimanche", "type": "jour", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الِاثْنَيْنِ", "fr": "Lundi", "type": "jour", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الثُّلَاثَاءُ", "fr": "Mardi", "type": "jour", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الْأَرْبِعَاءُ", "fr": "Mercredi", "type": "jour", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الْخَمِيسُ", "fr": "Jeudi", "type": "jour", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الْجُمُعَةُ", "fr": "Vendredi (prière)", "type": "jour", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "السَّبْتُ", "fr": "Samedi", "type": "jour", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الشَّمَالُ", "fr": "Le Nord", "type": "direction", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الْجَنُوبُ", "fr": "Le Sud", "type": "direction", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الشَّرْقُ", "fr": "L\\", "type": "mot", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الْغَرْبُ", "fr": "L\\", "type": "mot", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الصَّبَاحُ", "fr": "Le matin", "type": "temps", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الْمَسَاءُ", "fr": "Le soir", "type": "temps", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "صَبَاحُ الْخَيْرِ", "fr": "Bonjour (matin)", "type": "salutation", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "مَسَاءُ الْخَيْرِ", "fr": "Bonsoir", "type": "salutation", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الرَّبِيعُ", "fr": "Le printemps", "type": "saison", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الصَّيْفُ", "fr": "L\\", "type": "mot", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الْخَرِيفُ", "fr": "L\\", "type": "mot", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الشِّتَاءُ", "fr": "L\\", "type": "mot", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الْفَجْرُ", "fr": "L\\", "type": "mot", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الظُّهْرُ", "fr": "Midi", "type": "moment de la journée", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الْعَصْرُ", "fr": "L\\", "type": "mot", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الْعِشَاءُ", "fr": "La nuit (début)", "type": "moment de la journée", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الْمَغْرِبُ", "fr": "Le coucher du soleil", "type": "moment de la journée", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "مُنْتَصَفُ اللَّيْلِ", "fr": "Minuit", "type": "expression temporelle", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "بِسْمِ اللَّهِ", "fr": "Au nom de Dieu (basmala)", "type": "formule religieuse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "الْحَمْدُ لِلَّهِ", "fr": "Louange à Dieu", "type": "formule religieuse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "إِنْ شَاءَ اللَّهُ", "fr": "Si Dieu le veut", "type": "formule religieuse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "مَاشَاءَ اللَّهُ", "fr": "Que Dieu l\\", "type": "mot", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "سُبْحَانَ اللَّهِ", "fr": "Gloire à Dieu", "type": "formule religieuse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "اللَّهُ أَكْبَرُ", "fr": "Dieu est le plus grand", "type": "formule religieuse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "شُكْرًا", "fr": "Merci", "type": "politesse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "جَزَاكَ اللَّهُ خَيْرًا", "fr": "Que Dieu te récompense (merci)", "type": "politesse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "عَفْوًا", "fr": "De rien / Pardon", "type": "politesse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "مِنْ فَضْلِكَ", "fr": "S\\", "type": "mot", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "آسِفٌ", "fr": "Désolé (masc.)", "type": "politesse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "أَهْلًا وَسَهْلًا", "fr": "Bienvenue", "type": "salutation", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "اَللَّهُمَّ", "fr": "Ô mon Dieu !", "type": "invocation", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "رَبُّنَا", "fr": "Notre Seigneur", "type": "nom de Dieu", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "إِنَّا لِلَّهِ وَإِنَّا إِلَيْهِ رَاجِعُونَ", "fr": "Inna lillah (formule de deuil)", "type": "formule religieuse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ", "fr": "Que la paix soit sur lui (après le nom du Prophète)", "type": "formule religieuse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "رَضِيَ اللَّهُ عَنْهُ", "fr": "Que Dieu soit satisfait de lui", "type": "formule religieuse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "أَعُوذُ بِاللَّهِ", "fr": "Je cherche refuge en Dieu", "type": "formule religieuse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "حَسْبُنَا اللَّهُ", "fr": "Dieu nous suffit", "type": "formule religieuse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "تَوَكَّلْتُ عَلَى اللَّهِ", "fr": "Je me confie à Dieu", "type": "formule religieuse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "أَوَّلًا", "fr": "Premièrement", "type": "connecteur", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "ثَانِيًا", "fr": "Deuxièmement", "type": "connecteur", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "أَخِيرًا", "fr": "Finalement", "type": "connecteur", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "بِالْإِضَافَةِ", "fr": "De plus / En outre", "type": "connecteur", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "عَلَى سَبِيلِ الْمِثَالِ", "fr": "Par exemple", "type": "connecteur", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "فِي الْخُلَاصَةِ", "fr": "En résumé", "type": "connecteur", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "الرَّفْعُ", "fr": "Nominatif (sujet)", "type": "grammaire", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "النَّصْبُ", "fr": "Accusatif (objet)", "type": "grammaire", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "الْجَرُّ", "fr": "Génitif (après prép.)", "type": "grammaire", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "مَشْغُولٌ", "fr": "Occupé(e)", "type": "adjectif", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "فَرِحٌ / فَرِحَةٌ", "fr": "Content(e)", "type": "adjectif", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "الْإِعْرَابُ", "fr": "La déclinaison", "type": "grammaire", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "مِنَ الْمَعْلُومِ أَنَّ", "fr": "Il est connu que...", "type": "connecteur", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "مِنَ الْجَدِيرِ بِالذِّكْرِ", "fr": "Il convient de mentionner", "type": "connecteur", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "يَجِبُ أَنْ", "fr": "Il faut que / On doit", "type": "expression", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "يَنْبَغِي أَنْ", "fr": "Il convient de", "type": "expression", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "مِنَ الضَّرُورِيِّ", "fr": "Il est nécessaire", "type": "expression", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "مِنَ الْمُمْكِنِ", "fr": "Il est possible", "type": "expression", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "مُبْتَدَأٌ", "fr": "Sujet (terme grammatical)", "type": "grammaire", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "خَبَرٌ", "fr": "Prédicat (terme grammatical)", "type": "grammaire", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "فِعْلٌ", "fr": "Verbe", "type": "grammaire", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "فَاعِلٌ", "fr": "Sujet verbal (agent)", "type": "grammaire", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "مُجْتَهِدٌ / مُجْتَهِدَةٌ", "fr": "Studieux / Appliqué(e)", "type": "adjectif", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "كَسُولٌ / كَسُولَةٌ", "fr": "Paresseux / Paresseuse", "type": "adjectif", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "قَوِيٌّ / قَوِيَّةٌ", "fr": "Fort(e)", "type": "adjectif", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "ضَعِيفٌ / ضَعِيفَةٌ", "fr": "Faible", "type": "adjectif", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "سَعِيدٌ / سَعِيدَةٌ", "fr": "Heureux / Heureuse", "type": "adjectif", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "حَزِينٌ / حَزِينَةٌ", "fr": "Triste", "type": "adjectif", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "مَرِيضٌ / مَرِيضَةٌ", "fr": "Malade", "type": "adjectif", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "صَحِيحٌ / صَحِيحَةٌ", "fr": "Correct(e) / En bonne santé", "type": "adjectif", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "فَرِحٌ / فَرِحَةٌ", "fr": "Content(e) / Joyeux", "type": "adjectif", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "الْجَوَابُ الصَّحِيحُ", "fr": "La bonne réponse", "type": "expression", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "أُبَارِكُ لَكَ", "fr": "Je te félicite", "type": "expression", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "مُرَاجَعَةٌ", "fr": "Révision", "type": "nom", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "خُلَاصَةٌ", "fr": "Résumé / Synthèse", "type": "nom", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "قَاعِدَةٌ", "fr": "Règle / Base", "type": "nom", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "اسْتِثْنَاءٌ", "fr": "Exception", "type": "nom", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "مِثَالٌ", "fr": "Exemple", "type": "nom", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "تَدْرِيبٌ", "fr": "Entraînement / Exercice", "type": "nom", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "إِتْقَانٌ", "fr": "Maîtrise / Perfectionnement", "type": "nom", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "مُسْتَوَى", "fr": "Niveau", "type": "nom", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "تَقَدُّمٌ", "fr": "Progrès", "type": "nom", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "نَجَاحٌ", "fr": "Succès / Réussite", "type": "nom", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}]
+;
+
+// ─── DEFAULT MODULES ───
+const DEFAULT_MODULES = [
+  {id:'m1', icon:'📋', name:'Mon Planning', desc:'Emploi du temps, A/B, sommeil.', url:'planning.html'},
+  {id:'m2', icon:'📖', name:'Arabe — Médine', desc:'Leçons, vocab, examens.', url:'arabe.html'},
+  {id:'m4', icon:'✈️', name:'PPL — Aviation', desc:'Bientôt disponible.', url:'', disabled:true},
 ];
 
-// ─── STATE ───
-let tiles = JSON.parse(localStorage.getItem('mylife_tiles') || 'null') || DEFAULT_TILES.map(t=>({...t}));
+let modules = null;
 let editMode = false;
-let editingTileId = null;
+let editingModId = null;
 let dragSrcIdx = null;
-let hubDocRef = null, saveTimer = null;
+let hubDoc = null, modSaveTimer = null;
+let qcmProgress = {green:{}, red:{}};
+let qcmDoc = null, qcmSaveTimer = null;
 
-// ─── FIREBASE ───
 firebase.initializeApp(window.FIREBASE_CONFIG);
 const auth = firebase.auth(), db = firebase.firestore();
-try{db.enablePersistence({synchronizeTabs:true}).catch(()=>{});}catch(e){}
+try{ db.enablePersistence({synchronizeTabs:true}).catch(()=>{}); }catch(e){}
 
 auth.onAuthStateChanged(async user=>{
   if(!user){
@@ -234,51 +420,62 @@ auth.onAuthStateChanged(async user=>{
     document.getElementById('auth-wrap').classList.remove('hidden');
     return;
   }
-  document.getElementById('user-email').textContent = user.email || user.displayName || '';
+  document.getElementById('user-email').textContent = user.displayName || user.email || '';
   document.getElementById('topbar-right').classList.remove('hidden');
-  hubDocRef = db.collection('users').doc(user.uid).collection('modules').doc('hub');
-  document.getElementById('loading-text').textContent = 'Chargement…';
+
+  // load modules
+  hubDoc = db.collection('users').doc(user.uid).collection('modules').doc('hub');
+  qcmDoc = db.collection('users').doc(user.uid).collection('modules').doc('qcm-arabe');
+
   try{
-    const snap = await hubDocRef.get();
-    if(snap.exists && snap.data().tiles){
-      tiles = snap.data().tiles;
-    } else {
-      await hubDocRef.set({tiles});
-    }
-    try{localStorage.setItem('mylife_tiles', JSON.stringify(tiles));}catch(e){}
+    const [hubSnap, qcmSnap] = await Promise.all([hubDoc.get(), qcmDoc.get()]);
+    modules = (hubSnap.exists && hubSnap.data().modules) ? hubSnap.data().modules
+      : DEFAULT_MODULES.map(m=>({...m}));
+    qcmProgress = qcmSnap.exists ? {green: qcmSnap.data().green||{}, red: qcmSnap.data().red||{}} : {green:{}, red:{}};
+    if(!hubSnap.exists) hubDoc.set({modules}).catch(()=>{});
   }catch(e){
-    const local = localStorage.getItem('mylife_tiles');
-    if(local) tiles = JSON.parse(local);
+    modules = DEFAULT_MODULES.map(m=>({...m}));
   }
+
   document.getElementById('loading-screen').classList.add('hidden');
   document.getElementById('auth-wrap').classList.add('hidden');
-  document.getElementById('hub').classList.remove('hidden');
-  renderGrid();
+  document.getElementById('layout').classList.remove('hidden');
+  renderModules();
+  updateQcmStats();
+  updateQcmStartInfo();
 });
 
-function saveTiles(){
-  try{localStorage.setItem('mylife_tiles', JSON.stringify(tiles));}catch(e){}
-  if(!hubDocRef) return;
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(()=> hubDocRef.set({tiles}).catch(()=>{}), 800);
+// ─── SAVE ───
+function saveModules(){
+  if(!hubDoc) return;
+  clearTimeout(modSaveTimer);
+  modSaveTimer = setTimeout(()=> hubDoc.set({modules}).catch(()=>{}), 600);
+}
+function saveQcmProgress(){
+  const el = document.getElementById('qcm-sync');
+  if(el){ el.style.opacity='.8'; el.textContent='☁️'; el.style.animation=''; }
+  setTimeout(()=>{ if(el) el.style.opacity='.4'; }, 1500);
+  try{localStorage.setItem('qcm_p', JSON.stringify(qcmProgress));}catch(e){}
+  if(!qcmDoc) return;
+  clearTimeout(qcmSaveTimer);
+  qcmSaveTimer = setTimeout(()=> qcmDoc.set(qcmProgress).catch(()=>{}), 800);
 }
 
 // ─── AUTH ───
 let authMode = 'login';
 document.getElementById('auth-google').addEventListener('click', async()=>{
-  clearErr();
-  try{ await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
-  catch(e){ showErr(e); }
+  clearAuthErr();
+  try{ await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }catch(e){showAuthErr(e.message);}
 });
 document.getElementById('auth-submit').addEventListener('click', async()=>{
-  clearErr();
-  const email = document.getElementById('auth-email').value.trim();
-  const password = document.getElementById('auth-password').value;
-  if(!email||!password){ showErr({message:'Remplis email et mot de passe.'}); return; }
+  clearAuthErr();
+  const em = document.getElementById('auth-email').value.trim();
+  const pw = document.getElementById('auth-password').value;
+  if(!em||!pw){ showAuthErr('Remplis email et mot de passe.'); return; }
   try{
-    if(authMode==='signup') await auth.createUserWithEmailAndPassword(email,password);
-    else await auth.signInWithEmailAndPassword(email,password);
-  }catch(e){ showErr(e); }
+    if(authMode==='signup') await auth.createUserWithEmailAndPassword(em,pw);
+    else await auth.signInWithEmailAndPassword(em,pw);
+  }catch(e){ showAuthErr(e.message); }
 });
 document.getElementById('auth-sw-link').addEventListener('click',()=>{
   authMode = authMode==='login'?'signup':'login';
@@ -287,113 +484,245 @@ document.getElementById('auth-sw-link').addEventListener('click',()=>{
   document.getElementById('auth-sw-link').textContent = authMode==='login'?'Créer un compte':'Se connecter';
 });
 document.getElementById('btn-logout').addEventListener('click',()=> auth.signOut());
-function showErr(e){ const el=document.getElementById('auth-error'); el.textContent=e.message||e; el.style.display='block'; }
-function clearErr(){ document.getElementById('auth-error').style.display='none'; }
+function showAuthErr(m){ const e=document.getElementById('auth-error'); e.textContent=m; e.style.display='block'; }
+function clearAuthErr(){ document.getElementById('auth-error').style.display='none'; }
 
-// ─── GRID ───
-function renderGrid(){
-  const grid = document.getElementById('grid');
-  grid.innerHTML = '';
-  tiles.forEach((tile, idx)=>{
-    const el = document.createElement(tile.url&&!tile.disabled ? 'a' : 'div');
-    el.className = 'tile'+(tile.disabled?' disabled':'');
-    if(tile.url&&!tile.disabled&&!editMode) el.href = tile.url;
-    if(tile.color) el.style.background = tile.color;
-
-    el.innerHTML = `
+// ─── MODULES ───
+function renderModules(){
+  const list = document.getElementById('modules-list');
+  list.innerHTML='';
+  modules.forEach((m, idx)=>{
+    const el = document.createElement('div');
+    el.className='module-tile'+(m.disabled?' disabled':'');
+    el.innerHTML=`
       <button class="tile-del" title="Supprimer">✕</button>
-      <div class="icon">${tile.icon||'📦'}</div>
-      <h3>${escHtml(tile.name)}</h3>
-      ${tile.desc?`<p>${escHtml(tile.desc)}</p>`:''}
-    `;
-    el.querySelector('.tile-del').addEventListener('click', e=>{ e.preventDefault(); e.stopPropagation(); removeTile(tile.id); });
+      <div class="micon">${m.icon||'📦'}</div>
+      <div class="minfo"><h3>${esc(m.name)}</h3>${m.desc?`<p>${esc(m.desc)}</p>`:''}</div>`;
+    el.querySelector('.tile-del').addEventListener('click', e=>{e.stopPropagation(); removeModule(m.id);});
 
     if(editMode){
-      el.addEventListener('click', e=>{ e.preventDefault(); openTileModal(tile); });
-      // drag-and-drop to reorder
+      el.addEventListener('click', ()=> openModModal(m));
       el.draggable = true;
       el.addEventListener('dragstart', ()=>{ dragSrcIdx=idx; el.classList.add('dragging'); });
-      el.addEventListener('dragend', ()=>{ el.classList.remove('dragging'); document.querySelectorAll('.tile').forEach(t=>t.classList.remove('drag-over')); });
+      el.addEventListener('dragend', ()=>{ el.classList.remove('dragging'); list.querySelectorAll('.module-tile').forEach(t=>t.classList.remove('drag-over')); });
       el.addEventListener('dragover', e=>{ e.preventDefault(); el.classList.add('drag-over'); });
-      el.addEventListener('dragleave', ()=>el.classList.remove('drag-over'));
-      el.addEventListener('drop', e=>{ e.preventDefault(); if(dragSrcIdx!==null&&dragSrcIdx!==idx){ const t=tiles.splice(dragSrcIdx,1)[0]; tiles.splice(idx,0,t); saveTiles(); renderGrid(); } });
+      el.addEventListener('dragleave', ()=> el.classList.remove('drag-over'));
+      el.addEventListener('drop', e=>{
+        e.preventDefault();
+        if(dragSrcIdx!==null && dragSrcIdx!==idx){
+          const moved = modules.splice(dragSrcIdx,1)[0];
+          modules.splice(idx,0,moved);
+          saveModules();
+          renderModules();
+        }
+      });
+    } else if(m.url && !m.disabled){
+      el.addEventListener('click', ()=> window.location.href=m.url);
     }
-    grid.appendChild(el);
+    list.appendChild(el);
   });
-
-  // Add tile button
-  const addBtn = document.createElement('div');
-  addBtn.className = 'tile-add';
-  addBtn.innerHTML = '<span style="font-size:1.8rem;">＋</span><span>Ajouter un module</span>';
-  addBtn.addEventListener('click', ()=> openTileModal(null));
-  grid.appendChild(addBtn);
 }
-
-// ─── EDIT MODE ───
 document.getElementById('btn-edit').addEventListener('click',()=>{
-  editMode = !editMode;
-  document.getElementById('btn-edit').classList.toggle('active', editMode);
-  document.body.classList.toggle('edit-mode', editMode);
-  renderGrid();
+  editMode=!editMode;
+  document.getElementById('btn-edit').classList.toggle('active',editMode);
+  document.body.classList.toggle('edit-mode',editMode);
+  renderModules();
 });
+document.getElementById('btn-add-module').addEventListener('click',()=> openModModal(null));
 
-// ─── TILE MODAL ───
-const tileOverlay = document.getElementById('tile-overlay');
-function openTileModal(tile){
-  editingTileId = tile ? tile.id : null;
-  document.getElementById('tile-modal-title').textContent = tile ? 'Modifier le module' : 'Ajouter un module';
-  document.getElementById('tile-emoji').value = tile ? (tile.icon||'') : '';
-  document.getElementById('tile-name').value = tile ? tile.name : '';
-  document.getElementById('tile-desc').value = tile ? (tile.desc||'') : '';
-  document.getElementById('tile-url').value = tile ? (tile.url||'') : '';
-  document.getElementById('tile-color').value = tile ? (tile.color||'#16261e') : '#16261e';
-  document.getElementById('tile-delete').classList.toggle('hidden', !tile);
-  tileOverlay.classList.add('open');
+// MODULE MODAL
+const modOverlay = document.getElementById('mod-overlay');
+function openModModal(m){
+  editingModId = m?m.id:null;
+  document.getElementById('mod-title').textContent = m?'Modifier':'Ajouter un module';
+  document.getElementById('mod-emoji').value = m?(m.icon||''):'';
+  document.getElementById('mod-name').value = m?m.name:'';
+  document.getElementById('mod-desc').value = m?(m.desc||''):'';
+  document.getElementById('mod-url').value = m?(m.url||''):'';
+  document.getElementById('mod-del').classList.toggle('hidden',!m);
+  modOverlay.classList.add('open');
 }
-function closeTileModal(){ tileOverlay.classList.remove('open'); editingTileId=null; }
-document.getElementById('tile-cancel').addEventListener('click', closeTileModal);
-function setTileEmoji(e){ document.getElementById('tile-emoji').value = e; }
-function setTileColor(c){ document.getElementById('tile-color').value = c; }
-
-document.getElementById('tile-save').addEventListener('click',()=>{
-  const name = document.getElementById('tile-name').value.trim();
-  if(!name){ alert('Nom requis.'); return; }
+function closeModModal(){ modOverlay.classList.remove('open'); editingModId=null; }
+function setME(e){ document.getElementById('mod-emoji').value=e; }
+document.getElementById('mod-cancel').addEventListener('click', closeModModal);
+document.getElementById('mod-save').addEventListener('click',()=>{
+  const name = document.getElementById('mod-name').value.trim();
+  if(!name){ alert('Nom requis'); return; }
   const data = {
-    id: editingTileId || 't'+Date.now(),
-    icon: document.getElementById('tile-emoji').value.trim() || '📦',
+    id: editingModId||'m'+Date.now(),
+    icon: document.getElementById('mod-emoji').value.trim()||'📦',
     name,
-    desc: document.getElementById('tile-desc').value.trim(),
-    url: document.getElementById('tile-url').value.trim(),
-    color: document.getElementById('tile-color').value,
-    disabled: !document.getElementById('tile-url').value.trim()
+    desc: document.getElementById('mod-desc').value.trim(),
+    url: document.getElementById('mod-url').value.trim(),
+    disabled: !document.getElementById('mod-url').value.trim()
   };
-  if(editingTileId){
-    const idx = tiles.findIndex(t=>t.id===editingTileId);
-    if(idx>-1) tiles[idx]=data;
+  if(editingModId){
+    const i=modules.findIndex(m=>m.id===editingModId);
+    if(i>-1) modules[i]=data;
   } else {
-    tiles.push(data);
+    modules.push(data);
   }
-  saveTiles();
-  closeTileModal();
-  renderGrid();
+  saveModules(); closeModModal(); renderModules();
 });
-document.getElementById('tile-delete').addEventListener('click',()=>{
-  if(!editingTileId) return;
-  if(!confirm('Supprimer ce module ?')) return;
-  tiles = tiles.filter(t=>t.id!==editingTileId);
-  saveTiles();
-  closeTileModal();
-  renderGrid();
+document.getElementById('mod-del').addEventListener('click',()=>{
+  if(!editingModId||!confirm('Supprimer ?')) return;
+  modules=modules.filter(m=>m.id!==editingModId);
+  saveModules(); closeModModal(); renderModules();
 });
-
-function removeTile(id){
+function removeModule(id){
   if(!confirm('Supprimer ce module ?')) return;
-  tiles = tiles.filter(t=>t.id!==id);
-  saveTiles();
-  renderGrid();
+  modules=modules.filter(m=>m.id!==id);
+  saveModules(); renderModules();
 }
 
-function escHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+// ─── QCM ───
+let qCount=15, qMode='all', qDir='ar2fr';
+let qQueue=[], qIdx=0, qScore=0, qMissed=[], qStreak=0, qMaxStreak=0;
+
+function updateQcmStats(){
+  const g=Object.keys(qcmProgress.green).length;
+  const r=Object.keys(qcmProgress.red).length;
+  const t=VOCAB.length;
+  document.getElementById('g-stat-green').textContent=g+' maîtrisés ✅';
+  document.getElementById('g-stat-red').textContent=r+' à revoir ❌';
+  document.getElementById('g-stat-total').textContent=t+' mots';
+  document.getElementById('g-err-count').textContent=r;
+  document.getElementById('g-gauge-green').style.width=(g/t*100)+'%';
+  document.getElementById('g-gauge-red').style.width=(r/t*100)+'%';
+}
+function selCount(n){
+  qCount=n;
+  document.querySelectorAll('.cfg-btn').forEach(b=>b.classList.toggle('active',Number(b.textContent)===n));
+  updateQcmStartInfo();
+}
+function selMode(m){
+  qMode=m;
+  document.querySelectorAll('.mode-pill').forEach(b=>b.classList.remove('active'));
+  const map={'all':0,'errors':1,'srs':2};
+  document.querySelectorAll('.mode-pill')[map[m]||0].classList.add('active');
+  updateQcmStartInfo();
+}
+function selDir(d){
+  qDir=d;
+  document.querySelectorAll('.dir-btn').forEach(b=>b.classList.remove('active'));
+  const map={'ar2fr':0,'fr2ar':1,'mix':2};
+  document.querySelectorAll('.dir-btn')[map[d]||0].classList.add('active');
+}
+function updateQcmStartInfo(){
+  const pool=buildPool();
+  const n=Math.min(qCount,pool.length);
+  const el=document.getElementById('qcm-start-info');
+  if(!pool.length && qMode==='errors') el.textContent='✅ Aucune erreur — tu maîtrises tout !';
+  else el.textContent=n+' question'+(n>1?'s':'')+' sur '+pool.length+' mots disponibles.';
+}
+function buildPool(){
+  let pool=[...VOCAB];
+  if(qMode==='errors') pool=pool.filter(v=>qcmProgress.red[v.ar]);
+  else if(qMode==='srs'){
+    const reds=pool.filter(v=>qcmProgress.red[v.ar]);
+    pool=[...pool,...reds,...reds];
+  }
+  return pool;
+}
+function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a; }
+
+function showQcmHome(){ document.getElementById('qcm-home').classList.remove('hidden'); document.getElementById('qcm-quiz').classList.add('hidden'); document.getElementById('qcm-results').classList.add('hidden'); document.getElementById('qcm-missed').classList.add('hidden'); updateQcmStats(); updateQcmStartInfo(); }
+function showQcmMissed(){
+  const reds=VOCAB.filter(v=>qcmProgress.red[v.ar]);
+  const c=document.getElementById('g-all-missed-list');
+  c.innerHTML=!reds.length?'<div style="padding:12px;color:var(--chalk-dim);font-size:.82rem">✅ Aucune erreur !</div>'
+    :reds.map(v=>`<div class="missed-item"><span class="missed-ar">${v.ar}</span><span class="missed-fr">${v.fr}</span><span style="margin-left:auto;font-size:.7rem;color:var(--chalk-dim)">${v.lessonTitle}</span></div>`).join('');
+  document.getElementById('qcm-home').classList.add('hidden');
+  document.getElementById('qcm-missed').classList.remove('hidden');
+}
+
+function startQcm(){
+  let pool=buildPool();
+  if(!pool.length){ alert('Aucun mot disponible.'); return; }
+  shuffle(pool);
+  qQueue=pool.slice(0,Math.min(qCount,pool.length));
+  qIdx=0; qScore=0; qMissed=[]; qStreak=0; qMaxStreak=0;
+  document.getElementById('qcm-home').classList.add('hidden');
+  document.getElementById('qcm-results').classList.add('hidden');
+  document.getElementById('qcm-missed').classList.add('hidden');
+  document.getElementById('qcm-quiz').classList.remove('hidden');
+  renderQ();
+}
+function renderQ(){
+  const q=qQueue[qIdx], total=qQueue.length;
+  document.getElementById('g-pbar').style.width=(qIdx/total*100)+'%';
+  document.getElementById('g-counter').textContent=(qIdx+1)+'/'+total;
+  document.getElementById('g-streak').textContent=qStreak>=3?'🔥×'+qStreak:'';
+  document.getElementById('g-fb').style.display='none';
+  document.getElementById('g-next').classList.add('hidden');
+
+  let dir=qDir==='mix'?(Math.random()<.5?'ar2fr':'fr2ar'):qDir;
+  q._dir=dir;
+  const qm=document.getElementById('g-qmain');
+  if(dir==='ar2fr'){
+    qm.textContent=q.ar; qm.className='q-main';
+    document.getElementById('g-qlabel').textContent='Que signifie ce mot arabe ?';
+  } else {
+    qm.textContent=q.fr; qm.className='q-main fr';
+    document.getElementById('g-qlabel').textContent='Comment dit-on en arabe ?';
+  }
+  document.getElementById('g-qlesson').textContent=q.lessonTitle;
+
+  let wrong=VOCAB.filter(v=>v.ar!==q.ar);
+  const sameType=wrong.filter(v=>v.type===q.type);
+  let dist=shuffle([...sameType]).slice(0,3);
+  if(dist.length<3) dist=[...dist,...shuffle(wrong.filter(v=>!dist.includes(v))).slice(0,3-dist.length)];
+  const opts=shuffle([q,...dist.slice(0,3)]);
+
+  const oc=document.getElementById('g-opts'); oc.innerHTML='';
+  opts.forEach(opt=>{
+    const b=document.createElement('button');
+    b.className='q-opt'+(dir==='fr2ar'?' fr-opt':'');
+    b.textContent=dir==='ar2fr'?opt.fr:opt.ar;
+    b.dataset.correct=opt.ar===q.ar?'1':'0';
+    b.onclick=()=>pickAns(b,q);
+    oc.appendChild(b);
+  });
+}
+function pickAns(btn, q){
+  const ok=btn.dataset.correct==='1';
+  document.querySelectorAll('.q-opt').forEach(b=>{ b.classList.add('locked'); b.onclick=null; if(b.dataset.correct==='1') b.classList.add('correct'); else if(b===btn&&!ok) b.classList.add('wrong'); });
+  const fb=document.getElementById('g-fb');
+  const dir=q._dir;
+  if(ok){
+    qScore++; qStreak++; qMaxStreak=Math.max(qMaxStreak,qStreak);
+    delete qcmProgress.red[q.ar]; qcmProgress.green[q.ar]=true;
+    fb.className='q-feedback ok'; fb.textContent='✅ '+q.ar+' = '+q.fr;
+  } else {
+    qStreak=0; qMissed.push(q);
+    delete qcmProgress.green[q.ar]; qcmProgress.red[q.ar]=true;
+    fb.className='q-feedback ko'; fb.textContent='❌ '+q.ar+' = '+q.fr;
+  }
+  fb.style.display='block';
+  document.getElementById('g-streak').textContent=qStreak>=3?'🔥×'+qStreak:'';
+  document.getElementById('g-next').classList.remove('hidden');
+  saveQcmProgress();
+}
+function nextQ(){ qIdx++; if(qIdx>=qQueue.length){ showResults(); return; } renderQ(); }
+function showResults(){
+  const tot=qQueue.length, pct=Math.round(qScore/tot*100);
+  document.getElementById('g-remoji').textContent=pct>=90?'🌟':pct>=70?'👍':pct>=50?'😊':'💪';
+  document.getElementById('g-rscore').textContent=qScore+' / '+tot;
+  document.getElementById('g-rpct').textContent=pct+'%';
+  document.getElementById('g-rgood').textContent=qScore;
+  document.getElementById('g-rbad').textContent=tot-qScore;
+  document.getElementById('g-rstreak').textContent=qMaxStreak;
+  const mw=document.getElementById('g-missed-wrap');
+  if(qMissed.length){
+    mw.classList.remove('hidden');
+    document.getElementById('g-missed-list').innerHTML=qMissed.map(v=>`<div class="missed-item"><span class="missed-ar">${v.ar}</span><span class="missed-fr">${v.fr}</span></div>`).join('');
+  } else { mw.classList.add('hidden'); }
+  document.getElementById('qcm-quiz').classList.add('hidden');
+  document.getElementById('qcm-results').classList.remove('hidden');
+  updateQcmStats();
+}
+
+function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 </script>
 </body>
 </html>
