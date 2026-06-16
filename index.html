@@ -155,7 +155,37 @@ body.edit-mode .module-tile{cursor:grab;}
 .mastered-item:last-child{border-bottom:none;}
 .mastered-item .to-review-btn{margin-left:auto;font-size:.65rem;background:var(--blue-l);border:1px solid var(--blue);color:var(--blue);border-radius:4px;padding:2px 6px;cursor:pointer;white-space:nowrap;}
 
-/* EDT WIDGET */
+/* SPORT WIDGET */
+.sport-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:700px){.sport-cols{grid-template-columns:1fr;}}
+.sport-col{}
+.sport-section-title{font-family:'Kalam',cursive;font-size:.9rem;color:var(--accent);margin-bottom:10px;}
+
+.weight-goal-bar-wrap{margin-bottom:10px;}
+.weight-goal-labels{display:flex;justify-content:space-between;font-size:.72rem;color:var(--chalk-dim);margin-bottom:4px;}
+.weight-goal-bar{height:10px;background:var(--line);border-radius:5px;overflow:hidden;position:relative;}
+.weight-goal-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--teal));border-radius:5px;transition:width .6s;}
+.weight-milestones{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px;}
+.milestone{font-size:.68rem;padding:3px 7px;border-radius:12px;border:1px solid var(--line);color:var(--chalk-dim);}
+.milestone.done{background:var(--green-l);border-color:var(--green);color:var(--green);font-weight:700;}
+.milestone.current{background:var(--teal-l);border-color:var(--teal);color:var(--teal);font-weight:700;}
+.weight-last{font-size:.8rem;color:var(--chalk-dim);margin-top:6px;}
+.weight-last strong{color:var(--chalk);font-size:1.05rem;}
+
+.regularity-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;}
+.reg-card{background:var(--bg3);border:1px solid var(--line);border-radius:9px;padding:10px 6px;text-align:center;}
+.reg-val{font-family:'Kalam',cursive;font-size:1.15rem;font-weight:700;}
+.reg-lbl{font-size:.65rem;color:var(--chalk-dim);margin-top:2px;}
+
+.weeks-history{display:flex;flex-direction:column;gap:5px;}
+.week-row{display:flex;align-items:center;gap:8px;font-size:.75rem;}
+.week-row .wk-lbl{width:60px;color:var(--chalk-dim);flex-shrink:0;}
+.week-dots{display:flex;gap:4px;}
+.week-dot{width:18px;height:18px;border-radius:50%;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:.6rem;}
+.week-dot.done{background:var(--green-l);border-color:var(--green);}
+.week-dot.missed{background:var(--red-l);border-color:var(--red);}
+.week-dot.future{background:var(--bg3);border-color:var(--line);}
+.week-pct{margin-left:auto;font-size:.68rem;color:var(--chalk-dim);}
 .edt-wrap{overflow-x:auto;}
 .edt-grid{min-width:320px;font-size:.68rem;}
 .edt-header{display:flex;border-bottom:1px solid var(--line);background:var(--bg3);}
@@ -411,6 +441,90 @@ body.edit-mode .module-tile{cursor:grab;}
   </div>
 </div>
 
+<!-- SPORT WIDGET (full-width below) -->
+<div style="padding:0 14px 14px;" id="sport-section" class="hidden">
+  <div class="widget" id="sport-widget">
+    <div class="widget-hdr">
+      <span style="font-size:1.2rem;">💪</span>
+      <h2>Suivi Sport & Poids</h2>
+      <button class="btn" id="sport-weigh-btn" style="margin-left:auto;font-size:.78rem;padding:5px 11px;">⚖️ Peser</button>
+    </div>
+    <div class="widget-body">
+      <div class="sport-cols">
+
+        <!-- COL 1 : poids -->
+        <div class="sport-col">
+          <div class="sport-section-title">📉 Courbe de poids</div>
+
+          <!-- Barre de progression vers objectif -->
+          <div class="weight-goal-bar-wrap">
+            <div class="weight-goal-labels">
+              <span id="w-start-lbl">97.2 kg</span>
+              <span id="w-goal-lbl" style="color:var(--accent);">Objectif : 83 kg</span>
+            </div>
+            <div class="weight-goal-bar">
+              <div class="weight-goal-fill" id="w-goal-fill" style="width:0%"></div>
+            </div>
+            <div class="weight-milestones" id="w-milestones"></div>
+          </div>
+
+          <!-- Dernière pesée -->
+          <div class="weight-last" id="weight-last">Aucune pesée enregistrée.</div>
+
+          <!-- Graphique SVG -->
+          <div style="margin-top:10px;">
+            <svg id="weight-chart" width="100%" height="140" viewBox="0 0 400 140" preserveAspectRatio="none" style="display:block;"></svg>
+          </div>
+        </div>
+
+        <!-- COL 2 : séances -->
+        <div class="sport-col">
+          <div class="sport-section-title">🏋️ Séances (depuis l'EDT)</div>
+
+          <!-- Régularité -->
+          <div class="regularity-row">
+            <div class="reg-card" id="reg-this-week">
+              <div class="reg-val" id="reg-week-done">0/3</div>
+              <div class="reg-lbl">Cette semaine</div>
+            </div>
+            <div class="reg-card" id="reg-4w">
+              <div class="reg-val" id="reg-4w-pct">0%</div>
+              <div class="reg-lbl">Régularité 4 sem.</div>
+            </div>
+            <div class="reg-card" id="reg-total">
+              <div class="reg-val" id="reg-total-val">0</div>
+              <div class="reg-lbl">Séances totales</div>
+            </div>
+          </div>
+
+          <!-- Historique semaines -->
+          <div class="weeks-history" id="weeks-history"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PESER -->
+<div class="overlay" id="weigh-overlay">
+  <div class="modal" style="max-width:340px;">
+    <h3>⚖️ Nouvelle pesée</h3>
+    <div class="field">
+      <label for="weigh-val">Poids (kg)</label>
+      <input type="number" id="weigh-val" step="0.1" min="40" max="200" placeholder="ex : 96.8" style="background:var(--bg);border:1px solid var(--line);color:var(--chalk);border-radius:6px;padding:9px 12px;font-size:1.1rem;font-family:inherit;width:100%;">
+    </div>
+    <div class="field">
+      <label for="weigh-date">Date</label>
+      <input type="date" id="weigh-date" style="background:var(--bg);border:1px solid var(--line);color:var(--chalk);border-radius:6px;padding:9px 12px;font-family:inherit;width:100%;">
+    </div>
+    <div class="modal-actions">
+      <button class="btn" id="weigh-cancel">Annuler</button>
+      <button class="btn primary" id="weigh-save">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODULE MODAL -->
 <div class="overlay" id="mod-overlay">
   <div class="modal">
@@ -515,7 +629,8 @@ auth.onAuthStateChanged(async user=>{
   updateQcmStats();
   updateQcmInfo();
   renderEdt();
-  setInterval(renderEdt, 60000); // refresh every minute for time-now line
+  setInterval(renderEdt, 60000);
+  initSportWidget(user.uid); // refresh every minute for time-now line
 });
 
 // ─── AUTH ───
@@ -921,6 +1036,259 @@ document.getElementById('edt-today').addEventListener('click',()=>{edtNavOffset=
 
 // ─── HELPERS ───
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+// ─── SPORT WIDGET ───
+const SPORT_KEYWORDS = ['musculation','musculations','muscul','sport','muscu'];
+const SPORT_GOAL_KG = 83;
+const SPORT_START_KG = 97.2;
+const SPORT_TARGET_PER_WEEK = 3;
+const SPORT_MILESTONE_STEP = 2;
+
+let sportDoc = null, sportData = {weights:[], goal: SPORT_GOAL_KG, startWeight: SPORT_START_KG};
+
+function isSportEvent(ev){
+  return SPORT_KEYWORDS.includes((ev.title||'').toLowerCase().trim());
+}
+
+// Compute past sport sessions from planningState, respecting exceptions and onlyDate
+function computeSessions(){
+  if(!planningState) return [];
+  const events = (planningState.events||[]).filter(isSportEvent);
+  const exceptions = planningState.exceptions||[];
+  const today = new Date(); today.setHours(23,59,59,999);
+  const sessions = [];
+
+  // We scan week by week from the earliest event date we can estimate
+  // to current week to find all past occurrences
+  const anchor = planningState.weekAnchor||{monday:dKey(mondayOf(new Date())),letter:'A'};
+  const anchorDate = new Date(anchor.monday+'T00:00:00');
+
+  // Go back up to 52 weeks
+  for(let w=-52; w<=0; w++){
+    const monday = mondayOf(addDays(anchorDate, w*7));
+    const diffWeeks = Math.round((monday-anchorDate)/604800000);
+    const parity = ((diffWeeks%2)+2)%2;
+    const letter = parity===0?anchor.letter:(anchor.letter==='A'?'B':'A');
+
+    for(let d=0; d<7; d++){
+      const date = addDays(monday, d);
+      const key = dKey(date);
+      if(date > today) continue;
+
+      events.forEach(ev=>{
+        if(ev.day !== d) return;
+        // Check if this event applies to this specific date
+        if(ev.onlyDate && ev.onlyDate !== key) return;
+        if(!ev.onlyDate && ev.week && ev.week !== letter) return;
+        // Check exceptions
+        if(exceptions.includes(ev.id+'@'+key)) return;
+        // Check holiday
+        // (simplified — we trust the user's EDT without re-applying holiday logic here)
+        const sessionEnd = new Date(date);
+        const [eh,em] = ev.end.split(':').map(Number);
+        sessionEnd.setHours(eh,em,0,0);
+        if(sessionEnd <= today){
+          sessions.push({date:key, title:ev.title, start:ev.start, end:ev.end});
+        }
+      });
+    }
+  }
+
+  // Deduplicate by date (same day can't count twice)
+  const seen = new Set();
+  return sessions.filter(s=>{ if(seen.has(s.date)) return false; seen.add(s.date); return true; });
+}
+
+function weekKey(monday){ return dKey(monday); }
+function getMonday(dateStr){ return mondayOf(new Date(dateStr+'T12:00:00')); }
+
+function renderSport(sessions){
+  const now = new Date();
+  const todayKey = dKey(now);
+  const thisMonday = mondayOf(now);
+  const thisMondayKey = dKey(thisMonday);
+
+  // ── POIDS ──
+  const weights = sportData.weights||[];
+  const goal = sportData.goal||SPORT_GOAL_KG;
+  const startW = sportData.startWeight||SPORT_START_KG;
+
+  if(weights.length>0){
+    const last = weights[weights.length-1];
+    const diff = (last.w - startW).toFixed(1);
+    const diffStr = diff>0?'+'+diff:diff;
+    document.getElementById('weight-last').innerHTML =
+      `Dernière pesée : <strong>${last.w} kg</strong> le ${last.d} — ${diffStr} kg depuis le début`;
+  }
+
+  // Milestones
+  const milestones = [];
+  for(let m=startW-SPORT_MILESTONE_STEP; m>=goal; m-=SPORT_MILESTONE_STEP){
+    milestones.push(Math.round(m*10)/10);
+  }
+  const lastW = weights.length>0?weights[weights.length-1].w:startW;
+  const el = document.getElementById('w-milestones');
+  el.innerHTML = milestones.map(m=>{
+    const done = lastW<=m;
+    const isCurrent = !done && milestones.indexOf(m)===milestones.findIndex(x=>lastW>x);
+    return `<div class="milestone${done?' done':isCurrent?' current':''}">${m} kg${done?' ✓':''}</div>`;
+  }).join('');
+
+  // Progress bar
+  const pct = Math.max(0,Math.min(100,(startW-lastW)/(startW-goal)*100));
+  document.getElementById('w-goal-fill').style.width = pct+'%';
+  document.getElementById('w-start-lbl').textContent = startW+' kg';
+  document.getElementById('w-goal-lbl').textContent = 'Objectif : '+goal+' kg';
+
+  // Chart
+  renderWeightChart(weights, goal, startW);
+
+  // ── SÉANCES ──
+  // Group sessions by week
+  const weekMap = {};
+  sessions.forEach(s=>{
+    const m = weekKey(mondayOf(new Date(s.date+'T12:00:00')));
+    if(!weekMap[m]) weekMap[m]=[];
+    weekMap[m].push(s);
+  });
+
+  // This week
+  const thisDone = (weekMap[thisMondayKey]||[]).length;
+  const regEl = document.getElementById('reg-week-done');
+  regEl.textContent = thisDone+'/'+SPORT_TARGET_PER_WEEK;
+  regEl.style.color = thisDone>=SPORT_TARGET_PER_WEEK?'var(--green)':thisDone>0?'var(--accent)':'var(--chalk)';
+
+  // 4-week regularity
+  let totalDone4=0, totalTarget4=0;
+  for(let w=-3;w<=0;w++){
+    const m = weekKey(mondayOf(addDays(now,w*7)));
+    const done = Math.min(SPORT_TARGET_PER_WEEK,(weekMap[m]||[]).length);
+    totalDone4+=done; totalTarget4+=SPORT_TARGET_PER_WEEK;
+  }
+  const pct4 = Math.round(totalDone4/totalTarget4*100);
+  const pct4El = document.getElementById('reg-4w-pct');
+  pct4El.textContent = pct4+'%';
+  pct4El.style.color = pct4>=80?'var(--green)':pct4>=50?'var(--accent)':'var(--red)';
+
+  document.getElementById('reg-total-val').textContent = sessions.length;
+
+  // Week history (last 8 weeks)
+  const hist = document.getElementById('weeks-history');
+  hist.innerHTML='';
+  for(let w=-7;w<=0;w++){
+    const monday = mondayOf(addDays(now,w*7));
+    const mKey = weekKey(monday);
+    const done = (weekMap[mKey]||[]).length;
+    const isFuture = monday > now;
+    const lbl = w===0?'Cette sem.':'-'+(Math.abs(w))+' sem.';
+    const dots = [];
+    for(let i=0;i<SPORT_TARGET_PER_WEEK;i++){
+      const cls = isFuture?'future':i<done?'done':'missed';
+      const icon = cls==='done'?'✓':cls==='missed'?'✕':'';
+      dots.push(`<div class="week-dot ${cls}">${icon}</div>`);
+    }
+    const pctW = isFuture?'':Math.round(Math.min(done,SPORT_TARGET_PER_WEEK)/SPORT_TARGET_PER_WEEK*100)+'%';
+    hist.innerHTML+=`<div class="week-row"><span class="wk-lbl">${lbl}</span><div class="week-dots">${dots.join('')}</div><span class="week-pct">${pctW}</span></div>`;
+  }
+}
+
+function renderWeightChart(weights, goal, startW){
+  const svg = document.getElementById('weight-chart');
+  if(weights.length<2){
+    svg.innerHTML=`<text x="50%" y="50%" text-anchor="middle" fill="var(--chalk-dim)" font-size="11" font-family="Work Sans">Ajoute au moins 2 pesées pour voir la courbe.</text>`;
+    return;
+  }
+
+  const W=400, H=140, PAD={t:10,r:10,b:24,l:36};
+  const cW=W-PAD.l-PAD.r, cH=H-PAD.t-PAD.b;
+
+  const vals = weights.map(w=>w.w);
+  const minV = Math.min(...vals, goal)-1;
+  const maxV = Math.max(...vals, startW)+1;
+  const yScale = v => PAD.t + cH - (v-minV)/(maxV-minV)*cH;
+  const xScale = i => PAD.l + i/(weights.length-1)*cW;
+
+  let html='';
+
+  // Goal line
+  const gy = yScale(goal);
+  html+=`<line x1="${PAD.l}" y1="${gy}" x2="${W-PAD.r}" y2="${gy}" stroke="var(--accent)" stroke-width="1" stroke-dasharray="4,3" opacity=".6"/>`;
+  html+=`<text x="${W-PAD.r-2}" y="${gy-3}" text-anchor="end" fill="var(--accent)" font-size="9" font-family="Work Sans">${goal}kg</text>`;
+
+  // Gradient area under curve
+  html+=`<defs><linearGradient id="wg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--teal)" stop-opacity=".35"/><stop offset="100%" stop-color="var(--teal)" stop-opacity="0"/></linearGradient></defs>`;
+
+  const pts = weights.map((w,i)=>`${xScale(i)},${yScale(w.w)}`).join(' ');
+  const areaPath = `M${xScale(0)},${H-PAD.b} `+weights.map((w,i)=>`L${xScale(i)},${yScale(w.w)}`).join(' ')+` L${xScale(weights.length-1)},${H-PAD.b} Z`;
+  html+=`<path d="${areaPath}" fill="url(#wg)"/>`;
+  html+=`<polyline points="${pts}" fill="none" stroke="var(--teal)" stroke-width="2" stroke-linejoin="round"/>`;
+
+  // Points
+  weights.forEach((w,i)=>{
+    const x=xScale(i), y=yScale(w.w);
+    html+=`<circle cx="${x}" cy="${y}" r="3" fill="var(--teal)" stroke="var(--bg2)" stroke-width="1.5"/>`;
+    if(i===weights.length-1||i===0){
+      html+=`<text x="${x}" y="${y-6}" text-anchor="middle" fill="var(--chalk)" font-size="9" font-family="Work Sans">${w.w}</text>`;
+    }
+  });
+
+  // X axis dates (first and last)
+  const fmt = d => d.slice(5).replace('-','/');
+  html+=`<text x="${PAD.l}" y="${H-4}" fill="var(--chalk-dim)" font-size="9" font-family="Work Sans">${fmt(weights[0].d)}</text>`;
+  html+=`<text x="${W-PAD.r}" y="${H-4}" text-anchor="end" fill="var(--chalk-dim)" font-size="9" font-family="Work Sans">${fmt(weights[weights.length-1].d)}</text>`;
+
+  // Y axis labels
+  const yTicks=[minV+1, goal, maxV-1].filter((v,i,a)=>a.indexOf(v)===i);
+  yTicks.forEach(v=>{
+    const y=yScale(v);
+    if(y<PAD.t||y>H-PAD.b) return;
+    html+=`<text x="${PAD.l-3}" y="${y+4}" text-anchor="end" fill="var(--chalk-dim)" font-size="9" font-family="Work Sans">${Math.round(v)}</text>`;
+  });
+
+  svg.innerHTML=html;
+}
+
+// Sport Firestore
+function initSportWidget(uid){
+  sportDoc = db.collection('users').doc(uid).collection('modules').doc('sport');
+  sportDoc.get().then(snap=>{
+    if(snap.exists) sportData = Object.assign({weights:[],goal:SPORT_GOAL_KG,startWeight:SPORT_START_KG}, snap.data());
+    const sessions = computeSessions();
+    renderSport(sessions);
+    document.getElementById('sport-section').classList.remove('hidden');
+  }).catch(()=>{
+    const sessions = computeSessions();
+    renderSport(sessions);
+    document.getElementById('sport-section').classList.remove('hidden');
+  });
+}
+function saveSportData(){
+  if(!sportDoc) return;
+  sportDoc.set(sportData).catch(()=>{});
+}
+
+// Pesée modal
+const weighOverlay = document.getElementById('weigh-overlay');
+document.getElementById('sport-weigh-btn').addEventListener('click',()=>{
+  document.getElementById('weigh-val').value='';
+  document.getElementById('weigh-date').value=dKey(new Date());
+  weighOverlay.classList.add('open');
+});
+document.getElementById('weigh-cancel').addEventListener('click',()=>weighOverlay.classList.remove('open'));
+document.getElementById('weigh-save').addEventListener('click',()=>{
+  const val = parseFloat(document.getElementById('weigh-val').value);
+  const date = document.getElementById('weigh-date').value;
+  if(!val||isNaN(val)||!date){alert('Saisis un poids valide.');return;}
+  if(!sportData.weights) sportData.weights=[];
+  // Remove existing entry for same date then push new one
+  sportData.weights = sportData.weights.filter(w=>w.d!==date);
+  sportData.weights.push({d:date, w:Math.round(val*10)/10});
+  sportData.weights.sort((a,b)=>a.d.localeCompare(b.d));
+  saveSportData();
+  weighOverlay.classList.remove('open');
+  const sessions = computeSessions();
+  renderSport(sessions);
+});
 </script>
 </body>
 </html>
