@@ -228,6 +228,9 @@ input, select, textarea { font-family: inherit; }
   <!-- TOPBAR -->
   <nav class="sidebar">
     <div class="sidebar-logo">
+      <a href="https://bigkarim93.github.io/MyLife/index.html" style="display:flex;align-items:center;gap:6px;text-decoration:none;color:inherit;margin-right:.5rem" title="Accueil MyLife">
+        <span style="font-size:18px">🏠</span>
+      </a>
       <div class="logo-icon">💶</div>
       <span>Mes Finances</span>
     </div>
@@ -241,6 +244,8 @@ input, select, textarea { font-family: inherit; }
     <button class="nav-item" onclick="showPage('import')">📂 Importer</button>
     <button class="nav-item" onclick="showPage('rules')">🏷️ Règles</button>
     <div style="flex:1"></div>
+    <span id="save-indicator" style="font-size:12px;padding:0 .5rem;align-self:center"></span>
+    <button class="nav-item" onclick="showTokenModal()" title="Configurer GitHub" style="font-size:18px;padding:.5rem">⚙️</button>
     <button class="nav-item" onclick="loadDemo()" style="color:var(--blue)">✨ Démo</button>
   </nav>
 
@@ -490,6 +495,7 @@ input, select, textarea { font-family: inherit; }
           <button class="btn btn-primary btn-sm" onclick="exportBackup()">💾 Exporter sauvegarde</button>
           <button class="btn btn-sm" onclick="document.getElementById('backupInput').click()">📂 Restaurer sauvegarde</button>
           <input type="file" id="backupInput" accept=".json" style="display:none" onchange="importBackup(this)">
+          <button class="btn btn-sm" onclick="showTokenModal()">🔑 Config GitHub</button>
           <button class="btn btn-danger btn-sm" onclick="clearAllData()">🗑️ Effacer toutes les données</button>
         </div>
         <p style="font-size:12px;color:var(--text3);margin-top:.75rem">⚠️ Exporte une sauvegarde régulièrement — les données sont stockées dans ce navigateur sur ce chemin de fichier exact.</p>
@@ -618,21 +624,68 @@ const DEFAULT_RULES = {
 };
 
 // ════════════════════════════════════════════════
-// STORAGE — window.storage (Claude, multi-appareils)
-// Cache local en mémoire pour éviter les appels répétés
+// STORAGE — GitHub API (persistance multi-appareils)
+// Données stockées dans bigkarim93/MyLife/finances-data.json
 // ════════════════════════════════════════════════
-const _cache = { tx: null, rules: null, budgets: null };
+const GITHUB_OWNER = 'bigkarim93';
+const GITHUB_REPO  = 'MyLife';
+const GITHUB_FILE  = 'finances-data.json';
+const GITHUB_API   = 'https://api.github.com/repos/' + GITHUB_OWNER + '/' + GITHUB_REPO + '/contents/' + GITHUB_FILE;
 
-async function storageSafe(op, key, value) {
+const _cache = { tx: null, rules: null, budgets: null };
+let _ghSha = null; // SHA du fichier sur GitHub (requis pour les mises à jour)
+
+function getGHToken() {
+  return localStorage.getItem('gh_token') || '';
+}
+
+function showSaveIndicator(state) {
+  // state: 'saving' | 'saved' | 'error'
+  let el = document.getElementById('save-indicator');
+  if (!el) return;
+  if (state === 'saving') { el.textContent = '☁️ Enregistrement…'; el.style.color = 'var(--amber)'; }
+  else if (state === 'saved') { el.textContent = '☁️ Enregistré'; el.style.color = 'var(--green)'; setTimeout(()=>{ el.textContent=''; }, 2500); }
+  else { el.textContent = '⚠️ Erreur sync'; el.style.color = 'var(--red)'; }
+}
+
+async function ghLoad() {
+  const token = getGHToken();
+  if (!token) return null;
   try {
-    if (op === 'get') return await window.storage.get(key);
-    if (op === 'set') return await window.storage.set(key, value);
+    const r = await fetch(GITHUB_API, {
+      headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' }
+    });
+    if (r.status === 404) return null; // fichier pas encore créé
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const json = await r.json();
+    _ghSha = json.sha;
+    return JSON.parse(atob(json.content.replace(/\n/g,'')));
+  } catch(e) { console.warn('GitHub load error:', e); return null; }
+}
+
+async function ghSave(data) {
+  const token = getGHToken();
+  if (!token) { localStorage.setItem('fin_offline', JSON.stringify(data)); return; }
+  showSaveIndicator('saving');
+  try {
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+    const body = { message: 'Mise à jour finances ' + new Date().toISOString().slice(0,10), content };
+    if (_ghSha) body.sha = _ghSha;
+    const r = await fetch(GITHUB_API, {
+      method: 'PUT',
+      headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' },
+      body: JSON.stringify(body)
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const json = await r.json();
+    _ghSha = json.content.sha;
+    showSaveIndicator('saved');
   } catch(e) {
-    // Fallback localStorage si window.storage indisponible
-    if (op === 'get') { const v = localStorage.getItem(key); return v ? {value: v} : null; }
-    if (op === 'set') { localStorage.setItem(key, value); return true; }
+    console.error('GitHub save error:', e);
+    showSaveIndicator('error');
+    // Fallback: sauvegarder en local
+    localStorage.setItem('fin_offline', JSON.stringify(data));
   }
-  return null;
 }
 
 function loadUiPrefs() {
@@ -653,27 +706,38 @@ function saveUiPrefs() {
 }
 
 async function loadAllData() {
-  const [txRes, rulesRes, budgetsRes] = await Promise.all([
-    storageSafe('get', 'fin_tx'),
-    storageSafe('get', 'fin_rules'),
-    storageSafe('get', 'fin_budgets'),
-  ]);
-  _cache.tx      = JSON.parse(txRes?.value      || '[]').map(t=>({...t, date: new Date(t.date)}));
-  _cache.rules   = JSON.parse(rulesRes?.value   || '{}');
-  _cache.budgets = JSON.parse(budgetsRes?.value || '[]');
+  // Essayer GitHub d'abord, fallback localStorage offline
+  const token = getGHToken();
+  let data = null;
+  if (token) {
+    data = await ghLoad();
+  }
+  if (!data) {
+    // Pas de token ou erreur réseau : charger le cache offline
+    const offline = localStorage.getItem('fin_offline');
+    if (offline) { try { data = JSON.parse(offline); } catch(e) {} }
+  }
+  if (!data) data = { tx: [], rules: {}, budgets: [] };
+  _cache.tx      = (data.tx      || []).map(t=>({...t, date: new Date(t.date)}));
+  _cache.rules   = data.rules   || {};
+  _cache.budgets = data.budgets || [];
+}
+
+function _buildSaveData() {
+  return { tx: _cache.tx || [], rules: _cache.rules || {}, budgets: _cache.budgets || [] };
 }
 
 async function saveTransactions(txs) {
   _cache.tx = txs;
-  await storageSafe('set', 'fin_tx', JSON.stringify(txs));
+  await ghSave(_buildSaveData());
 }
 async function saveRules(rules) {
   _cache.rules = rules;
-  await storageSafe('set', 'fin_rules', JSON.stringify(rules));
+  await ghSave(_buildSaveData());
 }
 async function saveBudgets(b) {
   _cache.budgets = b;
-  await storageSafe('set', 'fin_budgets', JSON.stringify(b));
+  await ghSave(_buildSaveData());
 }
 function getAllTx()      { return _cache.tx      || []; }
 function getUserRules()  { return _cache.rules   || {}; }
@@ -2737,7 +2801,45 @@ async function importBackup(input) {
   input.value = '';
 }
 
-async function clearAllData() {
+async function showTokenModal(force) {
+  const current = getGHToken();
+  document.getElementById('modal-content').innerHTML =
+    '<h2 style="margin-bottom:.5rem">⚙️ Connexion GitHub</h2>' +
+    '<p style="font-size:13px;color:var(--text2);margin-bottom:1rem;line-height:1.6">Tes données sont sauvegardées sur GitHub (<strong>bigkarim93/MyLife</strong>). Entre ton token GitHub pour activer la synchronisation.</p>' +
+    '<div style="background:var(--surface2);border-radius:var(--radius-sm);padding:.75rem 1rem;margin-bottom:1rem;font-size:12px;color:var(--text2);line-height:1.7">' +
+      '1. Va sur <strong>github.com</strong> → Settings → Developer settings<br>' +
+      '2. Personal access tokens → Tokens (classic) → Generate new token<br>' +
+      '3. Coche uniquement <strong>repo</strong> → Generate → Copie le token' +
+    '</div>' +
+    '<div class="modal-field">' +
+      '<label>Token GitHub (commence par ghp_...)</label>' +
+      '<input type="password" id="gh-token-input" value="' + current + '" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" style="width:100%;padding:.5rem .75rem;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:monospace">' +
+    '</div>' +
+    '<div style="display:flex;gap:8px;justify-content:space-between;margin-top:1rem">' +
+      (current ? '<button class="btn btn-danger btn-sm" onclick="localStorage.removeItem(&quot;gh_token&quot;);closeModal();showToast(&quot;Token supprimé&quot;,&quot;success&quot;)">🗑️ Déconnecter</button>' : '<div></div>') +
+      '<div style="display:flex;gap:8px">' +
+        (force ? '' : '<button class="btn btn-sm" onclick="closeModal()">Annuler</button>') +
+        '<button class="btn btn-primary btn-sm" onclick="saveToken()">✓ Enregistrer</button>' +
+      '</div>' +
+    '</div>';
+  document.getElementById('modal-overlay').style.display = 'flex';
+  setTimeout(() => document.getElementById('gh-token-input')?.focus(), 50);
+}
+
+async function saveToken() {
+  const val = document.getElementById('gh-token-input')?.value.trim();
+  if (!val) { showToast('Entre un token valide', 'error'); return; }
+  localStorage.setItem('gh_token', val);
+  closeModal();
+  showToast('Connexion GitHub enregistrée ✓', 'success');
+  // Recharger les données depuis GitHub
+  await loadAllData();
+  refreshAllPeriodSelects();
+  renderImportStats();
+  showPage('monthly');
+}
+
+function clearAllData() {
   if (!confirm('Effacer toutes les transactions ? Cette action est irréversible.')) return;
   localStorage.removeItem('fin_tx');
   showToast('Données effacées', 'success');
@@ -2804,6 +2906,12 @@ function applySpecialRules(tx) {
 
 (async function init() {
   loadUiPrefs();
+  // Si pas de token GitHub : afficher la modale de config
+  if (!getGHToken()) {
+    try { refreshAllPeriodSelects(); renderImportStats(); showPage('monthly'); } catch(e) {}
+    showTokenModal(true);
+    return;
+  }
   try { await loadAllData(); } catch(e) { console.warn('Load error:', e); }
   try {
     refreshAllPeriodSelects();
