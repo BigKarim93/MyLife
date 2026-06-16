@@ -247,8 +247,6 @@
   .modal-actions{display:flex;justify-content:space-between;gap:8px;margin-top:14px;flex-wrap:wrap;}
   .modal-actions .right{display:flex;gap:8px;margin-left:auto;}
   .modal-actions .left{display:flex;gap:8px;flex-wrap:wrap;}
-  .emoji-opt{background:var(--bg3);border:1px solid var(--line);border-radius:6px;padding:3px 5px;font-size:1.1rem;cursor:pointer;transition:.1s;}
-  .emoji-opt:hover{border-color:var(--accent);}
 
   footer{text-align:center;color:var(--chalk-dim);font-size:.75rem;padding:18px;}
 
@@ -401,24 +399,7 @@
           <button type="button" class="btn" id="ev-color-clear" style="font-size:.78rem;padding:6px 10px;">✕ Effacer</button>
         </div>
       </div>
-      <div class="field">
-        <label for="ev-emoji">Emoji (optionnel)</label>
-        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-          <input type="text" id="ev-emoji" maxlength="4" style="width:60px;font-size:1.3rem;text-align:center;">
-          <div id="emoji-picker" style="display:flex;gap:4px;flex-wrap:wrap;">
-            <button type="button" class="emoji-opt" onclick="pickEmoji('🎉')">🎉</button>
-            <button type="button" class="emoji-opt" onclick="pickEmoji('⚽')">⚽</button>
-            <button type="button" class="emoji-opt" onclick="pickEmoji('✈️')">✈️</button>
-            <button type="button" class="emoji-opt" onclick="pickEmoji('🏥')">🏥</button>
-            <button type="button" class="emoji-opt" onclick="pickEmoji('📚')">📚</button>
-            <button type="button" class="emoji-opt" onclick="pickEmoji('🎵')">🎵</button>
-            <button type="button" class="emoji-opt" onclick="pickEmoji('🏋️')">🏋️</button>
-            <button type="button" class="emoji-opt" onclick="pickEmoji('🍕')">🍕</button>
-            <button type="button" class="emoji-opt" onclick="pickEmoji('💊')">💊</button>
-            <button type="button" class="emoji-opt" onclick="pickEmoji('🎮')">🎮</button>
-          </div>
-        </div>
-      </div>
+    </div>
     <div class="field-row">
       <div class="field">
         <label for="ev-day">Jour</label>
@@ -939,7 +920,7 @@ function renderEventsInColumn(col, events, opts){
     }
 
     div.innerHTML =
-      '<span class="ev-title">'+(ev.emoji?ev.emoji+' ':'')+escapeHtml(ev.title)+'</span>'+
+      '<span class="ev-title">'+escapeHtml(ev.title)+'</span>'+
       (ev.week?('<span class="ev-meta">'+ev.week+'</span>'):'');
 
     const delBtn = document.createElement('button');
@@ -1207,7 +1188,6 @@ function openEventModal(ev, dateStr){
   document.getElementById('ev-end').value = ev ? ev.end : '10:00';
   document.getElementById('ev-once-date').value = (ev && ev.onlyDate) ? ev.onlyDate : editingDate;
   document.getElementById('ev-color').value = (ev && ev.color) ? ev.color : '#92c7ed';
-  document.getElementById('ev-emoji').value = (ev && ev.emoji) ? ev.emoji : '';
   updateOnceRowVisibility();
 
   const group = document.getElementById('ev-delete-group');
@@ -1235,7 +1215,6 @@ function updateOnceRowVisibility(){
   document.getElementById('ev-day').disabled = isOnce;
 }
 document.getElementById('ev-week').addEventListener('change', updateOnceRowVisibility);
-function pickEmoji(e){ document.getElementById('ev-emoji').value = e; }
 document.getElementById('ev-color-clear').addEventListener('click', ()=>{
   document.getElementById('ev-color').value = '#92c7ed';
   document.getElementById('ev-color').dataset.cleared = '1';
@@ -1265,7 +1244,6 @@ document.getElementById('ev-save').addEventListener('click', ()=>{
     week: weekVal==='once' ? '' : weekVal,
     onlyDate: weekVal==='once' ? onceDate : null,
     color: document.getElementById('ev-color').dataset.cleared ? null : document.getElementById('ev-color').value,
-    emoji: document.getElementById('ev-emoji').value.trim() || null,
     start, end
   };
   // Pour un évènement ponctuel, le jour doit correspondre à la date choisie
