@@ -244,8 +244,7 @@ input, select, textarea { font-family: inherit; }
     <button class="nav-item" onclick="showPage('import')">📂 Importer</button>
     <button class="nav-item" onclick="showPage('rules')">🏷️ Règles</button>
     <div style="flex:1"></div>
-    <span id="save-indicator" style="font-size:12px;padding:0 .5rem;align-self:center"></span>
-    <button class="nav-item" onclick="showTokenModal()" title="Configurer GitHub" style="font-size:18px;padding:.5rem">⚙️</button>
+    <span id="save-indicator" style="font-size:18px;padding:0 .5rem;align-self:center;opacity:.3;transition:opacity .3s" title="Synchronisation">☁️</span>
     <button class="nav-item" onclick="loadDemo()" style="color:var(--blue)">✨ Démo</button>
   </nav>
 
@@ -495,7 +494,6 @@ input, select, textarea { font-family: inherit; }
           <button class="btn btn-primary btn-sm" onclick="exportBackup()">💾 Exporter sauvegarde</button>
           <button class="btn btn-sm" onclick="document.getElementById('backupInput').click()">📂 Restaurer sauvegarde</button>
           <input type="file" id="backupInput" accept=".json" style="display:none" onchange="importBackup(this)">
-          <button class="btn btn-sm" onclick="showTokenModal()">🔑 Config GitHub</button>
           <button class="btn btn-danger btn-sm" onclick="clearAllData()">🗑️ Effacer toutes les données</button>
         </div>
         <p style="font-size:12px;color:var(--text3);margin-top:.75rem">⚠️ Exporte une sauvegarde régulièrement — les données sont stockées dans ce navigateur sur ce chemin de fichier exact.</p>
@@ -624,68 +622,26 @@ const DEFAULT_RULES = {
 };
 
 // ════════════════════════════════════════════════
-// STORAGE — GitHub API (persistance multi-appareils)
-// Données stockées dans bigkarim93/MyLife/finances-data.json
+// STORAGE — window.storage (Claude, multi-appareils)
+// Synchronisé automatiquement sur tous tes appareils Claude
 // ════════════════════════════════════════════════
-const GITHUB_OWNER = 'bigkarim93';
-const GITHUB_REPO  = 'MyLife';
-const GITHUB_FILE  = 'finances-data.json';
-const GITHUB_API   = 'https://api.github.com/repos/' + GITHUB_OWNER + '/' + GITHUB_REPO + '/contents/' + GITHUB_FILE;
-
 const _cache = { tx: null, rules: null, budgets: null };
-let _ghSha = null; // SHA du fichier sur GitHub (requis pour les mises à jour)
-
-function getGHToken() {
-  return localStorage.getItem('gh_token') || '';
-}
 
 function showSaveIndicator(state) {
-  // state: 'saving' | 'saved' | 'error'
-  let el = document.getElementById('save-indicator');
+  const el = document.getElementById('save-indicator');
   if (!el) return;
-  if (state === 'saving') { el.textContent = '☁️ Enregistrement…'; el.style.color = 'var(--amber)'; }
-  else if (state === 'saved') { el.textContent = '☁️ Enregistré'; el.style.color = 'var(--green)'; setTimeout(()=>{ el.textContent=''; }, 2500); }
-  else { el.textContent = '⚠️ Erreur sync'; el.style.color = 'var(--red)'; }
+  if (state === 'saving') { el.textContent = '☁️'; el.title = 'Enregistrement…'; el.style.opacity='1'; }
+  else if (state === 'saved') { el.textContent = '☁️'; el.title = 'Enregistré'; el.style.opacity='1'; setTimeout(()=>{ el.style.opacity='0.3'; }, 2000); }
+  else { el.textContent = '⚠️'; el.title = 'Erreur sync'; el.style.opacity='1'; }
 }
 
-async function ghLoad() {
-  const token = getGHToken();
-  if (!token) return null;
-  try {
-    const r = await fetch(GITHUB_API, {
-      headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' }
-    });
-    if (r.status === 404) return null; // fichier pas encore créé
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    const json = await r.json();
-    _ghSha = json.sha;
-    return JSON.parse(atob(json.content.replace(/\n/g,'')));
-  } catch(e) { console.warn('GitHub load error:', e); return null; }
+async function storageSave(key, value) {
+  try { await window.storage.set(key, value); } 
+  catch(e) { localStorage.setItem(key, value); }
 }
-
-async function ghSave(data) {
-  const token = getGHToken();
-  if (!token) { localStorage.setItem('fin_offline', JSON.stringify(data)); return; }
-  showSaveIndicator('saving');
-  try {
-    const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
-    const body = { message: 'Mise à jour finances ' + new Date().toISOString().slice(0,10), content };
-    if (_ghSha) body.sha = _ghSha;
-    const r = await fetch(GITHUB_API, {
-      method: 'PUT',
-      headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' },
-      body: JSON.stringify(body)
-    });
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    const json = await r.json();
-    _ghSha = json.content.sha;
-    showSaveIndicator('saved');
-  } catch(e) {
-    console.error('GitHub save error:', e);
-    showSaveIndicator('error');
-    // Fallback: sauvegarder en local
-    localStorage.setItem('fin_offline', JSON.stringify(data));
-  }
+async function storageLoad(key) {
+  try { const r = await window.storage.get(key); return r ? r.value : null; }
+  catch(e) { return localStorage.getItem(key); }
 }
 
 function loadUiPrefs() {
@@ -706,38 +662,29 @@ function saveUiPrefs() {
 }
 
 async function loadAllData() {
-  // Essayer GitHub d'abord, fallback localStorage offline
-  const token = getGHToken();
-  let data = null;
-  if (token) {
-    data = await ghLoad();
-  }
-  if (!data) {
-    // Pas de token ou erreur réseau : charger le cache offline
-    const offline = localStorage.getItem('fin_offline');
-    if (offline) { try { data = JSON.parse(offline); } catch(e) {} }
-  }
-  if (!data) data = { tx: [], rules: {}, budgets: [] };
-  _cache.tx      = (data.tx      || []).map(t=>({...t, date: new Date(t.date)}));
-  _cache.rules   = data.rules   || {};
-  _cache.budgets = data.budgets || [];
-}
-
-function _buildSaveData() {
-  return { tx: _cache.tx || [], rules: _cache.rules || {}, budgets: _cache.budgets || [] };
+  const [tx, rules, budgets] = await Promise.all([
+    storageLoad('fin_tx'),
+    storageLoad('fin_rules'),
+    storageLoad('fin_budgets'),
+  ]);
+  _cache.tx      = JSON.parse(tx      || '[]').map(t=>({...t, date: new Date(t.date)}));
+  _cache.rules   = JSON.parse(rules   || '{}');
+  _cache.budgets = JSON.parse(budgets || '[]');
 }
 
 async function saveTransactions(txs) {
   _cache.tx = txs;
-  await ghSave(_buildSaveData());
+  showSaveIndicator('saving');
+  try { await storageSave('fin_tx', JSON.stringify(txs)); showSaveIndicator('saved'); }
+  catch(e) { showSaveIndicator('error'); }
 }
 async function saveRules(rules) {
   _cache.rules = rules;
-  await ghSave(_buildSaveData());
+  await storageSave('fin_rules', JSON.stringify(rules));
 }
 async function saveBudgets(b) {
   _cache.budgets = b;
-  await ghSave(_buildSaveData());
+  await storageSave('fin_budgets', JSON.stringify(b));
 }
 function getAllTx()      { return _cache.tx      || []; }
 function getUserRules()  { return _cache.rules   || {}; }
@@ -2781,14 +2728,14 @@ async function importBackup(input) {
   const file = input.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = ev => {
+  reader.onload = async ev => {
     try {
       const data = JSON.parse(ev.target.result);
       if (!data.transactions) { showToast('Fichier invalide', 'error'); return; }
       if (!confirm('Restaurer cette sauvegarde du ' + (data.exportedAt||'?').slice(0,10) + ' ? Les données actuelles seront remplacées.')) return;
-      localStorage.setItem('fin_tx', data.transactions);
-      if (data.rules)   localStorage.setItem('fin_rules', data.rules);
-      if (data.budgets) localStorage.setItem('fin_budgets', data.budgets);
+      await storageSave('fin_tx', data.transactions);
+      if (data.rules)   await storageSave('fin_rules', data.rules);
+      if (data.budgets) await storageSave('fin_budgets', data.budgets);
       refreshAllPeriodSelects();
       renderImportStats();
       showPage('monthly');
@@ -2906,12 +2853,6 @@ function applySpecialRules(tx) {
 
 (async function init() {
   loadUiPrefs();
-  // Si pas de token GitHub : afficher la modale de config
-  if (!getGHToken()) {
-    try { refreshAllPeriodSelects(); renderImportStats(); showPage('monthly'); } catch(e) {}
-    showTokenModal(true);
-    return;
-  }
   try { await loadAllData(); } catch(e) { console.warn('Load error:', e); }
   try {
     refreshAllPeriodSelects();
