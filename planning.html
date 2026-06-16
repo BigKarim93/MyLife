@@ -446,6 +446,7 @@
         <button class="btn danger" id="ev-delete-all">Supprimer pour de bon</button>
       </div>
       <div class="right">
+        <button class="btn hidden" id="ev-duplicate">⧉ Dupliquer</button>
         <button class="btn" id="ev-cancel">Annuler</button>
         <button class="btn primary" id="ev-save">Enregistrer</button>
       </div>
@@ -1184,11 +1185,12 @@ function openEventModal(ev, dateStr){
   document.getElementById('ev-room').value = ev ? (ev.room||'') : '';
   document.getElementById('ev-type').value = ev ? ev.type : 'perso';
   document.getElementById('ev-day').value = ev ? ev.day : jsDayToOur(new Date().getDay());
-  document.getElementById('ev-week').value = ev ? (ev.onlyDate ? 'once' : (ev.week||'')) : '';
+  document.getElementById('ev-week').value = ev ? (ev.onlyDate ? 'once' : (ev.week||'')) : 'once';
   document.getElementById('ev-start').value = ev ? ev.start : '09:00';
   document.getElementById('ev-end').value = ev ? ev.end : '10:00';
   document.getElementById('ev-once-date').value = (ev && ev.onlyDate) ? ev.onlyDate : editingDate;
   document.getElementById('ev-color').value = (ev && ev.color) ? ev.color : '#92c7ed';
+  document.getElementById('ev-duplicate').classList.toggle('hidden', !ev);
   updateOnceRowVisibility();
 
   const group = document.getElementById('ev-delete-group');
@@ -1357,29 +1359,35 @@ document.getElementById('sleep-save').addEventListener('click', ()=>{
 function setupColumnClicks(){
   document.querySelectorAll('#week-days-body .day-col').forEach(col=>{
     col.addEventListener('click', e=>{
-      if(e.target!==col) return; // clic sur un évènement = géré par attachDrag
+      if(e.target!==col) return;
       const day = Number(col.dataset.day);
-      addFromClick(col, e, day);
+      const monday = mondayForOffset(state.weekNavOffset);
+      const dateStr = dateKey(addDays(monday, day));
+      addFromClick(col, e, day, dateStr);
     });
   });
   const dayCol = document.getElementById('day-col-single');
   dayCol.addEventListener('click', e=>{
     if(e.target!==dayCol) return;
     const day = Number(dayCol.dataset.day);
-    addFromClick(dayCol, e, day);
+    const dateStr = document.getElementById('day-date-picker').value || dateKey(new Date());
+    addFromClick(dayCol, e, day, dateStr);
   });
 }
-function addFromClick(col, e, day){
+function addFromClick(col, e, day, dateStr){
   const rect = col.getBoundingClientRect();
-  const y = e.clientY - rect.top;
+  const y = e.clientY - rect.top + col.closest('.week-wrap').scrollTop;
   const gsm = gridStartMin();
   let startMin = gsm + Math.round((y/PX_PER_MIN)/5)*5;
   startMin = Math.max(gsm, Math.min(23*60+55, startMin));
   const endMin = Math.min(24*60, startMin+55);
-  openEventModal(null);
+  openEventModal(null, dateStr);
   document.getElementById('ev-day').value = day;
   document.getElementById('ev-start').value = minToTime(startMin);
   document.getElementById('ev-end').value = minToTime(endMin);
+  // 'once' is already default — set the date picker to the clicked date
+  document.getElementById('ev-once-date').value = dateStr || dateKey(new Date());
+  updateOnceRowVisibility();
 }
 
 /* ====================================================================
@@ -1396,6 +1404,7 @@ function attachDrag(div, ev, opts){
     let moved=false, ghost=null;
 
     function onMove(e2){
+      if(!editMode) return; // drag gelé hors mode édition
       const dx=e2.clientX-startX, dy=e2.clientY-startY;
       if(!moved && Math.hypot(dx,dy)>THRESHOLD){
         moved=true;
@@ -1419,7 +1428,6 @@ function attachDrag(div, ev, opts){
       window.removeEventListener('pointerup', onUp);
 
       if(!moved){
-        // clic simple -> édition
         openEventModal(ev, opts.date);
         return;
       }
@@ -1452,6 +1460,21 @@ function attachDrag(div, ev, opts){
     window.addEventListener('pointerup', onUp);
   });
 }
+
+// ─── DUPLIQUER ───
+document.getElementById('ev-duplicate').addEventListener('click', ()=>{
+  if(!editingId) return;
+  const original = state.events.find(e=>e.id===editingId);
+  if(!original) return;
+  const copy = Object.assign({}, original, {id:'e'+Date.now()});
+  // décale de 1h pour que la copie soit visible
+  copy.start = minToTime(Math.min(timeToMin(original.start)+60, 22*60));
+  copy.end   = minToTime(Math.min(timeToMin(original.end)+60,   23*60));
+  state.events.push(copy);
+  saveState();
+  closeEventModal();
+  renderAll();
+});
 
 /* ====================================================================
    NAVIGATION SEMAINE A / B
