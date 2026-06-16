@@ -2736,6 +2736,8 @@ async function importBackup(input) {
       await storageSave('fin_tx', data.transactions);
       if (data.rules)   await storageSave('fin_rules', data.rules);
       if (data.budgets) await storageSave('fin_budgets', data.budgets);
+      // Recharger le cache en mémoire depuis ce qu'on vient de sauver
+      await loadAllData();
       refreshAllPeriodSelects();
       renderImportStats();
       showPage('monthly');
@@ -2748,43 +2750,7 @@ async function importBackup(input) {
   input.value = '';
 }
 
-async function showTokenModal(force) {
-  const current = getGHToken();
-  document.getElementById('modal-content').innerHTML =
-    '<h2 style="margin-bottom:.5rem">⚙️ Connexion GitHub</h2>' +
-    '<p style="font-size:13px;color:var(--text2);margin-bottom:1rem;line-height:1.6">Tes données sont sauvegardées sur GitHub (<strong>bigkarim93/MyLife</strong>). Entre ton token GitHub pour activer la synchronisation.</p>' +
-    '<div style="background:var(--surface2);border-radius:var(--radius-sm);padding:.75rem 1rem;margin-bottom:1rem;font-size:12px;color:var(--text2);line-height:1.7">' +
-      '1. Va sur <strong>github.com</strong> → Settings → Developer settings<br>' +
-      '2. Personal access tokens → Tokens (classic) → Generate new token<br>' +
-      '3. Coche uniquement <strong>repo</strong> → Generate → Copie le token' +
-    '</div>' +
-    '<div class="modal-field">' +
-      '<label>Token GitHub (commence par ghp_...)</label>' +
-      '<input type="password" id="gh-token-input" value="' + current + '" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" style="width:100%;padding:.5rem .75rem;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:monospace">' +
-    '</div>' +
-    '<div style="display:flex;gap:8px;justify-content:space-between;margin-top:1rem">' +
-      (current ? '<button class="btn btn-danger btn-sm" onclick="localStorage.removeItem(&quot;gh_token&quot;);closeModal();showToast(&quot;Token supprimé&quot;,&quot;success&quot;)">🗑️ Déconnecter</button>' : '<div></div>') +
-      '<div style="display:flex;gap:8px">' +
-        (force ? '' : '<button class="btn btn-sm" onclick="closeModal()">Annuler</button>') +
-        '<button class="btn btn-primary btn-sm" onclick="saveToken()">✓ Enregistrer</button>' +
-      '</div>' +
-    '</div>';
-  document.getElementById('modal-overlay').style.display = 'flex';
-  setTimeout(() => document.getElementById('gh-token-input')?.focus(), 50);
-}
 
-async function saveToken() {
-  const val = document.getElementById('gh-token-input')?.value.trim();
-  if (!val) { showToast('Entre un token valide', 'error'); return; }
-  localStorage.setItem('gh_token', val);
-  closeModal();
-  showToast('Connexion GitHub enregistrée ✓', 'success');
-  // Recharger les données depuis GitHub
-  await loadAllData();
-  refreshAllPeriodSelects();
-  renderImportStats();
-  showPage('monthly');
-}
 
 function clearAllData() {
   if (!confirm('Effacer toutes les transactions ? Cette action est irréversible.')) return;
