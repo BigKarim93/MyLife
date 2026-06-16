@@ -1433,23 +1433,51 @@ function attachDrag(div, ev, opts){
       }
 
       div.classList.remove('dragging-src');
-      if(ghost){ ghost.style.pointerEvents='none'; ghost.remove(); }
+      // Masquer le ghost AVANT elementFromPoint pour qu'il ne bloque pas la détection
+      if(ghost){ ghost.style.display='none'; }
 
       const target = document.elementFromPoint(e2.clientX, e2.clientY);
-      const col = target ? target.closest('.day-col') : null;
+      if(ghost){ ghost.remove(); }
+
+      // Cherche la colonne cible, ou la plus proche si le pointeur est hors grille
+      let col = target ? target.closest('.day-col') : null;
+      if(!col){
+        // Fallback : trouver la colonne dont le centre est le plus proche du pointeur X
+        const allCols = [...document.querySelectorAll('#week-days-body .day-col')];
+        let minDist = Infinity;
+        allCols.forEach(c=>{
+          const r = c.getBoundingClientRect();
+          const cx = r.left + r.width/2;
+          const dist = Math.abs(e2.clientX - cx);
+          if(e2.clientY >= r.top - 40 && e2.clientY <= r.bottom + 40 && dist < minDist){
+            minDist = dist; col = c;
+          }
+        });
+        // Fallback vue jour
+        if(!col){
+          const dc = document.getElementById('day-col-single');
+          if(dc){
+            const r = dc.getBoundingClientRect();
+            if(e2.clientY >= r.top - 40 && e2.clientY <= r.bottom + 40) col = dc;
+          }
+        }
+      }
+
       if(col){
         const rect = col.getBoundingClientRect();
-        const y = e2.clientY - rect.top;
+        // Clampe Y à l'intérieur de la colonne
+        const rawY = e2.clientY - rect.top;
+        const clampedY = Math.max(0, Math.min(rect.height - 1, rawY));
         const gsm = gridStartMin();
-        let newStart = gsm + Math.round((y/PX_PER_MIN)/5)*5;
+        let newStart = gsm + Math.round((clampedY/PX_PER_MIN)/5)*5;
         const duration = timeToMin(ev.end)-timeToMin(ev.start);
         newStart = Math.max(0, Math.min(24*60-duration, newStart));
         const newDay = (opts.context==='day') ? ev.day : Number(col.dataset.day);
         const idx = state.events.findIndex(x=>x.id===ev.id);
         if(idx>-1){
           state.events[idx].start = minToTime(newStart);
-          state.events[idx].end = minToTime(newStart+duration);
-          state.events[idx].day = newDay;
+          state.events[idx].end   = minToTime(newStart+duration);
+          state.events[idx].day   = newDay;
           saveState();
         }
       }
