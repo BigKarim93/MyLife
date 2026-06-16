@@ -176,7 +176,9 @@
   .event .ev-title{font-weight:700;font-family:'Kalam';font-size:1.05rem;}
   .event .ev-sub{color:rgba(241,239,228,.8);font-size:.68rem;display:block;}
   .event .ev-meta{position:absolute;bottom:2px;right:4px;font-size:.62rem;color:rgba(241,239,228,.65);font-weight:700;}
-  .event-delete{
+  .event.past{opacity:.35;filter:grayscale(.7);}
+  .day-col.past-day{background-color:rgba(0,0,0,.15);}
+  .day-header.past-day-hdr{opacity:.5;}
     position:absolute;top:1px;right:1px;width:18px;height:18px;border-radius:50%;
     background:rgba(20,30,24,.75);color:#fff;border:1px solid rgba(255,255,255,.25);
     font-size:11px;line-height:1;display:flex;align-items:center;justify-content:center;
@@ -245,6 +247,8 @@
   .modal-actions{display:flex;justify-content:space-between;gap:8px;margin-top:14px;flex-wrap:wrap;}
   .modal-actions .right{display:flex;gap:8px;margin-left:auto;}
   .modal-actions .left{display:flex;gap:8px;flex-wrap:wrap;}
+  .emoji-opt{background:var(--bg3);border:1px solid var(--line);border-radius:6px;padding:3px 5px;font-size:1.1rem;cursor:pointer;transition:.1s;}
+  .emoji-opt:hover{border-color:var(--accent);}
 
   footer{text-align:center;color:var(--chalk-dim);font-size:.75rem;padding:18px;}
 
@@ -389,6 +393,32 @@
         </select>
       </div>
     </div>
+    <div class="field-row">
+      <div class="field">
+        <label for="ev-color">Couleur perso (optionnel)</label>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="color" id="ev-color" style="width:44px;height:36px;border-radius:6px;border:1px solid var(--line);background:var(--bg);cursor:pointer;padding:2px;">
+          <button type="button" class="btn" id="ev-color-clear" style="font-size:.78rem;padding:6px 10px;">✕ Effacer</button>
+        </div>
+      </div>
+      <div class="field">
+        <label for="ev-emoji">Emoji (optionnel)</label>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+          <input type="text" id="ev-emoji" maxlength="4" style="width:60px;font-size:1.3rem;text-align:center;">
+          <div id="emoji-picker" style="display:flex;gap:4px;flex-wrap:wrap;">
+            <button type="button" class="emoji-opt" onclick="pickEmoji('🎉')">🎉</button>
+            <button type="button" class="emoji-opt" onclick="pickEmoji('⚽')">⚽</button>
+            <button type="button" class="emoji-opt" onclick="pickEmoji('✈️')">✈️</button>
+            <button type="button" class="emoji-opt" onclick="pickEmoji('🏥')">🏥</button>
+            <button type="button" class="emoji-opt" onclick="pickEmoji('📚')">📚</button>
+            <button type="button" class="emoji-opt" onclick="pickEmoji('🎵')">🎵</button>
+            <button type="button" class="emoji-opt" onclick="pickEmoji('🏋️')">🏋️</button>
+            <button type="button" class="emoji-opt" onclick="pickEmoji('🍕')">🍕</button>
+            <button type="button" class="emoji-opt" onclick="pickEmoji('💊')">💊</button>
+            <button type="button" class="emoji-opt" onclick="pickEmoji('🎮')">🎮</button>
+          </div>
+        </div>
+      </div>
     <div class="field-row">
       <div class="field">
         <label for="ev-day">Jour</label>
@@ -879,7 +909,27 @@ function renderEventsInColumn(col, events, opts){
     div.style.height = Math.max(20,(visBottom-visTop)*PX_PER_MIN)+'px';
     div.dataset.id = ev.id;
 
-    // Semaine A à gauche, semaine B à droite (uniquement quand les deux sont visibles)
+    // Couleur personnalisée
+    if(ev.color){
+      div.style.background = ev.color+'28'; // ~16% opacity
+      div.style.borderLeftColor = ev.color;
+      div.style.borderLeftStyle = ev.type==='lycee' ? 'dashed' : 'solid';
+    }
+
+    // Cours passé (uniquement sur la semaine en cours)
+    if(opts.date){
+      const now = new Date();
+      const todayKey = dateKey(now);
+      const nowMin = now.getHours()*60+now.getMinutes();
+      const isCurrentWeek = state.weekNavOffset===0;
+      if(isCurrentWeek){
+        if(opts.date<todayKey || (opts.date===todayKey && en<=nowMin)){
+          div.classList.add('past');
+        }
+      }
+    }
+
+    // Semaine A à gauche, semaine B à droite
     if(state.weekFilter==='all' && ev.week==='A'){
       div.style.left='3px'; div.style.width='calc(50% - 4px)';
     } else if(state.weekFilter==='all' && ev.week==='B'){
@@ -889,7 +939,7 @@ function renderEventsInColumn(col, events, opts){
     }
 
     div.innerHTML =
-      '<span class="ev-title">'+escapeHtml(ev.title)+'</span>'+
+      '<span class="ev-title">'+(ev.emoji?ev.emoji+' ':'')+escapeHtml(ev.title)+'</span>'+
       (ev.week?('<span class="ev-meta">'+ev.week+'</span>'):'');
 
     const delBtn = document.createElement('button');
@@ -996,7 +1046,9 @@ function renderWeek(){
     const key = dateKey(date);
     const hol = holidayInfo(key);
     const isToday = isCurrentWeek && day===todayOurDay;
+    const isPast = isCurrentWeek && key<todayKey;
     h.classList.toggle('today', isToday);
+    h.classList.toggle('past-day-hdr', isPast);
     h.innerHTML = DAY_NAMES[day] +
       '<span class="day-date">'+fmtDateShort(date)+'</span>' +
       (hol ? '<span class="day-tag">'+(hol.type==='vacances'?'Vacances':'Férié')+'</span>' : '');
@@ -1008,7 +1060,9 @@ function renderWeek(){
     const key = dateKey(date);
     const hol = holidayInfo(key);
     const isToday = isCurrentWeek && day===todayOurDay;
+    const isPast = isCurrentWeek && key<todayKey;
     col.classList.toggle('today-col', isToday);
+    col.classList.toggle('past-day', isPast);
     const evs = applyExceptions(applyHolidayFilter(filteredEvents(day, key), hol), key);
     renderEventsInColumn(col, evs, {context:'week', date:key});
   });
@@ -1152,6 +1206,8 @@ function openEventModal(ev, dateStr){
   document.getElementById('ev-start').value = ev ? ev.start : '09:00';
   document.getElementById('ev-end').value = ev ? ev.end : '10:00';
   document.getElementById('ev-once-date').value = (ev && ev.onlyDate) ? ev.onlyDate : editingDate;
+  document.getElementById('ev-color').value = (ev && ev.color) ? ev.color : '#92c7ed';
+  document.getElementById('ev-emoji').value = (ev && ev.emoji) ? ev.emoji : '';
   updateOnceRowVisibility();
 
   const group = document.getElementById('ev-delete-group');
@@ -1179,6 +1235,14 @@ function updateOnceRowVisibility(){
   document.getElementById('ev-day').disabled = isOnce;
 }
 document.getElementById('ev-week').addEventListener('change', updateOnceRowVisibility);
+function pickEmoji(e){ document.getElementById('ev-emoji').value = e; }
+document.getElementById('ev-color-clear').addEventListener('click', ()=>{
+  document.getElementById('ev-color').value = '#92c7ed';
+  document.getElementById('ev-color').dataset.cleared = '1';
+});
+document.getElementById('ev-color').addEventListener('input', ()=>{
+  delete document.getElementById('ev-color').dataset.cleared;
+});
 
 document.getElementById('ev-cancel').addEventListener('click', closeEventModal);
 document.getElementById('ev-save').addEventListener('click', ()=>{
@@ -1200,6 +1264,8 @@ document.getElementById('ev-save').addEventListener('click', ()=>{
     day: Number(document.getElementById('ev-day').value),
     week: weekVal==='once' ? '' : weekVal,
     onlyDate: weekVal==='once' ? onceDate : null,
+    color: document.getElementById('ev-color').dataset.cleared ? null : document.getElementById('ev-color').value,
+    emoji: document.getElementById('ev-emoji').value.trim() || null,
     start, end
   };
   // Pour un évènement ponctuel, le jour doit correspondre à la date choisie
@@ -1466,16 +1532,19 @@ document.getElementById('btn-today').addEventListener('click', ()=>{
 });
 
 let lastSeenDateKey = dateKey(new Date());
+let lastSeenMinute = Math.floor(Date.now()/60000);
 function checkDateChange(){
   const k = dateKey(new Date());
-  if(k!==lastSeenDateKey){
+  const m = Math.floor(Date.now()/60000);
+  if(k!==lastSeenDateKey || m!==lastSeenMinute){
     lastSeenDateKey = k;
+    lastSeenMinute = m;
     updateTopbarDate();
     updateTodayButton();
     renderAll();
   }
 }
-setInterval(checkDateChange, 60000);
+setInterval(checkDateChange, 30000); // check toutes les 30s pour griser les cours passés
 document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) checkDateChange(); });
 
 /* ====================================================================

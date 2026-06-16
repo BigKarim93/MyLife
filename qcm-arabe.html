@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QCM Arabe — Médine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f1117;--surface:#1a1d27;--surface2:#22263a;--border:#2e3248;--border2:#3d4260;
+  --text:#e8eaf6;--text2:#9198c0;--text3:#5a6090;
+  --green:#4ade80;--green-l:rgba(74,222,128,.12);
+  --amber:#fbbf24;--amber-l:rgba(251,191,36,.1);
+  --red:#f87171;--red-l:rgba(248,113,113,.12);
+  --teal:#2dd4bf;--teal-l:rgba(45,212,191,.12);--teal-g:linear-gradient(135deg,#2dd4bf,#0ea5e9);
+  --radius:14px;--radius-sm:8px;
+  --ar:'Scheherazade New',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Work Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:56px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:50;}
+.header h1{font-size:1.05rem;font-weight:700;flex:1;}
+.header h1 span{color:var(--teal);}
+a.btn-home{background:none;border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text2);font-size:14px;padding:5px 10px;text-decoration:none;display:inline-flex;align-items:center;}
+a.btn-home:hover{background:var(--surface2);}
+.sync{font-size:1rem;opacity:.6;}
+.sync.saving{opacity:1;animation:pulse 1s infinite;}
+.sync.error{color:var(--red);opacity:1;}
+@keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}
+
+.wrap{max-width:640px;margin:0 auto;padding:20px 16px;}
+
+/* STATS BAR */
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;text-align:center;}
+.stat-card .val{font-size:1.4rem;font-weight:700;}
+.stat-card .lbl{font-size:.72rem;color:var(--text3);margin-top:2px;}
+.stat-card.green .val{color:var(--green);}
+.stat-card.red .val{color:var(--red);}
+.stat-card.amber .val{color:var(--amber);}
+
+/* GAUGE */
+.gauge-row{display:flex;height:8px;border-radius:4px;overflow:hidden;background:var(--border);margin-bottom:20px;}
+.gauge-green{background:var(--green);transition:width .5s;}
+.gauge-red{background:var(--red);transition:width .5s;}
+
+/* BUTTONS */
+.btn{background:var(--surface2);border:1px solid var(--border2);color:var(--text);border-radius:var(--radius-sm);padding:9px 16px;font-size:.9rem;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s;}
+.btn:hover{border-color:var(--teal);}
+.btn.primary{background:var(--teal-g);border-color:transparent;color:#0f1117;}
+.btn.danger{background:rgba(248,113,113,.15);border-color:var(--red);color:var(--red);}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+
+/* HOME */
+.home-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;}
+.home-section h2{font-size:1rem;font-weight:700;margin-bottom:12px;color:var(--teal);}
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.mode-btn{background:var(--surface2);border:2px solid var(--border2);border-radius:var(--radius-sm);padding:14px;text-align:center;cursor:pointer;transition:.15s;}
+.mode-btn:hover,.mode-btn.active{border-color:var(--teal);background:var(--teal-l);}
+.mode-btn .icon{font-size:1.6rem;display:block;margin-bottom:4px;}
+.mode-btn .name{font-weight:700;font-size:.9rem;}
+.mode-btn .desc{font-size:.72rem;color:var(--text2);margin-top:2px;}
+.count-row{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap;}
+.count-btn{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:7px 16px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--text2);transition:.15s;}
+.count-btn.active{border-color:var(--teal);color:var(--teal);background:var(--teal-l);}
+.dir-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.dir-btn{flex:1;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:8px;text-align:center;cursor:pointer;font-family:inherit;font-size:.85rem;color:var(--text2);transition:.15s;white-space:nowrap;}
+.dir-btn.active{border-color:var(--teal);color:var(--teal);background:var(--teal-l);}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.filter-row select{flex:1;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:8px 10px;font-size:.85rem;color:var(--text);font-family:inherit;min-width:130px;}
+.start-info{font-size:.8rem;color:var(--text3);margin-bottom:10px;}
+
+/* QUIZ */
+.quiz-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+.progress-bar-wrap{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;min-width:80px;}
+.progress-bar{height:100%;background:var(--teal-g);border-radius:3px;transition:width .3s;}
+.quiz-counter{font-size:.82rem;color:var(--text3);white-space:nowrap;}
+.quiz-streak{font-size:.82rem;font-weight:700;color:var(--amber);}
+
+.question-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px;text-align:center;}
+.question-label{font-size:.75rem;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;}
+.question-main{font-family:var(--ar);font-size:2.2rem;direction:rtl;color:var(--teal);line-height:2.2;margin-bottom:4px;}
+.question-main.fr{font-family:'Work Sans',sans-serif;font-size:1.4rem;direction:ltr;color:var(--text);}
+.question-lesson{font-size:.72rem;color:var(--text3);margin-top:4px;}
+
+.options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.option{background:var(--surface2);border:2px solid var(--border2);border-radius:var(--radius-sm);padding:14px 10px;text-align:center;cursor:pointer;transition:.15s;font-family:var(--ar);font-size:1.4rem;direction:rtl;line-height:1.8;position:relative;}
+.option.fr-opt{font-family:'Work Sans',sans-serif;font-size:.9rem;direction:ltr;line-height:1.4;}
+.option:hover:not(.locked){border-color:var(--teal);background:var(--teal-l);}
+.option.correct{border-color:var(--green);background:var(--green-l);}
+.option.wrong{border-color:var(--red);background:var(--red-l);}
+.option.locked{cursor:default;}
+.option .badge{position:absolute;top:4px;right:6px;font-size:.65rem;font-weight:700;font-family:'Work Sans',sans-serif;direction:ltr;}
+
+.feedback{border-radius:var(--radius-sm);padding:12px 16px;font-size:.88rem;line-height:1.5;margin-bottom:14px;display:none;}
+.feedback.ok{background:var(--green-l);border:1px solid var(--green);color:var(--green);}
+.feedback.ko{background:var(--red-l);border:1px solid var(--red);color:var(--red);}
+
+.quiz-actions{display:flex;gap:10px;justify-content:center;}
+
+/* RESULTS */
+.result-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;text-align:center;margin-bottom:16px;}
+.result-emoji{font-size:3rem;display:block;margin-bottom:8px;}
+.result-score{font-size:2rem;font-weight:700;}
+.result-pct{font-size:.9rem;color:var(--text2);margin-top:4px;}
+.result-detail{display:flex;gap:16px;justify-content:center;margin-top:16px;flex-wrap:wrap;}
+.result-detail .item{font-size:.85rem;color:var(--text2);}
+.result-detail .item strong{display:block;font-size:1.2rem;font-weight:700;}
+.result-detail .item strong.g{color:var(--green);}
+.result-detail .item strong.r{color:var(--red);}
+
+.result-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:16px;}
+.missed-list{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.missed-list h3{padding:12px 16px;font-size:.88rem;font-weight:700;border-bottom:1px solid var(--border);background:var(--surface2);}
+.missed-item{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:.85rem;}
+.missed-item:last-child{border-bottom:none;}
+.missed-ar{font-family:var(--ar);font-size:1.4rem;direction:rtl;color:var(--teal);min-width:80px;text-align:right;}
+.missed-fr{color:var(--text2);}
+
+.hidden{display:none;}
+.loading-screen{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;align-items:center;justify-content:center;}
+.loading-screen.hidden{display:none;}
+.loading-box{text-align:center;color:var(--text2);}
+.loading-box p{margin-top:14px;font-size:.9rem;}
+.spinner{width:32px;height:32px;border-radius:50%;border:3px solid var(--border2);border-top-color:var(--teal);margin:0 auto;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+footer{text-align:center;padding:20px;font-size:.75rem;color:var(--text3);}
+</style>
+</head>
+<body>
+
+<div class="loading-screen" id="loading-screen">
+  <div class="loading-box"><div class="spinner"></div><p id="loading-text">Connexion…</p></div>
+</div>
+
+<div class="header">
+  <a href="index.html" class="btn-home">🏠</a>
+  <h1>QCM <span>Arabe — Médine</span></h1>
+  <span class="sync" id="sync-status">☁️</span>
+</div>
+
+<div class="wrap">
+
+  <!-- HOME -->
+  <div id="screen-home">
+    <div class="stats">
+      <div class="stat-card green"><div class="val" id="stat-green">0</div><div class="lbl">Maîtrisés ✅</div></div>
+      <div class="stat-card red"><div class="val" id="stat-red">0</div><div class="lbl">À revoir ❌</div></div>
+      <div class="stat-card amber"><div class="val" id="stat-total">463</div><div class="lbl">Total</div></div>
+    </div>
+    <div class="gauge-row">
+      <div class="gauge-green" id="gauge-green" style="width:0%"></div>
+      <div class="gauge-red" id="gauge-red" style="width:0%"></div>
+    </div>
+
+    <div class="home-section">
+      <h2>Mode</h2>
+      <div class="mode-grid">
+        <div class="mode-btn active" id="mode-all" onclick="selectMode('all')">
+          <span class="icon">🎲</span>
+          <div class="name">Tous les mots</div>
+          <div class="desc">463 mots aléatoires</div>
+        </div>
+        <div class="mode-btn" id="mode-errors" onclick="selectMode('errors')">
+          <span class="icon">🔁</span>
+          <div class="name">Mes erreurs</div>
+          <div class="desc">Révise les mots ratés</div>
+        </div>
+        <div class="mode-btn" id="mode-lesson" onclick="selectMode('lesson')">
+          <span class="icon">📖</span>
+          <div class="name">Par leçon</div>
+          <div class="desc">Choisis une leçon</div>
+        </div>
+        <div class="mode-btn" id="mode-srs" onclick="selectMode('srs')">
+          <span class="icon">🧠</span>
+          <div class="name">Intelligent</div>
+          <div class="desc">Les erreurs reviennent plus</div>
+        </div>
+      </div>
+
+      <div class="filter-row" id="lesson-filter-row" style="display:none">
+        <select id="lesson-select">
+          <option value="">Toutes les leçons</option>
+        </select>
+      </div>
+
+      <h2 style="margin-top:14px;">Nombre de questions</h2>
+      <div class="count-row">
+        <button class="count-btn" onclick="selectCount(10)">10</button>
+        <button class="count-btn active" onclick="selectCount(15)">15</button>
+        <button class="count-btn" onclick="selectCount(20)">20</button>
+        <button class="count-btn" onclick="selectCount(30)">30</button>
+        <button class="count-btn" onclick="selectCount(463)">Tout</button>
+      </div>
+
+      <h2>Sens</h2>
+      <div class="dir-row">
+        <button class="dir-btn active" onclick="selectDir('ar2fr')">🇸🇦 → 🇫🇷 Arabe → Français</button>
+        <button class="dir-btn" onclick="selectDir('fr2ar')">🇫🇷 → 🇸🇦 Français → Arabe</button>
+        <button class="dir-btn" onclick="selectDir('mix')">🔀 Aléatoire</button>
+      </div>
+
+      <div class="start-info" id="start-info"></div>
+      <button class="btn primary" style="width:100%;font-size:1rem;padding:14px;" onclick="startQuiz()">▶ Commencer</button>
+    </div>
+
+    <div class="home-section">
+      <h2>⚙️ Progression</h2>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn danger" onclick="resetProgress()">↺ Tout réinitialiser</button>
+        <button class="btn" onclick="showMissed()">❌ Voir mes erreurs (<span id="btn-errors-count">0</span>)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MISSED LIST -->
+  <div id="screen-missed" class="hidden">
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;">
+      <button class="btn" onclick="showScreen('home')">← Retour</button>
+      <h2 style="font-size:1rem;">Mots à revoir</h2>
+    </div>
+    <div class="missed-list" id="missed-list-content"></div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="screen-quiz" class="hidden">
+    <div class="quiz-header">
+      <div class="progress-bar-wrap"><div class="progress-bar" id="quiz-progress"></div></div>
+      <div class="quiz-counter" id="quiz-counter">1/15</div>
+      <div class="quiz-streak" id="quiz-streak"></div>
+    </div>
+
+    <div class="question-card">
+      <div class="question-label" id="q-label">Que signifie ce mot ?</div>
+      <div class="question-main" id="q-main"></div>
+      <div class="question-lesson" id="q-lesson"></div>
+    </div>
+
+    <div class="options" id="q-options"></div>
+    <div class="feedback" id="q-feedback"></div>
+    <div class="quiz-actions">
+      <button class="btn primary hidden" id="btn-next" onclick="nextQuestion()">Suivant →</button>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="screen-results" class="hidden">
+    <div class="result-card">
+      <span class="result-emoji" id="res-emoji">🌟</span>
+      <div class="result-score" id="res-score">12 / 15</div>
+      <div class="result-pct" id="res-pct">80%</div>
+      <div class="result-detail">
+        <div class="item"><strong class="g" id="res-good">12</strong>Bonne(s)</div>
+        <div class="item"><strong class="r" id="res-bad">3</strong>Erreur(s)</div>
+        <div class="item"><strong id="res-streak">0</strong>Série max</div>
+      </div>
+    </div>
+    <div class="result-actions">
+      <button class="btn primary" onclick="startQuiz()">🔁 Rejouer</button>
+      <button class="btn" onclick="startErrorQuiz()">❌ Réviser mes erreurs</button>
+      <button class="btn" onclick="showScreen('home')">🏠 Accueil</button>
+    </div>
+    <div class="missed-list hidden" id="res-missed">
+      <h3>Mots manqués cette session</h3>
+      <div id="res-missed-list"></div>
+    </div>
+  </div>
+
+</div>
+<footer>Vocabulaire extrait de Médine Tome 1 · 463 mots</footer>
+
+<!-- Firebase -->
+<script src="firebase-config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+// ─── PROGRESS STATE ───
+let progress = {green:{}, red:{}}; // green/red: {ar_word: true}
+let docRef = null, saveTimer = null;
+
+function setSyncStatus(s){
+  const el = document.getElementById('sync-status');
+  el.className = 'sync'+(s==='saving'?' saving':s==='error'?' error':'');
+  el.textContent = s==='error'?'⚠️':'☁️';
+}
+function saveProgress(){
+  try{localStorage.setItem('qcm_arabe_progress', JSON.stringify(progress));}catch(e){}
+  if(!docRef) return;
+  setSyncStatus('saving');
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(()=>{
+    docRef.set(progress)
+      .then(()=>setSyncStatus('ok'))
+      .catch(()=>setSyncStatus('error'));
+  }, 800);
+}
+
+// ─── FIREBASE ───
+firebase.initializeApp(window.FIREBASE_CONFIG);
+const auth = firebase.auth(), db = firebase.firestore();
+try{db.enablePersistence({synchronizeTabs:true}).catch(()=>{});}catch(e){}
+
+auth.onAuthStateChanged(async user=>{
+  if(!user){ window.location.href='index.html'; return; }
+  docRef = db.collection('users').doc(user.uid).collection('modules').doc('qcm-arabe');
+  document.getElementById('loading-text').textContent = 'Chargement de ta progression…';
+  try{
+    const snap = await docRef.get();
+    if(snap.exists){
+      const data = snap.data();
+      progress = {green: data.green||{}, red: data.red||{}};
+    } else {
+      const local = localStorage.getItem('qcm_arabe_progress');
+      if(local){ progress = JSON.parse(local); }
+      await docRef.set(progress);
+    }
+  }catch(e){
+    const local = localStorage.getItem('qcm_arabe_progress');
+    if(local) progress = JSON.parse(local);
+    setSyncStatus('error');
+  }
+  initApp();
+});
+
+// ─── APP ───
+let quizMode = 'all'; // all|errors|lesson|srs
+let quizCount = 15;
+let quizDir = 'ar2fr'; // ar2fr|fr2ar|mix
+let selectedLesson = '';
+
+let quizQueue = [], qIdx = 0, qScore = 0, qMissed = [], qStreak = 0, qMaxStreak = 0;
+
+function initApp(){
+  // populate lesson select
+  const sel = document.getElementById('lesson-select');
+  const lessons = [...new Set(VOCAB.map(v=>v.lesson))];
+  lessons.forEach(l=>{
+    const opt = document.createElement('option');
+    opt.value = l;
+    const sample = VOCAB.find(v=>v.lesson===l);
+    opt.textContent = l.toUpperCase()+' · '+(sample?sample.lessonTitle:'');
+    sel.appendChild(opt);
+  });
+  updateStats();
+  updateStartInfo();
+  document.getElementById('loading-screen').classList.add('hidden');
+  showScreen('home');
+}
+function showScreen(id){
+  ['home','quiz','results','missed'].forEach(s=>{
+    const el = document.getElementById('screen-'+s);
+    if(el) el.classList.toggle('hidden', s!==id);
+  });
+}
+function updateStats(){
+  const g = Object.keys(progress.green).length;
+  const r = Object.keys(progress.red).length;
+  const t = VOCAB.length;
+  document.getElementById('stat-green').textContent = g;
+  document.getElementById('stat-red').textContent = r;
+  document.getElementById('stat-total').textContent = t;
+  document.getElementById('btn-errors-count').textContent = r;
+  const w = 100;
+  document.getElementById('gauge-green').style.width = (g/t*w)+'%';
+  document.getElementById('gauge-red').style.width = (r/t*w)+'%';
+}
+function selectMode(m){
+  quizMode = m;
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('mode-'+m).classList.add('active');
+  document.getElementById('lesson-filter-row').style.display = m==='lesson'?'flex':'none';
+  updateStartInfo();
+}
+function selectCount(n){
+  quizCount = n;
+  document.querySelectorAll('.count-btn').forEach(b=>{
+    b.classList.toggle('active', Number(b.textContent)===n || (b.textContent==='Tout' && n===463));
+  });
+  updateStartInfo();
+}
+function selectDir(d){
+  quizDir = d;
+  document.querySelectorAll('.dir-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+function updateStartInfo(){
+  const pool = buildPool();
+  const n = Math.min(quizCount, pool.length);
+  const el = document.getElementById('start-info');
+  if(pool.length===0 && quizMode==='errors'){
+    el.textContent = '✅ Aucune erreur enregistrée. Lance un QCM normal !';
+  } else {
+    el.textContent = `${n} question${n>1?'s':''} sur un pool de ${pool.length} mot${pool.length>1?'s':''}.`;
+  }
+}
+function buildPool(){
+  let pool = [...VOCAB];
+  if(quizMode==='errors') pool = pool.filter(v=>progress.red[v.ar]);
+  else if(quizMode==='lesson'){
+    selectedLesson = document.getElementById('lesson-select').value;
+    if(selectedLesson) pool = pool.filter(v=>v.lesson===selectedLesson);
+  } else if(quizMode==='srs'){
+    // errors more likely (×3 weight) → duplicate them
+    const reds = pool.filter(v=>progress.red[v.ar]);
+    pool = [...pool, ...reds, ...reds];
+  }
+  return pool;
+}
+function shuffle(arr){ for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr; }
+
+function startQuiz(){
+  let pool = buildPool();
+  if(pool.length===0){ alert('Aucun mot disponible pour ce mode.'); return; }
+  shuffle(pool);
+  quizQueue = pool.slice(0, Math.min(quizCount, pool.length));
+  qIdx=0; qScore=0; qMissed=[]; qStreak=0; qMaxStreak=0;
+  showScreen('quiz');
+  renderQuestion();
+}
+function startErrorQuiz(){
+  selectMode('errors');
+  startQuiz();
+}
+
+function renderQuestion(){
+  const q = quizQueue[qIdx];
+  const total = quizQueue.length;
+  // progress bar
+  document.getElementById('quiz-progress').style.width = (qIdx/total*100)+'%';
+  document.getElementById('quiz-counter').textContent = (qIdx+1)+'/'+total;
+  document.getElementById('quiz-streak').textContent = qStreak>=3?'🔥 ×'+qStreak:'';
+
+  // direction
+  let dir = quizDir==='mix' ? (Math.random()<.5?'ar2fr':'fr2ar') : quizDir;
+  const mainEl = document.getElementById('q-main');
+  if(dir==='ar2fr'){
+    mainEl.textContent = q.ar;
+    mainEl.className = 'question-main';
+    document.getElementById('q-label').textContent = 'Que signifie ce mot arabe ?';
+  } else {
+    mainEl.textContent = q.fr;
+    mainEl.className = 'question-main fr';
+    document.getElementById('q-label').textContent = 'Comment dit-on en arabe ?';
+  }
+  document.getElementById('q-lesson').textContent = q.lessonTitle;
+  document.getElementById('q-feedback').style.display='none';
+  document.getElementById('btn-next').classList.add('hidden');
+
+  // build options (1 correct + 3 wrong from same type if possible)
+  let wrong = VOCAB.filter(v=>v.ar!==q.ar);
+  // prefer same type
+  const sameType = wrong.filter(v=>v.type===q.type);
+  let distractors = shuffle([...sameType]).slice(0,3);
+  if(distractors.length<3) distractors = [...distractors, ...shuffle(wrong.filter(v=>!distractors.includes(v))).slice(0,3-distractors.length)];
+  const options = shuffle([q, ...distractors.slice(0,3)]);
+
+  const container = document.getElementById('q-options');
+  container.innerHTML='';
+  options.forEach((opt,i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'option'+(dir==='fr2ar'?' fr-opt':'');
+    btn.textContent = dir==='ar2fr' ? opt.fr : opt.ar;
+    btn.dataset.correct = opt.ar===q.ar ? '1':'0';
+    btn.onclick = ()=>pickAnswer(btn, q, dir);
+    container.appendChild(btn);
+  });
+  // store current dir on question
+  quizQueue[qIdx]._dir = dir;
+}
+
+function pickAnswer(btn, q, dir){
+  const isCorrect = btn.dataset.correct==='1';
+  // lock all buttons
+  document.querySelectorAll('.option').forEach(b=>{
+    b.classList.add('locked');
+    b.onclick=null;
+    if(b.dataset.correct==='1') b.classList.add('correct');
+    else if(b===btn && !isCorrect) b.classList.add('wrong');
+  });
+
+  const fb = document.getElementById('q-feedback');
+  if(isCorrect){
+    qScore++; qStreak++; qMaxStreak=Math.max(qMaxStreak,qStreak);
+    // update progress
+    delete progress.red[q.ar];
+    if(!progress.green[q.ar]) progress.green[q.ar]=true;
+    fb.className='feedback ok';
+    fb.textContent='✅ Correct ! '+( dir==='ar2fr' ? q.ar+' = '+q.fr : q.fr+' = '+q.ar );
+  } else {
+    qStreak=0;
+    qMissed.push(q);
+    // update progress
+    delete progress.green[q.ar];
+    progress.red[q.ar]=true;
+    fb.className='feedback ko';
+    fb.textContent='❌ Pas tout à fait — '+(dir==='ar2fr' ? q.ar+' = '+q.fr : q.fr+' = '+q.ar );
+  }
+  fb.style.display='block';
+  document.getElementById('quiz-streak').textContent = qStreak>=3?'🔥 ×'+qStreak:'';
+  document.getElementById('btn-next').classList.remove('hidden');
+  saveProgress();
+}
+
+function nextQuestion(){
+  qIdx++;
+  if(qIdx>=quizQueue.length){ showResults(); return; }
+  renderQuestion();
+}
+
+function showResults(){
+  const total = quizQueue.length;
+  const pct = Math.round(qScore/total*100);
+  const emoji = pct>=90?'🌟':pct>=70?'👍':pct>=50?'😊':'💪';
+  document.getElementById('res-emoji').textContent = emoji;
+  document.getElementById('res-score').textContent = qScore+' / '+total;
+  document.getElementById('res-pct').textContent = pct+'% de réussite';
+  document.getElementById('res-good').textContent = qScore;
+  document.getElementById('res-bad').textContent = total-qScore;
+  document.getElementById('res-streak').textContent = qMaxStreak;
+
+  const missedDiv = document.getElementById('res-missed');
+  const missedList = document.getElementById('res-missed-list');
+  if(qMissed.length>0){
+    missedDiv.classList.remove('hidden');
+    missedList.innerHTML = qMissed.map(v=>`
+      <div class="missed-item">
+        <span class="missed-ar">${v.ar}</span>
+        <span class="missed-fr">${v.fr}</span>
+        <span style="margin-left:auto;font-size:.72rem;color:var(--text3)">${v.lessonTitle}</span>
+      </div>`).join('');
+  } else {
+    missedDiv.classList.add('hidden');
+  }
+  updateStats();
+  showScreen('results');
+}
+
+function showMissed(){
+  const reds = VOCAB.filter(v=>progress.red[v.ar]);
+  const container = document.getElementById('missed-list-content');
+  if(reds.length===0){
+    container.innerHTML='<div style="padding:20px;text-align:center;color:var(--text3)">✅ Aucune erreur enregistrée !</div>';
+  } else {
+    container.innerHTML = reds.map(v=>`
+      <div class="missed-item">
+        <span class="missed-ar">${v.ar}</span>
+        <span class="missed-fr">${v.fr}</span>
+        <span style="margin-left:auto;font-size:.72rem;color:var(--text3)">${v.lessonTitle}</span>
+      </div>`).join('');
+  }
+  showScreen('missed');
+}
+
+function resetProgress(){
+  if(!confirm('Réinitialiser toute ta progression ?')) return;
+  progress = {green:{}, red:{}};
+  saveProgress();
+  updateStats();
+  showScreen('home');
+}
+</script>
+</body>
+</html>
