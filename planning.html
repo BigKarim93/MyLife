@@ -1498,9 +1498,11 @@ function attachDrag(div, ev, opts){
 
       if(col){
         const rect = col.getBoundingClientRect();
-        // Clampe Y à l'intérieur de la colonne
-        const rawY = e2.clientY - rect.top;
-        const clampedY = Math.max(0, Math.min(rect.height - 1, rawY));
+        const wrap = col.closest('.week-wrap');
+        const scrollTop = wrap ? wrap.scrollTop : 0;
+        // Y relatif à la colonne EN TENANT COMPTE DU SCROLL
+        const rawY = e2.clientY - rect.top + scrollTop;
+        const clampedY = Math.max(0, Math.min(col.scrollHeight - 1, rawY));
         const gsm = gridStartMin();
         let newStart = gsm + Math.round((clampedY/PX_PER_MIN)/5)*5;
         const duration = timeToMin(ev.end)-timeToMin(ev.start);
@@ -1511,6 +1513,11 @@ function attachDrag(div, ev, opts){
           state.events[idx].start = minToTime(newStart);
           state.events[idx].end   = minToTime(newStart+duration);
           state.events[idx].day   = newDay;
+          // Si l'évènement est ponctuel (onlyDate), on met à jour la date vers le nouveau jour
+          if(state.events[idx].onlyDate && opts.context==='week'){
+            const monday = mondayForOffset(state.weekNavOffset);
+            state.events[idx].onlyDate = dateKey(addDays(monday, newDay));
+          }
           saveState();
         }
       }
@@ -1527,8 +1534,12 @@ document.getElementById('ev-duplicate').addEventListener('click', ()=>{
   if(!editingId) return;
   const original = state.events.find(e=>e.id===editingId);
   if(!original) return;
-  const copy = Object.assign({}, original, {id:'e'+Date.now()});
-  // décale de 1h pour que la copie soit visible
+  const copy = Object.assign({}, original, {
+    id: 'e'+Date.now(),
+    // La copie ne doit pas hériter d'une date ponctuelle — elle deviendra une entrée indépendante
+    onlyDate: original.onlyDate || null
+  });
+  // décale de 1h pour que la copie soit visible sans superposition
   copy.start = minToTime(Math.min(timeToMin(original.start)+60, 22*60));
   copy.end   = minToTime(Math.min(timeToMin(original.end)+60,   23*60));
   state.events.push(copy);

@@ -176,6 +176,8 @@ body.edit-mode .module-tile{cursor:grab;}
 .ev-4e{background:rgba(146,199,237,.2);border-color:#92c7ed;}
 .ev-lycee{background:rgba(217,166,230,.15);border-color:#d9a6e6;border-left-style:dashed;}
 .ev-perso{background:rgba(240,169,120,.2);border-color:#f0a978;}
+.edt-day-hdr.edt-past{opacity:.45;}
+.edt-day-col.edt-past-col{background-color:rgba(0,0,0,.12);}
 .edt-nav{display:flex;align-items:center;gap:6px;margin-left:auto;}
 .edt-week-lbl{font-size:.72rem;color:var(--chalk-dim);white-space:nowrap;}
 
@@ -398,6 +400,7 @@ body.edit-mode .module-tile{cursor:grab;}
           <button class="btn" id="edt-prev" style="padding:4px 8px;">◀</button>
           <span class="edt-week-lbl" id="edt-week-lbl">Sem. A</span>
           <button class="btn" id="edt-next" style="padding:4px 8px;">▶</button>
+          <button class="btn" id="edt-today" style="padding:4px 8px;font-size:.7rem;">Auj.</button>
         </div>
       </div>
       <div class="widget-body" style="padding:8px;">
@@ -429,7 +432,7 @@ body.edit-mode .module-tile{cursor:grab;}
     <div class="field"><label>Description</label><input type="text" id="mod-desc" maxlength="60" style="background:var(--bg);border:1px solid var(--line);color:var(--chalk);border-radius:5px;padding:8px;font-family:inherit;"></div>
     <div class="field"><label>Lien (.html)</label><input type="text" id="mod-url" placeholder="planning.html" style="background:var(--bg);border:1px solid var(--line);color:var(--chalk);border-radius:5px;padding:8px;font-family:inherit;"></div>
     <div class="modal-actions">
-      <button class="btn" style="background:#5a2b2b;border-color:#7a3a3a;" id="mod-del" style="display:none">Supprimer</button>
+      <button class="btn" id="mod-del" style="background:#5a2b2b;border-color:#7a3a3a;display:none">Supprimer</button>
       <button class="btn" id="mod-cancel">Annuler</button>
       <button class="btn primary" id="mod-save">Enregistrer</button>
     </div>
@@ -447,10 +450,10 @@ const VOCAB =
 ;
 
 // ─── CONSTANTS ───
-const ETYH = 28; // pixels per hour in EDT widget
+const ETYH = 18; // pixels per hour in EDT widget (réduit pour tenir dans le widget)
 const EDT_PPM = ETYH / 60;
 const EDT_START = 7; // widget starts at 7h
-const EDT_END = 22;  // widget ends at 22h
+const EDT_END = 25;  // widget ends at 1h du matin (25 = 1h lendemain)
 
 const EDT_TYPE_COLORS = {
   '6e':'#dfe48f','5e':'#97dcb3','4e':'#92c7ed','lycee':'#d9a6e6','perso':'#f0a978'
@@ -544,7 +547,7 @@ function renderModules(){
     el.innerHTML=`<button class="tile-del">✕</button><div class="micon">${m.icon||'📦'}</div><div class="minfo"><h3>${esc(m.name)}</h3>${m.desc?`<p>${esc(m.desc)}</p>`:''}</div>`;
     el.querySelector('.tile-del').addEventListener('click',e=>{e.stopPropagation();removeModule(m.id);});
     if(editMode){
-      el.addEventListener('click',()=>openModModal(m));
+      el.addEventListener('click',e=>{e.preventDefault();openModModal(m);});
       el.draggable=true;
       el.addEventListener('dragstart',()=>{dragSrcIdx=idx;el.classList.add('dragging');});
       el.addEventListener('dragend',()=>{el.classList.remove('dragging');list.querySelectorAll('.module-tile').forEach(t=>t.classList.remove('drag-over'));});
@@ -556,6 +559,14 @@ function renderModules(){
       });
     } else if(m.url&&!m.disabled){
       el.addEventListener('click',()=>window.location.href=m.url);
+      // clic long = ouvrir la modale d'édition même hors mode édition
+      let pressTimer=null;
+      el.addEventListener('pointerdown',()=>{pressTimer=setTimeout(()=>openModModal(m),600);});
+      el.addEventListener('pointerup',()=>clearTimeout(pressTimer));
+      el.addEventListener('pointerleave',()=>clearTimeout(pressTimer));
+    } else if(m.disabled){
+      // pas d'URL => clic ouvre la modale pour pouvoir éditer
+      el.addEventListener('click',()=>openModModal(m));
     }
     list.appendChild(el);
   });
@@ -832,9 +843,10 @@ function renderEdt(){
   const todayKey=dKey(new Date());
   const isCurrentWeek=edtNavOffset===0;
   const nowMin=new Date().getHours()*60+new Date().getMinutes();
+  // pour la ligne "après minuit", on utilise nowMin+1440 si on est entre 0h et EDT_END-24h
+  const nowMinExt = nowMin < (EDT_END-24)*60 ? nowMin+1440 : nowMin;
 
-  // Update label
-  document.getElementById('edt-week-lbl').textContent='Sem. '+letter+' · '+fmtShort(monday)+' – '+fmtShort(addDays(monday,6));
+  document.getElementById('edt-week-lbl').textContent='Sem. '+letter+' · '+fmtShort(monday)+'–'+fmtShort(addDays(monday,6));
 
   const visH=(EDT_END-EDT_START)*ETYH;
 
@@ -844,14 +856,16 @@ function renderEdt(){
     const date=addDays(monday,d);
     const key=dKey(date);
     const isToday=isCurrentWeek&&key===todayKey;
-    hdr+=`<div class="edt-day-hdr${isToday?' today':''}">${DAY_NAMES[d]}<br><span style="font-size:.6rem;font-family:'Work Sans'">${fmtShort(date)}</span></div>`;
+    const isPast=isCurrentWeek&&key<todayKey;
+    hdr+=`<div class="edt-day-hdr${isToday?' today':''}${isPast?' edt-past':''}">${DAY_NAMES[d]}<br><span style="font-size:.58rem;font-family:'Work Sans'">${fmtShort(date)}</span></div>`;
   }
   hdr+='</div>';
 
-  // TIME COL
+  // TIME COL — labels avec wrap 24h
   let timeCol='<div class="edt-time-col" style="height:'+visH+'px">';
   for(let h=EDT_START;h<EDT_END;h++){
-    timeCol+=`<div class="edt-tlabel" style="top:${(h-EDT_START)*ETYH}px">${h}h</div>`;
+    const label=(h%24)+'h';
+    timeCol+=`<div class="edt-tlabel" style="top:${(h-EDT_START)*ETYH}px">${label}</div>`;
   }
   timeCol+='</div>';
 
@@ -861,9 +875,9 @@ function renderEdt(){
     const date=addDays(monday,d);
     const key=dKey(date);
     const isToday=isCurrentWeek&&key===todayKey;
-    let colHtml=`<div class="edt-day-col${isToday?' today-col':''}" style="height:${visH}px">`;
+    const isPast=isCurrentWeek&&key<todayKey;
+    let colHtml=`<div class="edt-day-col${isToday?' today-col':''}${isPast?' edt-past-col':''}" style="height:${visH}px">`;
 
-    // filter events for this day/week
     const dayEvs=events.filter(e=>{
       if(e.day!==d) return false;
       if(exceptions.includes(e.id+'@'+key)) return false;
@@ -873,18 +887,25 @@ function renderEdt(){
     });
 
     dayEvs.forEach(ev=>{
-      const s=tmToMin(ev.start),en=tmToMin(ev.end);
-      const top=(s-EDT_START*60)*EDT_PPM;
-      const h=Math.max(8,(en-s)*EDT_PPM);
+      const s=tmToMin(ev.start);
+      const en=tmToMin(ev.end);
+      // les évènements après minuit ont s/en en minutes < 120 → on ajoute 1440
+      const sAdj = s < EDT_START*60 ? s+1440 : s;
+      const enAdj = en <= sAdj ? en+1440 : en;
+      const top=(sAdj-EDT_START*60)*EDT_PPM;
+      const h2=Math.max(6,(enAdj-sAdj)*EDT_PPM);
       if(top<0||top>=visH) return;
-      const color=ev.color||EDT_TYPE_COLORS[ev.type]||'#aebcb1';
-      colHtml+=`<div class="edt-event ev-${ev.type}" style="top:${top}px;height:${h}px;${ev.color?'background:'+ev.color+'28;border-color:'+ev.color:''}">${esc(ev.title)}</div>`;
+      // griser les cours passés
+      const pastCls=(isToday&&enAdj<=nowMinExt)||(isPast)?'opacity:.35;filter:grayscale(.6);':'';
+      colHtml+=`<div class="edt-event ev-${ev.type}" style="top:${top}px;height:${h2}px;${pastCls}${ev.color?'background:'+ev.color+'28;border-color:'+ev.color:''}">${esc(ev.title)}</div>`;
     });
 
     // time-now line
-    if(isToday&&nowMin>=EDT_START*60&&nowMin<EDT_END*60){
-      const top=(nowMin-EDT_START*60)*EDT_PPM;
-      colHtml+=`<div class="edt-now-line" style="top:${top}px"></div>`;
+    if(isToday){
+      const topNow=(nowMinExt-EDT_START*60)*EDT_PPM;
+      if(topNow>=0&&topNow<visH){
+        colHtml+=`<div class="edt-now-line" style="top:${topNow}px"></div>`;
+      }
     }
     colHtml+='</div>';
     dayCols+=colHtml;
@@ -896,6 +917,7 @@ function renderEdt(){
 
 document.getElementById('edt-prev').addEventListener('click',()=>{edtNavOffset--;renderEdt();});
 document.getElementById('edt-next').addEventListener('click',()=>{edtNavOffset++;renderEdt();});
+document.getElementById('edt-today').addEventListener('click',()=>{edtNavOffset=0;renderEdt();});
 
 // ─── HELPERS ───
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
