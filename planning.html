@@ -178,6 +178,15 @@
   .event .ev-meta{position:absolute;bottom:2px;right:4px;font-size:.62rem;color:rgba(241,239,228,.65);font-weight:700;}
   .event.past{opacity:.35;filter:grayscale(.7);}
   .day-col.past-day{background-color:rgba(0,0,0,.15);}
+  .time-now-line{
+    position:absolute;left:0;right:0;height:2px;
+    background:repeating-linear-gradient(90deg, var(--accent) 0 6px, transparent 6px 10px);
+    z-index:4;pointer-events:none;
+  }
+  .time-now-line::before{
+    content:'';position:absolute;left:-4px;top:-4px;
+    width:10px;height:10px;border-radius:50%;background:var(--accent);
+  }
   .day-header.past-day-hdr{opacity:.5;}
   .event-delete{
     position:absolute;top:1px;right:1px;width:18px;height:18px;border-radius:50%;
@@ -825,6 +834,18 @@ function updateTopbarDate(){
 /* ====================================================================
    RENDU : grille horaire (réutilisé semaine + jour)
 ==================================================================== */
+function renderTimeNowLine(col){
+  const now = new Date();
+  const gsm = gridStartMin();
+  const nowMin = now.getHours()*60 + now.getMinutes();
+  const top = (nowMin - gsm) * PX_PER_MIN;
+  if(top < 0 || top > gridTotalHeight()) return;
+  const line = document.createElement('div');
+  line.className = 'time-now-line';
+  line.style.top = top + 'px';
+  col.appendChild(line);
+}
+
 function buildTimeColumn(container){
   container.innerHTML='';
   const gsm = gridStartMin();
@@ -1049,6 +1070,15 @@ function renderWeek(){
     const evs = applyExceptions(applyHolidayFilter(filteredEvents(day, key), hol), key);
     renderEventsInColumn(col, evs, {context:'week', date:key});
   });
+
+  // Trait horaire — uniquement sur la semaine en cours, colonne du jour actuel
+  document.querySelectorAll('#week-days-body .day-col').forEach(col=>{
+    col.querySelectorAll('.time-now-line').forEach(n=>n.remove());
+    if(!isCurrentWeek) return;
+    const day = Number(col.dataset.day);
+    if(day !== todayOurDay) return;
+    renderTimeNowLine(col);
+  });
 }
 
 /* ====================================================================
@@ -1087,6 +1117,9 @@ function renderDay(){
   col.dataset.day = ourDay;
   const evs = applyExceptions(applyHolidayFilter(filteredEvents(ourDay, key), hol), key);
   renderEventsInColumn(col, evs, {context:'day', date:key});
+
+  col.querySelectorAll('.time-now-line').forEach(n=>n.remove());
+  if(key === dateKey(new Date())) renderTimeNowLine(col);
 }
 
 
