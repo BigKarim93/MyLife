@@ -81,32 +81,26 @@ body.grid-edit .grid-mode-hint{display:block;}
   grid-template-columns:repeat(4,1fr);
   grid-auto-rows:160px;
   gap:10px;
-  position:relative;
-  z-index:1;
 }
-
-/* ── GHOST CELLS BACKGROUND — absolutely positioned overlay ── */
-.grid-bg{
-  display:none;
-  position:absolute;
-  top:0;left:0;right:0;bottom:0;
-  grid-template-columns:repeat(4,1fr);
-  grid-auto-rows:160px;
-  gap:10px;
-  pointer-events:none;
-  z-index:0;
-}
-body.grid-edit .grid-bg{display:grid;}
+/* Ghost cells go inside widget-grid with z-index:0, widgets at z-index:1 */
 .ghost-cell{
-  background:rgba(242,193,78,.04);
-  border:1px dashed rgba(242,193,78,.2);
+  grid-column:var(--gc);
+  grid-row:var(--gr);
+  background:transparent;
+  border:1px dashed transparent;
   border-radius:var(--radius);
-  pointer-events:all;
-  cursor:crosshair;
+  z-index:0;
+  pointer-events:none;
   transition:.12s;
 }
-.ghost-cell:hover{background:rgba(242,193,78,.1);border-color:rgba(242,193,78,.5);}
-.ghost-cell.active-drop{background:rgba(242,193,78,.18);border-color:var(--accent);}
+body.grid-edit .ghost-cell{
+  background:rgba(242,193,78,.04);
+  border-color:rgba(242,193,78,.2);
+  pointer-events:all;
+  cursor:crosshair;
+}
+body.grid-edit .ghost-cell:hover{background:rgba(242,193,78,.1);border-color:rgba(242,193,78,.5);}
+.ghost-cell.active-drop{background:rgba(242,193,78,.18) !important;border-color:var(--accent) !important;}
 
 /* ── WIDGET CELLS (explicit grid-column/row set by JS) ── */
 .wcell{
@@ -356,10 +350,8 @@ body.grid-edit .wcell-move{display:flex;align-items:center;gap:3px;}
   </div>
 
   <div class="col-grid">
-    <div class="grid-mode-hint">Clique sur ↔ pour déplacer un widget · Clique sur ⊞ pour changer sa taille</div>
-    <div style="position:relative;">
-      <div class="grid-bg" id="grid-bg"></div>
-      <div class="widget-grid" id="widget-grid">
+    <div class="grid-mode-hint">Mode disposition : clique sur <strong>✥ Déplacer</strong> pour sélectionner un widget, puis clique sur une case du quadrillage pour le déposer. Clique sur <strong>⊞ Taille</strong> pour redimensionner.</div>
+    <div class="widget-grid" id="widget-grid">
 
       <!-- QCM -->
       <div class="wcell" id="wc-qcm">
@@ -524,7 +516,6 @@ body.grid-edit .wcell-move{display:flex;align-items:center;gap:3px;}
       </div>
 
     </div><!-- end widget-grid -->
-    </div><!-- end position:relative wrapper -->
   </div><!-- end col-grid -->
 </div><!-- end page-layout -->
 
@@ -727,38 +718,36 @@ const GRID_COLS = 4;
 const GRID_ROWS = 6;
 
 function applyLayout(){
+  const maxRow = Math.max(...Object.values(wLayout).filter(p=>p&&p.row).map(p=>p.row+p.h-1), GRID_ROWS);
   Object.entries(wLayout).forEach(([id,p])=>{
+    if(!p || !p.col) return;
     const cell = document.getElementById('wc-'+id);
     if(!cell) return;
     cell.style.gridColumn = p.col+' / span '+p.w;
     cell.style.gridRow    = p.row+' / span '+p.h;
+    cell.style.zIndex     = '1';
   });
-  // ensure grid has enough rows
-  const maxRow = Math.max(...Object.values(wLayout).map(p=>p.row+p.h-1), GRID_ROWS);
-  document.getElementById('widget-grid').style.gridTemplateRows = 'repeat('+maxRow+',160px)';
-  document.getElementById('grid-bg').style.gridTemplateRows    = 'repeat('+maxRow+',160px)';
   rebuildGhostCells(maxRow);
 }
 function rebuildGhostCells(rows){
-  const bg = document.getElementById('grid-bg');
-  bg.innerHTML = '';
-  const totalRows = rows + 2; // extra rows so you can always place lower
-  // sync grid height so overlay matches exactly
-  const cellH = 160, gap = 10;
-  const totalH = totalRows * cellH + (totalRows - 1) * gap;
-  bg.style.height = totalH + 'px';
-  bg.style.gridTemplateRows = 'repeat('+totalRows+','+cellH+'px)';
-  document.getElementById('widget-grid').style.minHeight = totalH + 'px';
+  // Remove old ghost cells from widget-grid
+  document.querySelectorAll('#widget-grid .ghost-cell').forEach(g=>g.remove());
+  const grid = document.getElementById('widget-grid');
+  const totalRows = rows + 2;
+  // Update grid template so it has enough rows
+  grid.style.gridTemplateRows = 'repeat('+totalRows+',160px)';
   for(let r=1; r<=totalRows; r++){
     for(let c=1; c<=GRID_COLS; c++){
       const g = document.createElement('div');
       g.className = 'ghost-cell';
-      g.dataset.col = c;
-      g.dataset.row = r;
+      g.style.setProperty('--gc', c);
+      g.style.setProperty('--gr', r);
       g.style.gridColumn = c;
       g.style.gridRow = r;
+      g.dataset.col = c;
+      g.dataset.row = r;
       g.addEventListener('click', ()=>onGhostClick(c, r));
-      bg.appendChild(g);
+      grid.appendChild(g);
     }
   }
 }
