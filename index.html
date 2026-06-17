@@ -797,35 +797,35 @@ function onGhostClick(col, row){
 }
 
 // Wire move buttons (select widget)
-// Attach move/resize handlers directly on each handle (delegation was blocked by widget buttons)
+// Wire move/resize directly on each button using onclick (not addEventListener)
+// so re-calling this never duplicates handlers
 function attachGridHandles(){
   document.querySelectorAll('.wcell-move[data-id]').forEach(handle=>{
-    handle.addEventListener('click', e=>{
+    const id = handle.dataset.id;
+    handle.onclick = e=>{
       e.stopPropagation();
       if(!gridEditMode) return;
-      const id = handle.dataset.id;
       if(selectedWidget === id) deselectWidget();
       else selectWidget(id);
-    });
+    };
   });
   document.querySelectorAll('.wcell-resize[data-id]').forEach(handle=>{
-    handle.addEventListener('click', e=>{
+    const id = handle.dataset.id;
+    handle.onclick = e=>{
       e.stopPropagation();
       if(!gridEditMode) return;
-      openSizeModal(handle.dataset.id);
-    });
+      openSizeModal(id);
+    };
   });
 }
-// Called after page renders
 document.addEventListener('DOMContentLoaded', attachGridHandles);
-// Also called after Firebase loads (in case DOM wasn't ready)
 function attachGridHandlesLate(){ attachGridHandles(); }
 
-// Click outside deselects
+// Click outside → deselect (but not when clicking the size modal)
 document.addEventListener('click',e=>{
-  if(selectedWidget && !e.target.closest('.wcell') && !e.target.closest('.ghost-cell')){
-    deselectWidget();
-  }
+  if(!selectedWidget) return;
+  if(e.target.closest('.wcell') || e.target.closest('.ghost-cell') || e.target.closest('.overlay')) return;
+  deselectWidget();
 });
 
 /* Size modal */
