@@ -116,26 +116,26 @@ body.grid-edit .ghost-cell:hover{background:rgba(242,193,78,.1);border-color:rgb
   outline-offset:2px;
 }
 
-/* resize button */
+/* move/resize buttons live inside widget-hdr */
 .wcell-resize{
-  position:absolute;bottom:5px;right:5px;z-index:20;display:none;
-  background:rgba(242,193,78,.2);border:1px solid rgba(242,193,78,.5);
-  border-radius:5px;padding:3px 6px;font-size:.68rem;color:var(--accent);
-  cursor:pointer;user-select:none;-webkit-user-select:none;white-space:nowrap;
-}
-body.grid-edit .wcell-resize{display:flex;align-items:center;gap:3px;}
-.wcell-resize:hover{background:rgba(242,193,78,.35);}
-
-/* select-to-move button */
-.wcell-move{
-  position:absolute;top:5px;right:5px;z-index:20;display:none;
+  display:none;
   background:rgba(242,193,78,.15);border:1px solid rgba(242,193,78,.4);
-  border-radius:5px;padding:2px 6px;cursor:pointer;font-size:.68rem;color:var(--accent);
-  white-space:nowrap;user-select:none;-webkit-user-select:none;
+  border-radius:5px;padding:3px 7px;cursor:pointer;font-size:.72rem;color:var(--accent);
+  white-space:nowrap;user-select:none;-webkit-user-select:none;font-weight:700;
+  font-family:inherit;
 }
-body.grid-edit .wcell-move{display:flex;align-items:center;gap:3px;}
+body.grid-edit .wcell-resize{display:inline-flex;align-items:center;}
+.wcell-resize:hover{background:rgba(242,193,78,.35);}
+.wcell-move{
+  display:none;
+  background:rgba(242,193,78,.15);border:1px solid rgba(242,193,78,.4);
+  border-radius:5px;padding:3px 7px;cursor:pointer;font-size:.72rem;color:var(--accent);
+  white-space:nowrap;user-select:none;-webkit-user-select:none;font-weight:700;
+  font-family:inherit;
+}
+body.grid-edit .wcell-move{display:inline-flex;align-items:center;}
 .wcell-move:hover{background:rgba(242,193,78,.3);}
-.wcell.selected-widget .wcell-move{background:var(--accent);color:#21321f;}
+.wcell.selected-widget .wcell-move{background:var(--accent);color:#21321f;border-color:var(--accent);}
 
 /* ── WIDGET ── */
 .widget{
@@ -323,6 +323,7 @@ body.grid-edit .wcell-move{display:flex;align-items:center;gap:3px;}
   <div class="topbar-right hidden" id="topbar-right">
     <span class="user-email" id="user-email"></span>
     <button class="btn active" id="btn-grid-edit">✏️ Disposition</button>
+    <button class="btn" id="btn-theme">🎨 Thème</button>
     <button class="btn" id="btn-logout">Déconnexion</button>
   </div>
 </div>
@@ -358,10 +359,7 @@ body.grid-edit .wcell-move{display:flex;align-items:center;gap:3px;}
 
       <!-- QCM -->
       <div class="wcell" id="wc-qcm" style="grid-column:1/span 2;grid-row:1/span 3;z-index:1;">
-        <div class="wcell-move" data-id="qcm">✥ Déplacer</div>
-        <div class="wcell-resize" data-id="qcm">⊞ Taille</div>
-        <div class="widget">
-          <div class="widget-hdr"><span>🧠</span><h2>QCM Arabe</h2><span id="qcm-sync" style="font-size:.8rem;opacity:.4;margin-left:auto;">☁️</span></div>
+        <div class="widget"><div class="widget-hdr"><span>🧠</span><h2>QCM Arabe</h2><span id="qcm-sync" style="font-size:.8rem;opacity:.4;margin-left:auto;">☁️</span><button class="wcell-move btn sm" data-id="qcm" style="display:none">✥</button><button class="wcell-resize btn sm" data-id="qcm" style="display:none">⊞</button></div>
           <div class="widget-body">
             <div id="qcm-home">
               <div class="gauge-lbls">
@@ -449,10 +447,7 @@ body.grid-edit .wcell-move{display:flex;align-items:center;gap:3px;}
 
       <!-- EDT -->
       <div class="wcell" id="wc-edt" style="grid-column:3/span 2;grid-row:1/span 3;z-index:1;">
-        <div class="wcell-move" data-id="edt">✥ Déplacer</div>
-        <div class="wcell-resize" data-id="edt">⊞ Taille</div>
-        <div class="widget">
-          <div class="widget-hdr">
+        <div class="widget"><div class="widget-hdr">
             <span>📋</span><h2>EDT</h2>
             <div class="edt-nav">
               <button class="btn sm" id="edt-prev">◀</button>
@@ -460,27 +455,21 @@ body.grid-edit .wcell-move{display:flex;align-items:center;gap:3px;}
               <button class="btn sm" id="edt-next">▶</button>
               <button class="btn sm" id="edt-today">Auj.</button>
             </div>
-          </div>
+          <button class="wcell-move btn sm" data-id="edt" style="display:none">✥</button><button class="wcell-resize btn sm" data-id="edt" style="display:none">⊞</button></div>
           <div class="widget-body" style="padding:6px;"><div class="edt-wrap"><div class="edt-gr" id="edt-grid"></div></div></div>
         </div>
       </div>
 
       <!-- SPORT -->
       <div class="wcell" id="wc-sport" style="grid-column:1/span 2;grid-row:4/span 2;z-index:1;">
-        <div class="wcell-move" data-id="sport">✥ Déplacer</div>
-        <div class="wcell-resize" data-id="sport">⊞ Taille</div>
-        <div class="widget">
-          <div class="widget-hdr"><span>💪</span><h2>Sport</h2><button class="btn sm" id="weigh-open" style="margin-left:auto;">⚖️ Peser</button></div>
+        <div class="widget"><div class="widget-hdr"><span>💪</span><h2>Sport</h2><button class="btn sm" id="weigh-open" style="margin-left:auto;">⚖️ Peser</button><button class="wcell-move btn sm" data-id="sport" style="display:none">✥</button><button class="wcell-resize btn sm" data-id="sport" style="display:none">⊞</button></div>
           <div class="widget-body" id="sport-body"></div>
         </div>
       </div>
 
       <!-- TASKS -->
       <div class="wcell" id="wc-tasks" style="grid-column:3/span 2;grid-row:4/span 2;z-index:1;">
-        <div class="wcell-move" data-id="tasks">✥ Déplacer</div>
-        <div class="wcell-resize" data-id="tasks">⊞ Taille</div>
-        <div class="widget">
-          <div class="widget-hdr"><span>✅</span><h2>Tâches</h2></div>
+        <div class="widget"><div class="widget-hdr"><span>✅</span><h2>Tâches</h2><button class="wcell-move btn sm" data-id="tasks" style="display:none">✥</button><button class="wcell-resize btn sm" data-id="tasks" style="display:none">⊞</button></div>
           <div class="widget-body">
             <div class="task-tabs">
               <button class="task-tab active" onclick="switchTaskTab('todo')">À faire</button>
@@ -578,6 +567,15 @@ body.grid-edit .wcell-move{display:flex;align-items:center;gap:3px;}
       </div>
     </div>
     <div class="modal-actions"><button class="btn primary" id="size-done">Fermer</button></div>
+  </div>
+</div>
+
+<!-- THEME MODAL -->
+<div class="overlay" id="theme-overlay">
+  <div class="modal" style="max-width:500px;">
+    <h3>🎨 Thème</h3>
+    <div id="theme-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px;"></div>
+    <div class="modal-actions"><button class="btn primary" id="theme-close">Fermer</button></div>
   </div>
 </div>
 
@@ -687,6 +685,7 @@ auth.onAuthStateChanged(async user=>{
   document.getElementById('page-layout').classList.remove('hidden');
   applyLayout();
   attachGridHandlesLate();
+  if(wLayout.theme) applyTheme(wLayout.theme);
   renderMods();
   updateQcmStats(); updateQcmInfo();
   renderEdt();
@@ -1204,6 +1203,90 @@ document.getElementById('cat-input').addEventListener('keydown',e=>{if(e.key==='
    HELPERS
 ══════════════════════════════════════════════ */
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+/* ═══════════════════════════════════════════════
+   THEMES
+══════════════════════════════════════════════ */
+const THEMES = [
+  {id:'foret',   name:'🌿 Forêt',       bg:'#16261e', bg2:'#1f3a2c', bg3:'#274a37', accent:'#f2c14e', teal:'#2dd4bf', green:'#4ade80', red:'#f87171', blue:'#60a5fa', chalk:'#f1efe4'},
+  {id:'ocean',   name:'🌊 Océan',        bg:'#0d1f2d', bg2:'#122534', bg3:'#193040', accent:'#22d3ee', teal:'#06b6d4', green:'#34d399', red:'#f87171', blue:'#38bdf8', chalk:'#e0f4ff'},
+  {id:'violet',  name:'🌙 Nuit violette',bg:'#1a1228', bg2:'#221535', bg3:'#2d1d48', accent:'#c084fc', teal:'#e879f9', green:'#a78bfa', red:'#f472b6', blue:'#818cf8', chalk:'#ede9fe'},
+  {id:'ember',   name:'🔥 Ember',        bg:'#1c1208', bg2:'#271a0c', bg3:'#332212', accent:'#fb923c', teal:'#fbbf24', green:'#84cc16', red:'#ef4444', blue:'#f97316', chalk:'#fff7ed'},
+  {id:'ardoise', name:'🤍 Ardoise',      bg:'#1a1f2e', bg2:'#222840', bg3:'#2a3050', accent:'#e2e8f0', teal:'#94a3b8', green:'#64748b', red:'#f87171', blue:'#93c5fd', chalk:'#f8fafc'},
+  {id:'sakura',  name:'🌸 Sakura',       bg:'#1f1218', bg2:'#2a1a22', bg3:'#38222e', accent:'#f9a8d4', teal:'#fb7185', green:'#86efac', red:'#fca5a5', blue:'#f0abfc', chalk:'#fdf2f8'},
+  {id:'electro', name:'⚡ Électrique',   bg:'#080808', bg2:'#111111', bg3:'#1a1a1a', accent:'#facc15', teal:'#3b82f6', green:'#22c55e', red:'#ef4444', blue:'#60a5fa', chalk:'#f9fafb'},
+  {id:'desert',  name:'🏜️ Désert',       bg:'#1e1610', bg2:'#271e14', bg3:'#332819', accent:'#d97706', teal:'#b45309', green:'#84cc16', red:'#ef4444', blue:'#f59e0b', chalk:'#fef3c7'},
+  {id:'autumn',  name:'🍂 Automne',      bg:'#1c1008', bg2:'#271608', bg3:'#361e0a', accent:'#f97316', teal:'#dc2626', green:'#fbbf24', red:'#ef4444', blue:'#fb923c', chalk:'#fff7ed'},
+  {id:'arctic',  name:'🧊 Arctique',     bg:'#0f1923', bg2:'#172433', bg3:'#1e3045', accent:'#bfdbfe', teal:'#7dd3fc', green:'#a5f3fc', red:'#fca5a5', blue:'#93c5fd', chalk:'#f0f9ff'},
+  {id:'tropic',  name:'🌺 Tropique',     bg:'#0a1f12', bg2:'#0f2918', bg3:'#173520', accent:'#f0abfc', teal:'#4ade80', green:'#86efac', red:'#f9a8d4', blue:'#a78bfa', chalk:'#f0fdf4'},
+  {id:'minuit',  name:'🖤 Minuit',       bg:'#000000', bg2:'#111111', bg3:'#1c1c1c', accent:'#ffffff', teal:'#a3a3a3', green:'#737373', red:'#ef4444', blue:'#6b7280', chalk:'#f5f5f5'},
+  {id:'neon',    name:'🟣 Néon',         bg:'#0a0010', bg2:'#10001a', bg3:'#18002a', accent:'#d946ef', teal:'#a855f7', green:'#34d399', red:'#f43f5e', blue:'#818cf8', chalk:'#fdf4ff'},
+  {id:'ble',     name:'🌾 Blé',          bg:'#1e1a10', bg2:'#272212', bg3:'#332d18', accent:'#fde68a', teal:'#d97706', green:'#a3e635', red:'#ef4444', blue:'#fcd34d', chalk:'#fffbeb'},
+];
+
+let currentTheme = 'foret';
+
+function applyTheme(id){
+  const t = THEMES.find(t=>t.id===id) || THEMES[0];
+  const r = document.documentElement.style;
+  r.setProperty('--bg', t.bg);
+  r.setProperty('--bg2', t.bg2);
+  r.setProperty('--bg3', t.bg3);
+  r.setProperty('--accent', t.accent);
+  r.setProperty('--teal', t.teal);
+  r.setProperty('--teal-l', t.teal+'22');
+  r.setProperty('--green', t.green);
+  r.setProperty('--green-l', t.green+'22');
+  r.setProperty('--red', t.red);
+  r.setProperty('--red-l', t.red+'22');
+  r.setProperty('--blue', t.blue);
+  r.setProperty('--blue-l', t.blue+'22');
+  r.setProperty('--chalk', t.chalk);
+  r.setProperty('--chalk-dim', t.chalk+'99');
+  r.setProperty('--line', t.chalk+'17');
+  r.setProperty('--line-strong', t.chalk+'2e');
+  currentTheme = id;
+}
+
+function buildThemeGrid(){
+  const grid = document.getElementById('theme-grid');
+  grid.innerHTML = '';
+  THEMES.forEach(t=>{
+    const btn = document.createElement('button');
+    btn.style.cssText = `background:${t.bg2};border:2px solid ${t.accent};border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;text-align:left;font-family:inherit;transition:.15s;`;
+    btn.innerHTML = `
+      <div style="display:flex;gap:4px;flex-shrink:0;">
+        <div style="width:14px;height:14px;border-radius:50%;background:${t.accent};"></div>
+        <div style="width:14px;height:14px;border-radius:50%;background:${t.teal};"></div>
+        <div style="width:14px;height:14px;border-radius:50%;background:${t.green};"></div>
+      </div>
+      <div>
+        <div style="font-size:.82rem;font-weight:700;color:${t.chalk};">${t.name}</div>
+        <div style="font-size:.65rem;color:${t.chalk}99;">${t.bg}</div>
+      </div>
+      ${currentTheme===t.id?'<div style="margin-left:auto;font-size:.8rem;color:'+t.accent+'">✓</div>':''}
+    `;
+    btn.addEventListener('click',()=>{
+      applyTheme(t.id);
+      if(layoutDoc) layoutDoc.set(Object.assign({}, wLayout, {theme: t.id})).catch(()=>{});
+      try{ localStorage.setItem('mylife_theme', t.id); }catch(e){}
+      buildThemeGrid(); // refresh checkmarks
+    });
+    grid.appendChild(btn);
+  });
+}
+
+document.getElementById('btn-theme').addEventListener('click',()=>{
+  buildThemeGrid();
+  document.getElementById('theme-overlay').classList.add('open');
+});
+document.getElementById('theme-close').addEventListener('click',()=>document.getElementById('theme-overlay').classList.remove('open'));
+
+// Load saved theme on init
+(function loadTheme(){
+  const saved = localStorage.getItem('mylife_theme');
+  if(saved) applyTheme(saved);
+})();
 </script>
 </body>
 </html>
