@@ -16,259 +16,298 @@
   --red:#f87171;--red-l:rgba(248,113,113,.13);
   --teal:#2dd4bf;--teal-l:rgba(45,212,191,.12);
   --radius:12px;
+  --cell:160px; /* base cell size */
+  --gap:10px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Work Sans',system-ui,sans-serif;background:var(--bg);color:var(--chalk);min-height:100vh;}
 h1,h2,h3{font-family:'Kalam',cursive;}
+button,input,select,textarea{font-family:inherit;}
 
-/* TOPBAR */
+/* ── TOPBAR ── */
 .topbar{position:sticky;top:0;z-index:100;background:linear-gradient(180deg,var(--bg2),rgba(31,58,44,.95));
-  border-bottom:2px solid var(--line-strong);padding:10px 16px;
-  display:flex;align-items:center;gap:12px;flex-wrap:wrap;backdrop-filter:blur(4px);}
-.topbar h1{font-size:1.4rem;color:var(--accent);}
-.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-.user-email{font-size:.8rem;color:var(--chalk-dim);}
-.btn{background:var(--bg3);border:1px solid var(--line);color:var(--chalk);padding:7px 13px;border-radius:8px;font-size:.85rem;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s;display:inline-flex;align-items:center;gap:5px;text-decoration:none;}
+  border-bottom:2px solid var(--line-strong);padding:10px 14px;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;backdrop-filter:blur(4px);}
+.topbar h1{font-size:1.35rem;color:var(--accent);}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.user-email{font-size:.78rem;color:var(--chalk-dim);}
+.btn{background:var(--bg3);border:1px solid var(--line);color:var(--chalk);padding:6px 12px;border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:5px;text-decoration:none;white-space:nowrap;}
 .btn:hover{border-color:var(--accent);}
 .btn.primary{background:var(--accent);color:#21321f;border-color:var(--accent);}
 .btn.active{background:var(--accent);color:#21321f;border-color:var(--accent);}
+.btn.sm{padding:4px 8px;font-size:.75rem;}
 
-/* AUTH */
+/* ── AUTH ── */
 .auth-wrap{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 62px);padding:20px;}
-.auth-card{background:var(--bg2);border:1px solid var(--line-strong);border-radius:var(--radius);padding:28px;width:100%;max-width:380px;}
-.auth-card h2{color:var(--accent);margin-bottom:6px;}
-.auth-sub{color:var(--chalk-dim);font-size:.85rem;margin-bottom:18px;}
-.google-btn{justify-content:center;gap:10px;background:#fff;color:#3c4043;border-color:#dadce0;padding:12px 16px;font-size:.95rem;width:100%;margin-bottom:14px;}
-.auth-divider{display:flex;align-items:center;gap:10px;color:var(--chalk-dim);font-size:.8rem;margin-bottom:14px;}
+.auth-card{background:var(--bg2);border:1px solid var(--line-strong);border-radius:var(--radius);padding:26px;width:100%;max-width:360px;}
+.auth-card h2{color:var(--accent);margin-bottom:5px;}
+.auth-sub{color:var(--chalk-dim);font-size:.83rem;margin-bottom:16px;}
+.google-btn{justify-content:center;gap:10px;background:#fff;color:#3c4043;border-color:#dadce0;padding:11px 14px;font-size:.92rem;width:100%;margin-bottom:12px;}
+.auth-divider{display:flex;align-items:center;gap:8px;color:var(--chalk-dim);font-size:.78rem;margin-bottom:12px;}
 .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--line);}
-.field{margin-bottom:10px;display:flex;flex-direction:column;gap:4px;}
-.field label{font-size:.78rem;color:var(--chalk-dim);font-weight:600;}
-.field input{background:var(--bg);border:1px solid var(--line);color:var(--chalk);border-radius:6px;padding:9px 12px;font-size:.9rem;font-family:inherit;}
-.auth-error{color:#ffb3b3;background:rgba(255,80,80,.1);border:1px solid rgba(255,80,80,.3);border-radius:6px;padding:8px;font-size:.82rem;margin-bottom:10px;display:none;}
-.auth-switch{margin-top:12px;text-align:center;font-size:.85rem;color:var(--chalk-dim);}
+.field{margin-bottom:9px;display:flex;flex-direction:column;gap:3px;}
+.field label{font-size:.75rem;color:var(--chalk-dim);font-weight:600;}
+.field input,.field select,.field textarea{background:var(--bg);border:1px solid var(--line);color:var(--chalk);border-radius:6px;padding:8px 10px;font-size:.88rem;width:100%;}
+.auth-error{color:#ffb3b3;background:rgba(255,80,80,.1);border:1px solid rgba(255,80,80,.3);border-radius:6px;padding:7px;font-size:.8rem;margin-bottom:8px;display:none;}
+.auth-switch{margin-top:10px;text-align:center;font-size:.82rem;color:var(--chalk-dim);}
 .auth-switch a{color:var(--accent);cursor:pointer;font-weight:600;}
 
-/* ===== DASHBOARD GRID ===== */
-.dashboard-layout{display:flex;gap:14px;padding:14px;min-height:calc(100vh - 62px);align-items:flex-start;}
-.col-left{width:200px;flex-shrink:0;display:flex;flex-direction:column;gap:8px;}
-.col-left-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;}
-.col-left-hdr h2{font-size:.95rem;}
+/* ── LAYOUT ── */
+.page-layout{display:flex;gap:12px;padding:12px;align-items:flex-start;min-height:calc(100vh - 62px);}
 
-/* Module tiles */
-.module-tile{background:var(--bg2);border:1px solid var(--line-strong);border-radius:10px;padding:12px;color:var(--chalk);display:flex;align-items:center;gap:10px;position:relative;transition:.15s;cursor:pointer;text-decoration:none;}
-.module-tile:hover{border-color:var(--accent);}
-.module-tile .micon{font-size:1.4rem;line-height:1;flex-shrink:0;}
-.module-tile .minfo h3{font-family:'Kalam',cursive;font-size:.88rem;}
-.module-tile .minfo p{font-size:.68rem;color:var(--chalk-dim);}
-.module-tile .tile-del{position:absolute;top:-7px;right:-7px;width:19px;height:19px;border-radius:50%;background:#c0392b;color:#fff;border:2px solid var(--bg);font-size:10px;display:none;align-items:center;justify-content:center;cursor:pointer;z-index:5;}
-body.edit-mode .module-tile .tile-del{display:flex;}
-body.edit-mode .module-tile{cursor:grab;}
-.module-tile.dragging{opacity:.4;}
-.module-tile.drag-over{border-color:var(--accent);background:rgba(242,193,78,.08);}
-.module-tile.disabled{opacity:.4;}
-.add-module-btn{background:transparent;border:2px dashed var(--line);border-radius:10px;padding:10px;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;color:var(--chalk-dim);font-size:.82rem;font-weight:600;transition:.15s;width:100%;font-family:inherit;}
-.add-module-btn:hover{border-color:var(--accent);color:var(--accent);}
+/* ── LEFT COL : modules ── */
+.col-modules{width:190px;flex-shrink:0;display:flex;flex-direction:column;gap:7px;}
+.col-mod-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;}
+.col-mod-hdr h2{font-size:.9rem;}
+.mod-tile{background:var(--bg2);border:1px solid var(--line-strong);border-radius:9px;padding:10px 11px;color:var(--chalk);display:flex;align-items:center;gap:9px;position:relative;transition:.15s;cursor:pointer;}
+.mod-tile:hover{border-color:var(--accent);}
+.mod-icon{font-size:1.35rem;line-height:1;flex-shrink:0;}
+.mod-info h3{font-size:.83rem;font-family:'Kalam',cursive;}
+.mod-info p{font-size:.65rem;color:var(--chalk-dim);}
+.mod-del{position:absolute;top:-6px;right:-6px;width:17px;height:17px;border-radius:50%;background:#c0392b;color:#fff;border:2px solid var(--bg);font-size:9px;display:none;align-items:center;justify-content:center;cursor:pointer;z-index:5;}
+.mod-tile.dragging{opacity:.4;}
+.mod-tile.drag-over{border-color:var(--accent);background:rgba(242,193,78,.07);}
+.add-mod-btn{background:transparent;border:2px dashed var(--line);border-radius:9px;padding:9px;display:flex;align-items:center;justify-content:center;gap:5px;cursor:pointer;color:var(--chalk-dim);font-size:.8rem;font-weight:600;transition:.15s;width:100%;}
+.add-mod-btn:hover{border-color:var(--accent);color:var(--accent);}
 
-/* ===== WIDGET GRID (right side) ===== */
-.col-right{flex:1;min-width:0;}
+/* ── GRID DASHBOARD ── */
+.col-grid{flex:1;min-width:0;}
+.grid-mode-hint{font-size:.72rem;color:var(--chalk-dim);margin-bottom:6px;display:none;}
+body.grid-edit .grid-mode-hint{display:block;}
+
 .widget-grid{
   display:grid;
-  grid-template-columns:repeat(12,1fr);
-  gap:12px;
-  align-items:start;
+  grid-template-columns:repeat(4,1fr);
+  grid-auto-rows:var(--cell);
+  gap:var(--gap);
+  min-height:calc(var(--cell)*2 + var(--gap));
+  position:relative;
 }
-/* default sizes */
-.widget-cell{min-width:0;position:relative;}
-.widget-cell[data-cols="4"]{grid-column:span 4;}
-.widget-cell[data-cols="6"]{grid-column:span 6;}
-.widget-cell[data-cols="8"]{grid-column:span 8;}
-.widget-cell[data-cols="12"]{grid-column:span 12;}
 
-/* resize handle */
-.widget-cell .resize-handle{
-  position:absolute;bottom:4px;right:4px;width:16px;height:16px;
-  cursor:se-resize;display:none;
-  background:linear-gradient(135deg,transparent 40%,var(--accent) 40%,var(--accent) 60%,transparent 60%),
-             linear-gradient(135deg,transparent 65%,var(--accent) 65%,var(--accent) 80%,transparent 80%);
-  opacity:.5;z-index:10;
+/* ── GHOST CELLS ── */
+.ghost-cell{
+  background:rgba(242,193,78,.04);border:1px dashed rgba(242,193,78,.2);
+  border-radius:var(--radius);cursor:pointer;transition:.15s;
+  display:none;
 }
-body.edit-mode .resize-handle{display:block;}
+body.grid-edit .ghost-cell{display:block;}
+.ghost-cell:hover{background:rgba(242,193,78,.1);border-color:rgba(242,193,78,.5);}
+.ghost-cell.drop-target{background:rgba(242,193,78,.18);border-color:var(--accent);}
 
-/* drag handle */
-.widget-cell .drag-handle{
-  position:absolute;top:6px;left:8px;font-size:12px;color:var(--chalk-dim);
-  cursor:grab;display:none;z-index:10;line-height:1;
+/* ── WIDGET CELLS ── */
+.wcell{
+  grid-column:span var(--w,2);
+  grid-row:span var(--h,2);
+  position:relative;
+  min-width:0;
+  min-height:0;
 }
-body.edit-mode .drag-handle{display:block;}
-.widget-cell.dragging-widget{opacity:.4;}
-.widget-cell.drop-target{outline:2px dashed var(--accent);outline-offset:-2px;border-radius:var(--radius);}
+/* resize handle — corner dots */
+.wcell-resize{
+  position:absolute;bottom:6px;right:6px;z-index:20;
+  display:none;
+  flex-direction:column;gap:2px;cursor:se-resize;padding:4px;
+}
+.wcell-resize span{display:flex;gap:2px;}
+.wcell-resize i{width:4px;height:4px;border-radius:50%;background:var(--accent);display:block;}
+body.grid-edit .wcell-resize{display:flex;}
+/* move handle */
+.wcell-move{
+  position:absolute;top:6px;right:6px;z-index:20;
+  display:none;
+  background:rgba(242,193,78,.15);border:1px solid rgba(242,193,78,.4);
+  border-radius:5px;padding:2px 5px;cursor:grab;font-size:.7rem;color:var(--accent);
+  white-space:nowrap;
+}
+body.grid-edit .wcell-move{display:flex;align-items:center;gap:3px;}
+.wcell.being-moved{opacity:.4;}
 
-/* ===== WIDGET BASE ===== */
-.widget{background:var(--bg2);border:1px solid var(--line-strong);border-radius:var(--radius);overflow:hidden;height:100%;}
-.widget-hdr{padding:10px 12px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;}
-.widget-hdr h2{font-size:.9rem;flex:1;}
-.widget-body{padding:12px;overflow:auto;}
+/* ── WIDGET ── */
+.widget{
+  background:var(--bg2);border:1px solid var(--line-strong);border-radius:var(--radius);
+  display:flex;flex-direction:column;height:100%;overflow:hidden;
+}
+.widget-hdr{padding:9px 12px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:7px;flex-shrink:0;}
+.widget-hdr h2{font-size:.88rem;flex:1;}
+.widget-body{padding:10px 12px;overflow-y:auto;flex:1;min-height:0;}
 
-/* ===== QCM ===== */
-.qcm-cfg{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.cfg-lbl{font-size:.7rem;color:var(--chalk-dim);font-weight:700;margin-bottom:4px;text-transform:uppercase;}
-.pills{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;}
-.pill{background:var(--bg3);border:1px solid var(--line);color:var(--chalk-dim);border-radius:6px;padding:4px 10px;font-size:.75rem;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s;}
+/* ── QCM ── */
+.gauge-bar{height:6px;border-radius:3px;overflow:hidden;background:var(--line);display:flex;margin:3px 0 8px;}
+.g-grn{background:var(--green);transition:width .5s;}
+.g-blu{background:var(--blue);transition:width .5s;}
+.g-red{background:var(--red);transition:width .5s;}
+.gauge-lbls{display:flex;justify-content:space-between;font-size:.65rem;margin-bottom:2px;}
+.pills{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;}
+.pill{background:var(--bg3);border:1px solid var(--line);color:var(--chalk-dim);border-radius:6px;padding:3px 9px;font-size:.72rem;font-weight:700;cursor:pointer;transition:.15s;}
 .pill.active{background:var(--accent);color:#21321f;border-color:var(--accent);}
 .pill:hover:not(.active){border-color:var(--accent);color:var(--chalk);}
-.gauge-bar{height:7px;border-radius:4px;overflow:hidden;background:var(--line);display:flex;margin-bottom:8px;}
-.g-bar-green{background:var(--green);transition:width .5s;}
-.g-bar-blue{background:var(--blue);transition:width .5s;}
-.g-bar-red{background:var(--red);transition:width .5s;}
-.gauge-lbls{display:flex;justify-content:space-between;font-size:.68rem;margin-bottom:3px;}
-.q-card{background:var(--bg3);border:1px solid var(--line);border-radius:9px;padding:12px;text-align:center;margin-bottom:8px;}
-.q-label{font-size:.65rem;color:var(--chalk-dim);text-transform:uppercase;margin-bottom:4px;}
-.q-main{font-family:'Scheherazade New',serif;font-size:1.7rem;direction:rtl;color:var(--teal);line-height:1.7;}
-.q-main.fr{font-family:'Work Sans',sans-serif;font-size:1.1rem;direction:ltr;color:var(--chalk);}
-.q-lesson{font-size:.62rem;color:var(--chalk-dim);margin-top:2px;}
-.q-opts{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:7px;}
-.q-opt{background:var(--bg3);border:2px solid var(--line);border-radius:8px;padding:8px 6px;text-align:center;cursor:pointer;transition:.15s;font-family:'Scheherazade New',serif;font-size:1.1rem;direction:rtl;line-height:1.6;}
-.q-opt.fr-opt{font-family:'Work Sans',sans-serif;font-size:.78rem;direction:ltr;line-height:1.3;}
+.cfg-lbl{font-size:.65rem;color:var(--chalk-dim);font-weight:700;margin-bottom:3px;text-transform:uppercase;}
+.qcm-2col{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.qstart-info{font-size:.68rem;color:var(--chalk-dim);margin-bottom:5px;}
+.q-card{background:var(--bg3);border:1px solid var(--line);border-radius:8px;padding:10px;text-align:center;margin-bottom:7px;}
+.q-lbl{font-size:.62rem;color:var(--chalk-dim);text-transform:uppercase;margin-bottom:4px;}
+.q-main{font-family:'Scheherazade New',serif;font-size:1.6rem;direction:rtl;color:var(--teal);line-height:1.6;}
+.q-main.fr{font-family:'Work Sans',sans-serif;font-size:1.05rem;direction:ltr;color:var(--chalk);}
+.q-lesson{font-size:.6rem;color:var(--chalk-dim);margin-top:2px;}
+.q-opts{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:6px;}
+.q-opt{background:var(--bg3);border:2px solid var(--line);border-radius:7px;padding:7px 5px;text-align:center;cursor:pointer;transition:.15s;font-family:'Scheherazade New',serif;font-size:1rem;direction:rtl;line-height:1.5;}
+.q-opt.fr-opt{font-family:'Work Sans',sans-serif;font-size:.75rem;direction:ltr;line-height:1.3;}
 .q-opt:hover:not(.locked){border-color:var(--teal);background:var(--teal-l);}
 .q-opt.correct{border-color:var(--green);background:var(--green-l);}
 .q-opt.wrong{border-color:var(--red);background:var(--red-l);}
 .q-opt.locked{cursor:default;}
-.q-fb{border-radius:7px;padding:7px 9px;font-size:.75rem;line-height:1.4;margin-bottom:7px;display:none;}
+.q-fb{border-radius:6px;padding:6px 8px;font-size:.72rem;line-height:1.3;margin-bottom:6px;display:none;}
 .q-fb.ok{background:var(--green-l);border:1px solid var(--green);color:var(--green);}
 .q-fb.ko{background:var(--red-l);border:1px solid var(--red);color:var(--red);}
 .q-fb.skip{background:var(--blue-l);border:1px solid var(--blue);color:var(--blue);}
-.q-progress{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
-.q-pbar-wrap{flex:1;height:5px;background:var(--line);border-radius:3px;overflow:hidden;}
-.q-pbar{height:100%;background:linear-gradient(90deg,var(--teal),#0ea5e9);border-radius:3px;transition:width .3s;}
-.q-counter{font-size:.72rem;color:var(--chalk-dim);}
-.q-streak{font-size:.75rem;font-weight:700;color:var(--accent);}
-.res-card{background:var(--bg3);border:1px solid var(--line);border-radius:9px;padding:12px;text-align:center;margin-bottom:8px;}
-.res-emoji{font-size:1.8rem;display:block;}
-.res-score{font-size:1.3rem;font-weight:700;font-family:'Kalam',cursive;}
-.res-row{display:flex;gap:8px;justify-content:center;margin-top:8px;flex-wrap:wrap;}
-.res-item{font-size:.7rem;color:var(--chalk-dim);text-align:center;}
-.res-item strong{display:block;font-size:.95rem;font-weight:700;}
-.res-item strong.g{color:var(--green);}
-.res-item strong.b{color:var(--blue);}
-.res-item strong.r{color:var(--red);}
-.missed-mini{background:var(--bg3);border:1px solid var(--line);border-radius:7px;max-height:120px;overflow-y:auto;margin-top:6px;}
-.missed-mini h4{padding:5px 9px;font-size:.72rem;border-bottom:1px solid var(--line);font-family:'Kalam',cursive;}
-.missed-item{display:flex;align-items:center;gap:7px;padding:5px 9px;border-bottom:1px solid var(--line);font-size:.72rem;}
-.missed-item:last-child{border-bottom:none;}
-.missed-ar{font-family:'Scheherazade New',serif;font-size:.95rem;direction:rtl;color:var(--teal);min-width:50px;text-align:right;}
-.mastered-list{background:var(--bg3);border:1px solid var(--line);border-radius:7px;max-height:140px;overflow-y:auto;margin-top:6px;}
-.mastered-list h4{padding:5px 9px;font-size:.72rem;border-bottom:1px solid var(--line);font-family:'Kalam',cursive;color:var(--green);}
-.mastered-item{display:flex;align-items:center;gap:7px;padding:5px 9px;border-bottom:1px solid var(--line);font-size:.72rem;}
-.mastered-item:last-child{border-bottom:none;}
-.to-review-btn{margin-left:auto;font-size:.62rem;background:var(--blue-l);border:1px solid var(--blue);color:var(--blue);border-radius:4px;padding:2px 5px;cursor:pointer;}
-.btn-review{background:var(--blue-l);border:1px solid var(--blue);color:var(--blue);padding:6px 10px;border-radius:7px;font-size:.75rem;font-weight:700;cursor:pointer;font-family:inherit;}
-.btn-review:hover{background:var(--blue);color:#0f1117;}
-.start-info{font-size:.7rem;color:var(--chalk-dim);margin-bottom:6px;}
+.q-prog{display:flex;align-items:center;gap:6px;margin-bottom:7px;}
+.q-pbar-w{flex:1;height:4px;background:var(--line);border-radius:2px;overflow:hidden;}
+.q-pbar{height:100%;background:linear-gradient(90deg,var(--teal),#0ea5e9);border-radius:2px;transition:width .3s;}
+.q-cnt{font-size:.68rem;color:var(--chalk-dim);}
+.q-str{font-size:.72rem;font-weight:700;color:var(--accent);}
+.res-card{background:var(--bg3);border:1px solid var(--line);border-radius:8px;padding:10px;text-align:center;margin-bottom:7px;}
+.res-emoji{font-size:1.6rem;display:block;}
+.res-score{font-size:1.2rem;font-weight:700;font-family:'Kalam',cursive;}
+.res-row{display:flex;gap:7px;justify-content:center;margin-top:6px;flex-wrap:wrap;}
+.res-item{font-size:.68rem;color:var(--chalk-dim);text-align:center;}
+.res-item strong{display:block;font-size:.88rem;font-weight:700;}
+.mini-list{background:var(--bg3);border:1px solid var(--line);border-radius:7px;max-height:110px;overflow-y:auto;margin-top:5px;}
+.mini-list h4{padding:4px 8px;font-size:.68rem;border-bottom:1px solid var(--line);font-family:'Kalam',cursive;}
+.mini-item{display:flex;align-items:center;gap:6px;padding:4px 8px;border-bottom:1px solid var(--line);font-size:.68rem;}
+.mini-item:last-child{border-bottom:none;}
+.mini-ar{font-family:'Scheherazade New',serif;font-size:.9rem;direction:rtl;color:var(--teal);min-width:46px;text-align:right;}
+.to-rev{margin-left:auto;font-size:.6rem;background:var(--blue-l);border:1px solid var(--blue);color:var(--blue);border-radius:3px;padding:1px 5px;cursor:pointer;}
+.btn-rev{background:var(--blue-l);border:1px solid var(--blue);color:var(--blue);padding:5px 9px;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:inherit;}
 
-/* ===== EDT ===== */
+/* ── EDT ── */
 .edt-wrap{overflow-x:auto;}
-.edt-grid{min-width:260px;font-size:.62rem;}
-.edt-header{display:flex;border-bottom:1px solid var(--line);background:var(--bg3);}
-.edt-time-hdr{width:28px;flex-shrink:0;}
-.edt-day-hdr{flex:1;text-align:center;padding:4px 1px;font-family:'Kalam',cursive;font-size:.72rem;border-left:1px solid var(--line);}
-.edt-day-hdr.today{color:var(--accent);}
-.edt-day-hdr.edt-past{opacity:.4;}
+.edt-gr{min-width:240px;font-size:.58rem;}
+.edt-hdr{display:flex;border-bottom:1px solid var(--line);background:var(--bg3);}
+.edt-th{width:24px;flex-shrink:0;}
+.edt-dh{flex:1;text-align:center;padding:3px 1px;font-family:'Kalam',cursive;font-size:.68rem;border-left:1px solid var(--line);}
+.edt-dh.today{color:var(--accent);}
+.edt-dh.past{opacity:.4;}
 .edt-body{display:flex;}
-.edt-time-col{width:28px;flex-shrink:0;position:relative;}
-.edt-tlabel{position:absolute;left:0;right:2px;text-align:right;font-size:.55rem;color:var(--chalk-dim);transform:translateY(-5px);}
+.edt-tc{width:24px;flex-shrink:0;position:relative;}
+.edt-tl{position:absolute;right:2px;font-size:.52rem;color:var(--chalk-dim);transform:translateY(-5px);}
 .edt-days{flex:1;display:flex;}
-.edt-day-col{flex:1;position:relative;border-left:1px solid var(--line);background:repeating-linear-gradient(to bottom,var(--line) 0 1px,transparent 1px 16px);}
-.edt-day-col.today-col{background-color:rgba(242,193,78,.04);}
-.edt-day-col.edt-past-col{background-color:rgba(0,0,0,.12);}
-.edt-event{position:absolute;left:1px;right:1px;border-radius:2px;padding:1px 2px;overflow:hidden;border-left:2px solid;font-size:.55rem;line-height:1.2;font-weight:700;z-index:2;}
-.edt-now-line{position:absolute;left:0;right:0;height:1px;background:repeating-linear-gradient(90deg,var(--accent) 0 3px,transparent 3px 5px);z-index:3;pointer-events:none;}
-.edt-now-line::before{content:'';position:absolute;left:-2px;top:-2px;width:5px;height:5px;border-radius:50%;background:var(--accent);}
+.edt-dc{flex:1;position:relative;border-left:1px solid var(--line);background:repeating-linear-gradient(to bottom,var(--line) 0 1px,transparent 1px 13px);}
+.edt-dc.today{background-color:rgba(242,193,78,.04);}
+.edt-dc.past{background-color:rgba(0,0,0,.12);}
+.edt-ev{position:absolute;left:1px;right:1px;border-radius:2px;padding:1px 2px;overflow:hidden;border-left:2px solid;font-size:.5rem;line-height:1.1;font-weight:700;z-index:2;}
+.edt-nl{position:absolute;left:0;right:0;height:1px;background:repeating-linear-gradient(90deg,var(--accent) 0 3px,transparent 3px 5px);z-index:3;pointer-events:none;}
+.edt-nl::before{content:'';position:absolute;left:-2px;top:-2px;width:5px;height:5px;border-radius:50%;background:var(--accent);}
 .ev-6e{background:rgba(223,228,143,.2);border-color:#dfe48f;}
 .ev-5e{background:rgba(151,220,179,.2);border-color:#97dcb3;}
 .ev-4e{background:rgba(146,199,237,.2);border-color:#92c7ed;}
 .ev-lycee{background:rgba(217,166,230,.15);border-color:#d9a6e6;border-left-style:dashed;}
 .ev-perso{background:rgba(240,169,120,.2);border-color:#f0a978;}
-.edt-nav{display:flex;align-items:center;gap:5px;margin-left:auto;}
-.edt-week-lbl{font-size:.68rem;color:var(--chalk-dim);}
+.edt-nav{display:flex;align-items:center;gap:4px;margin-left:auto;}
+.edt-nav-lbl{font-size:.64rem;color:var(--chalk-dim);}
 
-/* ===== SPORT ===== */
-.sport-month-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
-.sport-month-name{font-family:'Kalam',cursive;font-size:.88rem;color:var(--accent);}
-.sport-month-count{font-size:.72rem;color:var(--chalk-dim);}
-.sport-weeks{display:flex;flex-direction:column;gap:4px;}
-.sport-week-row{display:flex;align-items:center;gap:5px;font-size:.7rem;}
-.sport-wk-lbl{width:44px;color:var(--chalk-dim);flex-shrink:0;font-size:.65rem;}
-.sport-dots{display:flex;gap:3px;}
-.sport-dot{width:16px;height:16px;border-radius:50%;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:.55rem;}
-.sport-dot.done{background:var(--green-l);border-color:var(--green);color:var(--green);}
-.sport-dot.missed{background:var(--red-l);border-color:var(--red);color:var(--red);}
-.sport-dot.future{background:var(--bg3);}
-.sport-reg{display:flex;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid var(--line);}
-.sport-reg-item{flex:1;text-align:center;background:var(--bg3);border:1px solid var(--line);border-radius:7px;padding:6px 4px;}
-.sport-reg-val{font-family:'Kalam',cursive;font-size:1rem;font-weight:700;}
-.sport-reg-lbl{font-size:.6rem;color:var(--chalk-dim);margin-top:1px;}
-.weight-last{font-size:.75rem;color:var(--chalk-dim);margin-bottom:6px;}
-.weight-last strong{color:var(--chalk);}
-.milestone-row{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;}
-.milestone{font-size:.62rem;padding:2px 6px;border-radius:10px;border:1px solid var(--line);color:var(--chalk-dim);}
-.milestone.done{background:var(--green-l);border-color:var(--green);color:var(--green);font-weight:700;}
-.milestone.next{background:var(--teal-l);border-color:var(--teal);color:var(--teal);font-weight:700;}
-.weight-bar{height:7px;background:var(--line);border-radius:4px;overflow:hidden;margin-bottom:4px;}
+/* ── SPORT ── */
+.sport-weight-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.sport-w-lbl{font-size:.75rem;color:var(--chalk-dim);}
+.sport-w-lbl strong{color:var(--chalk);}
+.weight-bar{flex:1;height:7px;background:var(--line);border-radius:4px;overflow:hidden;}
 .weight-bar-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--teal));border-radius:4px;transition:width .6s;}
-.weight-bar-lbls{display:flex;justify-content:space-between;font-size:.62rem;color:var(--chalk-dim);margin-bottom:6px;}
+.milestone-row{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:8px;}
+.ms{font-size:.6rem;padding:2px 5px;border-radius:10px;border:1px solid var(--line);color:var(--chalk-dim);}
+.ms.done{background:var(--green-l);border-color:var(--green);color:var(--green);font-weight:700;}
+.ms.next{background:var(--teal-l);border-color:var(--teal);color:var(--teal);font-weight:700;}
+.sport-month{margin-bottom:8px;}
+.sport-month-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.sport-month-name{font-family:'Kalam',cursive;font-size:.85rem;color:var(--accent);}
+.sport-month-count{font-size:.68rem;color:var(--chalk-dim);}
+.sport-weeks{display:flex;flex-direction:column;gap:3px;}
+.sport-wrow{display:flex;align-items:center;gap:5px;}
+.sport-wlbl{width:28px;font-size:.62rem;color:var(--chalk-dim);flex-shrink:0;}
+.sport-dots{display:flex;gap:3px;}
+.sdot{width:15px;height:15px;border-radius:50%;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:.52rem;}
+.sdot.done{background:var(--green-l);border-color:var(--green);color:var(--green);}
+.sdot.missed{background:var(--red-l);border-color:var(--red);color:var(--red);}
+.sdot.future{background:var(--bg3);}
+.sport-stats{display:flex;gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid var(--line);}
+.sstat{flex:1;text-align:center;background:var(--bg3);border:1px solid var(--line);border-radius:6px;padding:5px 3px;}
+.sstat-val{font-family:'Kalam',cursive;font-size:.95rem;font-weight:700;}
+.sstat-lbl{font-size:.58rem;color:var(--chalk-dim);margin-top:1px;}
 
-/* ===== EMOJI PICKER ===== */
+/* ── TASKS ── */
+.task-tabs{display:flex;gap:6px;margin-bottom:8px;border-bottom:1px solid var(--line);padding-bottom:7px;}
+.task-tab{background:none;border:none;color:var(--chalk-dim);font-size:.75rem;font-weight:700;cursor:pointer;padding:3px 6px;border-radius:5px;transition:.15s;}
+.task-tab.active{background:var(--accent);color:#21321f;}
+.task-add-row{display:flex;gap:6px;margin-bottom:8px;}
+.task-add-row input{flex:1;background:var(--bg);border:1px solid var(--line);color:var(--chalk);border-radius:6px;padding:6px 9px;font-size:.8rem;}
+.task-cat-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;}
+.cat-pill{font-size:.65rem;padding:2px 7px;border-radius:12px;border:1px solid var(--line);color:var(--chalk-dim);cursor:pointer;background:var(--bg3);transition:.15s;}
+.cat-pill.active{border-color:var(--accent);color:var(--accent);background:rgba(242,193,78,.08);}
+.task-list{display:flex;flex-direction:column;gap:4px;max-height:240px;overflow-y:auto;}
+.task-item{display:flex;align-items:center;gap:7px;padding:7px 9px;background:var(--bg3);border:1px solid var(--line);border-radius:7px;transition:.15s;cursor:grab;}
+.task-item:hover{border-color:var(--line-strong);}
+.task-item.done-item{opacity:.5;}
+.task-check{width:16px;height:16px;border-radius:4px;border:2px solid var(--line);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:.15s;background:transparent;}
+.task-check.checked{background:var(--green);border-color:var(--green);}
+.task-check.checked::after{content:'✓';font-size:.65rem;color:#0f1117;font-weight:700;}
+.task-text{flex:1;font-size:.78rem;line-height:1.3;}
+.task-text.striked{text-decoration:line-through;color:var(--chalk-dim);}
+.task-prio{font-size:.9rem;flex-shrink:0;cursor:pointer;line-height:1;}
+.task-del{font-size:.68rem;color:var(--chalk-dim);cursor:pointer;opacity:0;transition:.15s;padding:2px 4px;border-radius:4px;border:1px solid transparent;}
+.task-item:hover .task-del{opacity:1;}
+.task-del:hover{border-color:var(--red);color:var(--red);}
+.task-cat-badge{font-size:.6rem;padding:1px 5px;border-radius:8px;border:1px solid var(--line);color:var(--chalk-dim);flex-shrink:0;}
+.task-add-opts{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;align-items:center;}
+.task-prio-sel{display:flex;gap:4px;}
+.prio-btn{font-size:.85rem;cursor:pointer;opacity:.35;transition:.15s;background:none;border:none;padding:0;}
+.prio-btn.active{opacity:1;transform:scale(1.2);}
+.task-empty{text-align:center;padding:20px;color:var(--chalk-dim);font-size:.78rem;}
+.task-cat-sel{background:var(--bg);border:1px solid var(--line);color:var(--chalk);border-radius:5px;padding:4px 7px;font-size:.72rem;}
+.task-drag-over{border-color:var(--accent) !important;background:rgba(242,193,78,.06) !important;}
+
+/* ── EMOJI PICKER ── */
 .emoji-field{position:relative;}
-.emoji-input-row{display:flex;gap:6px;align-items:center;}
-.emoji-input{width:50px;font-size:1.3rem;text-align:center;background:var(--bg);border:1px solid var(--line);color:var(--chalk);border-radius:6px;padding:5px;font-family:inherit;}
-.emoji-toggle-btn{background:var(--bg3);border:1px solid var(--line);color:var(--chalk-dim);border-radius:6px;padding:5px 10px;cursor:pointer;font-size:.8rem;font-family:inherit;}
-.emoji-toggle-btn:hover{border-color:var(--accent);}
-.emoji-dropdown{
-  display:none;position:absolute;left:0;top:calc(100% + 4px);
-  background:var(--bg2);border:1px solid var(--line-strong);border-radius:9px;
-  padding:10px;z-index:200;width:300px;max-height:220px;overflow-y:auto;
-  box-shadow:0 8px 24px rgba(0,0,0,.4);
-}
-.emoji-dropdown.open{display:block;}
-.emoji-cat-lbl{font-size:.65rem;color:var(--chalk-dim);font-weight:700;text-transform:uppercase;margin:6px 0 3px;letter-spacing:.04em;}
-.emoji-cat-lbl:first-child{margin-top:0;}
-.emoji-grid-picker{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:4px;}
-.epick{font-size:1.3rem;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:6px;transition:.1s;}
+.emoji-input-row{display:flex;gap:5px;align-items:center;}
+.emoji-inp{width:46px;font-size:1.2rem;text-align:center;background:var(--bg);border:1px solid var(--line);color:var(--chalk);border-radius:6px;padding:4px;}
+.emoji-tog{background:var(--bg3);border:1px solid var(--line);color:var(--chalk-dim);border-radius:6px;padding:4px 9px;cursor:pointer;font-size:.75rem;}
+.emoji-tog:hover{border-color:var(--accent);}
+.emoji-dd{display:none;position:absolute;left:0;top:calc(100% + 4px);background:var(--bg2);border:1px solid var(--line-strong);border-radius:9px;padding:10px;z-index:200;width:290px;max-height:200px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.45);}
+.emoji-dd.open{display:block;}
+.ecat-lbl{font-size:.62rem;color:var(--chalk-dim);font-weight:700;text-transform:uppercase;margin:5px 0 3px;letter-spacing:.04em;}
+.ecat-lbl:first-child{margin-top:0;}
+.epick-grid{display:flex;flex-wrap:wrap;gap:2px;margin-bottom:3px;}
+.epick{font-size:1.2rem;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:5px;}
 .epick:hover{background:var(--bg3);}
 
-/* MODAL */
-.overlay{position:fixed;inset:0;background:rgba(10,16,12,.7);display:none;align-items:center;justify-content:center;z-index:300;padding:16px;}
+/* ── MODALS ── */
+.overlay{position:fixed;inset:0;background:rgba(10,16,12,.7);display:none;align-items:center;justify-content:center;z-index:300;padding:14px;}
 .overlay.open{display:flex;}
-.modal{background:var(--bg2);border:1px solid var(--line-strong);border-radius:var(--radius);padding:18px;width:100%;max-width:360px;max-height:90vh;overflow:auto;}
-.modal h3{color:var(--accent);margin-bottom:12px;}
-.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;}
+.modal{background:var(--bg2);border:1px solid var(--line-strong);border-radius:var(--radius);padding:16px;width:100%;max-width:340px;max-height:90vh;overflow:auto;}
+.modal h3{color:var(--accent);margin-bottom:10px;}
+.modal-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:10px;}
 
+/* UTIL */
 .hidden{display:none !important;}
 .loading-screen{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;align-items:center;justify-content:center;}
 .loading-screen.hidden{display:none;}
 .loading-box{text-align:center;color:var(--chalk-dim);}
-.loading-box p{margin-top:12px;font-size:.9rem;}
-.spinner{width:32px;height:32px;border-radius:50%;border:3px solid var(--line-strong);border-top-color:var(--accent);margin:0 auto;animation:spin .8s linear infinite;}
+.loading-box p{margin-top:10px;font-size:.88rem;}
+.spinner{width:30px;height:30px;border-radius:50%;border:3px solid var(--line-strong);border-top-color:var(--accent);margin:0 auto;animation:spin .8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
+
 @media(max-width:700px){
-  .dashboard-layout{flex-direction:column;}
-  .col-left{width:100%;flex-direction:row;flex-wrap:wrap;}
-  .widget-grid{grid-template-columns:1fr;}
-  .widget-cell[data-cols]{grid-column:span 1;}
+  .page-layout{flex-direction:column;}
+  .col-modules{width:100%;flex-direction:row;flex-wrap:wrap;}
+  .widget-grid{grid-template-columns:repeat(2,1fr);}
 }
 </style>
 </head>
 <body>
-
-<div class="loading-screen" id="loading-screen">
-  <div class="loading-box"><div class="spinner"></div><p id="loading-text">Connexion à MyLife…</p></div>
-</div>
+<div class="loading-screen" id="ls"><div class="loading-box"><div class="spinner"></div><p id="lt">Connexion…</p></div></div>
 
 <div class="topbar">
   <h1>🏠 MyLife</h1>
   <div class="topbar-right hidden" id="topbar-right">
     <span class="user-email" id="user-email"></span>
-    <button class="btn active" id="btn-edit-layout">✏️ Modifier</button>
+    <button class="btn active" id="btn-grid-edit">✏️ Disposition</button>
     <button class="btn" id="btn-logout">Déconnexion</button>
   </div>
 </div>
@@ -279,7 +318,7 @@ body.edit-mode .drag-handle{display:block;}
     <h2>MyLife</h2><p class="auth-sub">Connecte-toi pour accéder à tes modules.</p>
     <div class="auth-error" id="auth-error"></div>
     <button class="btn google-btn" id="auth-google">
-      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20.4H24v7.2h11.3C33.7 32 29.3 35 24 35c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l5.1-5.1C33.6 5.3 29.1 3.5 24 3.5 12.7 3.5 3.5 12.7 3.5 24S12.7 44.5 24 44.5 44.5 35.3 44.5 24c0-1.2-.1-2.4-.3-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l5.9 4.3C13.7 15.6 18.5 12.5 24 12.5c3.1 0 5.8 1.1 8 3l5.1-5.1C33.6 7.3 29.1 5.5 24 5.5 16.2 5.5 9.5 9.9 6.3 14.7z"/><path fill="#4CAF50" d="M24 44.5c5.1 0 9.6-1.7 12.8-4.7l-5.9-5c-1.6 1.2-3.7 1.9-6.9 1.9-5.3 0-9.7-3-11.4-7.2l-5.9 4.6C9.4 39.9 16.2 44.5 24 44.5z"/><path fill="#1976D2" d="M43.6 20.5H42V20.4H24v7.2h11.3c-.8 2.3-2.3 4.2-4.3 5.6l5.9 5C40.9 35 44.5 30.1 44.5 24c0-1.2-.1-2.4-.3-3.5z"/></svg>
+      <svg width="17" height="17" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20.4H24v7.2h11.3C33.7 32 29.3 35 24 35c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l5.1-5.1C33.6 5.3 29.1 3.5 24 3.5 12.7 3.5 3.5 12.7 3.5 24S12.7 44.5 24 44.5 44.5 35.3 44.5 24c0-1.2-.1-2.4-.3-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l5.9 4.3C13.7 15.6 18.5 12.5 24 12.5c3.1 0 5.8 1.1 8 3l5.1-5.1C33.6 7.3 29.1 5.5 24 5.5 16.2 5.5 9.5 9.9 6.3 14.7z"/><path fill="#4CAF50" d="M24 44.5c5.1 0 9.6-1.7 12.8-4.7l-5.9-5c-1.6 1.2-3.7 1.9-6.9 1.9-5.3 0-9.7-3-11.4-7.2l-5.9 4.6C9.4 39.9 16.2 44.5 24 44.5z"/><path fill="#1976D2" d="M43.6 20.5H42V20.4H24v7.2h11.3c-.8 2.3-2.3 4.2-4.3 5.6l5.9 5C40.9 35 44.5 30.1 44.5 24c0-1.2-.1-2.4-.3-3.5z"/></svg>
       Continuer avec Google
     </button>
     <div class="auth-divider"><span>ou</span></div>
@@ -290,50 +329,39 @@ body.edit-mode .drag-handle{display:block;}
   </div>
 </div>
 
-<!-- DASHBOARD -->
-<div class="dashboard-layout hidden" id="dashboard">
-
-  <!-- COL GAUCHE : modules -->
-  <div class="col-left">
-    <div class="col-left-hdr">
-      <h2>Modules</h2>
-      <button class="btn" id="btn-edit-mods" style="font-size:.72rem;padding:4px 8px;">✏️</button>
-    </div>
+<!-- MAIN -->
+<div class="page-layout hidden" id="page-layout">
+  <div class="col-modules">
+    <div class="col-mod-hdr"><h2>Modules</h2><button class="btn sm" id="btn-edit-mods">✏️</button></div>
     <div id="modules-list"></div>
-    <button class="add-module-btn" id="btn-add-mod">＋ Ajouter</button>
+    <button class="add-mod-btn" id="btn-add-mod">＋</button>
   </div>
 
-  <!-- COL DROITE : widget grid -->
-  <div class="col-right">
+  <div class="col-grid">
+    <div class="grid-mode-hint">Clique sur ↔ pour déplacer un widget · Clique sur ⊞ pour changer sa taille</div>
     <div class="widget-grid" id="widget-grid">
 
-      <!-- QCM widget -->
-      <div class="widget-cell" data-widget="qcm" data-cols="6">
-        <div class="drag-handle">⠿⠿</div>
-        <div class="resize-handle"></div>
+      <!-- QCM -->
+      <div class="wcell" id="wc-qcm" style="--w:2;--h:3;">
+        <div class="wcell-move" data-id="qcm">↔ Déplacer</div>
+        <div class="wcell-resize" data-id="qcm" title="Changer la taille">
+          <span><i></i><i></i></span><span><i></i><i></i></span>
+        </div>
         <div class="widget">
-          <div class="widget-hdr">
-            <span>🧠</span><h2>QCM Arabe</h2>
-            <span id="qcm-sync" style="font-size:.85rem;opacity:.4;margin-left:auto;">☁️</span>
-          </div>
+          <div class="widget-hdr"><span>🧠</span><h2>QCM Arabe</h2><span id="qcm-sync" style="font-size:.8rem;opacity:.4;margin-left:auto;">☁️</span></div>
           <div class="widget-body">
-            <!-- HOME -->
             <div id="qcm-home">
               <div class="gauge-lbls">
-                <span style="color:var(--green);font-size:.68rem" id="g-lbl-green">0 ✅</span>
-                <span style="color:var(--blue);font-size:.68rem" id="g-lbl-blue">0 🔵</span>
-                <span style="color:var(--chalk-dim);font-size:.68rem">463</span>
-                <span style="color:var(--red);font-size:.68rem" id="g-lbl-red">0 ❌</span>
+                <span style="color:var(--green);font-size:.65rem" id="g-lbl-g">0 ✅</span>
+                <span style="color:var(--blue);font-size:.65rem" id="g-lbl-b">0 🔵</span>
+                <span style="color:var(--chalk-dim);font-size:.65rem">463</span>
+                <span style="color:var(--red);font-size:.65rem" id="g-lbl-r">0 ❌</span>
               </div>
-              <div class="gauge-bar">
-                <div class="g-bar-green" id="g-bar-green" style="width:0%"></div>
-                <div class="g-bar-blue" id="g-bar-blue" style="width:0%"></div>
-                <div class="g-bar-red" id="g-bar-red" style="width:0%"></div>
-              </div>
-              <div class="qcm-cfg">
+              <div class="gauge-bar"><div class="g-grn" id="gb-g" style="width:0%"></div><div class="g-blu" id="gb-b" style="width:0%"></div><div class="g-red" id="gb-r" style="width:0%"></div></div>
+              <div class="qcm-2col">
                 <div>
                   <div class="cfg-lbl">Questions</div>
-                  <div class="pills" id="count-pills">
+                  <div class="pills" id="cnt-pills">
                     <button class="pill" onclick="selCount(10)">10</button>
                     <button class="pill active" onclick="selCount(15)">15</button>
                     <button class="pill" onclick="selCount(20)">20</button>
@@ -354,112 +382,124 @@ body.edit-mode .drag-handle{display:block;}
                     <button class="pill" onclick="selDir('fr2ar')">🇫🇷→🇸🇦</button>
                     <button class="pill" onclick="selDir('mix')">🔀</button>
                   </div>
-                  <div class="start-info" id="qcm-info"></div>
+                  <div class="qstart-info" id="qcm-info"></div>
                   <button class="btn primary" style="width:100%;justify-content:center;margin-bottom:4px;" onclick="startQcm()">▶ Lancer</button>
-                  <button class="btn" style="width:100%;justify-content:center;margin-bottom:4px;" onclick="showMastered()">⭐ Maîtrisés (<span id="g-mastered-count">0</span>)</button>
-                  <button class="btn" style="width:100%;justify-content:center;" onclick="showAllErrors()">❌ Erreurs (<span id="g-err-count">0</span>)</button>
+                  <button class="btn" style="width:100%;justify-content:center;margin-bottom:3px;" onclick="showMastered()">⭐ Maîtrisés (<span id="g-mc">0</span>)</button>
+                  <button class="btn" style="width:100%;justify-content:center;" onclick="showAllErrors()">❌ Erreurs (<span id="g-ec">0</span>)</button>
                 </div>
               </div>
-              <div id="mastered-panel" class="hidden" style="margin-top:8px;">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                  <span style="font-size:.78rem;font-weight:700;color:var(--green);">⭐ Maîtrisés</span>
-                  <button class="btn" style="font-size:.7rem;padding:3px 7px;" onclick="hideMastered()">✕</button>
+              <div id="mastered-panel" class="hidden" style="margin-top:7px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+                  <span style="font-size:.75rem;font-weight:700;color:var(--green);">⭐ Maîtrisés</span>
+                  <button class="btn sm" onclick="document.getElementById('mastered-panel').classList.add('hidden')">✕</button>
                 </div>
-                <div class="mastered-list" id="mastered-list"></div>
+                <div class="mini-list" id="mastered-list"></div>
               </div>
-              <div id="errors-panel" class="hidden" style="margin-top:8px;">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                  <span style="font-size:.78rem;font-weight:700;color:var(--red);">❌ Erreurs</span>
-                  <button class="btn" style="font-size:.7rem;padding:3px 7px;" onclick="hideErrors()">✕</button>
+              <div id="errors-panel" class="hidden" style="margin-top:7px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+                  <span style="font-size:.75rem;font-weight:700;color:var(--red);">❌ Erreurs</span>
+                  <button class="btn sm" onclick="document.getElementById('errors-panel').classList.add('hidden')">✕</button>
                 </div>
-                <div class="missed-mini" id="all-errors-list"></div>
+                <div class="mini-list" id="all-errors-list"></div>
               </div>
             </div>
-            <!-- QUIZ -->
             <div id="qcm-quiz" class="hidden">
-              <div class="q-progress">
-                <div class="q-pbar-wrap"><div class="q-pbar" id="g-pbar" style="width:0%"></div></div>
-                <div class="q-counter" id="g-counter">1/15</div>
-                <div class="q-streak" id="g-streak"></div>
-              </div>
-              <div class="q-card">
-                <div class="q-label" id="g-qlabel"></div>
-                <div class="q-main" id="g-qmain"></div>
-                <div class="q-lesson" id="g-qlesson"></div>
-              </div>
+              <div class="q-prog"><div class="q-pbar-w"><div class="q-pbar" id="g-pbar"></div></div><div class="q-cnt" id="g-cnt"></div><div class="q-str" id="g-str"></div></div>
+              <div class="q-card"><div class="q-lbl" id="g-ql"></div><div class="q-main" id="g-qm"></div><div class="q-lesson" id="g-qles"></div></div>
               <div class="q-opts" id="g-opts"></div>
               <div class="q-fb" id="g-fb"></div>
-              <div style="display:flex;gap:6px;margin-bottom:6px;">
-                <button class="btn-review hidden" id="g-review-btn" onclick="markReview()">🔵 À revoir</button>
+              <div style="display:flex;gap:5px;margin-bottom:5px;">
+                <button class="btn-rev hidden" id="g-revbtn" onclick="markReview()">🔵 À revoir</button>
                 <button class="btn primary hidden" id="g-next" onclick="nextQ()" style="flex:1;justify-content:center;">Suivant →</button>
               </div>
               <button class="btn" style="width:100%;justify-content:center;" onclick="showQcmHome()">✕ Arrêter</button>
             </div>
-            <!-- RESULTS -->
             <div id="qcm-results" class="hidden">
-              <div class="res-card">
-                <span class="res-emoji" id="g-remoji">🌟</span>
-                <div class="res-score" id="g-rscore"></div>
+              <div class="res-card"><span class="res-emoji" id="g-re">🌟</span><div class="res-score" id="g-rs"></div>
                 <div class="res-row">
-                  <div class="res-item"><strong class="g" id="g-rgood">0</strong>Bon</div>
-                  <div class="res-item"><strong class="b" id="g-rblue">0</strong>Revoir</div>
-                  <div class="res-item"><strong class="r" id="g-rbad">0</strong>Erreur</div>
-                  <div class="res-item"><strong id="g-rstreak">0</strong>Série</div>
+                  <div class="res-item"><strong style="color:var(--green)" id="g-rg">0</strong>Bon</div>
+                  <div class="res-item"><strong style="color:var(--blue)" id="g-rb">0</strong>Revoir</div>
+                  <div class="res-item"><strong style="color:var(--red)" id="g-rr">0</strong>Erreur</div>
+                  <div class="res-item"><strong id="g-rst">0</strong>Série</div>
                 </div>
               </div>
-              <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px;">
+              <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:5px;">
                 <button class="btn primary" onclick="startQcm()">🔁</button>
                 <button class="btn" onclick="selMode('review');startQcm()">🔵 Réviser</button>
                 <button class="btn" onclick="showQcmHome()">🏠</button>
               </div>
-              <div class="missed-mini hidden" id="g-missed-wrap">
-                <h4>Manqués</h4>
-                <div id="g-missed-list"></div>
-              </div>
+              <div class="mini-list hidden" id="g-mw"><h4>Manqués</h4><div id="g-ml"></div></div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- EDT widget -->
-      <div class="widget-cell" data-widget="edt" data-cols="6">
-        <div class="drag-handle">⠿⠿</div>
-        <div class="resize-handle"></div>
+      <!-- EDT -->
+      <div class="wcell" id="wc-edt" style="--w:2;--h:3;">
+        <div class="wcell-move" data-id="edt">↔ Déplacer</div>
+        <div class="wcell-resize" data-id="edt" title="Changer la taille"><span><i></i><i></i></span><span><i></i><i></i></span></div>
         <div class="widget">
           <div class="widget-hdr">
             <span>📋</span><h2>EDT</h2>
             <div class="edt-nav">
-              <button class="btn" id="edt-prev" style="padding:3px 7px;">◀</button>
-              <span class="edt-week-lbl" id="edt-week-lbl"></span>
-              <button class="btn" id="edt-next" style="padding:3px 7px;">▶</button>
-              <button class="btn" id="edt-today" style="padding:3px 7px;font-size:.65rem;">Auj.</button>
+              <button class="btn sm" id="edt-prev">◀</button>
+              <span class="edt-nav-lbl" id="edt-lbl"></span>
+              <button class="btn sm" id="edt-next">▶</button>
+              <button class="btn sm" id="edt-today">Auj.</button>
             </div>
           </div>
-          <div class="widget-body" style="padding:6px;">
-            <div class="edt-wrap"><div class="edt-grid" id="edt-grid"></div></div>
-          </div>
+          <div class="widget-body" style="padding:6px;"><div class="edt-wrap"><div class="edt-gr" id="edt-grid"></div></div></div>
         </div>
       </div>
 
-      <!-- SPORT widget -->
-      <div class="widget-cell" data-widget="sport" data-cols="4">
-        <div class="drag-handle">⠿⠿</div>
-        <div class="resize-handle"></div>
+      <!-- SPORT -->
+      <div class="wcell" id="wc-sport" style="--w:2;--h:2;">
+        <div class="wcell-move" data-id="sport">↔ Déplacer</div>
+        <div class="wcell-resize" data-id="sport" title="Changer la taille"><span><i></i><i></i></span><span><i></i><i></i></span></div>
         <div class="widget">
-          <div class="widget-hdr">
-            <span>💪</span><h2>Sport</h2>
-            <button class="btn" id="sport-weigh-btn" style="margin-left:auto;font-size:.72rem;padding:4px 8px;">⚖️ Peser</button>
-          </div>
-          <div class="widget-body" id="sport-body">
-            <div class="weight-last" id="weight-last" style="margin-bottom:6px;">Aucune pesée.</div>
-            <div class="weight-bar-lbls"><span id="w-start-lbl">97.2kg</span><span style="color:var(--accent);" id="w-goal-lbl">→ 83kg</span></div>
-            <div class="weight-bar"><div class="weight-bar-fill" id="w-goal-fill" style="width:0%"></div></div>
-            <div class="milestone-row" id="w-milestones"></div>
-            <div id="sport-months"></div>
-            <div class="sport-reg" id="sport-reg">
-              <div class="sport-reg-item"><div class="sport-reg-val" id="sreg-week">0/3</div><div class="sport-reg-lbl">Cette sem.</div></div>
-              <div class="sport-reg-item"><div class="sport-reg-val" id="sreg-reg">0%</div><div class="sport-reg-lbl">Régularité</div></div>
-              <div class="sport-reg-item"><div class="sport-reg-val" id="sreg-total">0</div><div class="sport-reg-lbl">Total</div></div>
+          <div class="widget-hdr"><span>💪</span><h2>Sport</h2><button class="btn sm" id="weigh-open" style="margin-left:auto;">⚖️ Peser</button></div>
+          <div class="widget-body" id="sport-body"></div>
+        </div>
+      </div>
+
+      <!-- TASKS -->
+      <div class="wcell" id="wc-tasks" style="--w:2;--h:2;">
+        <div class="wcell-move" data-id="tasks">↔ Déplacer</div>
+        <div class="wcell-resize" data-id="tasks" title="Changer la taille"><span><i></i><i></i></span><span><i></i><i></i></span></div>
+        <div class="widget">
+          <div class="widget-hdr"><span>✅</span><h2>Tâches</h2></div>
+          <div class="widget-body">
+            <div class="task-tabs">
+              <button class="task-tab active" onclick="switchTaskTab('todo')">À faire</button>
+              <button class="task-tab" onclick="switchTaskTab('done')">Effectuées</button>
+              <button class="task-tab" onclick="switchTaskTab('cats')">Catégories</button>
+            </div>
+            <div id="tab-todo">
+              <div class="task-add-row">
+                <input type="text" id="task-input" placeholder="Nouvelle tâche…" maxlength="80">
+                <button class="btn primary" id="task-add-btn" style="padding:5px 10px;">+</button>
+              </div>
+              <div class="task-add-opts">
+                <div class="task-prio-sel">
+                  <button class="prio-btn active" data-p="🔴" onclick="selectPrio(this)">🔴</button>
+                  <button class="prio-btn" data-p="🟡" onclick="selectPrio(this)">🟡</button>
+                  <button class="prio-btn" data-p="🟢" onclick="selectPrio(this)">🟢</button>
+                </div>
+                <select class="task-cat-sel" id="task-cat-sel"><option value="">Aucune catégorie</option></select>
+              </div>
+              <div class="task-cat-row" id="task-filter-cats"></div>
+              <div class="task-list" id="task-list"></div>
+            </div>
+            <div id="tab-done" class="hidden">
+              <div style="font-size:.68rem;color:var(--chalk-dim);margin-bottom:6px;">Les tâches effectuées sont supprimées après 7 jours.</div>
+              <div class="task-list" id="done-list"></div>
+            </div>
+            <div id="tab-cats" class="hidden">
+              <div class="task-add-row" style="margin-bottom:8px;">
+                <input type="text" id="cat-input" placeholder="Nouvelle catégorie…" maxlength="30">
+                <button class="btn primary" id="cat-add-btn" style="padding:5px 10px;">+</button>
+              </div>
+              <div class="task-list" id="cat-list"></div>
             </div>
           </div>
         </div>
@@ -469,23 +509,22 @@ body.edit-mode .drag-handle{display:block;}
   </div>
 </div>
 
-<!-- MODULE MODAL -->
+<!-- MODALS -->
 <div class="overlay" id="mod-overlay">
   <div class="modal">
     <h3 id="mod-title">Ajouter</h3>
-    <div class="field">
-      <label>Emoji</label>
+    <div class="field"><label>Emoji</label>
       <div class="emoji-field">
         <div class="emoji-input-row">
-          <input type="text" id="mod-emoji" class="emoji-input" maxlength="4" placeholder="📦">
-          <button type="button" class="emoji-toggle-btn" id="emoji-toggle">Choisir ▾</button>
+          <input type="text" id="mod-emoji" class="emoji-inp" maxlength="4" placeholder="📦">
+          <button type="button" class="emoji-tog" id="emoji-tog">Choisir ▾</button>
         </div>
-        <div class="emoji-dropdown" id="emoji-dropdown"></div>
+        <div class="emoji-dd" id="emoji-dd"></div>
       </div>
     </div>
-    <div class="field"><label>Nom</label><input type="text" id="mod-name" maxlength="30" style="background:var(--bg);border:1px solid var(--line);color:var(--chalk);border-radius:6px;padding:8px;font-family:inherit;width:100%;"></div>
-    <div class="field"><label>Description</label><input type="text" id="mod-desc" maxlength="60" style="background:var(--bg);border:1px solid var(--line);color:var(--chalk);border-radius:6px;padding:8px;font-family:inherit;width:100%;"></div>
-    <div class="field"><label>Lien (.html)</label><input type="text" id="mod-url" placeholder="planning.html" style="background:var(--bg);border:1px solid var(--line);color:var(--chalk);border-radius:6px;padding:8px;font-family:inherit;width:100%;"></div>
+    <div class="field"><label>Nom</label><input type="text" id="mod-name" maxlength="30"></div>
+    <div class="field"><label>Description</label><input type="text" id="mod-desc" maxlength="60"></div>
+    <div class="field"><label>Lien (.html)</label><input type="text" id="mod-url" placeholder="planning.html"></div>
     <div class="modal-actions">
       <button class="btn" id="mod-del" style="background:#5a2b2b;border-color:#7a3a3a;display:none;">Supprimer</button>
       <button class="btn" id="mod-cancel">Annuler</button>
@@ -494,22 +533,38 @@ body.edit-mode .drag-handle{display:block;}
   </div>
 </div>
 
-<!-- PESER MODAL -->
 <div class="overlay" id="weigh-overlay">
-  <div class="modal" style="max-width:320px;">
-    <h3>⚖️ Nouvelle pesée</h3>
-    <div class="field">
-      <label>Poids (kg)</label>
-      <input type="number" id="weigh-val" step="0.1" min="40" max="200" placeholder="ex: 96.8" style="background:var(--bg);border:1px solid var(--line);color:var(--chalk);border-radius:6px;padding:9px 12px;font-size:1.1rem;font-family:inherit;width:100%;">
-    </div>
-    <div class="field">
-      <label>Date</label>
-      <input type="date" id="weigh-date" style="background:var(--bg);border:1px solid var(--line);color:var(--chalk);border-radius:6px;padding:9px 12px;font-family:inherit;width:100%;">
-    </div>
+  <div class="modal" style="max-width:300px;">
+    <h3>⚖️ Peser</h3>
+    <div class="field"><label>Poids (kg)</label><input type="number" id="weigh-val" step="0.1" min="40" max="200" placeholder="96.8" style="font-size:1.1rem;"></div>
+    <div class="field"><label>Date</label><input type="date" id="weigh-date"></div>
     <div class="modal-actions">
       <button class="btn" id="weigh-cancel">Annuler</button>
       <button class="btn primary" id="weigh-save">Enregistrer</button>
     </div>
+  </div>
+</div>
+
+<div class="overlay" id="size-overlay">
+  <div class="modal" style="max-width:300px;">
+    <h3>⊞ Taille du widget</h3>
+    <div class="field"><label>Largeur (colonnes sur 4)</label>
+      <div class="pills" id="size-w-pills">
+        <button class="pill" onclick="setSizeW(1)">1</button>
+        <button class="pill" onclick="setSizeW(2)">2</button>
+        <button class="pill" onclick="setSizeW(3)">3</button>
+        <button class="pill" onclick="setSizeW(4)">4</button>
+      </div>
+    </div>
+    <div class="field"><label>Hauteur (unités)</label>
+      <div class="pills" id="size-h-pills">
+        <button class="pill" onclick="setSizeH(1)">Petite</button>
+        <button class="pill" onclick="setSizeH(2)">Moyenne</button>
+        <button class="pill" onclick="setSizeH(3)">Grande</button>
+        <button class="pill" onclick="setSizeH(4)">Très grande</button>
+      </div>
+    </div>
+    <div class="modal-actions"><button class="btn primary" id="size-done">Fermer</button></div>
   </div>
 </div>
 
@@ -523,128 +578,108 @@ const VOCAB =
 [{"ar": "أَنَا", "fr": "Je / Moi", "type": "pronom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "أَنْتَ", "fr": "Tu (masc.)", "type": "pronom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "أَنْتِ", "fr": "Tu (fém.)", "type": "pronom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "هُوَ", "fr": "Il", "type": "pronom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "هِيَ", "fr": "Elle", "type": "pronom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "نَحْنُ", "fr": "Nous", "type": "pronom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "اسْمِي", "fr": "Mon nom est / Je m\\", "type": "mot", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "اَلسَّلَامُ عَلَيْكُمْ", "fr": "Paix sur vous (salutation)", "type": "formule", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "وَعَلَيْكُمُ السَّلَامُ", "fr": "Et sur vous la paix (réponse)", "type": "formule", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "كَيْفَ حَالُكَ؟", "fr": "Comment vas-tu ? (masc.)", "type": "question", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "بِخَيْرٍ", "fr": "Bien", "type": "réponse", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "طَالِبٌ", "fr": "Étudiant (masc.)", "type": "nom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "طَالِبَةٌ", "fr": "Étudiante (fém.)", "type": "nom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "مُعَلِّمٌ", "fr": "Enseignant (masc.)", "type": "nom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "مُعَلِّمَةٌ", "fr": "Enseignante (fém.)", "type": "nom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "طَبِيبٌ / طَبِيبَةٌ", "fr": "Médecin (masc./fém.)", "type": "métier", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "مُهَنْدِسٌ", "fr": "Ingénieur", "type": "métier", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "مُحَامٍ", "fr": "Avocat", "type": "métier", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "أُسْتَاذٌ / أُسْتَاذَةٌ", "fr": "Professeur (masc./fém.)", "type": "métier", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "هُمْ", "fr": "Ils", "type": "pronom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "أَنْتُمْ", "fr": "Vous", "type": "pronom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "تَعَارُفٌ", "fr": "Présentation / Connaissance mutuelle", "type": "nom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "اَلْكِتَابُ", "fr": "Le livre", "type": "nom masc.", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "اَلْبَيْتُ", "fr": "La maison", "type": "nom masc.", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "اَلْوَلَدُ", "fr": "Le garçon", "type": "nom masc.", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "اَلْبِنْتُ", "fr": "La fille", "type": "nom fém.", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "الشَّمْسُ", "fr": "Le soleil (lettre solaire)", "type": "nom fém.", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "الْقَمَرُ", "fr": "La lune (lettre lunaire)", "type": "nom masc.", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "الرَّجُلُ", "fr": "L\\", "type": "mot", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "الْمَرْأَةُ", "fr": "La femme", "type": "nom fém.", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "الْمَدْرَسَةُ", "fr": "L\\", "type": "mot", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "الْقَلَمُ", "fr": "Le stylo", "type": "nom masc.", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "الطَّاوِلَةُ", "fr": "La table (lettre solaire)", "type": "nom fém.", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "الْبَابُ", "fr": "La porte", "type": "nom masc.", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "تَعْرِيفٌ", "fr": "Définition / Article défini", "type": "grammaire", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "حَرْفٌ شَمْسِيٌّ", "fr": "Lettre solaire", "type": "grammaire", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "حَرْفٌ قَمَرِيٌّ", "fr": "Lettre lunaire", "type": "grammaire", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "تَنْوِينٌ", "fr": "Tanwin (nunation)", "type": "grammaire", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "الْعَلَمُ", "fr": "Le drapeau", "type": "nom", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "النَّجْمُ", "fr": "L\\", "type": "mot", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "السَّمَاءُ", "fr": "Le ciel", "type": "nom", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "النُّورُ", "fr": "La lumière", "type": "nom", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "الْغُرْفَةُ", "fr": "La chambre", "type": "nom", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "السَّرِيرُ", "fr": "Le lit", "type": "nom", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "الْمَكْتَبُ", "fr": "Le bureau", "type": "nom", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "الْكُرْسِيُّ", "fr": "La chaise", "type": "nom", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "النَّافِذَةُ", "fr": "La fenêtre", "type": "nom", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "الْحَقِيبَةُ", "fr": "Le sac", "type": "nom", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "فِي", "fr": "Dans / En", "type": "préposition", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "عَلَى", "fr": "Sur", "type": "préposition", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "تَحْتَ", "fr": "Sous", "type": "préposition", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "فَوْقَ", "fr": "Au-dessus de", "type": "préposition", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "أَمَامَ", "fr": "Devant", "type": "préposition", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "وَرَاءَ", "fr": "Derrière", "type": "préposition", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "الْمَطْبَخُ", "fr": "La cuisine", "type": "pièce", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "الْحَمَّامُ", "fr": "La salle de bain", "type": "pièce", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "الصَّالُونُ", "fr": "Le salon", "type": "pièce", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "الْفِنَاءُ", "fr": "La cour", "type": "pièce", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "الدَّرَجُ", "fr": "Les escaliers", "type": "nom", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "الْجَارُ", "fr": "Le voisin", "type": "nom", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "الشَّارِعُ", "fr": "La rue", "type": "nom", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "كَتَبَ", "fr": "Il écrivit / a écrit", "type": "verbe", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "قَرَأَ", "fr": "Il lut / a lu", "type": "verbe", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "ذَهَبَ", "fr": "Il alla / est allé", "type": "verbe", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "أَكَلَ", "fr": "Il mangea / a mangé", "type": "verbe", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "شَرِبَ", "fr": "Il but / a bu", "type": "verbe", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "دَرَسَ", "fr": "Il étudia / a étudié", "type": "verbe", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "جَلَسَ", "fr": "Il s\\", "type": "mot", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "خَرَجَ", "fr": "Il sortit", "type": "verbe", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "دَخَلَ", "fr": "Il entra", "type": "verbe", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "فَهِمَ", "fr": "Il comprit", "type": "verbe", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "سَمِعَ", "fr": "Il entendit", "type": "verbe", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "فَتَحَ", "fr": "Il ouvrit", "type": "verbe", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "أَغْلَقَ", "fr": "Il ferma", "type": "verbe passé", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "وَصَلَ", "fr": "Il arriva", "type": "verbe passé", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "رَجَعَ", "fr": "Il retourna", "type": "verbe passé", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "بَدَأَ", "fr": "Il commença", "type": "verbe passé", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "انْتَهَى", "fr": "Il finit / Il termina", "type": "verbe passé", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "جَاءَ", "fr": "Il vint", "type": "verbe passé", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "أَخَذَ", "fr": "Il prit", "type": "verbe passé", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "أَبٌ / أَبِي", "fr": "Père / Mon père", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "أُمٌّ / أُمِّي", "fr": "Mère / Ma mère", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "أَخٌ / أَخِي", "fr": "Frère / Mon frère", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "أُخْتٌ / أُخْتِي", "fr": "Sœur / Ma sœur", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "جَدٌّ / جَدِّي", "fr": "Grand-père / Mon grand-père", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "جَدَّةٌ / جَدَّتِي", "fr": "Grand-mère / Ma grand-mère", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "ابْنٌ / ابْنِي", "fr": "Fils / Mon fils", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "بِنْتٌ / بِنْتِي", "fr": "Fille / Ma fille", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "زَوْجٌ / زَوْجِي", "fr": "Mari / Mon mari", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "عَمٌّ / عَمِّي", "fr": "Oncle paternel / Mon oncle", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "خَالٌ / خَالِي", "fr": "Oncle maternel / Mon oncle", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "عَائِلَةٌ / عَائِلَتِي", "fr": "Famille / Ma famille", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "خَالَةٌ / خَالَتِي", "fr": "Tante maternelle / Ma tante", "type": "famille", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "عَمَّةٌ / عَمَّتِي", "fr": "Tante paternelle / Ma tante", "type": "famille", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "ابْنُ عَمٍّ", "fr": "Cousin (fils d\\", "type": "mot", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "حَفِيدٌ / حَفِيدَةٌ", "fr": "Petit-fils / Petite-fille", "type": "famille", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "أَصْغَرُ / الصَّغِيرُ", "fr": "Le plus jeune / Cadet", "type": "famille", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "أَكْبَرُ / الْكَبِيرُ", "fr": "Le plus âgé / Aîné", "type": "famille", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "عَائِلَةٌ كَبِيرَةٌ", "fr": "Grande famille", "type": "expression", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "أَبُو", "fr": "Père de... (dans un nom)", "type": "grammaire", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "كَبِيرٌ / كَبِيرَةٌ", "fr": "Grand(e)", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "صَغِيرٌ / صَغِيرَةٌ", "fr": "Petit(e)", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "جَمِيلٌ / جَمِيلَةٌ", "fr": "Beau / Belle", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "جَدِيدٌ / جَدِيدَةٌ", "fr": "Nouveau / Nouvelle", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "قَدِيمٌ / قَدِيمَةٌ", "fr": "Ancien(ne) / Vieux", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "طَوِيلٌ / طَوِيلَةٌ", "fr": "Grand(e) / Long(ue)", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "قَصِيرٌ / قَصِيرَةٌ", "fr": "Court(e) / Petit(e)", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "حَسَنٌ / حَسَنَةٌ", "fr": "Bon(ne) / Bien", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "ذَكِيٌّ / ذَكِيَّةٌ", "fr": "Intelligent(e)", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "مَفْتُوحٌ / مَفْتُوحَةٌ", "fr": "Ouvert(e)", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "مُغْلَقٌ / مُغْلَقَةٌ", "fr": "Fermé(e)", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "كَرِيمٌ / كَرِيمَةٌ", "fr": "Généreux / Généreuse", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "قَبِيحٌ / قَبِيحَةٌ", "fr": "Laid(e)", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "سَرِيعٌ / سَرِيعَةٌ", "fr": "Rapide", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "بَطِيءٌ / بَطِيئَةٌ", "fr": "Lent(e)", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "قَرِيبٌ / قَرِيبَةٌ", "fr": "Proche", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "بَعِيدٌ / بَعِيدَةٌ", "fr": "Loin / Éloigné(e)", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "نَظِيفٌ / نَظِيفَةٌ", "fr": "Propre", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "وَسِخٌ / وَسِخَةٌ", "fr": "Sale", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "طَالِبٌ → طُلَّابٌ", "fr": "Étudiant → Étudiants", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "كِتَابٌ → كُتُبٌ", "fr": "Livre → Livres", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "وَلَدٌ → أَوْلَادٌ", "fr": "Garçon → Garçons", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "بَيْتٌ → بُيُوتٌ", "fr": "Maison → Maisons", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "قَلَمٌ → أَقْلَامٌ", "fr": "Stylo → Stylos", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "رَجُلٌ → رِجَالٌ", "fr": "Homme → Hommes", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "مُعَلِّمٌ → مُعَلِّمُونَ", "fr": "Enseignant → Enseignants", "type": "pluriel sain masc.", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "مُعَلِّمَةٌ → مُعَلِّمَاتٌ", "fr": "Enseignante → Enseignantes", "type": "pluriel sain fém.", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "مُسْلِمٌ → مُسْلِمُونَ", "fr": "Musulman → Musulmans", "type": "pluriel sain masc.", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "طَالِبَةٌ → طَالِبَاتٌ", "fr": "Étudiante → Étudiantes", "type": "pluriel sain fém.", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "مَدْرَسَةٌ → مَدَارِسُ", "fr": "École → Écoles", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "غُرْفَةٌ → غُرَفٌ", "fr": "Chambre → Chambres", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "دُرُوسٌ", "fr": "Leçons (pl. de دَرْسٌ)", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "بُيُوتٌ", "fr": "Maisons (pl. de بَيْتٌ)", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "رِجَالٌ", "fr": "Hommes (pl. de رَجُلٌ)", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "نِسَاءٌ", "fr": "Femmes (pl. de امْرَأَةٌ)", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "أَطْفَالٌ", "fr": "Enfants (pl. de طِفْلٌ)", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "مَسَاجِدُ", "fr": "Mosquées (pl. de مَسْجِدٌ)", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "أَصْدِقَاءُ", "fr": "Amis (pl. de صَدِيقٌ)", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "أَسْمَاءُ", "fr": "Noms (pl. de اسْمٌ)", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "هَذَا", "fr": "Ceci / Ce ...-ci (masc.)", "type": "démonstratif proche", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "هَذِهِ", "fr": "Ceci / Cette ...-ci (fém.)", "type": "démonstratif proche", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "ذَلِكَ", "fr": "Cela / Ce ...-là (masc.)", "type": "démonstratif lointain", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "تِلْكَ", "fr": "Cela / Cette ...-là (fém.)", "type": "démonstratif lointain", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "مَنْ هَذَا؟", "fr": "Qui est-ce ?", "type": "question", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "مَا هَذَا؟", "fr": "Qu\\", "type": "mot", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "مَا هَذِهِ؟", "fr": "Qu\\", "type": "mot", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "هَذَا هُوَ", "fr": "C\\", "type": "mot", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "هَذَا الْكِتَابُ", "fr": "Ce livre-ci", "type": "groupe nominal", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "تِلْكَ الْمَدْرَسَةُ", "fr": "Cette école-là", "type": "groupe nominal", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "هَؤُلَاءِ", "fr": "Ceux-ci / Ces gens (pl. proche)", "type": "démonstratif", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "أُولَئِكَ", "fr": "Ceux-là (pl. lointain)", "type": "démonstratif", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "هَذَانِ / هَاتَانِ", "fr": "Ces deux-ci (masc./fém.)", "type": "démonstratif duel", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "السَّيَّارَةُ", "fr": "La voiture", "type": "nom", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "الطَّائِرَةُ", "fr": "L\\", "type": "mot", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "الْقِطَارُ", "fr": "Le train", "type": "nom", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "الْحَقِيبَةُ", "fr": "Le sac / La valise", "type": "nom", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "الْهَاتِفُ", "fr": "Le téléphone", "type": "nom", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "الْحَاسُوبُ", "fr": "L\\", "type": "mot", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "الْمِفْتَاحُ", "fr": "La clé", "type": "nom", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "مَنْ؟", "fr": "Qui ?", "type": "interrogatif", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "مَا؟ / مَاذَا؟", "fr": "Quoi ? / Qu\\", "type": "mot", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "أَيْنَ؟", "fr": "Où ?", "type": "interrogatif", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "مَتَى؟", "fr": "Quand ?", "type": "interrogatif", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "كَيْفَ؟", "fr": "Comment ?", "type": "interrogatif", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "كَمْ؟", "fr": "Combien ?", "type": "interrogatif", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "لِمَاذَا؟", "fr": "Pourquoi ?", "type": "interrogatif", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "هَلْ؟", "fr": "Est-ce que ? (oui/non)", "type": "interrogatif", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "نَعَمْ", "fr": "Oui", "type": "réponse", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "لَا", "fr": "Non", "type": "réponse", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "بَلَى", "fr": "Si ! (réponse à négation)", "type": "réponse", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "مَا اسْمُكَ؟", "fr": "Quel est ton nom ?", "type": "expression", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "كَمْ عُمْرُكَ؟", "fr": "Quel âge as-tu ?", "type": "expression", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "مِنْ أَيْنَ أَنْتَ؟", "fr": "D\\", "type": "mot", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "مَاذَا تُرِيدُ؟", "fr": "Que veux-tu ?", "type": "expression", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "كَيْفَ ذَلِكَ؟", "fr": "Comment ça ?", "type": "expression", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "مَتَى وَصَلْتَ؟", "fr": "Quand es-tu arrivé ?", "type": "expression", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "لِمَاذَا لَا؟", "fr": "Pourquoi pas ?", "type": "expression", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "هَلْ تَفْهَمُ؟", "fr": "Tu comprends ?", "type": "expression", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "نَعَمْ، أَفْهَمُ", "fr": "Oui, je comprends", "type": "expression", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "وَاحِدٌ / وَاحِدَةٌ", "fr": "Un / Une", "type": "cardinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "اثْنَانِ / اثْنَتَانِ", "fr": "Deux (masc./fém.)", "type": "cardinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "ثَلَاثَةٌ / ثَلَاثٌ", "fr": "Trois", "type": "cardinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "أَرْبَعَةٌ / أَرْبَعٌ", "fr": "Quatre", "type": "cardinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "خَمْسَةٌ / خَمْسٌ", "fr": "Cinq", "type": "cardinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "سِتَّةٌ / سِتٌّ", "fr": "Six", "type": "cardinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "سَبْعَةٌ / سَبْعٌ", "fr": "Sept", "type": "cardinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "ثَمَانِيَةٌ / ثَمَانٍ", "fr": "Huit", "type": "cardinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "تِسْعَةٌ / تِسْعٌ", "fr": "Neuf", "type": "cardinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "عَشَرَةٌ / عَشْرٌ", "fr": "Dix", "type": "cardinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "الْأَوَّلُ / الْأُولَى", "fr": "Premier / Première", "type": "ordinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "الثَّانِي / الثَّانِيَةُ", "fr": "Deuxième", "type": "ordinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "عِنْدِي", "fr": "J\\", "type": "mot", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "عِشْرُونَ", "fr": "Vingt", "type": "nombre", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "ثَلَاثُونَ", "fr": "Trente", "type": "nombre", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "مِئَةٌ", "fr": "Cent", "type": "nombre", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "أَلْفٌ", "fr": "Mille", "type": "nombre", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "نِصْفٌ", "fr": "Moitié / Demi", "type": "nombre", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "رُبْعٌ", "fr": "Quart", "type": "nombre", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "الثَّالِثُ عَشَرَ", "fr": "Treizième", "type": "ordinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "الْعِشْرُونَ", "fr": "Vingtième", "type": "ordinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "أَحْمَرُ / حَمْرَاءُ", "fr": "Rouge", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "أَخْضَرُ / خَضْرَاءُ", "fr": "Vert(e)", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "أَزْرَقُ / زَرْقَاءُ", "fr": "Bleu(e)", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "أَصْفَرُ / صَفْرَاءُ", "fr": "Jaune", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "أَبْيَضُ / بَيْضَاءُ", "fr": "Blanc / Blanche", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "أَسْوَدُ / سَوْدَاءُ", "fr": "Noir(e)", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "بُنِّيٌّ", "fr": "Marron / Brun", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "بُرْتُقَالِيٌّ", "fr": "Orange", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "رَمَادِيٌّ", "fr": "Gris(e)", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "وَرْدِيٌّ", "fr": "Rose", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "مَا لَوْنُهُ؟", "fr": "De quelle couleur est-il ?", "type": "question", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "لَوْنٌ", "fr": "Couleur", "type": "nom", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "بَنَفْسَجِيٌّ", "fr": "Violet", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "زَيْتُونِيٌّ", "fr": "Kaki / Vert olive", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "فَاتِحٌ", "fr": "Clair (couleur)", "type": "adjectif couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "غَامِقٌ", "fr": "Foncé (couleur)", "type": "adjectif couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "أَزْرَقُ فَاتِحٌ", "fr": "Bleu clair", "type": "expression couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "أَخْضَرُ غَامِقٌ", "fr": "Vert foncé", "type": "expression couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "مُلَوَّنٌ", "fr": "Coloré / Multicolore", "type": "adjectif", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "يَكْتُبُ", "fr": "Il écrit", "type": "présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَقْرَأُ", "fr": "Il lit", "type": "présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَذْهَبُ", "fr": "Il va", "type": "présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَدْرُسُ", "fr": "Il étudie", "type": "présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَأْكُلُ", "fr": "Il mange", "type": "présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَشْرَبُ", "fr": "Il boit", "type": "présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَعْمَلُ", "fr": "Il travaille", "type": "présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَسْكُنُ", "fr": "Il habite", "type": "présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يُحِبُّ", "fr": "Il aime", "type": "présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَفْهَمُ", "fr": "Il comprend", "type": "présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَتَكَلَّمُ", "fr": "Il parle", "type": "présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "كُلَّ يَوْمٍ", "fr": "Chaque jour", "type": "expression", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "الْآنَ", "fr": "Maintenant", "type": "adverbe", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "دَائِمًا", "fr": "Toujours", "type": "adverbe", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَذْهَبُ إِلَى", "fr": "Il va à", "type": "expression", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَرْجِعُ مِنْ", "fr": "Il revient de", "type": "expression", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يُرِيدُ", "fr": "Il veut", "type": "verbe présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَسْتَطِيعُ", "fr": "Il peut", "type": "verbe présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَعْرِفُ", "fr": "Il sait / Il connaît", "type": "verbe présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَظُنُّ", "fr": "Il pense / Il croit", "type": "verbe présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَقُولُ", "fr": "Il dit", "type": "verbe présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَسْأَلُ", "fr": "Il demande", "type": "verbe présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "لَا", "fr": "Ne... pas (présent)", "type": "négation", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "لَمْ", "fr": "Ne... pas (passé) + apocopé", "type": "négation", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "لَيْسَ / لَيْسَتْ", "fr": "N\\", "type": "mot", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "لَنْ", "fr": "Ne... pas (futur)", "type": "négation", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "لَا أَفْهَمُ", "fr": "Je ne comprends pas", "type": "expression", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "لَمْ أَذْهَبْ", "fr": "Je ne suis pas allé", "type": "expression", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "لَيْسَ هُنَا", "fr": "Il n\\", "type": "mot", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "أَمْسِ", "fr": "Hier", "type": "adverbe", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "غَدًا", "fr": "Demain", "type": "adverbe", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "أَبَدًا", "fr": "Jamais", "type": "adverbe", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "لَا شَيْءَ", "fr": "Rien", "type": "expression négative", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "لَا أَحَدَ", "fr": "Personne", "type": "expression négative", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "مَا زَالَ", "fr": "Il est encore / Il continue", "type": "expression", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "لَمْ يَعُدْ", "fr": "Il n\\", "type": "mot", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "بَعِيدًا عَنْ", "fr": "Loin de", "type": "expression", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "لَيْسَ فَقَطْ", "fr": "Pas seulement", "type": "expression", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "غَيْرُ", "fr": "Non / Pas / Autre que", "type": "négation", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "بِدُونَ", "fr": "Sans", "type": "préposition", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "الْيَوْمَ", "fr": "Aujourd\\", "type": "mot", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "أَحْيَانًا", "fr": "Parfois", "type": "adv. fréquence", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "هُنَا", "fr": "Ici", "type": "adv. lieu", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "هُنَاكَ", "fr": "Là-bas", "type": "adv. lieu", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "جَيِّدًا", "fr": "Bien (adv.)", "type": "adv. manière", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "كَثِيرًا", "fr": "Beaucoup", "type": "adv. quantité", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "قَلِيلًا", "fr": "Peu", "type": "adv. quantité", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "سَرِيعًا", "fr": "Vite", "type": "adv. manière", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "بَعْدَ", "fr": "Après", "type": "préposition temps", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "قَبْلَ", "fr": "Avant", "type": "préposition temps", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "مُنْذُ", "fr": "Depuis", "type": "préposition temps", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "خِلَالَ", "fr": "Pendant / Durant", "type": "préposition temps", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "فِي الْبِدَايَةِ", "fr": "Au début", "type": "expression", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "فِي النِّهَايَةِ", "fr": "À la fin", "type": "expression", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "فَجْأَةً", "fr": "Soudainement", "type": "adverbe", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "أَحْيَانًا مَا", "fr": "Quelquefois", "type": "adverbe", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "وَ", "fr": "Et (collé)", "type": "conjonction", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "فَ", "fr": "Et puis / Donc", "type": "conjonction", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "ثُمَّ", "fr": "Puis / Ensuite", "type": "conjonction", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "أَوْ", "fr": "Ou", "type": "conjonction", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "لَكِنْ", "fr": "Mais", "type": "conjonction", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "بَلْ", "fr": "Mais au contraire", "type": "conjonction", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "لِأَنَّ", "fr": "Parce que", "type": "subordination", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "إِذَا", "fr": "Si / Quand (futur)", "type": "subordination", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "عِنْدَمَا", "fr": "Quand / Lorsque", "type": "subordination", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "مَسْرُورٌ", "fr": "Content / Heureux", "type": "adjectif", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "لِأَنَّهُ", "fr": "Parce qu\\", "type": "mot", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "كَسُولٌ", "fr": "Paresseux", "type": "adjectif", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "إِذَنْ", "fr": "Donc / Alors", "type": "conjonction", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "لِذَلِكَ", "fr": "C\\", "type": "mot", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "وَمَعَ ذَلِكَ", "fr": "Cependant / Néanmoins", "type": "conjonction", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "عَلَى الرَّغْمِ مِنْ", "fr": "Malgré", "type": "préposition", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "طَالَمَا", "fr": "Tant que / Aussi longtemps que", "type": "subordination", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "كُلَّمَا", "fr": "Chaque fois que / Plus... plus", "type": "subordination", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "بِحَيْثُ", "fr": "De telle sorte que", "type": "subordination", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "مَعَ أَنَّ", "fr": "Bien que / Quoique", "type": "subordination", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "كِتَابَانِ", "fr": "Deux livres", "type": "duel masc.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "طَالِبَانِ", "fr": "Deux étudiants", "type": "duel masc.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "طَالِبَتَانِ", "fr": "Deux étudiantes", "type": "duel fém.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "يَوْمَانِ", "fr": "Deux jours", "type": "duel masc.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "سَاعَتَانِ", "fr": "Deux heures", "type": "duel fém.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "وَلَدَانِ", "fr": "Deux garçons", "type": "duel masc.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "بِنْتَانِ", "fr": "Deux filles", "type": "duel fém.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "أَخَوَانِ", "fr": "Deux frères", "type": "duel masc.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "يَدَانِ", "fr": "Deux mains", "type": "duel fém.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "عَيْنَانِ", "fr": "Deux yeux", "type": "duel fém.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "رِجْلَانِ", "fr": "Deux jambes", "type": "duel fém.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "بَيْتَانِ", "fr": "Deux maisons", "type": "duel masc.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "الْفَمُ / فَمِي", "fr": "La bouche / Ma bouche", "type": "corps (duel possible)", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "الْأُذُنَانِ", "fr": "Les deux oreilles", "type": "duel", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "الرُّكْبَتَانِ", "fr": "Les deux genoux", "type": "duel", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "الْكَتِفَانِ", "fr": "Les deux épaules", "type": "duel", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "صَدِيقَانِ", "fr": "Deux amis", "type": "duel", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "طَالِبَانِ مُجْتَهِدَانِ", "fr": "Deux étudiants studieux", "type": "exemple duel", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "كِلَاهُمَا", "fr": "Tous les deux (masc.)", "type": "pronom duel", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "كِلْتَاهُمَا", "fr": "Toutes les deux (fém.)", "type": "pronom duel", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "اُكْتُبْ", "fr": "Écris ! (masc.)", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "اِقْرَأْ", "fr": "Lis ! (masc.)", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "اِذْهَبْ", "fr": "Va ! (masc.)", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "اِجْلِسْ", "fr": "Assieds-toi ! (masc.)", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "تَعَالَ", "fr": "Viens ! (masc.)", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "اِسْمَعْ", "fr": "Écoute ! (masc.)", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "اُنْظُرْ", "fr": "Regarde ! (masc.)", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "قُلْ", "fr": "Dis ! (masc.)", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "لَا تَذْهَبْ", "fr": "Ne pars pas !", "type": "interdiction", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "لَا تَتَكَلَّمْ", "fr": "Ne parle pas !", "type": "interdiction", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "اُكْتُبِي", "fr": "Écris ! (fém.)", "type": "impératif fém.", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "اُكْتُبُوا", "fr": "Écrivez ! (plur.)", "type": "impératif plur.", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "اِسْمَعْ / اِسْمَعِي", "fr": "Écoute ! (masc./fém.)", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "اِنْتَبِهْ", "fr": "Fais attention !", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "اِفْتَحْ / اِفْتَحِي", "fr": "Ouvre ! (masc./fém.)", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "أَغْلِقْ", "fr": "Ferme !", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "اِجْلِسُوا", "fr": "Asseyez-vous !", "type": "impératif plur.", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "قُومُوا", "fr": "Levez-vous !", "type": "impératif plur.", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "لَا تَتَأَخَّرْ", "fr": "Ne sois pas en retard !", "type": "interdiction", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "لَا تَنْسَ", "fr": "N\\", "type": "mot", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "كِتَابَةٌ", "fr": "Écriture / Écrire", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "دِرَاسَةٌ", "fr": "Étude / Étudier", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "قِرَاءَةٌ", "fr": "Lecture / Lire", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "ذَهَابٌ", "fr": "Action d\\", "type": "mot", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "أَكْلٌ", "fr": "Action de manger", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "شُرْبٌ", "fr": "Action de boire", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "عَمَلٌ", "fr": "Travail / Action", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "فَهْمٌ", "fr": "Compréhension", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "تَكَلُّمٌ", "fr": "Parole / Le fait de parler", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "مُهِمٌّ", "fr": "Important(e)", "type": "adjectif", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "سَهْلٌ", "fr": "Facile", "type": "adjectif", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "صَعْبٌ", "fr": "Difficile", "type": "adjectif", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "تَعْلِيمٌ", "fr": "Enseignement / Éducation", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "تَدْرِيسٌ", "fr": "L\\", "type": "mot", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "سَفَرٌ", "fr": "Voyage", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "تَفْكِيرٌ", "fr": "Réflexion / Pensée", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "صَلَاةٌ", "fr": "Prière", "type": "masdar/nom", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "صِيَامٌ / صَوْمٌ", "fr": "Jeûne", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "حُبٌّ", "fr": "Amour", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "كَرَاهِيَةٌ", "fr": "Haine", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "صَبْرٌ", "fr": "Patience", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "شُكْرٌ", "fr": "Gratitude / Remerciement", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "كَاتِبٌ / كَاتِبَةٌ", "fr": "Écrivain(e)", "type": "participe actif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "دَارِسٌ / دَارِسَةٌ", "fr": "Étudiant(e)/studieux", "type": "participe actif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مُسَافِرٌ / مُسَافِرَةٌ", "fr": "Voyageur/euse", "type": "participe actif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مَكْتُوبٌ / مَكْتُوبَةٌ", "fr": "Écrit(e)", "type": "participe passif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مَعْرُوفٌ / مَعْرُوفَةٌ", "fr": "Connu(e)", "type": "participe passif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مَشْهُورٌ / مَشْهُورَةٌ", "fr": "Célèbre", "type": "adjectif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "نَاجِحٌ / نَاجِحَةٌ", "fr": "Qui réussit", "type": "participe actif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "رِسَالَةٌ", "fr": "Lettre / Message", "type": "nom", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مُسَافِرٌ", "fr": "Voyageur (participe actif)", "type": "participe actif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مُقِيمٌ", "fr": "Résident (qui réside)", "type": "participe actif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مَسْمُوعٌ", "fr": "Entendu / Audible", "type": "participe passif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مَفْهُومٌ", "fr": "Compris / Compréhensible", "type": "participe passif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مَشْرُوبٌ", "fr": "Boisson / Ce qui est bu", "type": "participe passif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مَأْكُولٌ", "fr": "Nourriture / Ce qui est mangé", "type": "participe passif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مَحْبُوبٌ", "fr": "Aimé / Bien-aimé", "type": "participe passif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مَذْكُورٌ", "fr": "Mentionné / Cité", "type": "participe passif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مَعْلُومٌ", "fr": "Connu / Notoire", "type": "participe passif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مَجْهُولٌ", "fr": "Inconnu / Ignoré", "type": "participe passif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "الْأَحَدُ", "fr": "Dimanche", "type": "jour", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الِاثْنَيْنِ", "fr": "Lundi", "type": "jour", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الثُّلَاثَاءُ", "fr": "Mardi", "type": "jour", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الْأَرْبِعَاءُ", "fr": "Mercredi", "type": "jour", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الْخَمِيسُ", "fr": "Jeudi", "type": "jour", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الْجُمُعَةُ", "fr": "Vendredi (prière)", "type": "jour", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "السَّبْتُ", "fr": "Samedi", "type": "jour", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الشَّمَالُ", "fr": "Le Nord", "type": "direction", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الْجَنُوبُ", "fr": "Le Sud", "type": "direction", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الشَّرْقُ", "fr": "L\\", "type": "mot", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الْغَرْبُ", "fr": "L\\", "type": "mot", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الصَّبَاحُ", "fr": "Le matin", "type": "temps", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الْمَسَاءُ", "fr": "Le soir", "type": "temps", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "صَبَاحُ الْخَيْرِ", "fr": "Bonjour (matin)", "type": "salutation", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "مَسَاءُ الْخَيْرِ", "fr": "Bonsoir", "type": "salutation", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الرَّبِيعُ", "fr": "Le printemps", "type": "saison", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الصَّيْفُ", "fr": "L\\", "type": "mot", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الْخَرِيفُ", "fr": "L\\", "type": "mot", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الشِّتَاءُ", "fr": "L\\", "type": "mot", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الْفَجْرُ", "fr": "L\\", "type": "mot", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الظُّهْرُ", "fr": "Midi", "type": "moment de la journée", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الْعَصْرُ", "fr": "L\\", "type": "mot", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الْعِشَاءُ", "fr": "La nuit (début)", "type": "moment de la journée", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الْمَغْرِبُ", "fr": "Le coucher du soleil", "type": "moment de la journée", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "مُنْتَصَفُ اللَّيْلِ", "fr": "Minuit", "type": "expression temporelle", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "بِسْمِ اللَّهِ", "fr": "Au nom de Dieu (basmala)", "type": "formule religieuse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "الْحَمْدُ لِلَّهِ", "fr": "Louange à Dieu", "type": "formule religieuse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "إِنْ شَاءَ اللَّهُ", "fr": "Si Dieu le veut", "type": "formule religieuse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "مَاشَاءَ اللَّهُ", "fr": "Que Dieu l\\", "type": "mot", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "سُبْحَانَ اللَّهِ", "fr": "Gloire à Dieu", "type": "formule religieuse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "اللَّهُ أَكْبَرُ", "fr": "Dieu est le plus grand", "type": "formule religieuse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "شُكْرًا", "fr": "Merci", "type": "politesse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "جَزَاكَ اللَّهُ خَيْرًا", "fr": "Que Dieu te récompense (merci)", "type": "politesse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "عَفْوًا", "fr": "De rien / Pardon", "type": "politesse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "مِنْ فَضْلِكَ", "fr": "S\\", "type": "mot", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "آسِفٌ", "fr": "Désolé (masc.)", "type": "politesse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "أَهْلًا وَسَهْلًا", "fr": "Bienvenue", "type": "salutation", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "اَللَّهُمَّ", "fr": "Ô mon Dieu !", "type": "invocation", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "رَبُّنَا", "fr": "Notre Seigneur", "type": "nom de Dieu", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "إِنَّا لِلَّهِ وَإِنَّا إِلَيْهِ رَاجِعُونَ", "fr": "Inna lillah (formule de deuil)", "type": "formule religieuse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ", "fr": "Que la paix soit sur lui (après le nom du Prophète)", "type": "formule religieuse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "رَضِيَ اللَّهُ عَنْهُ", "fr": "Que Dieu soit satisfait de lui", "type": "formule religieuse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "أَعُوذُ بِاللَّهِ", "fr": "Je cherche refuge en Dieu", "type": "formule religieuse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "حَسْبُنَا اللَّهُ", "fr": "Dieu nous suffit", "type": "formule religieuse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "تَوَكَّلْتُ عَلَى اللَّهِ", "fr": "Je me confie à Dieu", "type": "formule religieuse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "أَوَّلًا", "fr": "Premièrement", "type": "connecteur", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "ثَانِيًا", "fr": "Deuxièmement", "type": "connecteur", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "أَخِيرًا", "fr": "Finalement", "type": "connecteur", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "بِالْإِضَافَةِ", "fr": "De plus / En outre", "type": "connecteur", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "عَلَى سَبِيلِ الْمِثَالِ", "fr": "Par exemple", "type": "connecteur", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "فِي الْخُلَاصَةِ", "fr": "En résumé", "type": "connecteur", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "الرَّفْعُ", "fr": "Nominatif (sujet)", "type": "grammaire", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "النَّصْبُ", "fr": "Accusatif (objet)", "type": "grammaire", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "الْجَرُّ", "fr": "Génitif (après prép.)", "type": "grammaire", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "مَشْغُولٌ", "fr": "Occupé(e)", "type": "adjectif", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "فَرِحٌ / فَرِحَةٌ", "fr": "Content(e)", "type": "adjectif", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "الْإِعْرَابُ", "fr": "La déclinaison", "type": "grammaire", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "مِنَ الْمَعْلُومِ أَنَّ", "fr": "Il est connu que...", "type": "connecteur", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "مِنَ الْجَدِيرِ بِالذِّكْرِ", "fr": "Il convient de mentionner", "type": "connecteur", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "يَجِبُ أَنْ", "fr": "Il faut que / On doit", "type": "expression", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "يَنْبَغِي أَنْ", "fr": "Il convient de", "type": "expression", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "مِنَ الضَّرُورِيِّ", "fr": "Il est nécessaire", "type": "expression", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "مِنَ الْمُمْكِنِ", "fr": "Il est possible", "type": "expression", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "مُبْتَدَأٌ", "fr": "Sujet (terme grammatical)", "type": "grammaire", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "خَبَرٌ", "fr": "Prédicat (terme grammatical)", "type": "grammaire", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "فِعْلٌ", "fr": "Verbe", "type": "grammaire", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "فَاعِلٌ", "fr": "Sujet verbal (agent)", "type": "grammaire", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "مُجْتَهِدٌ / مُجْتَهِدَةٌ", "fr": "Studieux / Appliqué(e)", "type": "adjectif", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "كَسُولٌ / كَسُولَةٌ", "fr": "Paresseux / Paresseuse", "type": "adjectif", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "قَوِيٌّ / قَوِيَّةٌ", "fr": "Fort(e)", "type": "adjectif", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "ضَعِيفٌ / ضَعِيفَةٌ", "fr": "Faible", "type": "adjectif", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "سَعِيدٌ / سَعِيدَةٌ", "fr": "Heureux / Heureuse", "type": "adjectif", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "حَزِينٌ / حَزِينَةٌ", "fr": "Triste", "type": "adjectif", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "مَرِيضٌ / مَرِيضَةٌ", "fr": "Malade", "type": "adjectif", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "صَحِيحٌ / صَحِيحَةٌ", "fr": "Correct(e) / En bonne santé", "type": "adjectif", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "فَرِحٌ / فَرِحَةٌ", "fr": "Content(e) / Joyeux", "type": "adjectif", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "الْجَوَابُ الصَّحِيحُ", "fr": "La bonne réponse", "type": "expression", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "أُبَارِكُ لَكَ", "fr": "Je te félicite", "type": "expression", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "مُرَاجَعَةٌ", "fr": "Révision", "type": "nom", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "خُلَاصَةٌ", "fr": "Résumé / Synthèse", "type": "nom", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "قَاعِدَةٌ", "fr": "Règle / Base", "type": "nom", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "اسْتِثْنَاءٌ", "fr": "Exception", "type": "nom", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "مِثَالٌ", "fr": "Exemple", "type": "nom", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "تَدْرِيبٌ", "fr": "Entraînement / Exercice", "type": "nom", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "إِتْقَانٌ", "fr": "Maîtrise / Perfectionnement", "type": "nom", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "مُسْتَوَى", "fr": "Niveau", "type": "nom", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "تَقَدُّمٌ", "fr": "Progrès", "type": "nom", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "نَجَاحٌ", "fr": "Succès / Réussite", "type": "nom", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}]
 ;
 
-// ─── EMOJI PICKER DATA ───
-const EMOJI_CATS = {
-  'Études & modules': ['📋','📖','📚','📝','✏️','🖊️','🗒️','📊','📈','🧠','💡','🔬','🔭','🎓','📐','📏'],
-  'Sport & santé': ['💪','🏋️','⚽','🏀','🎾','🏊','🚴','🤸','🧘','🏃','🥗','💊','🏥','❤️','🩺','⚖️'],
-  'Voyage & loisirs': ['✈️','🌍','🗺️','🏖️','⛰️','🎵','🎮','🎬','📷','🎨','🎭','🎤','🏕️','🚗','🛵','🚂'],
-  'Maison & vie': ['🏠','🍕','🍎','☕','🛒','💰','💳','📱','💻','🔑','🛏️','🧹','🌱','🐶','🐱','🌸'],
-  'Symboles & étoiles': ['⭐','🌟','💫','🔥','✅','❌','⚡','🎯','🏆','🥇','💎','🎁','🎉','🔵','🟡','🟢']
+/* ═══════════════════════════════════════════════
+   EMOJI PICKER
+══════════════════════════════════════════════ */
+const EMOJI_CATS={
+  'Études & modules':['📋','📖','📚','📝','✏️','🖊️','📊','📈','🧠','💡','🔬','🎓','📐','📏','🖥️','💻'],
+  'Sport & santé':['💪','🏋️','⚽','🏀','🎾','🏊','🚴','🤸','🧘','🏃','🥗','💊','🏥','❤️','⚖️','🩺'],
+  'Voyage & loisirs':['✈️','🌍','🗺️','🏖️','⛰️','🎵','🎮','🎬','📷','🎨','🎤','🚗','🛵','🏕️','🎭','🚂'],
+  'Maison & vie':['🏠','🍕','🍎','☕','🛒','💰','💳','📱','🔑','🛏️','🧹','🌱','🐶','🐱','🌸','🧺'],
+  'Symboles':['⭐','🌟','💫','🔥','✅','❌','⚡','🎯','🏆','🥇','💎','🎁','🎉','🔵','🟡','🟢','🔴','⚠️']
 };
-
-function buildEmojiDropdown(){
-  const dd = document.getElementById('emoji-dropdown');
-  let html = '';
-  Object.entries(EMOJI_CATS).forEach(([cat, emojis])=>{
-    html += `<div class="emoji-cat-lbl">${cat}</div><div class="emoji-grid-picker">`;
-    emojis.forEach(e=>{
-      html += `<div class="epick" title="${e}" onclick="pickModEmoji('${e}')">${e}</div>`;
-    });
-    html += '</div>';
+function buildEmojiPicker(){
+  const dd=document.getElementById('emoji-dd');
+  let html='';
+  Object.entries(EMOJI_CATS).forEach(([cat,emojis])=>{
+    html+=`<div class="ecat-lbl">${cat}</div><div class="epick-grid">`;
+    emojis.forEach(e=>{ html+=`<div class="epick" onclick="pickEmoji('${e}')">${e}</div>`; });
+    html+='</div>';
   });
-  dd.innerHTML = html;
+  dd.innerHTML=html;
 }
-function pickModEmoji(e){
-  document.getElementById('mod-emoji').value = e;
-  document.getElementById('emoji-dropdown').classList.remove('open');
-}
-document.addEventListener('DOMContentLoaded', buildEmojiDropdown);
-document.getElementById('emoji-toggle').addEventListener('click', e=>{
-  e.stopPropagation();
-  document.getElementById('emoji-dropdown').classList.toggle('open');
-});
-document.addEventListener('click', e=>{
-  if(!e.target.closest('.emoji-field')) document.getElementById('emoji-dropdown').classList.remove('open');
-});
+function pickEmoji(e){ document.getElementById('mod-emoji').value=e; document.getElementById('emoji-dd').classList.remove('open'); }
+document.getElementById('emoji-tog').addEventListener('click',e=>{ e.stopPropagation(); document.getElementById('emoji-dd').classList.toggle('open'); });
+document.addEventListener('click',e=>{ if(!e.target.closest('.emoji-field')) document.getElementById('emoji-dd').classList.remove('open'); });
+buildEmojiPicker();
 
-// ─── CONSTANTS ───
-const ETYH = 14;
-const EDT_PPM = ETYH/60;
-const EDT_START = 7;
-const EDT_END = 25;
-const SPORT_KW = ['musculation','musculations','muscul','sport','muscu'];
-const SPORT_GOAL = 83;
-const SPORT_START = 97.2;
-const SPORT_TARGET = 3;
-const SPORT_MILESTONE_STEP = 2;
-const SPORT_START_DATE = '2026-06-01';
+/* ═══════════════════════════════════════════════
+   CONSTANTS & STATE
+══════════════════════════════════════════════ */
+const ETYH=13, EDT_PPM=ETYH/60, EDT_START=7, EDT_END=25;
+const SPORT_KW=['musculation','musculations','muscul','sport','muscu'];
+const SPORT_GOAL=83, SPORT_START_W=97.2, SPORT_TARGET=3, SPORT_MS_STEP=2, SPORT_FROM='2026-06-01';
+const MONTHS_FR=['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
 
-// ─── STATE ───
-const DEFAULT_MODULES = [
+const DEFAULT_MODS=[
   {id:'m1',icon:'📋',name:'Mon Planning',desc:'Emploi du temps.',url:'planning.html'},
   {id:'m2',icon:'📖',name:'Arabe Médine',desc:'Leçons & examens.',url:'arabe.html'},
   {id:'m4',icon:'✈️',name:'PPL Aviation',desc:'Bientôt.',url:'',disabled:true},
 ];
-// Default widget layout: id -> cols
-const DEFAULT_LAYOUT = {qcm:6, edt:6, sport:4};
+const DEFAULT_LAYOUT={qcm:{w:2,h:3},edt:{w:2,h:3},sport:{w:2,h:2},tasks:{w:2,h:2}};
 
-let modules=null, editModMode=false, editingModId=null, dragModSrcIdx=null;
-let hubDoc=null, modSaveTimer=null;
-let qcmProg={green:{},blue:{},red:{}};
-let qcmDoc=null, qcmSaveTimer=null;
-let planningState=null, planningDoc=null;
-let sportData={weights:[], goal:SPORT_GOAL, startWeight:SPORT_START};
-let sportDoc=null;
-let widgetLayout=Object.assign({},DEFAULT_LAYOUT), layoutDoc=null, layoutSaveTimer=null;
-let edtNavOffset=0;
-let editLayoutMode=false;
-let qCount=15,qMode='all',qDir='ar2fr';
-let qQueue=[],qIdx=0,qScore=0,qMissed=[],qBlue=[],qStreak=0,qMaxStreak=0,currentQ=null;
+let mods=null, editModMode=false, editModId=null, dragModIdx=null;
+let hubDoc=null, modTimer=null;
+let qcmProg={green:{},blue:{},red:{}}, qcmDoc=null, qcmTimer=null;
+let planState=null, planDoc=null;
+let sportData={weights:[],goal:SPORT_GOAL,startWeight:SPORT_START_W}, sportDoc=null;
+let tasksData={tasks:[],cats:[]}, tasksDoc=null, tasksTimer=null;
+let wLayout=JSON.parse(JSON.stringify(DEFAULT_LAYOUT)), layoutDoc=null, layoutTimer=null;
+let gridEditMode=false, movingWidget=null;
+let edtOff=0;
+let qCnt=15, qMode='all', qDir='ar2fr', qQueue=[], qIdx=0, qScore=0, qMissed=[], qBlue=[], qStr=0, qMaxStr=0, curQ=null;
+let taskTab='todo', taskFilter='', taskPrio='🔴';
 
-// ─── FIREBASE ───
+/* ═══════════════════════════════════════════════
+   FIREBASE
+══════════════════════════════════════════════ */
 firebase.initializeApp(window.FIREBASE_CONFIG);
 const auth=firebase.auth(), db=firebase.firestore();
 try{db.enablePersistence({synchronizeTabs:true}).catch(()=>{});}catch(e){}
-
 auth.onAuthStateChanged(async user=>{
-  if(!user){
-    document.getElementById('loading-screen').classList.add('hidden');
-    document.getElementById('auth-wrap').classList.remove('hidden');
-    return;
-  }
+  if(!user){ document.getElementById('ls').classList.add('hidden'); document.getElementById('auth-wrap').classList.remove('hidden'); return; }
   document.getElementById('user-email').textContent=user.displayName||user.email||'';
   document.getElementById('topbar-right').classList.remove('hidden');
-
   hubDoc=db.collection('users').doc(user.uid).collection('modules').doc('hub');
   qcmDoc=db.collection('users').doc(user.uid).collection('modules').doc('qcm-arabe');
-  planningDoc=db.collection('users').doc(user.uid).collection('modules').doc('planning');
+  planDoc=db.collection('users').doc(user.uid).collection('modules').doc('planning');
   sportDoc=db.collection('users').doc(user.uid).collection('modules').doc('sport');
+  tasksDoc=db.collection('users').doc(user.uid).collection('modules').doc('tasks');
   layoutDoc=db.collection('users').doc(user.uid).collection('modules').doc('dashboard-layout');
-
   try{
-    const [hubSnap,qcmSnap,planSnap,sportSnap,layoutSnap]=await Promise.all([
-      hubDoc.get(),qcmDoc.get(),planningDoc.get(),sportDoc.get(),layoutDoc.get()
-    ]);
-    modules=(hubSnap.exists&&hubSnap.data().modules)?hubSnap.data().modules:DEFAULT_MODULES.map(m=>({...m}));
-    const qd=qcmSnap.exists?qcmSnap.data():{};
-    qcmProg={green:qd.green||{},blue:qd.blue||{},red:qd.red||{}};
-    if(planSnap.exists) planningState=planSnap.data();
-    if(sportSnap.exists) sportData=Object.assign({weights:[],goal:SPORT_GOAL,startWeight:SPORT_START},sportSnap.data());
-    if(layoutSnap.exists) widgetLayout=Object.assign({},DEFAULT_LAYOUT,layoutSnap.data());
-    if(!hubSnap.exists) hubDoc.set({modules}).catch(()=>{});
-  }catch(e){
-    modules=DEFAULT_MODULES.map(m=>({...m}));
-  }
-
-  document.getElementById('loading-screen').classList.add('hidden');
+    const [h,q,p,s,t,l]=await Promise.all([hubDoc.get(),qcmDoc.get(),planDoc.get(),sportDoc.get(),tasksDoc.get(),layoutDoc.get()]);
+    mods=(h.exists&&h.data().modules)?h.data().modules:DEFAULT_MODS.map(m=>({...m}));
+    if(q.exists){const d=q.data();qcmProg={green:d.green||{},blue:d.blue||{},red:d.red||{}};}
+    if(p.exists) planState=p.data();
+    if(s.exists) sportData=Object.assign({weights:[],goal:SPORT_GOAL,startWeight:SPORT_START_W},s.data());
+    if(t.exists) tasksData=Object.assign({tasks:[],cats:[]},t.data());
+    if(l.exists) wLayout=Object.assign(JSON.parse(JSON.stringify(DEFAULT_LAYOUT)),l.data());
+    if(!h.exists) hubDoc.set({modules:mods}).catch(()=>{});
+    // prune done tasks older than 7 days
+    const now7=new Date(); now7.setDate(now7.getDate()-7);
+    tasksData.tasks=tasksData.tasks.filter(t=>!t.done||(t.doneAt&&new Date(t.doneAt)>now7));
+  }catch(e){ mods=DEFAULT_MODS.map(m=>({...m})); }
+  document.getElementById('ls').classList.add('hidden');
   document.getElementById('auth-wrap').classList.add('hidden');
-  document.getElementById('dashboard').classList.remove('hidden');
-  applyWidgetLayout();
-  renderModules();
-  updateQcmStats();updateQcmInfo();
+  document.getElementById('page-layout').classList.remove('hidden');
+  applyLayout();
+  renderMods();
+  updateQcmStats(); updateQcmInfo();
   renderEdt();
   renderSport();
-  setInterval(()=>{renderEdt();renderSport();}, 60000);
+  renderTasks();
+  setInterval(()=>{renderEdt();renderSport();},60000);
 });
 
-// ─── AUTH ───
+/* ═══════════════════════════════════════════════
+   AUTH
+══════════════════════════════════════════════ */
 let authMode='login';
-document.getElementById('auth-google').addEventListener('click',async()=>{clearAuthErr();try{await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());}catch(e){showAuthErr(e.message);}});
+document.getElementById('auth-google').addEventListener('click',async()=>{clearAE();try{await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());}catch(e){showAE(e.message);}});
 document.getElementById('auth-submit').addEventListener('click',async()=>{
-  clearAuthErr();
-  const em=document.getElementById('auth-email').value.trim(),pw=document.getElementById('auth-password').value;
-  if(!em||!pw){showAuthErr('Remplis email et mot de passe.');return;}
-  try{if(authMode==='signup')await auth.createUserWithEmailAndPassword(em,pw);else await auth.signInWithEmailAndPassword(em,pw);}catch(e){showAuthErr(e.message);}
+  clearAE();const em=document.getElementById('auth-email').value.trim(),pw=document.getElementById('auth-password').value;
+  if(!em||!pw){showAE('Remplis email et mot de passe.');return;}
+  try{if(authMode==='signup')await auth.createUserWithEmailAndPassword(em,pw);else await auth.signInWithEmailAndPassword(em,pw);}catch(e){showAE(e.message);}
 });
 document.getElementById('auth-sw-link').addEventListener('click',()=>{
   authMode=authMode==='login'?'signup':'login';
@@ -653,128 +688,115 @@ document.getElementById('auth-sw-link').addEventListener('click',()=>{
   document.getElementById('auth-sw-link').textContent=authMode==='login'?'Créer un compte':'Se connecter';
 });
 document.getElementById('btn-logout').addEventListener('click',()=>auth.signOut());
-function showAuthErr(m){const e=document.getElementById('auth-error');e.textContent=m;e.style.display='block';}
-function clearAuthErr(){document.getElementById('auth-error').style.display='none';}
+function showAE(m){const e=document.getElementById('auth-error');e.textContent=m;e.style.display='block';}
+function clearAE(){document.getElementById('auth-error').style.display='none';}
 
-// ─── WIDGET LAYOUT ───
-const COL_SIZES=[4,6,8,12];
-function applyWidgetLayout(){
-  document.querySelectorAll('.widget-cell[data-widget]').forEach(cell=>{
-    const id=cell.dataset.widget;
-    const cols=widgetLayout[id]||6;
-    cell.dataset.cols=cols;
+/* ═══════════════════════════════════════════════
+   GRID LAYOUT
+══════════════════════════════════════════════ */
+function applyLayout(){
+  Object.entries(wLayout).forEach(([id,{w,h}])=>{
+    const cell=document.getElementById('wc-'+id);
+    if(cell){cell.style.setProperty('--w',w);cell.style.setProperty('--h',h);}
   });
 }
-function saveLayout(){
-  if(!layoutDoc)return;
-  clearTimeout(layoutSaveTimer);
-  layoutSaveTimer=setTimeout(()=>layoutDoc.set(widgetLayout).catch(()=>{}),600);
-}
+function saveLayout(){if(!layoutDoc)return;clearTimeout(layoutTimer);layoutTimer=setTimeout(()=>layoutDoc.set(wLayout).catch(()=>{}),600);}
 
-// ─── WIDGET EDIT MODE (resize + drag) ───
-document.getElementById('btn-edit-layout').addEventListener('click',()=>{
-  editLayoutMode=!editLayoutMode;
-  document.getElementById('btn-edit-layout').classList.toggle('active',editLayoutMode);
-  document.body.classList.toggle('edit-mode',editLayoutMode);
-  if(editLayoutMode) attachWidgetControls();
+/* Size modal */
+let sizingId=null;
+const sizeOverlay=document.getElementById('size-overlay');
+function openSizeModal(id){
+  sizingId=id;
+  const {w,h}=wLayout[id]||{w:2,h:2};
+  document.querySelectorAll('#size-w-pills .pill').forEach(b=>b.classList.toggle('active',Number(b.textContent)===w));
+  document.querySelectorAll('#size-h-pills .pill').forEach((b,i)=>b.classList.toggle('active',i+1===h));
+  sizeOverlay.classList.add('open');
+}
+function setSizeW(w){if(!sizingId)return;wLayout[sizingId].w=w;applyLayout();saveLayout();document.querySelectorAll('#size-w-pills .pill').forEach(b=>b.classList.toggle('active',Number(b.textContent)===w));}
+function setSizeH(h){if(!sizingId)return;wLayout[sizingId].h=h;applyLayout();saveLayout();document.querySelectorAll('#size-h-pills .pill').forEach((b,i)=>b.classList.toggle('active',i+1===h));}
+document.getElementById('size-done').addEventListener('click',()=>sizeOverlay.classList.remove('open'));
+
+/* Grid edit mode */
+document.getElementById('btn-grid-edit').addEventListener('click',()=>{
+  gridEditMode=!gridEditMode;
+  document.getElementById('btn-grid-edit').classList.toggle('active',gridEditMode);
+  document.body.classList.toggle('grid-edit',gridEditMode);
 });
 
-let wDragSrc=null;
-function attachWidgetControls(){
-  document.querySelectorAll('.widget-cell[data-widget]').forEach(cell=>{
-    const dh=cell.querySelector('.drag-handle');
-    const rh=cell.querySelector('.resize-handle');
+/* Wire resize buttons → open size modal */
+document.querySelectorAll('.wcell-resize').forEach(h=>{
+  h.addEventListener('click',()=>openSizeModal(h.dataset.id));
+});
 
-    // drag to reorder
-    dh.onmousedown=dh.ontouchstart=(e)=>{
-      e.preventDefault();
-      cell.classList.add('dragging-widget');
-      wDragSrc=cell;
-    };
-
-    // resize: click cycles through sizes
-    rh.onclick=()=>{
-      const id=cell.dataset.widget;
-      const cur=Number(cell.dataset.cols)||6;
-      const idx=COL_SIZES.indexOf(cur);
-      const next=COL_SIZES[(idx+1)%COL_SIZES.length];
-      cell.dataset.cols=next;
-      widgetLayout[id]=next;
+/* Wire move buttons → drag-to-reorder */
+document.querySelectorAll('.wcell-move').forEach(handle=>{
+  handle.addEventListener('pointerdown',e=>{
+    if(!gridEditMode)return;
+    e.preventDefault();
+    const cell=handle.closest('.wcell');
+    movingWidget=cell;
+    cell.classList.add('being-moved');
+    // highlight valid drop zones (other wcells)
+    document.querySelectorAll('.wcell').forEach(c=>{if(c!==cell){c.classList.add('drop-target');}});
+  });
+});
+document.addEventListener('pointerup',e=>{
+  if(!movingWidget)return;
+  const target=document.elementFromPoint(e.clientX,e.clientY);
+  const dropCell=target?target.closest('.wcell[id]'):null;
+  if(dropCell&&dropCell!==movingWidget){
+    const grid=document.getElementById('widget-grid');
+    const cells=[...grid.querySelectorAll('.wcell[id]')];
+    const si=cells.indexOf(movingWidget),di=cells.indexOf(dropCell);
+    if(si>-1&&di>-1){
+      if(si<di) grid.insertBefore(movingWidget,dropCell.nextSibling);
+      else grid.insertBefore(movingWidget,dropCell);
+      // save order
+      const order=[...grid.querySelectorAll('.wcell[id]')].map(c=>c.id.replace('wc-',''));
+      wLayout._order=order;
       saveLayout();
-    };
-  });
+    }
+  }
+  movingWidget.classList.remove('being-moved');
+  document.querySelectorAll('.drop-target').forEach(c=>c.classList.remove('drop-target'));
+  movingWidget=null;
+});
 
-  // drop targets
-  document.querySelectorAll('.widget-cell[data-widget]').forEach(cell=>{
-    cell.ondragover=cell.ontouchover=(e)=>{e.preventDefault();cell.classList.add('drop-target');};
-    cell.ondragleave=()=>cell.classList.remove('drop-target');
-    cell.ondrop=cell.ontouchend=(e)=>{
-      e.preventDefault();
-      cell.classList.remove('drop-target');
-      if(wDragSrc&&wDragSrc!==cell){
-        const grid=document.getElementById('widget-grid');
-        const cells=[...grid.querySelectorAll('.widget-cell[data-widget]')];
-        const si=cells.indexOf(wDragSrc), di=cells.indexOf(cell);
-        if(si>-1&&di>-1){
-          if(si<di) grid.insertBefore(wDragSrc,cell.nextSibling);
-          else grid.insertBefore(wDragSrc,cell);
-          // save order
-          const order=cells.map(c=>c.dataset.widget);
-          widgetLayout._order=order;
-          saveLayout();
-        }
-      }
-      wDragSrc&&wDragSrc.classList.remove('dragging-widget');
-      wDragSrc=null;
-    };
-  });
-  document.onmouseup=document.ontouchend=()=>{
-    if(wDragSrc) wDragSrc.classList.remove('dragging-widget');
-    wDragSrc=null;
-    document.querySelectorAll('.drop-target').forEach(c=>c.classList.remove('drop-target'));
-  };
-}
-
-// ─── MODULES ───
-function renderModules(){
-  const list=document.getElementById('modules-list');
-  list.innerHTML='';
-  modules.forEach((m,idx)=>{
-    const el=document.createElement('div');
-    el.className='module-tile'+(m.disabled?' disabled':'');
-    el.innerHTML=`<button class="tile-del">✕</button><div class="micon">${m.icon||'📦'}</div><div class="minfo"><h3>${esc(m.name)}</h3>${m.desc?`<p>${esc(m.desc)}</p>`:''}</div>`;
-    el.querySelector('.tile-del').addEventListener('click',e=>{e.stopPropagation();removeModule(m.id);});
+/* ═══════════════════════════════════════════════
+   MODULES (col left)
+══════════════════════════════════════════════ */
+function renderMods(){
+  const list=document.getElementById('modules-list');list.innerHTML='';
+  mods.forEach((m,idx)=>{
+    const el=document.createElement('div');el.className='mod-tile'+(m.disabled?' disabled':'');
+    el.innerHTML=`<button class="mod-del">✕</button><div class="mod-icon">${m.icon||'📦'}</div><div class="mod-info"><h3>${esc(m.name)}</h3>${m.desc?`<p>${esc(m.desc)}</p>`:''}</div>`;
+    el.querySelector('.mod-del').addEventListener('click',e=>{e.stopPropagation();removeMod(m.id);});
     if(editModMode){
-      el.addEventListener('click',e=>{e.preventDefault();openModModal(m);});
+      el.style.display='flex'; el.querySelector('.mod-del').style.display='flex';
+      el.addEventListener('click',ev=>{ev.preventDefault();openModModal(m);});
       el.draggable=true;
-      el.addEventListener('dragstart',()=>{dragModSrcIdx=idx;el.classList.add('dragging');});
-      el.addEventListener('dragend',()=>{el.classList.remove('dragging');list.querySelectorAll('.module-tile').forEach(t=>t.classList.remove('drag-over'));});
+      el.addEventListener('dragstart',()=>{dragModIdx=idx;el.classList.add('dragging');});
+      el.addEventListener('dragend',()=>{el.classList.remove('dragging');list.querySelectorAll('.mod-tile').forEach(t=>t.classList.remove('drag-over'));});
       el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('drag-over');});
       el.addEventListener('dragleave',()=>el.classList.remove('drag-over'));
-      el.addEventListener('drop',e=>{e.preventDefault();if(dragModSrcIdx!==null&&dragModSrcIdx!==idx){const mv=modules.splice(dragModSrcIdx,1)[0];modules.splice(idx,0,mv);saveModules();renderModules();}});
-    } else if(m.url&&!m.disabled){
-      el.addEventListener('click',()=>window.location.href=m.url);
-      let pt=null;
-      el.addEventListener('pointerdown',()=>{pt=setTimeout(()=>openModModal(m),600);});
-      el.addEventListener('pointerup',()=>clearTimeout(pt));
-      el.addEventListener('pointerleave',()=>clearTimeout(pt));
+      el.addEventListener('drop',e=>{e.preventDefault();if(dragModIdx!==null&&dragModIdx!==idx){const mv=mods.splice(dragModIdx,1)[0];mods.splice(idx,0,mv);saveMods();renderMods();}});
     } else {
-      el.addEventListener('click',()=>openModModal(m));
+      el.querySelector('.mod-del').style.display='none';
+      if(m.url&&!m.disabled){
+        el.addEventListener('click',()=>window.location.href=m.url);
+        let pt=null;el.addEventListener('pointerdown',()=>{pt=setTimeout(()=>openModModal(m),600);});
+        el.addEventListener('pointerup',()=>clearTimeout(pt));el.addEventListener('pointerleave',()=>clearTimeout(pt));
+      } else el.addEventListener('click',()=>openModModal(m));
     }
     list.appendChild(el);
   });
 }
-function saveModules(){if(!hubDoc)return;clearTimeout(modSaveTimer);modSaveTimer=setTimeout(()=>hubDoc.set({modules}).catch(()=>{}),600);}
-document.getElementById('btn-edit-mods').addEventListener('click',()=>{
-  editModMode=!editModMode;
-  document.getElementById('btn-edit-mods').classList.toggle('active',editModMode);
-  renderModules();
-});
+function saveMods(){if(!hubDoc)return;clearTimeout(modTimer);modTimer=setTimeout(()=>hubDoc.set({modules:mods}).catch(()=>{}),600);}
+document.getElementById('btn-edit-mods').addEventListener('click',()=>{editModMode=!editModMode;document.getElementById('btn-edit-mods').classList.toggle('active',editModMode);renderMods();});
 document.getElementById('btn-add-mod').addEventListener('click',()=>openModModal(null));
-
 const modOverlay=document.getElementById('mod-overlay');
 function openModModal(m){
-  editingModId=m?m.id:null;
+  editModId=m?m.id:null;
   document.getElementById('mod-title').textContent=m?'Modifier':'Ajouter';
   document.getElementById('mod-emoji').value=m?(m.icon||''):'';
   document.getElementById('mod-name').value=m?m.name:'';
@@ -785,39 +807,25 @@ function openModModal(m){
 }
 document.getElementById('mod-cancel').addEventListener('click',()=>modOverlay.classList.remove('open'));
 document.getElementById('mod-save').addEventListener('click',()=>{
-  const name=document.getElementById('mod-name').value.trim();
-  if(!name){alert('Nom requis');return;}
-  const data={id:editingModId||'m'+Date.now(),icon:document.getElementById('mod-emoji').value.trim()||'📦',name,desc:document.getElementById('mod-desc').value.trim(),url:document.getElementById('mod-url').value.trim(),disabled:!document.getElementById('mod-url').value.trim()};
-  if(editingModId){const i=modules.findIndex(m=>m.id===editingModId);if(i>-1)modules[i]=data;}else modules.push(data);
-  saveModules();modOverlay.classList.remove('open');renderModules();
+  const name=document.getElementById('mod-name').value.trim();if(!name){alert('Nom requis');return;}
+  const data={id:editModId||'m'+Date.now(),icon:document.getElementById('mod-emoji').value.trim()||'📦',name,desc:document.getElementById('mod-desc').value.trim(),url:document.getElementById('mod-url').value.trim(),disabled:!document.getElementById('mod-url').value.trim()};
+  if(editModId){const i=mods.findIndex(m=>m.id===editModId);if(i>-1)mods[i]=data;}else mods.push(data);
+  saveMods();modOverlay.classList.remove('open');renderMods();
 });
-document.getElementById('mod-del').addEventListener('click',()=>{
-  if(!editingModId||!confirm('Supprimer ?'))return;
-  modules=modules.filter(m=>m.id!==editingModId);
-  saveModules();modOverlay.classList.remove('open');renderModules();
-});
-function removeModule(id){if(!confirm('Supprimer ?'))return;modules=modules.filter(m=>m.id!==id);saveModules();renderModules();}
+document.getElementById('mod-del').addEventListener('click',()=>{if(!editModId||!confirm('Supprimer ?'))return;mods=mods.filter(m=>m.id!==editModId);saveMods();modOverlay.classList.remove('open');renderMods();});
+function removeMod(id){if(!confirm('Supprimer ?'))return;mods=mods.filter(m=>m.id!==id);saveMods();renderMods();}
 
-// ─── QCM ───
-function saveQcmProg(){
-  const el=document.getElementById('qcm-sync');
-  if(el){el.style.opacity='.8';setTimeout(()=>{if(el)el.style.opacity='.4';},1500);}
-  if(!qcmDoc)return;
-  clearTimeout(qcmSaveTimer);
-  qcmSaveTimer=setTimeout(()=>qcmDoc.set(qcmProg).catch(()=>{}),800);
-}
+/* ═══════════════════════════════════════════════
+   QCM
+══════════════════════════════════════════════ */
+function saveQcm(){const el=document.getElementById('qcm-sync');if(el){el.style.opacity='.8';setTimeout(()=>{if(el)el.style.opacity='.4';},1500);}if(!qcmDoc)return;clearTimeout(qcmTimer);qcmTimer=setTimeout(()=>qcmDoc.set(qcmProg).catch(()=>{}),800);}
 function updateQcmStats(){
   const g=Object.keys(qcmProg.green).length,b=Object.keys(qcmProg.blue||{}).length,r=Object.keys(qcmProg.red).length,t=VOCAB.length;
-  document.getElementById('g-lbl-green').textContent=g+' ✅';
-  document.getElementById('g-lbl-blue').textContent=b+' 🔵';
-  document.getElementById('g-lbl-red').textContent=r+' ❌';
-  document.getElementById('g-mastered-count').textContent=g;
-  document.getElementById('g-err-count').textContent=r;
-  document.getElementById('g-bar-green').style.width=(g/t*100)+'%';
-  document.getElementById('g-bar-blue').style.width=(b/t*100)+'%';
-  document.getElementById('g-bar-red').style.width=(r/t*100)+'%';
+  document.getElementById('g-lbl-g').textContent=g+' ✅';document.getElementById('g-lbl-b').textContent=b+' 🔵';document.getElementById('g-lbl-r').textContent=r+' ❌';
+  document.getElementById('g-mc').textContent=g;document.getElementById('g-ec').textContent=r;
+  document.getElementById('gb-g').style.width=(g/t*100)+'%';document.getElementById('gb-b').style.width=(b/t*100)+'%';document.getElementById('gb-r').style.width=(r/t*100)+'%';
 }
-function selCount(n){qCount=n;document.querySelectorAll('#count-pills .pill').forEach(b=>b.classList.toggle('active',Number(b.textContent)===n));updateQcmInfo();}
+function selCount(n){qCnt=n;document.querySelectorAll('#cnt-pills .pill').forEach(b=>b.classList.toggle('active',Number(b.textContent)===n));updateQcmInfo();}
 function selMode(m){
   qMode=m;
   const map={'all':'🎲 Tout','review':'🔵 Revoir','errors':'❌ Erreurs','srs':'🧠 Smart'};
@@ -829,263 +837,283 @@ function selDir(d){
   const map={'ar2fr':'🇸🇦→🇫🇷','fr2ar':'🇫🇷→🇸🇦','mix':'🔀'};
   document.querySelectorAll('.pills .pill').forEach(b=>{if(Object.values(map).includes(b.textContent)){const dm=Object.fromEntries(Object.entries(map).map(([k,v])=>[v,k]));b.classList.toggle('active',dm[b.textContent]===d);}});
 }
-function updateQcmInfo(){const pool=buildQPool();const n=Math.min(qCount,pool.length);document.getElementById('qcm-info').textContent=n+'q sur '+pool.length+' mots'+(pool.length===0?' — catégorie vide':'.');}
-function buildQPool(){
-  let p=[...VOCAB];
-  if(qMode==='errors')p=p.filter(v=>qcmProg.red[v.ar]);
-  else if(qMode==='review')p=p.filter(v=>(qcmProg.blue||{})[v.ar]);
-  else if(qMode==='srs'){const r=p.filter(v=>qcmProg.red[v.ar]),b=p.filter(v=>(qcmProg.blue||{})[v.ar]);p=[...p,...r,...r,...b];}
-  return p;
-}
+function updateQcmInfo(){const p=buildQPool();const n=Math.min(qCnt,p.length);document.getElementById('qcm-info').textContent=n+'q sur '+p.length+(p.length===0?' — vide':'.');}
+function buildQPool(){let p=[...VOCAB];if(qMode==='errors')p=p.filter(v=>qcmProg.red[v.ar]);else if(qMode==='review')p=p.filter(v=>(qcmProg.blue||{})[v.ar]);else if(qMode==='srs'){const r=p.filter(v=>qcmProg.red[v.ar]),b2=p.filter(v=>(qcmProg.blue||{})[v.ar]);p=[...p,...r,...r,...b2];}return p;}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
-function showQcmHome(){['qcm-home','qcm-quiz','qcm-results'].forEach(id=>{document.getElementById(id).classList.toggle('hidden',id!=='qcm-home');});hideMastered();hideErrors();updateQcmStats();updateQcmInfo();}
-function showMastered(){document.getElementById('mastered-panel').classList.remove('hidden');document.getElementById('errors-panel').classList.add('hidden');const list=document.getElementById('mastered-list');const g=VOCAB.filter(v=>qcmProg.green[v.ar]);list.innerHTML=!g.length?'<div style="padding:8px;color:var(--chalk-dim);font-size:.72rem">Aucun encore.</div>':g.map(v=>`<div class="mastered-item"><span class="missed-ar">${v.ar}</span><span>${esc(v.fr)}</span><button class="to-review-btn" onclick="moveToReview('${v.ar.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}')">🔵</button></div>`).join('');}
-function hideMastered(){document.getElementById('mastered-panel').classList.add('hidden');}
-function showAllErrors(){document.getElementById('errors-panel').classList.remove('hidden');document.getElementById('mastered-panel').classList.add('hidden');const list=document.getElementById('all-errors-list');const r=VOCAB.filter(v=>qcmProg.red[v.ar]);list.innerHTML=!r.length?'<div style="padding:8px;color:var(--chalk-dim);font-size:.72rem">Aucune erreur !</div>':r.map(v=>`<div class="missed-item"><span class="missed-ar">${v.ar}</span><span>${esc(v.fr)}</span></div>`).join('');}
-function hideErrors(){document.getElementById('errors-panel').classList.add('hidden');}
-function moveToReview(ar){if(!qcmProg.blue)qcmProg.blue={};delete qcmProg.green[ar];qcmProg.blue[ar]=true;saveQcmProg();updateQcmStats();showMastered();}
-function startQcm(){let p=buildQPool();if(!p.length){alert('Aucun mot.');return;}shuffle(p);qQueue=p.slice(0,Math.min(qCount,p.length));qIdx=0;qScore=0;qMissed=[];qBlue=[];qStreak=0;qMaxStreak=0;document.getElementById('qcm-home').classList.add('hidden');document.getElementById('qcm-results').classList.add('hidden');document.getElementById('qcm-quiz').classList.remove('hidden');renderQ();}
+function showQcmHome(){['qcm-home','qcm-quiz','qcm-results'].forEach(id=>document.getElementById(id).classList.toggle('hidden',id!=='qcm-home'));document.getElementById('mastered-panel').classList.add('hidden');document.getElementById('errors-panel').classList.add('hidden');updateQcmStats();updateQcmInfo();}
+function showMastered(){document.getElementById('mastered-panel').classList.remove('hidden');document.getElementById('errors-panel').classList.add('hidden');const g=VOCAB.filter(v=>qcmProg.green[v.ar]);document.getElementById('mastered-list').innerHTML=!g.length?'<div style="padding:7px;color:var(--chalk-dim);font-size:.7rem">Aucun encore.</div>':g.map(v=>`<div class="mini-item"><span class="mini-ar">${v.ar}</span><span>${esc(v.fr)}</span><button class="to-rev" onclick="moveToReview('${v.ar.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}')">🔵</button></div>`).join('');}
+function showAllErrors(){document.getElementById('errors-panel').classList.remove('hidden');document.getElementById('mastered-panel').classList.add('hidden');const r=VOCAB.filter(v=>qcmProg.red[v.ar]);document.getElementById('all-errors-list').innerHTML=!r.length?'<div style="padding:7px;color:var(--chalk-dim);font-size:.7rem">Aucune erreur !</div>':r.map(v=>`<div class="mini-item"><span class="mini-ar">${v.ar}</span><span>${esc(v.fr)}</span></div>`).join('');}
+function moveToReview(ar){if(!qcmProg.blue)qcmProg.blue={};delete qcmProg.green[ar];qcmProg.blue[ar]=true;saveQcm();updateQcmStats();showMastered();}
+function startQcm(){let p=buildQPool();if(!p.length){alert('Aucun mot.');return;}shuffle(p);qQueue=p.slice(0,Math.min(qCnt,p.length));qIdx=0;qScore=0;qMissed=[];qBlue=[];qStr=0;qMaxStr=0;document.getElementById('qcm-home').classList.add('hidden');document.getElementById('qcm-results').classList.add('hidden');document.getElementById('qcm-quiz').classList.remove('hidden');renderQ();}
 function renderQ(){
-  currentQ=qQueue[qIdx];const tot=qQueue.length;
-  document.getElementById('g-pbar').style.width=(qIdx/tot*100)+'%';
-  document.getElementById('g-counter').textContent=(qIdx+1)+'/'+tot;
-  document.getElementById('g-streak').textContent=qStreak>=3?'🔥×'+qStreak:'';
-  document.getElementById('g-fb').style.display='none';
-  document.getElementById('g-next').classList.add('hidden');
-  document.getElementById('g-review-btn').classList.add('hidden');
-  let dir=qDir==='mix'?(Math.random()<.5?'ar2fr':'fr2ar'):qDir;
-  currentQ._dir=dir;
-  const qm=document.getElementById('g-qmain');
-  if(dir==='ar2fr'){qm.textContent=currentQ.ar;qm.className='q-main';document.getElementById('g-qlabel').textContent='Que signifie ce mot ?';}
-  else{qm.textContent=currentQ.fr;qm.className='q-main fr';document.getElementById('g-qlabel').textContent='Comment dit-on en arabe ?';}
-  document.getElementById('g-qlesson').textContent=currentQ.lessonTitle;
-  let wrong=VOCAB.filter(v=>v.ar!==currentQ.ar);
-  const st=wrong.filter(v=>v.type===currentQ.type);
-  let dist=shuffle([...st]).slice(0,3);
-  if(dist.length<3)dist=[...dist,...shuffle(wrong.filter(v=>!dist.includes(v))).slice(0,3-dist.length)];
-  const opts=shuffle([currentQ,...dist.slice(0,3)]);
-  const oc=document.getElementById('g-opts');oc.innerHTML='';
-  opts.forEach(opt=>{const b=document.createElement('button');b.className='q-opt'+(dir==='fr2ar'?' fr-opt':'');b.textContent=dir==='ar2fr'?opt.fr:opt.ar;b.dataset.correct=opt.ar===currentQ.ar?'1':'0';b.onclick=()=>pickAns(b);oc.appendChild(b);});
+  curQ=qQueue[qIdx];const tot=qQueue.length;
+  document.getElementById('g-pbar').style.width=(qIdx/tot*100)+'%';document.getElementById('g-cnt').textContent=(qIdx+1)+'/'+tot;document.getElementById('g-str').textContent=qStr>=3?'🔥×'+qStr:'';
+  document.getElementById('g-fb').style.display='none';document.getElementById('g-next').classList.add('hidden');document.getElementById('g-revbtn').classList.add('hidden');
+  const dir=qDir==='mix'?(Math.random()<.5?'ar2fr':'fr2ar'):qDir;curQ._dir=dir;
+  const qm=document.getElementById('g-qm');
+  if(dir==='ar2fr'){qm.textContent=curQ.ar;qm.className='q-main';document.getElementById('g-ql').textContent='Que signifie ce mot ?';}
+  else{qm.textContent=curQ.fr;qm.className='q-main fr';document.getElementById('g-ql').textContent='Comment dit-on en arabe ?';}
+  document.getElementById('g-qles').textContent=curQ.lessonTitle;
+  let wr=VOCAB.filter(v=>v.ar!==curQ.ar);const st=wr.filter(v=>v.type===curQ.type);let dist=shuffle([...st]).slice(0,3);if(dist.length<3)dist=[...dist,...shuffle(wr.filter(v=>!dist.includes(v))).slice(0,3-dist.length)];
+  const opts=shuffle([curQ,...dist.slice(0,3)]);const oc=document.getElementById('g-opts');oc.innerHTML='';
+  opts.forEach(opt=>{const b=document.createElement('button');b.className='q-opt'+(dir==='fr2ar'?' fr-opt':'');b.textContent=dir==='ar2fr'?opt.fr:opt.ar;b.dataset.correct=opt.ar===curQ.ar?'1':'0';b.onclick=()=>pickAns(b);oc.appendChild(b);});
 }
 function pickAns(btn){
-  const ok=btn.dataset.correct==='1';const q=currentQ;
+  const ok=btn.dataset.correct==='1';const q=curQ;
   document.querySelectorAll('.q-opt').forEach(b=>{b.classList.add('locked');b.onclick=null;if(b.dataset.correct==='1')b.classList.add('correct');else if(b===btn&&!ok)b.classList.add('wrong');});
-  if(!qcmProg.blue)qcmProg.blue={};
-  const fb=document.getElementById('g-fb');
-  if(ok){qScore++;qStreak++;qMaxStreak=Math.max(qMaxStreak,qStreak);delete qcmProg.red[q.ar];if(!qcmProg.blue[q.ar])qcmProg.green[q.ar]=true;fb.className='q-fb ok';fb.textContent='✅ '+q.ar+' = '+q.fr;document.getElementById('g-review-btn').classList.remove('hidden');}
-  else{qStreak=0;qMissed.push(q);delete qcmProg.green[q.ar];qcmProg.red[q.ar]=true;fb.className='q-fb ko';fb.textContent='❌ '+q.ar+' = '+q.fr;}
-  fb.style.display='block';document.getElementById('g-streak').textContent=qStreak>=3?'🔥×'+qStreak:'';document.getElementById('g-next').classList.remove('hidden');saveQcmProg();
+  if(!qcmProg.blue)qcmProg.blue={};const fb=document.getElementById('g-fb');
+  if(ok){qScore++;qStr++;qMaxStr=Math.max(qMaxStr,qStr);delete qcmProg.red[q.ar];if(!qcmProg.blue[q.ar])qcmProg.green[q.ar]=true;fb.className='q-fb ok';fb.textContent='✅ '+q.ar+' = '+q.fr;document.getElementById('g-revbtn').classList.remove('hidden');}
+  else{qStr=0;qMissed.push(q);delete qcmProg.green[q.ar];qcmProg.red[q.ar]=true;fb.className='q-fb ko';fb.textContent='❌ '+q.ar+' = '+q.fr;}
+  fb.style.display='block';document.getElementById('g-str').textContent=qStr>=3?'🔥×'+qStr:'';document.getElementById('g-next').classList.remove('hidden');saveQcm();
 }
-function markReview(){if(!currentQ)return;if(!qcmProg.blue)qcmProg.blue={};delete qcmProg.green[currentQ.ar];qcmProg.blue[currentQ.ar]=true;qBlue.push(currentQ);document.getElementById('g-review-btn').classList.add('hidden');const fb=document.getElementById('g-fb');fb.className='q-fb skip';fb.textContent='🔵 À revoir : '+currentQ.ar+' = '+currentQ.fr;saveQcmProg();updateQcmStats();}
-function nextQ(){qIdx++;if(qIdx>=qQueue.length){showQcmResults();return;}renderQ();}
-function showQcmResults(){
+function markReview(){if(!curQ)return;if(!qcmProg.blue)qcmProg.blue={};delete qcmProg.green[curQ.ar];qcmProg.blue[curQ.ar]=true;qBlue.push(curQ);document.getElementById('g-revbtn').classList.add('hidden');const fb=document.getElementById('g-fb');fb.className='q-fb skip';fb.textContent='🔵 À revoir : '+curQ.ar+' = '+curQ.fr;saveQcm();updateQcmStats();}
+function nextQ(){qIdx++;if(qIdx>=qQueue.length){showQcmRes();return;}renderQ();}
+function showQcmRes(){
   const tot=qQueue.length,pct=Math.round(qScore/tot*100);
-  document.getElementById('g-remoji').textContent=pct>=90?'🌟':pct>=70?'👍':pct>=50?'😊':'💪';
-  document.getElementById('g-rscore').textContent=qScore+'/'+tot+' ('+pct+'%)';
-  document.getElementById('g-rgood').textContent=qScore;
-  document.getElementById('g-rblue').textContent=qBlue.length;
-  document.getElementById('g-rbad').textContent=tot-qScore;
-  document.getElementById('g-rstreak').textContent=qMaxStreak;
-  const mw=document.getElementById('g-missed-wrap');
-  if(qMissed.length){mw.classList.remove('hidden');document.getElementById('g-missed-list').innerHTML=qMissed.map(v=>`<div class="missed-item"><span class="missed-ar">${v.ar}</span><span>${esc(v.fr)}</span></div>`).join('');}
-  else mw.classList.add('hidden');
+  document.getElementById('g-re').textContent=pct>=90?'🌟':pct>=70?'👍':pct>=50?'😊':'💪';
+  document.getElementById('g-rs').textContent=qScore+'/'+tot+' ('+pct+'%)';
+  document.getElementById('g-rg').textContent=qScore;document.getElementById('g-rb').textContent=qBlue.length;document.getElementById('g-rr').textContent=tot-qScore;document.getElementById('g-rst').textContent=qMaxStr;
+  const mw=document.getElementById('g-mw');
+  if(qMissed.length){mw.classList.remove('hidden');document.getElementById('g-ml').innerHTML=qMissed.map(v=>`<div class="mini-item"><span class="mini-ar">${v.ar}</span><span>${esc(v.fr)}</span></div>`).join('');}else mw.classList.add('hidden');
   document.getElementById('qcm-quiz').classList.add('hidden');document.getElementById('qcm-results').classList.remove('hidden');updateQcmStats();
 }
 
-// ─── EDT ───
+/* ═══════════════════════════════════════════════
+   EDT
+══════════════════════════════════════════════ */
 const DN=['Lu','Ma','Me','Je','Ve','Sa','Di'];
 function pad2(n){return String(n).padStart(2,'0');}
-function tmToMin(t){const[h,m]=t.split(':').map(Number);return h*60+m;}
-function jsToOur(d){return(d+6)%7;}
-function dKey(d){return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());}
-function mondayOf(date){const d=new Date(date);d.setHours(0,0,0,0);d.setDate(d.getDate()-jsToOur(d.getDay()));return d;}
-function addDays(date,n){const d=new Date(date);d.setDate(d.getDate()+n);return d;}
+function tmM(t){const[h,m]=t.split(':').map(Number);return h*60+m;}
+function jsD(d){return(d+6)%7;}
+function dK(d){return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());}
+function monOf(date){const d=new Date(date);d.setHours(0,0,0,0);d.setDate(d.getDate()-jsD(d.getDay()));return d;}
+function addD(date,n){const d=new Date(date);d.setDate(d.getDate()+n);return d;}
 function fmtS(d){return d.getDate()+'/'+(d.getMonth()+1);}
 function edtLetter(){
-  if(!planningState)return 'A';
-  const anchor=planningState.weekAnchor||{monday:dKey(mondayOf(new Date())),letter:'A'};
-  const anchorDate=new Date(anchor.monday+'T00:00:00');
-  const thisMonday=mondayOf(addDays(new Date(),edtNavOffset*7));
-  const dw=Math.round((thisMonday-anchorDate)/604800000);
-  const p=((dw%2)+2)%2;
-  return p===0?anchor.letter:(anchor.letter==='A'?'B':'A');
+  if(!planState)return 'A';
+  const a=planState.weekAnchor||{monday:dK(monOf(new Date())),letter:'A'};
+  const ad=new Date(a.monday+'T00:00:00'),tm=monOf(addD(new Date(),edtOff*7));
+  const dw=Math.round((tm-ad)/604800000),p=((dw%2)+2)%2;
+  return p===0?a.letter:(a.letter==='A'?'B':'A');
 }
 function renderEdt(){
   const grid=document.getElementById('edt-grid');
-  if(!planningState){grid.innerHTML='<div style="padding:8px;color:var(--chalk-dim);font-size:.72rem">Planning non chargé.</div>';return;}
-  const events=planningState.events||[],exceptions=planningState.exceptions||[];
-  const letter=edtLetter(),monday=mondayOf(addDays(new Date(),edtNavOffset*7));
-  const todayKey=dKey(new Date()),isCurrentWeek=edtNavOffset===0;
+  if(!planState){grid.innerHTML='<div style="padding:6px;color:var(--chalk-dim);font-size:.7rem">Non chargé.</div>';return;}
+  const evs=planState.events||[],exc=planState.exceptions||[],letter=edtLetter();
+  const monday=monOf(addD(new Date(),edtOff*7)),todayKey=dK(new Date()),isNow=edtOff===0;
   const nowMin=new Date().getHours()*60+new Date().getMinutes();
-  const nowMinExt=nowMin<(EDT_END-24)*60?nowMin+1440:nowMin;
+  const nowExt=nowMin<(EDT_END-24)*60?nowMin+1440:nowMin;
   const visH=(EDT_END-EDT_START)*ETYH;
-  document.getElementById('edt-week-lbl').textContent='Sem.'+letter+' '+fmtS(monday)+'-'+fmtS(addDays(monday,6));
-  let hdr='<div class="edt-header"><div class="edt-time-hdr"></div>';
-  for(let d=0;d<7;d++){const date=addDays(monday,d),key=dKey(date),isT=isCurrentWeek&&key===todayKey,isPast=isCurrentWeek&&key<todayKey;hdr+=`<div class="edt-day-hdr${isT?' today':''}${isPast?' edt-past':''}">${DN[d]}<br><span style="font-size:.55rem">${fmtS(date)}</span></div>`;}
+  document.getElementById('edt-lbl').textContent='S'+letter+' '+fmtS(monday)+'-'+fmtS(addD(monday,6));
+  let hdr='<div class="edt-hdr"><div class="edt-th"></div>';
+  for(let d=0;d<7;d++){const dt=addD(monday,d),k=dK(dt),isT=isNow&&k===todayKey,isPast=isNow&&k<todayKey;hdr+=`<div class="edt-dh${isT?' today':''}${isPast?' past':''}">${DN[d]}<br><span style="font-size:.5rem">${fmtS(dt)}</span></div>`;}
   hdr+='</div>';
-  let tc='<div class="edt-time-col" style="height:'+visH+'px">';
-  for(let h=EDT_START;h<EDT_END;h++){tc+=`<div class="edt-tlabel" style="top:${(h-EDT_START)*ETYH}px">${h%24}h</div>`;}
+  let tc='<div class="edt-tc" style="height:'+visH+'px">';
+  for(let h=EDT_START;h<EDT_END;h++)tc+=`<div class="edt-tl" style="top:${(h-EDT_START)*ETYH}px">${h%24}h</div>`;
   tc+='</div>';
   let dc='<div class="edt-days" style="height:'+visH+'px">';
   for(let d=0;d<7;d++){
-    const date=addDays(monday,d),key=dKey(date),isT=isCurrentWeek&&key===todayKey,isPast=isCurrentWeek&&key<todayKey;
-    let ch=`<div class="edt-day-col${isT?' today-col':''}${isPast?' edt-past-col':''}" style="height:${visH}px">`;
-    events.filter(e=>{
-      if(e.day!==d)return false;if(exceptions.includes(e.id+'@'+key))return false;
-      if(e.onlyDate)return e.onlyDate===key;if(!e.week||e.week==='')return true;return e.week===letter;
-    }).forEach(ev=>{
-      const s=tmToMin(ev.start),en=tmToMin(ev.end);
-      const sA=s<EDT_START*60?s+1440:s,enA=en<=sA?en+1440:en;
+    const dt=addD(monday,d),k=dK(dt),isT=isNow&&k===todayKey,isPast=isNow&&k<todayKey;
+    let ch=`<div class="edt-dc${isT?' today':''}${isPast?' past':''}" style="height:${visH}px">`;
+    evs.filter(e=>{if(e.day!==d)return false;if(exc.includes(e.id+'@'+k))return false;if(e.onlyDate)return e.onlyDate===k;if(!e.week||e.week==='')return true;return e.week===letter;}).forEach(ev=>{
+      const s=tmM(ev.start),en=tmM(ev.end),sA=s<EDT_START*60?s+1440:s,enA=en<=sA?en+1440:en;
       const top=(sA-EDT_START*60)*EDT_PPM,h2=Math.max(5,(enA-sA)*EDT_PPM);
       if(top<0||top>=visH)return;
-      const pastCls=(isT&&enA<=nowMinExt)||(isPast)?'opacity:.3;filter:grayscale(.6);':'';
-      ch+=`<div class="edt-event ev-${ev.type}" style="top:${top}px;height:${h2}px;${pastCls}${ev.color?'background:'+ev.color+'28;border-color:'+ev.color:''}">${esc(ev.title)}</div>`;
+      const past=(isT&&enA<=nowExt)||isPast?'opacity:.3;filter:grayscale(.6);':'';
+      ch+=`<div class="edt-ev ev-${ev.type}" style="top:${top}px;height:${h2}px;${past}${ev.color?'background:'+ev.color+'28;border-color:'+ev.color:''}">${esc(ev.title)}</div>`;
     });
-    if(isT){const tn=(nowMinExt-EDT_START*60)*EDT_PPM;if(tn>=0&&tn<visH)ch+=`<div class="edt-now-line" style="top:${tn}px"></div>`;}
+    if(isT){const tn=(nowExt-EDT_START*60)*EDT_PPM;if(tn>=0&&tn<visH)ch+=`<div class="edt-nl" style="top:${tn}px"></div>`;}
     ch+='</div>';dc+=ch;
   }
   dc+='</div>';
   grid.innerHTML=hdr+'<div style="display:flex">'+tc+dc+'</div>';
 }
-document.getElementById('edt-prev').addEventListener('click',()=>{edtNavOffset--;renderEdt();});
-document.getElementById('edt-next').addEventListener('click',()=>{edtNavOffset++;renderEdt();});
-document.getElementById('edt-today').addEventListener('click',()=>{edtNavOffset=0;renderEdt();});
+document.getElementById('edt-prev').addEventListener('click',()=>{edtOff--;renderEdt();});
+document.getElementById('edt-next').addEventListener('click',()=>{edtOff++;renderEdt();});
+document.getElementById('edt-today').addEventListener('click',()=>{edtOff=0;renderEdt();});
 
-// ─── SPORT ───
+/* ═══════════════════════════════════════════════
+   SPORT
+══════════════════════════════════════════════ */
 function isSportEv(ev){return SPORT_KW.includes((ev.title||'').toLowerCase().trim());}
-function dKey2(dateStr){return dateStr;}
-function computeSportSessions(){
-  if(!planningState)return[];
-  const events=(planningState.events||[]).filter(isSportEv);
-  const exceptions=planningState.exceptions||[];
+function computeSessions(){
+  if(!planState)return[];
+  const evs=(planState.events||[]).filter(isSportEv),exc=planState.exceptions||[];
   const today=new Date();today.setHours(23,59,59,999);
-  const anchor=planningState.weekAnchor||{monday:dKey(mondayOf(new Date())),letter:'A'};
-  const anchorDate=new Date(anchor.monday+'T00:00:00');
-  const startDate=new Date(SPORT_START_DATE+'T00:00:00');
+  const a=planState.weekAnchor||{monday:dK(monOf(new Date())),letter:'A'};
+  const ad=new Date(a.monday+'T00:00:00'),sd=new Date(SPORT_FROM+'T00:00:00');
   const sessions=[];
-  for(let w=-52;w<=0;w++){
-    const monday=mondayOf(addDays(anchorDate,w*7));
-    if(monday<startDate)continue;
-    const dw=Math.round((monday-anchorDate)/604800000);
-    const p=((dw%2)+2)%2;
-    const letter=p===0?anchor.letter:(anchor.letter==='A'?'B':'A');
+  for(let w=-60;w<=0;w++){
+    const mon=monOf(addD(ad,w*7));if(mon<sd)continue;
+    const dw=Math.round((mon-ad)/604800000),p=((dw%2)+2)%2;
+    const letter=p===0?a.letter:(a.letter==='A'?'B':'A');
     for(let d=0;d<7;d++){
-      const date=addDays(monday,d),key=dKey(date);
-      if(date>today)continue;
-      events.forEach(ev=>{
-        if(ev.day!==d)return;
-        if(ev.onlyDate&&ev.onlyDate!==key)return;
-        if(!ev.onlyDate&&ev.week&&ev.week!==letter)return;
-        if(exceptions.includes(ev.id+'@'+key))return;
-        const end2=new Date(date);const[eh,em]=ev.end.split(':').map(Number);end2.setHours(eh,em);
-        if(end2<=today)sessions.push({date:key});
+      const dt=addD(mon,d),k=dK(dt);if(dt>today)continue;
+      evs.forEach(ev=>{
+        if(ev.day!==d)return;if(ev.onlyDate&&ev.onlyDate!==k)return;if(!ev.onlyDate&&ev.week&&ev.week!==letter)return;if(exc.includes(ev.id+'@'+k))return;
+        const end2=new Date(dt);const[eh,em]=ev.end.split(':').map(Number);end2.setHours(eh,em);
+        if(end2<=today)sessions.push({date:k});
       });
     }
   }
-  const seen=new Set();
-  return sessions.filter(s=>{if(seen.has(s.date))return false;seen.add(s.date);return true;});
+  const seen=new Set();return sessions.filter(s=>{if(seen.has(s.date))return false;seen.add(s.date);return true;});
 }
-function getMondayStr(dateStr){return dKey(mondayOf(new Date(dateStr+'T12:00:00')));}
+function getMonStr(ds){return dK(monOf(new Date(ds+'T12:00:00')));}
 function renderSport(){
-  const sessions=computeSportSessions();
-  const now=new Date(),todayKey=dKey(now);
-  // weight
-  const weights=sportData.weights||[];
-  const goal=sportData.goal||SPORT_GOAL,startW=sportData.startWeight||SPORT_START;
-  if(weights.length>0){
-    const last=weights[weights.length-1];
-    const diff=(last.w-startW).toFixed(1);
-    document.getElementById('weight-last').innerHTML=`Dernier : <strong>${last.w} kg</strong> (${diff>0?'+'+diff:diff} kg)`;
-  }
+  const sessions=computeSessions(),now=new Date();
+  const sb=document.getElementById('sport-body');
+  const weights=sportData.weights||[],goal=sportData.goal||SPORT_GOAL,startW=sportData.startWeight||SPORT_START_W;
   const lastW=weights.length>0?weights[weights.length-1].w:startW;
   const pct=Math.max(0,Math.min(100,(startW-lastW)/(startW-goal)*100));
-  document.getElementById('w-goal-fill').style.width=pct+'%';
-  document.getElementById('w-start-lbl').textContent=startW+'kg';
-  document.getElementById('w-goal-lbl').textContent='→ '+goal+'kg';
-  // milestones
-  const ms=[],mEl=document.getElementById('w-milestones');
-  for(let m=Math.floor((startW-1)/SPORT_MILESTONE_STEP)*SPORT_MILESTONE_STEP;m>=goal;m-=SPORT_MILESTONE_STEP)ms.push(Math.round(m*10)/10);
-  mEl.innerHTML=ms.map(m=>{const done=lastW<=m;const isNext=!done&&ms.findIndex(x=>lastW>x)===ms.indexOf(m);return`<div class="milestone${done?' done':isNext?' next':''}">${m}${done?'✓':''}</div>`;}).join('');
-
-  // Group sessions by week and month
-  const weekMap={};
-  sessions.forEach(s=>{const mk=getMondayStr(s.date);if(!weekMap[mk])weekMap[mk]=[];weekMap[mk].push(s.date);});
-
-  // Build months since SPORT_START_DATE
-  const startMonth=new Date(SPORT_START_DATE+'T00:00:00');
-  startMonth.setDate(1);
-  const months=[];
-  const cur=new Date(startMonth);
-  while(cur<=now){months.push(new Date(cur));cur.setMonth(cur.getMonth()+1);}
-
-  // Current month + up to 4 weeks back
-  const MONTHS_FR=['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+  // weight row
   let html='';
-  months.slice(-2).forEach(monthDate=>{
-    const year=monthDate.getFullYear(),month=monthDate.getMonth();
-    const monthName=MONTHS_FR[month]+' '+year;
-    // get weeks that overlap this month
-    const firstDay=new Date(year,month,1);
-    const lastDay=new Date(year,month+1,0);
-    const weeksInMonth=[];
-    let wStart=mondayOf(firstDay);
-    while(wStart<=lastDay){
-      const wKey=dKey(wStart);
-      weeksInMonth.push({monday:new Date(wStart),key:wKey});
-      wStart=addDays(wStart,7);
+  html+=`<div class="sport-weight-row">`;
+  html+=`<div class="sport-w-lbl">${weights.length?`<strong>${lastW}kg</strong>`:'Aucune pesée'}</div>`;
+  html+=`<div class="weight-bar"><div class="weight-bar-fill" style="width:${pct}%"></div></div>`;
+  html+=`<div style="font-size:.65rem;color:var(--accent);white-space:nowrap;margin-left:5px;">${goal}kg</div></div>`;
+  // milestones
+  const ms=[];for(let m=Math.floor((startW-1)/SPORT_MS_STEP)*SPORT_MS_STEP;m>=goal;m-=SPORT_MS_STEP)ms.push(Math.round(m*10)/10);
+  html+=`<div class="milestone-row">`;
+  ms.forEach(m=>{const done=lastW<=m;const isNext=!done&&ms.findIndex(x=>lastW>x)===ms.indexOf(m);html+=`<div class="ms${done?' done':isNext?' next':''}">${m}${done?'✓':''}</div>`;});
+  html+='</div>';
+  // sessions by week grouped by month
+  const wkMap={};sessions.forEach(s=>{const mk=getMonStr(s.date);if(!wkMap[mk])wkMap[mk]=[];wkMap[mk].push(s.date);});
+  const sd=new Date(SPORT_FROM+'T00:00:00');sd.setDate(1);
+  const months=[];const cur2=new Date(sd);while(cur2<=now){months.push(new Date(cur2));cur2.setMonth(cur2.getMonth()+1);}
+  months.slice(-2).forEach(md=>{
+    const y=md.getFullYear(),mo=md.getMonth();
+    const first=new Date(y,mo,1),last=new Date(y,mo+1,0);
+    const monthTotal=sessions.filter(s=>s.date>=dK(first)&&s.date<=dK(last)).length;
+    html+=`<div class="sport-month"><div class="sport-month-hdr"><span class="sport-month-name">${MONTHS_FR[mo]} ${y}</span><span class="sport-month-count">${monthTotal} séance${monthTotal>1?'s':''}</span></div><div class="sport-weeks">`;
+    let wStart=monOf(first),wNum=1;
+    while(wStart<=last){
+      const mk=dK(wStart),done=(wkMap[mk]||[]).length,isFut=wStart>now;
+      const dots=[];for(let i=0;i<SPORT_TARGET;i++){const cls=isFut?'future':i<done?'done':'missed';dots.push(`<div class="sdot ${cls}">${cls==='done'?'✓':cls==='missed'?'✕':''}</div>`);}
+      html+=`<div class="sport-wrow"><span class="sport-wlbl">S${wNum}</span><div class="sport-dots">${dots.join('')}</div></div>`;
+      wStart=addD(wStart,7);wNum++;
     }
-    const monthTotal=sessions.filter(s=>s.date>=dKey(firstDay)&&s.date<=dKey(lastDay)).length;
-    html+=`<div class="sport-month-row"><span class="sport-month-name">${monthName}</span><span class="sport-month-count">${monthTotal} séance${monthTotal>1?'s':''}</span></div>`;
-    html+='<div class="sport-weeks">';
-    weeksInMonth.forEach(({monday,key})=>{
-      const done=(weekMap[key]||[]).length;
-      const isFuture=monday>now;
-      const wEnd=addDays(monday,6);
-      const lbl=fmtS(monday)+'-'+fmtS(wEnd);
-      const dots=[];
-      for(let i=0;i<SPORT_TARGET;i++){
-        const cls=isFuture?'future':i<done?'done':'missed';
-        dots.push(`<div class="sport-dot ${cls}">${cls==='done'?'✓':cls==='missed'?'✕':''}</div>`);
-      }
-      html+=`<div class="sport-week-row"><span class="sport-wk-lbl">${lbl}</span><div class="sport-dots">${dots.join('')}</div></div>`;
-    });
-    html+='</div>';
+    html+='</div></div>';
   });
-  document.getElementById('sport-months').innerHTML=html;
-
-  // Regularity stats
-  const thisMK=dKey(mondayOf(now));
-  const thisDone=Math.min(SPORT_TARGET,(weekMap[thisMK]||[]).length);
-  const rW=document.getElementById('sreg-week');
-  rW.textContent=thisDone+'/'+SPORT_TARGET;
-  rW.style.color=thisDone>=SPORT_TARGET?'var(--green)':thisDone>0?'var(--accent)':'var(--chalk)';
-  let t4=0;for(let w=-3;w<=0;w++){const mk=dKey(mondayOf(addDays(now,w*7)));t4+=Math.min(SPORT_TARGET,(weekMap[mk]||[]).length);}
-  const p4=Math.round(t4/(SPORT_TARGET*4)*100);
-  const rR=document.getElementById('sreg-reg');
-  rR.textContent=p4+'%';rR.style.color=p4>=80?'var(--green)':p4>=50?'var(--accent)':'var(--red)';
-  document.getElementById('sreg-total').textContent=sessions.length;
+  // stats
+  const thisMk=dK(monOf(now)),thisDone=Math.min(SPORT_TARGET,(wkMap[thisMk]||[]).length);
+  let t4=0;for(let w=-3;w<=0;w++){const mk=dK(monOf(addD(now,w*7)));t4+=Math.min(SPORT_TARGET,(wkMap[mk]||[]).length);}
+  const wc=thisDone>=SPORT_TARGET?'var(--green)':thisDone>0?'var(--accent)':'var(--chalk)';
+  html+=`<div class="sport-stats">`;
+  html+=`<div class="sstat"><div class="sstat-val" style="color:${wc}">${thisDone}/${SPORT_TARGET}</div><div class="sstat-lbl">Cette sem.</div></div>`;
+  html+=`<div class="sstat"><div class="sstat-val">${sessions.length}</div><div class="sstat-lbl">Total</div></div>`;
+  html+=`</div>`;
+  sb.innerHTML=html;
 }
-// pesée modal
-const weighOverlay=document.getElementById('weigh-overlay');
-document.getElementById('sport-weigh-btn').addEventListener('click',()=>{
-  document.getElementById('weigh-val').value='';
-  document.getElementById('weigh-date').value=dKey(new Date());
-  weighOverlay.classList.add('open');
-});
-document.getElementById('weigh-cancel').addEventListener('click',()=>weighOverlay.classList.remove('open'));
+const weighOv=document.getElementById('weigh-overlay');
+document.getElementById('weigh-open').addEventListener('click',()=>{document.getElementById('weigh-val').value='';document.getElementById('weigh-date').value=dK(new Date());weighOv.classList.add('open');});
+document.getElementById('weigh-cancel').addEventListener('click',()=>weighOv.classList.remove('open'));
 document.getElementById('weigh-save').addEventListener('click',()=>{
   const val=parseFloat(document.getElementById('weigh-val').value),date=document.getElementById('weigh-date').value;
   if(!val||isNaN(val)||!date){alert('Poids invalide.');return;}
-  if(!sportData.weights)sportData.weights=[];
   sportData.weights=sportData.weights.filter(w=>w.d!==date);
   sportData.weights.push({d:date,w:Math.round(val*10)/10});
   sportData.weights.sort((a,b)=>a.d.localeCompare(b.d));
   if(sportDoc)sportDoc.set(sportData).catch(()=>{});
-  weighOverlay.classList.remove('open');
-  renderSport();
+  weighOv.classList.remove('open');renderSport();
 });
 
-// ─── HELPERS ───
+/* ═══════════════════════════════════════════════
+   TASKS
+══════════════════════════════════════════════ */
+function saveTasks(){if(!tasksDoc)return;clearTimeout(tasksTimer);tasksTimer=setTimeout(()=>tasksDoc.set(tasksData).catch(()=>{}),600);}
+function switchTaskTab(tab){
+  taskTab=tab;
+  ['todo','done','cats'].forEach(t=>{document.getElementById('tab-'+t).classList.toggle('hidden',t!==tab);});
+  document.querySelectorAll('.task-tab').forEach((b,i)=>b.classList.toggle('active',['todo','done','cats'][i]===tab));
+  renderTasks();
+}
+function selectPrio(btn){taskPrio=btn.dataset.p;document.querySelectorAll('.prio-btn').forEach(b=>b.classList.toggle('active',b.dataset.p===taskPrio));}
+function renderTasks(){
+  renderCatFilter();renderCatSel();
+  if(taskTab==='todo') renderTodoList();
+  else if(taskTab==='done') renderDoneList();
+  else renderCatList();
+}
+function renderCatFilter(){
+  const c=document.getElementById('task-filter-cats');
+  c.innerHTML='<div class="cat-pill'+(taskFilter===''?' active':'')+'" onclick="setTaskFilter(\'\')">Tout</div>';
+  (tasksData.cats||[]).forEach(cat=>{c.innerHTML+=`<div class="cat-pill${taskFilter===cat?' active':''}" onclick="setTaskFilter('${esc(cat)}')">${esc(cat)}</div>`;});
+}
+function setTaskFilter(f){taskFilter=f;renderTasks();}
+function renderCatSel(){
+  const s=document.getElementById('task-cat-sel');
+  s.innerHTML='<option value="">Aucune catégorie</option>';
+  (tasksData.cats||[]).forEach(cat=>{s.innerHTML+=`<option value="${esc(cat)}">${esc(cat)}</option>`;});
+}
+function renderTodoList(){
+  const list=document.getElementById('task-list');
+  const tasks=(tasksData.tasks||[]).filter(t=>!t.done&&(taskFilter===''||t.cat===taskFilter));
+  const sorted=[...tasks].sort((a,b)=>{const po={'🔴':0,'🟡':1,'🟢':2};return(po[a.prio]||1)-(po[b.prio]||1);});
+  if(!sorted.length){list.innerHTML=`<div class="task-empty">Aucune tâche 🎉</div>`;return;}
+  list.innerHTML='';
+  sorted.forEach(task=>{
+    const el=document.createElement('div');el.className='task-item';el.dataset.id=task.id;
+    el.innerHTML=`<div class="task-check" onclick="toggleTask('${task.id}')"></div><div class="task-prio" onclick="cyclePrio('${task.id}')">${task.prio||'🟡'}</div><div class="task-text">${esc(task.text)}</div>${task.cat?`<div class="task-cat-badge">${esc(task.cat)}</div>`:''}<div class="task-del" onclick="deleteTask('${task.id}')">✕</div>`;
+    el.draggable=true;
+    el.addEventListener('dragstart',()=>el.classList.add('dragging'));
+    el.addEventListener('dragend',()=>el.classList.remove('dragging'));
+    el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('task-drag-over');});
+    el.addEventListener('dragleave',()=>el.classList.remove('task-drag-over'));
+    el.addEventListener('drop',e=>{
+      e.preventDefault();el.classList.remove('task-drag-over');
+      const srcId=document.querySelector('.task-item.dragging')?.dataset.id;
+      if(srcId&&srcId!==task.id){
+        const si=tasksData.tasks.findIndex(t=>t.id===srcId),di=tasksData.tasks.findIndex(t=>t.id===task.id);
+        if(si>-1&&di>-1){const mv=tasksData.tasks.splice(si,1)[0];tasksData.tasks.splice(di,0,mv);saveTasks();renderTasks();}
+      }
+    });
+    list.appendChild(el);
+  });
+}
+function renderDoneList(){
+  const list=document.getElementById('done-list');
+  const tasks=(tasksData.tasks||[]).filter(t=>t.done&&(taskFilter===''||t.cat===taskFilter));
+  if(!tasks.length){list.innerHTML=`<div class="task-empty">Aucune tâche effectuée.</div>`;return;}
+  list.innerHTML='';
+  tasks.forEach(task=>{
+    const el=document.createElement('div');el.className='task-item done-item';
+    el.innerHTML=`<div class="task-check checked" onclick="toggleTask('${task.id}')"></div><div class="task-prio">${task.prio||'🟡'}</div><div class="task-text striked">${esc(task.text)}</div>${task.cat?`<div class="task-cat-badge">${esc(task.cat)}</div>`:''}<div class="task-del" onclick="deleteTask('${task.id}')">✕</div>`;
+    list.appendChild(el);
+  });
+}
+function renderCatList(){
+  const list=document.getElementById('cat-list');const cats=tasksData.cats||[];
+  if(!cats.length){list.innerHTML=`<div class="task-empty">Aucune catégorie.</div>`;return;}
+  list.innerHTML='';
+  cats.forEach((cat,i)=>{
+    const el=document.createElement('div');el.className='task-item';
+    el.innerHTML=`<div class="task-text">${esc(cat)}</div><div class="task-del" onclick="deleteCat(${i})">✕</div>`;
+    list.appendChild(el);
+  });
+}
+function addTask(){
+  const inp=document.getElementById('task-input');const text=inp.value.trim();if(!text)return;
+  const cat=document.getElementById('task-cat-sel').value;
+  tasksData.tasks.push({id:'t'+Date.now(),text,prio:taskPrio,cat,done:false,createdAt:new Date().toISOString()});
+  inp.value='';saveTasks();renderTasks();
+}
+function toggleTask(id){
+  const t=tasksData.tasks.find(t=>t.id===id);if(!t)return;
+  t.done=!t.done;t.doneAt=t.done?new Date().toISOString():null;
+  saveTasks();renderTasks();
+}
+function deleteTask(id){tasksData.tasks=tasksData.tasks.filter(t=>t.id!==id);saveTasks();renderTasks();}
+function cyclePrio(id){const t=tasksData.tasks.find(t=>t.id===id);if(!t)return;const cycle={'🔴':'🟡','🟡':'🟢','🟢':'🔴'};t.prio=cycle[t.prio]||'🟡';saveTasks();renderTasks();}
+function addCat(){const inp=document.getElementById('cat-input');const v=inp.value.trim();if(!v)return;if(!tasksData.cats)tasksData.cats=[];if(!tasksData.cats.includes(v))tasksData.cats.push(v);inp.value='';saveTasks();renderTasks();}
+function deleteCat(i){tasksData.cats.splice(i,1);saveTasks();renderTasks();}
+document.getElementById('task-add-btn').addEventListener('click',addTask);
+document.getElementById('task-input').addEventListener('keydown',e=>{if(e.key==='Enter')addTask();});
+document.getElementById('cat-add-btn').addEventListener('click',addCat);
+document.getElementById('cat-input').addEventListener('keydown',e=>{if(e.key==='Enter')addCat();});
+
+/* ═══════════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════════ */
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 </script>
 </body>
