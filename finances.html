@@ -2731,19 +2731,25 @@ async function importBackup(input) {
   reader.onload = async ev => {
     try {
       const data = JSON.parse(ev.target.result);
-      if (!data.transactions) { showToast('Fichier invalide', 'error'); return; }
-      if (!confirm('Restaurer cette sauvegarde du ' + (data.exportedAt||'?').slice(0,10) + ' ? Les données actuelles seront remplacées.')) return;
-      await storageSave('fin_tx', data.transactions);
-      if (data.rules)   await storageSave('fin_rules', data.rules);
-      if (data.budgets) await storageSave('fin_budgets', data.budgets);
-      // Recharger le cache en mémoire depuis ce qu'on vient de sauver
+      // transactions peut être une string JSON ou un tableau directement
+      const txRaw  = typeof data.transactions === 'string' ? data.transactions : JSON.stringify(data.transactions || []);
+      const rulesRaw   = typeof data.rules   === 'string' ? data.rules   : JSON.stringify(data.rules   || {});
+      const budgetsRaw = typeof data.budgets === 'string' ? data.budgets : JSON.stringify(data.budgets || []);
+      // Valider qu'on a bien des transactions
+      const txArr = JSON.parse(txRaw);
+      if (!Array.isArray(txArr) || txArr.length === 0) { showToast('Aucune transaction trouvée dans ce fichier', 'error'); return; }
+      if (!confirm('Restaurer ' + txArr.length + ' transactions depuis la sauvegarde du ' + (data.exportedAt||'?').slice(0,10) + ' ?')) return;
+      await storageSave('fin_tx', txRaw);
+      await storageSave('fin_rules', rulesRaw);
+      await storageSave('fin_budgets', budgetsRaw);
+      // Recharger le cache en mémoire
       await loadAllData();
       refreshAllPeriodSelects();
       renderImportStats();
       showPage('monthly');
-      showToast('Sauvegarde restaurée ✓', 'success');
+      showToast(txArr.length + ' transactions restaurées ✓', 'success');
     } catch(e) {
-      showToast('Erreur lecture : ' + e.message, 'error');
+      showToast('Erreur : ' + e.message, 'error');
     }
   };
   reader.readAsText(file);
