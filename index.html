@@ -106,7 +106,8 @@ body.grid-edit .ghost-cell{display:block;}
 .wcell-resize{
   position:absolute;bottom:6px;right:6px;z-index:20;
   display:none;
-  flex-direction:column;gap:2px;cursor:se-resize;padding:4px;
+  flex-direction:column;gap:2px;cursor:pointer;padding:6px;
+  user-select:none;-webkit-user-select:none;
 }
 .wcell-resize span{display:flex;gap:2px;}
 .wcell-resize i{width:4px;height:4px;border-radius:50%;background:var(--accent);display:block;}
@@ -117,7 +118,7 @@ body.grid-edit .wcell-resize{display:flex;}
   display:none;
   background:rgba(242,193,78,.15);border:1px solid rgba(242,193,78,.4);
   border-radius:5px;padding:2px 5px;cursor:grab;font-size:.7rem;color:var(--accent);
-  white-space:nowrap;
+  white-space:nowrap;user-select:none;-webkit-user-select:none;
 }
 body.grid-edit .wcell-move{display:flex;align-items:center;gap:3px;}
 .wcell.being-moved{opacity:.4;}
@@ -723,43 +724,47 @@ document.getElementById('btn-grid-edit').addEventListener('click',()=>{
   document.body.classList.toggle('grid-edit',gridEditMode);
 });
 
-/* Wire resize buttons → open size modal */
-document.querySelectorAll('.wcell-resize').forEach(h=>{
-  h.addEventListener('click',()=>openSizeModal(h.dataset.id));
+/* Wire resize buttons → open size modal (use event delegation so inner i/span elements work too) */
+document.getElementById('widget-grid').addEventListener('click',e=>{
+  const handle = e.target.closest('.wcell-resize[data-id]');
+  if(!handle) return;
+  openSizeModal(handle.dataset.id);
 });
 
 /* Wire move buttons → drag-to-reorder */
-document.querySelectorAll('.wcell-move').forEach(handle=>{
-  handle.addEventListener('pointerdown',e=>{
-    if(!gridEditMode)return;
-    e.preventDefault();
-    const cell=handle.closest('.wcell');
-    movingWidget=cell;
-    cell.classList.add('being-moved');
-    // highlight valid drop zones (other wcells)
-    document.querySelectorAll('.wcell').forEach(c=>{if(c!==cell){c.classList.add('drop-target');}});
-  });
+document.getElementById('widget-grid').addEventListener('pointerdown',e=>{
+  const handle = e.target.closest('.wcell-move[data-id]');
+  if(!handle || !gridEditMode) return;
+  e.preventDefault();
+  const cell = handle.closest('.wcell');
+  if(!cell) return;
+  movingWidget = cell;
+  cell.classList.add('being-moved');
+  document.querySelectorAll('.wcell[id]').forEach(c=>{ if(c!==cell) c.classList.add('drop-target'); });
 });
+
 document.addEventListener('pointerup',e=>{
-  if(!movingWidget)return;
-  const target=document.elementFromPoint(e.clientX,e.clientY);
-  const dropCell=target?target.closest('.wcell[id]'):null;
-  if(dropCell&&dropCell!==movingWidget){
-    const grid=document.getElementById('widget-grid');
-    const cells=[...grid.querySelectorAll('.wcell[id]')];
-    const si=cells.indexOf(movingWidget),di=cells.indexOf(dropCell);
-    if(si>-1&&di>-1){
-      if(si<di) grid.insertBefore(movingWidget,dropCell.nextSibling);
-      else grid.insertBefore(movingWidget,dropCell);
-      // save order
-      const order=[...grid.querySelectorAll('.wcell[id]')].map(c=>c.id.replace('wc-',''));
-      wLayout._order=order;
+  if(!movingWidget) return;
+  // Hide moving widget so elementFromPoint finds the cell underneath
+  movingWidget.style.pointerEvents = 'none';
+  const target = document.elementFromPoint(e.clientX, e.clientY);
+  movingWidget.style.pointerEvents = '';
+  const dropCell = target ? target.closest('.wcell[id]') : null;
+  if(dropCell && dropCell !== movingWidget){
+    const grid = document.getElementById('widget-grid');
+    const cells = [...grid.querySelectorAll('.wcell[id]')];
+    const si = cells.indexOf(movingWidget), di = cells.indexOf(dropCell);
+    if(si>-1 && di>-1){
+      if(si<di) grid.insertBefore(movingWidget, dropCell.nextSibling);
+      else grid.insertBefore(movingWidget, dropCell);
+      const order = [...grid.querySelectorAll('.wcell[id]')].map(c=>c.id.replace('wc-',''));
+      wLayout._order = order;
       saveLayout();
     }
   }
   movingWidget.classList.remove('being-moved');
   document.querySelectorAll('.drop-target').forEach(c=>c.classList.remove('drop-target'));
-  movingWidget=null;
+  movingWidget = null;
 });
 
 /* ═══════════════════════════════════════════════
