@@ -82,12 +82,14 @@ body.grid-edit .grid-mode-hint{display:block;}
   grid-auto-rows:160px;
   gap:10px;
   position:relative;
+  z-index:1;
 }
 
-/* ── GHOST CELLS (background quadrillage) ── */
+/* ── GHOST CELLS BACKGROUND — absolutely positioned overlay ── */
 .grid-bg{
   display:none;
-  position:absolute;inset:0;
+  position:absolute;
+  top:0;left:0;right:0;bottom:0;
   grid-template-columns:repeat(4,1fr);
   grid-auto-rows:160px;
   gap:10px;
@@ -96,14 +98,14 @@ body.grid-edit .grid-mode-hint{display:block;}
 }
 body.grid-edit .grid-bg{display:grid;}
 .ghost-cell{
-  background:rgba(242,193,78,.03);
-  border:1px dashed rgba(242,193,78,.15);
+  background:rgba(242,193,78,.04);
+  border:1px dashed rgba(242,193,78,.2);
   border-radius:var(--radius);
   pointer-events:all;
   cursor:crosshair;
   transition:.12s;
 }
-.ghost-cell:hover{background:rgba(242,193,78,.08);border-color:rgba(242,193,78,.4);}
+.ghost-cell:hover{background:rgba(242,193,78,.1);border-color:rgba(242,193,78,.5);}
 .ghost-cell.active-drop{background:rgba(242,193,78,.18);border-color:var(--accent);}
 
 /* ── WIDGET CELLS (explicit grid-column/row set by JS) ── */
@@ -355,8 +357,9 @@ body.grid-edit .wcell-move{display:flex;align-items:center;gap:3px;}
 
   <div class="col-grid">
     <div class="grid-mode-hint">Clique sur ↔ pour déplacer un widget · Clique sur ⊞ pour changer sa taille</div>
-    <div class="widget-grid" id="widget-grid">
+    <div style="position:relative;">
       <div class="grid-bg" id="grid-bg"></div>
+      <div class="widget-grid" id="widget-grid">
 
       <!-- QCM -->
       <div class="wcell" id="wc-qcm">
@@ -450,7 +453,7 @@ body.grid-edit .wcell-move{display:flex;align-items:center;gap:3px;}
       </div>
 
       <!-- EDT -->
-      <div class="wcell" id="wc-edt" style="--w:2;--h:3;">
+      <div class="wcell" id="wc-edt">
         <div class="wcell-move" data-id="edt">✥ Déplacer</div>
         <div class="wcell-resize" data-id="edt">⊞ Taille</div>
         <div class="widget">
@@ -468,7 +471,7 @@ body.grid-edit .wcell-move{display:flex;align-items:center;gap:3px;}
       </div>
 
       <!-- SPORT -->
-      <div class="wcell" id="wc-sport" style="--w:2;--h:2;">
+      <div class="wcell" id="wc-sport">
         <div class="wcell-move" data-id="sport">✥ Déplacer</div>
         <div class="wcell-resize" data-id="sport">⊞ Taille</div>
         <div class="widget">
@@ -478,7 +481,7 @@ body.grid-edit .wcell-move{display:flex;align-items:center;gap:3px;}
       </div>
 
       <!-- TASKS -->
-      <div class="wcell" id="wc-tasks" style="--w:2;--h:2;">
+      <div class="wcell" id="wc-tasks">
         <div class="wcell-move" data-id="tasks">✥ Déplacer</div>
         <div class="wcell-resize" data-id="tasks">⊞ Taille</div>
         <div class="widget">
@@ -520,9 +523,10 @@ body.grid-edit .wcell-move{display:flex;align-items:center;gap:3px;}
         </div>
       </div>
 
-    </div>
-  </div>
-</div>
+    </div><!-- end widget-grid -->
+    </div><!-- end position:relative wrapper -->
+  </div><!-- end col-grid -->
+</div><!-- end page-layout -->
 
 <!-- MODALS -->
 <div class="overlay" id="mod-overlay">
@@ -631,7 +635,13 @@ const DEFAULT_MODS=[
   {id:'m2',icon:'📖',name:'Arabe Médine',desc:'Leçons & examens.',url:'arabe.html'},
   {id:'m4',icon:'✈️',name:'PPL Aviation',desc:'Bientôt.',url:'',disabled:true},
 ];
-// DEFAULT_LAYOUT defined in grid section below
+// DEFAULT_LAYOUT — must be declared before Firebase auth callback
+const DEFAULT_LAYOUT = {
+  qcm:   {col:1,row:1,w:2,h:3},
+  edt:   {col:3,row:1,w:2,h:3},
+  sport: {col:1,row:4,w:2,h:2},
+  tasks: {col:3,row:4,w:2,h:2},
+};
 
 let mods=null, editModMode=false, editModId=null, dragModIdx=null;
 let hubDoc=null, modTimer=null;
@@ -639,7 +649,7 @@ let qcmProg={green:{},blue:{},red:{}}, qcmDoc=null, qcmTimer=null;
 let planState=null, planDoc=null;
 let sportData={weights:[],goal:SPORT_GOAL,startWeight:SPORT_START_W}, sportDoc=null;
 let tasksData={tasks:[],cats:[]}, tasksDoc=null, tasksTimer=null;
-let wLayout=null, layoutDoc=null, layoutTimer=null;
+let wLayout=JSON.parse(JSON.stringify(DEFAULT_LAYOUT)), layoutDoc=null, layoutTimer=null;
 let edtOff=0;
 let qCnt=15, qMode='all', qDir='ar2fr', qQueue=[], qIdx=0, qScore=0, qMissed=[], qBlue=[], qStr=0, qMaxStr=0, curQ=null;
 let taskTab='todo', taskFilter='', taskPrio='🔴';
@@ -714,14 +724,7 @@ function clearAE(){document.getElementById('auth-error').style.display='none';}
    GRID LAYOUT — explicit placement
 ══════════════════════════════════════════════ */
 const GRID_COLS = 4;
-const GRID_ROWS = 6; // number of background rows to show
-// Default layout: each widget has col, row, w (width cols), h (height rows)
-const DEFAULT_LAYOUT = {
-  qcm:   {col:1,row:1,w:2,h:3},
-  edt:   {col:3,row:1,w:2,h:3},
-  sport: {col:1,row:4,w:2,h:2},
-  tasks: {col:3,row:4,w:2,h:2},
-};
+const GRID_ROWS = 6;
 
 function applyLayout(){
   Object.entries(wLayout).forEach(([id,p])=>{
@@ -739,7 +742,14 @@ function applyLayout(){
 function rebuildGhostCells(rows){
   const bg = document.getElementById('grid-bg');
   bg.innerHTML = '';
-  for(let r=1; r<=rows+2; r++){  // +2 extra rows so you can always place lower
+  const totalRows = rows + 2; // extra rows so you can always place lower
+  // sync grid height so overlay matches exactly
+  const cellH = 160, gap = 10;
+  const totalH = totalRows * cellH + (totalRows - 1) * gap;
+  bg.style.height = totalH + 'px';
+  bg.style.gridTemplateRows = 'repeat('+totalRows+','+cellH+'px)';
+  document.getElementById('widget-grid').style.minHeight = totalH + 'px';
+  for(let r=1; r<=totalRows; r++){
     for(let c=1; c<=GRID_COLS; c++){
       const g = document.createElement('div');
       g.className = 'ghost-cell';
