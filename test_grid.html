@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+:root{--accent:#f2c14e;}
+body{background:#16261e;color:#f1efe4;font-family:sans-serif;padding:20px;}
+.btn{background:#274a37;border:1px solid rgba(238,241,234,.2);color:#f1efe4;padding:6px 12px;border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer;}
+.btn.active{background:var(--accent);color:#21321f;}
+.widget-grid{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:160px;gap:10px;margin-top:16px;}
+.wcell{position:relative;z-index:1;}
+.wcell.selected-widget{outline:3px solid var(--accent);outline-offset:2px;}
+.widget{background:#1f3a2c;border:1px solid rgba(238,241,234,.18);border-radius:12px;display:flex;flex-direction:column;height:100%;overflow:hidden;}
+.widget-hdr{padding:10px 12px;border-bottom:1px solid rgba(238,241,234,.09);display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.widget-hdr h2{font-size:.88rem;flex:1;margin:0;}
+.wcell-move,.wcell-resize{display:none;background:rgba(242,193,78,.15);border:1px solid rgba(242,193,78,.4);border-radius:5px;padding:3px 7px;cursor:pointer;font-size:.72rem;color:var(--accent);font-weight:700;font-family:inherit;user-select:none;}
+body.grid-edit .wcell-move, body.grid-edit .wcell-resize{display:inline-flex;align-items:center;}
+.ghost-cell{background:transparent;border:1px dashed transparent;border-radius:12px;pointer-events:none;}
+body.grid-edit .ghost-cell{background:rgba(242,193,78,.04);border-color:rgba(242,193,78,.2);}
+.ghost-cell.active-drop{background:rgba(242,193,78,.18)!important;border-color:var(--accent)!important;pointer-events:all!important;cursor:crosshair;}
+#log{margin-top:16px;background:#0f1117;padding:12px;border-radius:8px;font-size:.78rem;font-family:monospace;min-height:80px;}
+</style>
+</head>
+<body>
+<button class="btn" id="btn-edit">✏️ Disposition</button>
+<div class="widget-grid" id="wg">
+  <div class="wcell" id="wc-a" style="grid-column:1/span 2;grid-row:1/span 2;z-index:1;">
+    <div class="widget">
+      <div class="widget-hdr">
+        <span>🧠</span><h2>Widget A</h2>
+        <button class="wcell-move btn" data-id="a">✥</button>
+        <button class="wcell-resize btn" data-id="a">⊞</button>
+      </div>
+      <div style="padding:10px;font-size:.8rem;">Contenu A<br><button class="btn" onclick="alert('inner btn A')">bouton interne</button></div>
+    </div>
+  </div>
+  <div class="wcell" id="wc-b" style="grid-column:3/span 2;grid-row:1/span 2;z-index:1;">
+    <div class="widget">
+      <div class="widget-hdr">
+        <span>📋</span><h2>Widget B</h2>
+        <button class="wcell-move btn" data-id="b">✥</button>
+        <button class="wcell-resize btn" data-id="b">⊞</button>
+      </div>
+      <div style="padding:10px;font-size:.8rem;">Contenu B</div>
+    </div>
+  </div>
+</div>
+<div id="log">Log : en attente...</div>
+
+<script>
+let gridEditMode = false, selectedWidget = null;
+const LAYOUT = {a:{col:1,row:1,w:2,h:2}, b:{col:3,row:1,w:2,h:2}};
+const log = t => { document.getElementById('log').textContent = t; console.log(t); };
+
+function attachGridHandles(){
+  document.querySelectorAll('.wcell-move[data-id]').forEach(btn=>{
+    btn.onclick = e=>{
+      e.stopPropagation();
+      log('✥ clicked: '+btn.dataset.id+' gridEditMode='+gridEditMode);
+      if(!gridEditMode) return;
+      if(selectedWidget===btn.dataset.id) deselectWidget();
+      else selectWidget(btn.dataset.id);
+    };
+  });
+  document.querySelectorAll('.wcell-resize[data-id]').forEach(btn=>{
+    btn.onclick = e=>{
+      e.stopPropagation();
+      log('⊞ clicked: '+btn.dataset.id);
+      if(!gridEditMode) return;
+      alert('Taille: '+btn.dataset.id);
+    };
+  });
+  log('attachGridHandles done — found '+document.querySelectorAll('.wcell-move[data-id]').length+' move buttons');
+}
+
+function selectWidget(id){
+  deselectWidget();
+  selectedWidget = id;
+  document.getElementById('wc-'+id).classList.add('selected-widget');
+  document.querySelectorAll('.ghost-cell').forEach(g=>g.classList.add('active-drop'));
+  log('Selected: '+id);
+}
+function deselectWidget(){
+  selectedWidget = null;
+  document.querySelectorAll('.wcell').forEach(c=>c.classList.remove('selected-widget'));
+  document.querySelectorAll('.ghost-cell').forEach(g=>g.classList.remove('active-drop'));
+}
+function rebuildGhosts(){
+  document.querySelectorAll('#wg .ghost-cell').forEach(g=>g.remove());
+  const grid = document.getElementById('wg');
+  grid.style.gridTemplateRows = 'repeat(4,160px)';
+  for(let r=1;r<=4;r++) for(let c=1;c<=4;c++){
+    const g=document.createElement('div');
+    g.className='ghost-cell';
+    g.style.gridColumn=c; g.style.gridRow=r;
+    g.dataset.col=c; g.dataset.row=r;
+    g.onclick=()=>{ if(!selectedWidget)return; LAYOUT[selectedWidget].col=c; LAYOUT[selectedWidget].row=r; applyLayout(); deselectWidget(); log('Moved '+selectedWidget+' to col='+c+' row='+r); };
+    grid.appendChild(g);
+  }
+}
+function applyLayout(){
+  Object.entries(LAYOUT).forEach(([id,p])=>{
+    const cell=document.getElementById('wc-'+id);
+    if(cell){cell.style.gridColumn=p.col+'/span '+p.w; cell.style.gridRow=p.row+'/span '+p.h;}
+  });
+  rebuildGhosts();
+  attachGridHandles();
+}
+
+document.getElementById('btn-edit').onclick=()=>{
+  gridEditMode=!gridEditMode;
+  document.getElementById('btn-edit').classList.toggle('active',gridEditMode);
+  document.body.classList.toggle('grid-edit',gridEditMode);
+  if(!gridEditMode) deselectWidget();
+  log('Edit mode: '+gridEditMode);
+};
+
+applyLayout();
+</script>
+</body>
+</html>
