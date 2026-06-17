@@ -75,53 +75,68 @@ button,input,select,textarea{font-family:inherit;}
 .grid-mode-hint{font-size:.72rem;color:var(--chalk-dim);margin-bottom:6px;display:none;}
 body.grid-edit .grid-mode-hint{display:block;}
 
+/* ── EXPLICIT GRID (4 cols × auto rows, 160px rows) ── */
 .widget-grid{
   display:grid;
   grid-template-columns:repeat(4,1fr);
-  grid-auto-rows:var(--cell);
-  gap:var(--gap);
-  min-height:calc(var(--cell)*2 + var(--gap));
+  grid-auto-rows:160px;
+  gap:10px;
   position:relative;
 }
 
-/* ── GHOST CELLS ── */
+/* ── GHOST CELLS (background quadrillage) ── */
+.grid-bg{
+  display:none;
+  position:absolute;inset:0;
+  grid-template-columns:repeat(4,1fr);
+  grid-auto-rows:160px;
+  gap:10px;
+  pointer-events:none;
+  z-index:0;
+}
+body.grid-edit .grid-bg{display:grid;}
 .ghost-cell{
-  background:rgba(242,193,78,.04);border:1px dashed rgba(242,193,78,.2);
-  border-radius:var(--radius);cursor:pointer;transition:.15s;
-  display:none;
+  background:rgba(242,193,78,.03);
+  border:1px dashed rgba(242,193,78,.15);
+  border-radius:var(--radius);
+  pointer-events:all;
+  cursor:crosshair;
+  transition:.12s;
 }
-body.grid-edit .ghost-cell{display:block;}
-.ghost-cell:hover{background:rgba(242,193,78,.1);border-color:rgba(242,193,78,.5);}
-.ghost-cell.drop-target{background:rgba(242,193,78,.18);border-color:var(--accent);}
+.ghost-cell:hover{background:rgba(242,193,78,.08);border-color:rgba(242,193,78,.4);}
+.ghost-cell.active-drop{background:rgba(242,193,78,.18);border-color:var(--accent);}
 
-/* ── WIDGET CELLS ── */
+/* ── WIDGET CELLS (explicit grid-column/row set by JS) ── */
 .wcell{
-  grid-column:span var(--w,2);
-  grid-row:span var(--h,2);
   position:relative;
-  min-width:0;
-  min-height:0;
+  min-width:0;min-height:0;
+  z-index:1;
 }
-/* resize handle — corner dots */
+.wcell.selected-widget{
+  outline:2px solid var(--accent);
+  outline-offset:2px;
+}
+
+/* resize button */
 .wcell-resize{
-  position:absolute;bottom:6px;right:6px;z-index:20;
-  display:none;
-  flex-direction:column;gap:2px;cursor:pointer;padding:6px;
-  user-select:none;-webkit-user-select:none;
+  position:absolute;bottom:5px;right:5px;z-index:20;display:none;
+  background:rgba(242,193,78,.2);border:1px solid rgba(242,193,78,.5);
+  border-radius:5px;padding:3px 6px;font-size:.68rem;color:var(--accent);
+  cursor:pointer;user-select:none;-webkit-user-select:none;white-space:nowrap;
 }
-.wcell-resize span{display:flex;gap:2px;}
-.wcell-resize i{width:4px;height:4px;border-radius:50%;background:var(--accent);display:block;}
-body.grid-edit .wcell-resize{display:flex;}
-/* move handle */
+body.grid-edit .wcell-resize{display:flex;align-items:center;gap:3px;}
+.wcell-resize:hover{background:rgba(242,193,78,.35);}
+
+/* select-to-move button */
 .wcell-move{
-  position:absolute;top:6px;right:6px;z-index:20;
-  display:none;
+  position:absolute;top:5px;right:5px;z-index:20;display:none;
   background:rgba(242,193,78,.15);border:1px solid rgba(242,193,78,.4);
-  border-radius:5px;padding:2px 5px;cursor:grab;font-size:.7rem;color:var(--accent);
+  border-radius:5px;padding:2px 6px;cursor:pointer;font-size:.68rem;color:var(--accent);
   white-space:nowrap;user-select:none;-webkit-user-select:none;
 }
 body.grid-edit .wcell-move{display:flex;align-items:center;gap:3px;}
-.wcell.being-moved{opacity:.4;}
+.wcell-move:hover{background:rgba(242,193,78,.3);}
+.wcell.selected-widget .wcell-move{background:var(--accent);color:#21321f;}
 
 /* ── WIDGET ── */
 .widget{
@@ -341,13 +356,12 @@ body.grid-edit .wcell-move{display:flex;align-items:center;gap:3px;}
   <div class="col-grid">
     <div class="grid-mode-hint">Clique sur ↔ pour déplacer un widget · Clique sur ⊞ pour changer sa taille</div>
     <div class="widget-grid" id="widget-grid">
+      <div class="grid-bg" id="grid-bg"></div>
 
       <!-- QCM -->
-      <div class="wcell" id="wc-qcm" style="--w:2;--h:3;">
-        <div class="wcell-move" data-id="qcm">↔ Déplacer</div>
-        <div class="wcell-resize" data-id="qcm" title="Changer la taille">
-          <span><i></i><i></i></span><span><i></i><i></i></span>
-        </div>
+      <div class="wcell" id="wc-qcm">
+        <div class="wcell-move" data-id="qcm">✥ Déplacer</div>
+        <div class="wcell-resize" data-id="qcm">⊞ Taille</div>
         <div class="widget">
           <div class="widget-hdr"><span>🧠</span><h2>QCM Arabe</h2><span id="qcm-sync" style="font-size:.8rem;opacity:.4;margin-left:auto;">☁️</span></div>
           <div class="widget-body">
@@ -437,8 +451,8 @@ body.grid-edit .wcell-move{display:flex;align-items:center;gap:3px;}
 
       <!-- EDT -->
       <div class="wcell" id="wc-edt" style="--w:2;--h:3;">
-        <div class="wcell-move" data-id="edt">↔ Déplacer</div>
-        <div class="wcell-resize" data-id="edt" title="Changer la taille"><span><i></i><i></i></span><span><i></i><i></i></span></div>
+        <div class="wcell-move" data-id="edt">✥ Déplacer</div>
+        <div class="wcell-resize" data-id="edt">⊞ Taille</div>
         <div class="widget">
           <div class="widget-hdr">
             <span>📋</span><h2>EDT</h2>
@@ -455,8 +469,8 @@ body.grid-edit .wcell-move{display:flex;align-items:center;gap:3px;}
 
       <!-- SPORT -->
       <div class="wcell" id="wc-sport" style="--w:2;--h:2;">
-        <div class="wcell-move" data-id="sport">↔ Déplacer</div>
-        <div class="wcell-resize" data-id="sport" title="Changer la taille"><span><i></i><i></i></span><span><i></i><i></i></span></div>
+        <div class="wcell-move" data-id="sport">✥ Déplacer</div>
+        <div class="wcell-resize" data-id="sport">⊞ Taille</div>
         <div class="widget">
           <div class="widget-hdr"><span>💪</span><h2>Sport</h2><button class="btn sm" id="weigh-open" style="margin-left:auto;">⚖️ Peser</button></div>
           <div class="widget-body" id="sport-body"></div>
@@ -465,8 +479,8 @@ body.grid-edit .wcell-move{display:flex;align-items:center;gap:3px;}
 
       <!-- TASKS -->
       <div class="wcell" id="wc-tasks" style="--w:2;--h:2;">
-        <div class="wcell-move" data-id="tasks">↔ Déplacer</div>
-        <div class="wcell-resize" data-id="tasks" title="Changer la taille"><span><i></i><i></i></span><span><i></i><i></i></span></div>
+        <div class="wcell-move" data-id="tasks">✥ Déplacer</div>
+        <div class="wcell-resize" data-id="tasks">⊞ Taille</div>
         <div class="widget">
           <div class="widget-hdr"><span>✅</span><h2>Tâches</h2></div>
           <div class="widget-body">
@@ -617,7 +631,7 @@ const DEFAULT_MODS=[
   {id:'m2',icon:'📖',name:'Arabe Médine',desc:'Leçons & examens.',url:'arabe.html'},
   {id:'m4',icon:'✈️',name:'PPL Aviation',desc:'Bientôt.',url:'',disabled:true},
 ];
-const DEFAULT_LAYOUT={qcm:{w:2,h:3},edt:{w:2,h:3},sport:{w:2,h:2},tasks:{w:2,h:2}};
+// DEFAULT_LAYOUT defined in grid section below
 
 let mods=null, editModMode=false, editModId=null, dragModIdx=null;
 let hubDoc=null, modTimer=null;
@@ -625,8 +639,7 @@ let qcmProg={green:{},blue:{},red:{}}, qcmDoc=null, qcmTimer=null;
 let planState=null, planDoc=null;
 let sportData={weights:[],goal:SPORT_GOAL,startWeight:SPORT_START_W}, sportDoc=null;
 let tasksData={tasks:[],cats:[]}, tasksDoc=null, tasksTimer=null;
-let wLayout=JSON.parse(JSON.stringify(DEFAULT_LAYOUT)), layoutDoc=null, layoutTimer=null;
-let gridEditMode=false, movingWidget=null;
+let wLayout=null, layoutDoc=null, layoutTimer=null;
 let edtOff=0;
 let qCnt=15, qMode='all', qDir='ar2fr', qQueue=[], qIdx=0, qScore=0, qMissed=[], qBlue=[], qStr=0, qMaxStr=0, curQ=null;
 let taskTab='todo', taskFilter='', taskPrio='🔴';
@@ -654,7 +667,12 @@ auth.onAuthStateChanged(async user=>{
     if(p.exists) planState=p.data();
     if(s.exists) sportData=Object.assign({weights:[],goal:SPORT_GOAL,startWeight:SPORT_START_W},s.data());
     if(t.exists) tasksData=Object.assign({tasks:[],cats:[]},t.data());
-    if(l.exists) wLayout=Object.assign(JSON.parse(JSON.stringify(DEFAULT_LAYOUT)),l.data());
+    if(l.exists){
+      // Merge saved layout with defaults so new widgets always have a position
+      wLayout = Object.assign(JSON.parse(JSON.stringify(DEFAULT_LAYOUT)), l.data());
+    } else {
+      wLayout = JSON.parse(JSON.stringify(DEFAULT_LAYOUT));
+    }
     if(!h.exists) hubDoc.set({modules:mods}).catch(()=>{});
     // prune done tasks older than 7 days
     const now7=new Date(); now7.setDate(now7.getDate()-7);
@@ -693,79 +711,132 @@ function showAE(m){const e=document.getElementById('auth-error');e.textContent=m
 function clearAE(){document.getElementById('auth-error').style.display='none';}
 
 /* ═══════════════════════════════════════════════
-   GRID LAYOUT
+   GRID LAYOUT — explicit placement
 ══════════════════════════════════════════════ */
+const GRID_COLS = 4;
+const GRID_ROWS = 6; // number of background rows to show
+// Default layout: each widget has col, row, w (width cols), h (height rows)
+const DEFAULT_LAYOUT = {
+  qcm:   {col:1,row:1,w:2,h:3},
+  edt:   {col:3,row:1,w:2,h:3},
+  sport: {col:1,row:4,w:2,h:2},
+  tasks: {col:3,row:4,w:2,h:2},
+};
+
 function applyLayout(){
-  Object.entries(wLayout).forEach(([id,{w,h}])=>{
-    const cell=document.getElementById('wc-'+id);
-    if(cell){cell.style.setProperty('--w',w);cell.style.setProperty('--h',h);}
+  Object.entries(wLayout).forEach(([id,p])=>{
+    const cell = document.getElementById('wc-'+id);
+    if(!cell) return;
+    cell.style.gridColumn = p.col+' / span '+p.w;
+    cell.style.gridRow    = p.row+' / span '+p.h;
   });
+  // ensure grid has enough rows
+  const maxRow = Math.max(...Object.values(wLayout).map(p=>p.row+p.h-1), GRID_ROWS);
+  document.getElementById('widget-grid').style.gridTemplateRows = 'repeat('+maxRow+',160px)';
+  document.getElementById('grid-bg').style.gridTemplateRows    = 'repeat('+maxRow+',160px)';
+  rebuildGhostCells(maxRow);
 }
-function saveLayout(){if(!layoutDoc)return;clearTimeout(layoutTimer);layoutTimer=setTimeout(()=>layoutDoc.set(wLayout).catch(()=>{}),600);}
-
-/* Size modal */
-let sizingId=null;
-const sizeOverlay=document.getElementById('size-overlay');
-function openSizeModal(id){
-  sizingId=id;
-  const {w,h}=wLayout[id]||{w:2,h:2};
-  document.querySelectorAll('#size-w-pills .pill').forEach(b=>b.classList.toggle('active',Number(b.textContent)===w));
-  document.querySelectorAll('#size-h-pills .pill').forEach((b,i)=>b.classList.toggle('active',i+1===h));
-  sizeOverlay.classList.add('open');
-}
-function setSizeW(w){if(!sizingId)return;wLayout[sizingId].w=w;applyLayout();saveLayout();document.querySelectorAll('#size-w-pills .pill').forEach(b=>b.classList.toggle('active',Number(b.textContent)===w));}
-function setSizeH(h){if(!sizingId)return;wLayout[sizingId].h=h;applyLayout();saveLayout();document.querySelectorAll('#size-h-pills .pill').forEach((b,i)=>b.classList.toggle('active',i+1===h));}
-document.getElementById('size-done').addEventListener('click',()=>sizeOverlay.classList.remove('open'));
-
-/* Grid edit mode */
-document.getElementById('btn-grid-edit').addEventListener('click',()=>{
-  gridEditMode=!gridEditMode;
-  document.getElementById('btn-grid-edit').classList.toggle('active',gridEditMode);
-  document.body.classList.toggle('grid-edit',gridEditMode);
-});
-
-/* Wire resize buttons → open size modal (use event delegation so inner i/span elements work too) */
-document.getElementById('widget-grid').addEventListener('click',e=>{
-  const handle = e.target.closest('.wcell-resize[data-id]');
-  if(!handle) return;
-  openSizeModal(handle.dataset.id);
-});
-
-/* Wire move buttons → drag-to-reorder */
-document.getElementById('widget-grid').addEventListener('pointerdown',e=>{
-  const handle = e.target.closest('.wcell-move[data-id]');
-  if(!handle || !gridEditMode) return;
-  e.preventDefault();
-  const cell = handle.closest('.wcell');
-  if(!cell) return;
-  movingWidget = cell;
-  cell.classList.add('being-moved');
-  document.querySelectorAll('.wcell[id]').forEach(c=>{ if(c!==cell) c.classList.add('drop-target'); });
-});
-
-document.addEventListener('pointerup',e=>{
-  if(!movingWidget) return;
-  // Hide moving widget so elementFromPoint finds the cell underneath
-  movingWidget.style.pointerEvents = 'none';
-  const target = document.elementFromPoint(e.clientX, e.clientY);
-  movingWidget.style.pointerEvents = '';
-  const dropCell = target ? target.closest('.wcell[id]') : null;
-  if(dropCell && dropCell !== movingWidget){
-    const grid = document.getElementById('widget-grid');
-    const cells = [...grid.querySelectorAll('.wcell[id]')];
-    const si = cells.indexOf(movingWidget), di = cells.indexOf(dropCell);
-    if(si>-1 && di>-1){
-      if(si<di) grid.insertBefore(movingWidget, dropCell.nextSibling);
-      else grid.insertBefore(movingWidget, dropCell);
-      const order = [...grid.querySelectorAll('.wcell[id]')].map(c=>c.id.replace('wc-',''));
-      wLayout._order = order;
-      saveLayout();
+function rebuildGhostCells(rows){
+  const bg = document.getElementById('grid-bg');
+  bg.innerHTML = '';
+  for(let r=1; r<=rows+2; r++){  // +2 extra rows so you can always place lower
+    for(let c=1; c<=GRID_COLS; c++){
+      const g = document.createElement('div');
+      g.className = 'ghost-cell';
+      g.dataset.col = c;
+      g.dataset.row = r;
+      g.style.gridColumn = c;
+      g.style.gridRow = r;
+      g.addEventListener('click', ()=>onGhostClick(c, r));
+      bg.appendChild(g);
     }
   }
-  movingWidget.classList.remove('being-moved');
-  document.querySelectorAll('.drop-target').forEach(c=>c.classList.remove('drop-target'));
-  movingWidget = null;
+}
+function saveLayout(){
+  if(!layoutDoc) return;
+  clearTimeout(layoutTimer);
+  layoutTimer = setTimeout(()=>layoutDoc.set(wLayout).catch(()=>{}), 600);
+}
+
+/* Grid edit mode */
+let gridEditMode = false, selectedWidget = null, sizingId = null;
+const sizeOverlay = document.getElementById('size-overlay');
+
+document.getElementById('btn-grid-edit').addEventListener('click',()=>{
+  gridEditMode = !gridEditMode;
+  document.getElementById('btn-grid-edit').classList.toggle('active', gridEditMode);
+  document.body.classList.toggle('grid-edit', gridEditMode);
+  if(!gridEditMode){ deselectWidget(); }
 });
+
+function selectWidget(id){
+  deselectWidget();
+  selectedWidget = id;
+  document.querySelectorAll('.wcell').forEach(c=>c.classList.remove('selected-widget'));
+  const cell = document.getElementById('wc-'+id);
+  if(cell) cell.classList.add('selected-widget');
+  // highlight valid ghost cells
+  document.querySelectorAll('.ghost-cell').forEach(g=>g.classList.add('active-drop'));
+}
+function deselectWidget(){
+  selectedWidget = null;
+  document.querySelectorAll('.wcell').forEach(c=>c.classList.remove('selected-widget'));
+  document.querySelectorAll('.ghost-cell').forEach(g=>g.classList.remove('active-drop'));
+}
+
+// Click on ghost cell → place selected widget there
+function onGhostClick(col, row){
+  if(!selectedWidget) return;
+  wLayout[selectedWidget].col = col;
+  wLayout[selectedWidget].row = row;
+  applyLayout();
+  saveLayout();
+  deselectWidget();
+}
+
+// Wire move buttons (select widget)
+document.getElementById('widget-grid').addEventListener('click',e=>{
+  const move = e.target.closest('.wcell-move[data-id]');
+  if(move && gridEditMode){
+    e.stopPropagation();
+    if(selectedWidget === move.dataset.id){ deselectWidget(); }
+    else { selectWidget(move.dataset.id); }
+    return;
+  }
+  const resize = e.target.closest('.wcell-resize[data-id]');
+  if(resize && gridEditMode){
+    e.stopPropagation();
+    openSizeModal(resize.dataset.id);
+  }
+});
+// Click outside deselects
+document.addEventListener('click',e=>{
+  if(selectedWidget && !e.target.closest('.wcell') && !e.target.closest('.ghost-cell')){
+    deselectWidget();
+  }
+});
+
+/* Size modal */
+function openSizeModal(id){
+  sizingId = id;
+  const p = wLayout[id] || {w:2, h:2};
+  document.querySelectorAll('#size-w-pills .pill').forEach(b=>b.classList.toggle('active', Number(b.textContent)===p.w));
+  document.querySelectorAll('#size-h-pills .pill').forEach((b,i)=>b.classList.toggle('active', i+1===p.h));
+  sizeOverlay.classList.add('open');
+}
+function setSizeW(w){
+  if(!sizingId) return;
+  wLayout[sizingId].w = w;
+  applyLayout(); saveLayout();
+  document.querySelectorAll('#size-w-pills .pill').forEach(b=>b.classList.toggle('active', Number(b.textContent)===w));
+}
+function setSizeH(h){
+  if(!sizingId) return;
+  wLayout[sizingId].h = h;
+  applyLayout(); saveLayout();
+  document.querySelectorAll('#size-h-pills .pill').forEach((b,i)=>b.classList.toggle('active', i+1===h));
+}
+document.getElementById('size-done').addEventListener('click',()=>sizeOverlay.classList.remove('open'));
 
 /* ═══════════════════════════════════════════════
    MODULES (col left)
