@@ -2679,12 +2679,13 @@ function copyBackup() {
 }
 function exportBackup() {
   try {
+    // Lire depuis le cache mémoire (source de vérité, chargé depuis window.storage)
     const data = {
       version: 1,
       exportedAt: new Date().toISOString(),
-      transactions: localStorage.getItem('fin_tx') || '[]',
-      rules: localStorage.getItem('fin_rules') || '{}',
-      budgets: localStorage.getItem('fin_budgets') || '[]',
+      transactions: JSON.stringify(getAllTx()),
+      rules: JSON.stringify(getUserRules()),
+      budgets: JSON.stringify(getBudgets()),
     };
     const json = JSON.stringify(data, null, 2);
     const filename = 'finances-backup-' + new Date().toISOString().slice(0,10) + '.json';
@@ -2758,10 +2759,15 @@ async function importBackup(input) {
 
 
 
-function clearAllData() {
+async function clearAllData() {
   if (!confirm('Effacer toutes les transactions ? Cette action est irréversible.')) return;
-  localStorage.removeItem('fin_tx');
-  showToast('Données effacées', 'success');
+  _cache.tx = []; _cache.rules = {}; _cache.budgets = [];
+  await Promise.all([
+    storageSave('fin_tx', '[]'),
+    storageSave('fin_rules', '{}'),
+    storageSave('fin_budgets', '[]'),
+  ]);
+  showToast('Données effacées ✓', 'success');
   refreshAllPeriodSelects();
   renderImportStats();
   showPage('import');
