@@ -839,13 +839,15 @@ function openSizeModal(id){
   sizeOverlay.classList.add('open');
 }
 function setSizeW(w){
-  if(!sizingId) return;
+  if(!sizingId){ alert('ERREUR: sizingId est null'); return; }
+  if(!wLayout[sizingId]){ alert('ERREUR: wLayout['+sizingId+'] introuvable. wLayout keys='+Object.keys(wLayout).join(',')); return; }
   wLayout[sizingId].w = w;
   applyLayout(); saveLayout();
   document.querySelectorAll('#size-w-pills .pill').forEach(b=>b.classList.toggle('active', Number(b.textContent)===w));
 }
 function setSizeH(h){
-  if(!sizingId) return;
+  if(!sizingId){ alert('ERREUR: sizingId est null'); return; }
+  if(!wLayout[sizingId]){ alert('ERREUR: wLayout['+sizingId+'] introuvable'); return; }
   wLayout[sizingId].h = h;
   applyLayout(); saveLayout();
   document.querySelectorAll('#size-h-pills .pill').forEach((b,i)=>b.classList.toggle('active', i+1===h));
