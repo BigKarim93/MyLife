@@ -96,8 +96,11 @@ body.grid-edit .grid-mode-hint{display:block;}
 body.grid-edit .ghost-cell{
   background:rgba(242,193,78,.04);
   border-color:rgba(242,193,78,.2);
-  pointer-events:all;
+  pointer-events:none; /* only enabled when a widget is selected */
   cursor:crosshair;
+}
+body.grid-edit .ghost-cell.active-drop{
+  pointer-events:all;
 }
 body.grid-edit .ghost-cell:hover{background:rgba(242,193,78,.1);border-color:rgba(242,193,78,.5);}
 .ghost-cell.active-drop{background:rgba(242,193,78,.18) !important;border-color:var(--accent) !important;}
@@ -354,7 +357,7 @@ body.grid-edit .wcell-move{display:flex;align-items:center;gap:3px;}
     <div class="widget-grid" id="widget-grid">
 
       <!-- QCM -->
-      <div class="wcell" id="wc-qcm">
+      <div class="wcell" id="wc-qcm" style="grid-column:1/span 2;grid-row:1/span 3;z-index:1;">
         <div class="wcell-move" data-id="qcm">✥ Déplacer</div>
         <div class="wcell-resize" data-id="qcm">⊞ Taille</div>
         <div class="widget">
@@ -445,7 +448,7 @@ body.grid-edit .wcell-move{display:flex;align-items:center;gap:3px;}
       </div>
 
       <!-- EDT -->
-      <div class="wcell" id="wc-edt">
+      <div class="wcell" id="wc-edt" style="grid-column:3/span 2;grid-row:1/span 3;z-index:1;">
         <div class="wcell-move" data-id="edt">✥ Déplacer</div>
         <div class="wcell-resize" data-id="edt">⊞ Taille</div>
         <div class="widget">
@@ -463,7 +466,7 @@ body.grid-edit .wcell-move{display:flex;align-items:center;gap:3px;}
       </div>
 
       <!-- SPORT -->
-      <div class="wcell" id="wc-sport">
+      <div class="wcell" id="wc-sport" style="grid-column:1/span 2;grid-row:4/span 2;z-index:1;">
         <div class="wcell-move" data-id="sport">✥ Déplacer</div>
         <div class="wcell-resize" data-id="sport">⊞ Taille</div>
         <div class="widget">
@@ -473,7 +476,7 @@ body.grid-edit .wcell-move{display:flex;align-items:center;gap:3px;}
       </div>
 
       <!-- TASKS -->
-      <div class="wcell" id="wc-tasks">
+      <div class="wcell" id="wc-tasks" style="grid-column:3/span 2;grid-row:4/span 2;z-index:1;">
         <div class="wcell-move" data-id="tasks">✥ Déplacer</div>
         <div class="wcell-resize" data-id="tasks">⊞ Taille</div>
         <div class="widget">
@@ -683,6 +686,7 @@ auth.onAuthStateChanged(async user=>{
   document.getElementById('auth-wrap').classList.add('hidden');
   document.getElementById('page-layout').classList.remove('hidden');
   applyLayout();
+  attachGridHandlesLate();
   renderMods();
   updateQcmStats(); updateQcmInfo();
   renderEdt();
@@ -794,20 +798,30 @@ function onGhostClick(col, row){
 }
 
 // Wire move buttons (select widget)
-document.getElementById('widget-grid').addEventListener('click',e=>{
-  const move = e.target.closest('.wcell-move[data-id]');
-  if(move && gridEditMode){
-    e.stopPropagation();
-    if(selectedWidget === move.dataset.id){ deselectWidget(); }
-    else { selectWidget(move.dataset.id); }
-    return;
-  }
-  const resize = e.target.closest('.wcell-resize[data-id]');
-  if(resize && gridEditMode){
-    e.stopPropagation();
-    openSizeModal(resize.dataset.id);
-  }
-});
+// Attach move/resize handlers directly on each handle (delegation was blocked by widget buttons)
+function attachGridHandles(){
+  document.querySelectorAll('.wcell-move[data-id]').forEach(handle=>{
+    handle.addEventListener('click', e=>{
+      e.stopPropagation();
+      if(!gridEditMode) return;
+      const id = handle.dataset.id;
+      if(selectedWidget === id) deselectWidget();
+      else selectWidget(id);
+    });
+  });
+  document.querySelectorAll('.wcell-resize[data-id]').forEach(handle=>{
+    handle.addEventListener('click', e=>{
+      e.stopPropagation();
+      if(!gridEditMode) return;
+      openSizeModal(handle.dataset.id);
+    });
+  });
+}
+// Called after page renders
+document.addEventListener('DOMContentLoaded', attachGridHandles);
+// Also called after Firebase loads (in case DOM wasn't ready)
+function attachGridHandlesLate(){ attachGridHandles(); }
+
 // Click outside deselects
 document.addEventListener('click',e=>{
   if(selectedWidget && !e.target.closest('.wcell') && !e.target.closest('.ghost-cell')){
