@@ -287,20 +287,7 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
       <div class="wgrid" id="wgrid">
 
         <!-- SPORT -->
-        <div class="wcell" id="wc-sport" style="grid-column:1/span 2;grid-row:1/span 3;">
-          <div class="widget">
-            <div class="whdr">
-              <span>💪</span><h2>Sport</h2>
-              <button class="wh-move" id="wmv-sport">✥</button>
-              <button class="wh-size" id="wsz-sport">⊞</button>
-            </div>
-            <div class="wbody" id="spbody">
-              <div style="margin-bottom:8px;"><button class="btn sm" id="wbtn-weigh">⚖️ Peser</button></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="wcell" id="wc-tasks" style="grid-column:3/span 2;grid-row:1/span 3;">
+        <div class="wcell" id="wc-tasks" style="grid-column:1/span 2;grid-row:1/span 3;">
           <div class="widget">
             <div class="whdr">
               <span>✅</span><h2>Tâches</h2>
@@ -333,6 +320,88 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
               <div id="tab-cats" class="hi">
                 <div class="tadd"><input type="text" id="catinp" placeholder="Nouvelle catégorie…" maxlength="30"><button class="btn prim" id="catadd">+</button></div>
                 <div class="tlist" id="tclist"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+        <div class="wcell" id="wc-tasks2" style="grid-column:1/span 2;grid-row:4/span 3;">
+          <div class="widget">
+            <div class="whdr">
+              <span>✅</span><h2>Tâches 2</h2>
+              <button class="wh-move" id="wmv-tasks2">✥</button>
+              <button class="wh-size" id="wsz-tasks2">⊞</button>
+            </div>
+            <div class="wbody">
+              <div class="ttabs">
+                <button class="ttab on" id="ttab2-todo">À faire</button>
+                <button class="ttab" id="ttab2-done">Effectuées</button>
+                <button class="ttab" id="ttab2-cats">Catégories</button>
+              </div>
+              <div id="tab2-todo">
+                <div class="tadd"><input type="text" id="tinp2" placeholder="Nouvelle tâche…" maxlength="80"><button class="btn prim" id="tadd2-btn">+</button></div>
+                <div class="topt">
+                  <div class="tpsel">
+                    <button class="tpbtn on" data-p="🔴">🔴</button>
+                    <button class="tpbtn" data-p="🟡">🟡</button>
+                    <button class="tpbtn" data-p="🟢">🟢</button>
+                  </div>
+                  <select class="tcat-sel" id="tcatsel2"><option value="">Aucune catégorie</option></select>
+                </div>
+                <div class="tcats" id="tcatfilt2"></div>
+                <div class="tlist" id="tlist2"></div>
+              </div>
+              <div id="tab2-done" class="hi">
+                <div style="font-size:.68rem;color:var(--dim);margin-bottom:6px;">Supprimées après 7 jours.</div>
+                <div class="tlist" id="tdlist2"></div>
+              </div>
+              <div id="tab2-cats" class="hi">
+                <div class="tadd"><input type="text" id="catinp2" placeholder="Nouvelle catégorie…" maxlength="30"><button class="btn prim" id="catadd2">+</button></div>
+                <div class="tlist" id="tclist2"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+        <div class="wcell" id="wc-tasks3" style="grid-column:3/span 2;grid-row:4/span 3;">
+          <div class="widget">
+            <div class="whdr">
+              <span>✅</span><h2>Tâches 3</h2>
+              <button class="wh-move" id="wmv-tasks3">✥</button>
+              <button class="wh-size" id="wsz-tasks3">⊞</button>
+            </div>
+            <div class="wbody">
+              <div class="ttabs">
+                <button class="ttab on" id="ttab3-todo">À faire</button>
+                <button class="ttab" id="ttab3-done">Effectuées</button>
+                <button class="ttab" id="ttab3-cats">Catégories</button>
+              </div>
+              <div id="tab3-todo">
+                <div class="tadd"><input type="text" id="tinp3" placeholder="Nouvelle tâche…" maxlength="80"><button class="btn prim" id="tadd3-btn">+</button></div>
+                <div class="topt">
+                  <div class="tpsel">
+                    <button class="tpbtn on" data-p="🔴">🔴</button>
+                    <button class="tpbtn" data-p="🟡">🟡</button>
+                    <button class="tpbtn" data-p="🟢">🟢</button>
+                  </div>
+                  <select class="tcat-sel" id="tcatsel3"><option value="">Aucune catégorie</option></select>
+                </div>
+                <div class="tcats" id="tcatfilt3"></div>
+                <div class="tlist" id="tlist3"></div>
+              </div>
+              <div id="tab3-done" class="hi">
+                <div style="font-size:.68rem;color:var(--dim);margin-bottom:6px;">Supprimées après 7 jours.</div>
+                <div class="tlist" id="tdlist3"></div>
+              </div>
+              <div id="tab3-cats" class="hi">
+                <div class="tadd"><input type="text" id="catinp3" placeholder="Nouvelle catégorie…" maxlength="30"><button class="btn prim" id="catadd3">+</button></div>
+                <div class="tlist" id="tclist3"></div>
               </div>
             </div>
           </div>
@@ -423,7 +492,7 @@ const VOCAB =
 const SPORT_KW=['musculation','musculations','muscul','sport','muscu'];
 const SPORT_GOAL=83,SPORT_START_W=97.2,SPORT_TARGET=3,SPORT_MS=2,SPORT_FROM='2026-06-01';
 const MFR=['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
-const DEFAULT_LAYOUT={sport:{c:1,r:1,w:2,h:3},tasks:{c:3,r:1,w:2,h:3}};
+const DEFAULT_LAYOUT={tasks:{c:1,r:1,w:2,h:3},tasks2:{c:3,r:1,w:2,h:3},tasks3:{c:1,r:4,w:2,h:3}};
 const EMOJI_CATS={
   'Études':['📋','📖','📚','📝','✏️','📊','🧠','💡','🔬','🎓','💻'],
   'Sport':['💪','🏋️','⚽','🏀','🎾','🏊','🚴','🤸','🧘','🏃','⚖️'],
@@ -518,6 +587,8 @@ auth.onAuthStateChanged(async user=>{
   renderMods();
   renderSport();
   renderTasks();
+  initTasksWidget(2);
+  initTasksWidget(3);
   // Wire grid handles NOW — after DOM is visible
   wireHandles();
 });
@@ -533,7 +604,7 @@ function clearAE(){$('aerr').style.display='none';}
 
 /* ── GRID LAYOUT ── (same mechanism as grid_test.html) ── */
 function applyLayout(){
-  ['sport','tasks'].forEach(id=>{
+  ['tasks','tasks2','tasks3'].forEach(id=>{
     const p=wLayout[id];
     const cell=$('wc-'+id);
     if(!cell||!p) return;
@@ -587,7 +658,7 @@ $('btn-gedit').addEventListener('click',()=>{
 });
 
 function wireHandles(){
-  ['sport','tasks'].forEach(id=>{
+  ['tasks','tasks2','tasks3'].forEach(id=>{
     const mv=$('wmv-'+id), sz=$('wsz-'+id);
     if(!mv||!sz) return;
     mv.onclick=e=>{
@@ -837,6 +908,66 @@ $('tdlist').addEventListener('click',e=>{
 $('tclist').addEventListener('click',e=>{const dc=e.target.closest('[data-dcat]');if(dc){tData.cats.splice(Number(dc.dataset.dcat),1);saveTasks();renderTasks();}});
 $('tcatfilt').addEventListener('click',e=>{const p=e.target.closest('[data-f]');if(!p)return;tFilt=p.dataset.f;renderTasks();});
 $('topt').addEventListener('click',e=>{const b=e.target.closest('.tpbtn[data-p]');if(!b)return;tPrio=b.dataset.p;document.querySelectorAll('.tpbtn').forEach(x=>x.classList.toggle('on',x.dataset.p===tPrio));});
+
+/* ── TASKS 2 & 3 (duplicate listeners) ── */
+function initTasksWidget(n){
+  const sfx = n===1?'':''+n;
+  const tab = (t)=>$('ttab'+sfx+'-'+t);
+  const inp = ()=>$('tinp'+sfx);
+  const addBtn = ()=>$('tadd'+sfx+'-btn');
+  const catInp = ()=>$('catinp'+sfx);
+  const catAdd = ()=>$('catadd'+sfx);
+  const list = ()=>$('tlist'+sfx);
+  const dlist = ()=>$('tdlist'+sfx);
+  const clist = ()=>$('tclist'+sfx);
+  const filt = ()=>$('tcatfilt'+sfx);
+  const catsel = ()=>$('tcatsel'+sfx);
+  
+  if(!tab('todo')) return; // widget not present
+  
+  let curTab='todo', curFilt='', curPrio='🔴';
+  
+  function switchT(t){
+    curTab=t;
+    ['todo','done','cats'].forEach(x=>$('tab'+sfx+'-'+x).classList.toggle('hi',x!==t));
+    ['todo','done','cats'].forEach(x=>tab(x)&&tab(x).classList.toggle('on',x===t));
+  }
+  ['todo','done','cats'].forEach(t=>{const b=tab(t);if(b)b.addEventListener('click',()=>switchT(t));});
+  
+  function addT(){const v=inp().value.trim();if(!v)return;tData.tasks.push({id:'t'+Date.now()+n,text:v,prio:curPrio,cat:catsel().value,done:false,createdAt:new Date().toISOString()});inp().value='';saveTasks();renderAll();}
+  if(addBtn()) addBtn().addEventListener('click',addT);
+  if(inp()) inp().addEventListener('keydown',e=>{if(e.key==='Enter')addT();});
+  if(catAdd()) catAdd().addEventListener('click',()=>{const v=catInp().value.trim();if(!v)return;if(!tData.cats.includes(v)){tData.cats.push(v);catInp().value='';saveTasks();renderAll();}});
+  if(catInp()) catInp().addEventListener('keydown',e=>{if(e.key==='Enter')catAdd().click();});
+  
+  function renderAll(){
+    // catfilt
+    filt().innerHTML=`<div class="tcpill${curFilt===''?' on':''}" data-f="">Tout</div>`+(tData.cats||[]).map(c=>`<div class="tcpill${curFilt===c?' on':''}" data-f="${esc(c)}">${esc(c)}</div>`).join('');
+    catsel().innerHTML='<option value="">Aucune catégorie</option>'+(tData.cats||[]).map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');
+    // todo
+    const tasks=(tData.tasks||[]).filter(t=>!t.done&&(curFilt===''||t.cat===curFilt));
+    const sorted=[...tasks].sort((a,b)=>({'🔴':0,'🟡':1,'🟢':2}[a.prio]||1)-({'🔴':0,'🟡':1,'🟢':2}[b.prio]||1));
+    list().innerHTML=!sorted.length?'<div class="empty">Aucune tâche 🎉</div>':sorted.map(t=>`<div class="titem" data-id="${t.id}"><div class="tck${t.done?' on':''}" data-ck="${t.id}"></div><div class="tpr" data-cp="${t.id}">${t.prio||'🟡'}</div><div class="ttxt">${esc(t.text)}</div>${t.cat?`<div class="tbadge">${esc(t.cat)}</div>`:''}<div class="tdl" data-dl="${t.id}">✕</div></div>`).join('');
+    const done=(tData.tasks||[]).filter(t=>t.done);
+    dlist().innerHTML=!done.length?'<div class="empty">Aucune effectuée.</div>':done.map(t=>`<div class="titem done-item"><div class="tck on" data-ck="${t.id}"></div><div class="tpr">${t.prio||'🟡'}</div><div class="ttxt sk">${esc(t.text)}</div>${t.cat?`<div class="tbadge">${esc(t.cat)}</div>`:''}<div class="tdl" data-dl="${t.id}">✕</div></div>`).join('');
+    const cats=tData.cats||[];
+    clist().innerHTML=!cats.length?'<div class="empty">Aucune catégorie.</div>':cats.map((c,i)=>`<div class="titem"><div class="ttxt">${esc(c)}</div><div class="tdl" data-dcat="${i}">✕</div></div>`).join('');
+  }
+  
+  list().addEventListener('click',e=>{
+    const ck=e.target.closest('[data-ck]');if(ck){const t=tData.tasks.find(x=>x.id===ck.dataset.ck);if(t){t.done=!t.done;t.doneAt=t.done?new Date().toISOString():null;saveTasks();renderAll();}return;}
+    const cp=e.target.closest('[data-cp]');if(cp){const t=tData.tasks.find(x=>x.id===cp.dataset.cp);if(t){const cy={'🔴':'🟡','🟡':'🟢','🟢':'🔴'};t.prio=cy[t.prio]||'🟡';saveTasks();renderAll();}return;}
+    const dl=e.target.closest('[data-dl]');if(dl){tData.tasks=tData.tasks.filter(x=>x.id!==dl.dataset.dl);saveTasks();renderAll();}
+  });
+  dlist().addEventListener('click',e=>{
+    const ck=e.target.closest('[data-ck]');if(ck){const t=tData.tasks.find(x=>x.id===ck.dataset.ck);if(t){t.done=false;t.doneAt=null;saveTasks();renderAll();}return;}
+    const dl=e.target.closest('[data-dl]');if(dl){tData.tasks=tData.tasks.filter(x=>x.id!==dl.dataset.dl);saveTasks();renderAll();}
+  });
+  clist().addEventListener('click',e=>{const dc=e.target.closest('[data-dcat]');if(dc){tData.cats.splice(Number(dc.dataset.dcat),1);saveTasks();renderAll();}});
+  filt().addEventListener('click',e=>{const p=e.target.closest('[data-f]');if(!p)return;curFilt=p.dataset.f;renderAll();});
+  $('topt') && document.querySelectorAll('.tpbtn[data-p]').forEach(b=>b.addEventListener('click',()=>{curPrio=b.dataset.p;}));
+  renderAll();
+}
 
 /* ── THEMES ── */
 function applyTheme(id){
