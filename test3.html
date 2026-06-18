@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Test 3 widgets</title>
+<style>
+:root{--bg:#16261e;--bg2:#1f3a2c;--bg3:#274a37;--line:rgba(238,241,234,.09);--line2:rgba(238,241,234,.18);--chalk:#f1efe4;--dim:#aebcb1;--accent:#f2c14e;--green:#4ade80;--gl:rgba(74,222,128,.13);--red:#f87171;--r:12px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Work Sans',sans-serif;background:var(--bg);color:var(--chalk);padding:12px;}
+h1{font-family:Georgia,serif;color:var(--accent);margin-bottom:12px;font-size:1.2rem;}
+#status{background:var(--bg2);border:1px solid var(--line2);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:.82rem;min-height:32px;}
+.btn{background:var(--bg3);border:1px solid var(--line);color:var(--chalk);padding:6px 12px;border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:5px;}
+.btn:hover{border-color:var(--accent);}
+.btn.prim{background:var(--accent);color:#21321f;border-color:var(--accent);}
+.btn.sm{padding:4px 8px;font-size:.72rem;}
+.btn.act{background:var(--accent);color:#21321f;}
+
+/* GRID — exact copy from grid_test.html */
+.grid-wrap{position:relative;margin-top:12px;}
+.ghost-layer{display:none;position:absolute;top:0;left:0;right:0;bottom:0;grid-template-columns:repeat(4,1fr);grid-auto-rows:200px;gap:10px;z-index:100;pointer-events:none;}
+.ghost-layer.active{display:grid;pointer-events:all;}
+.gcell{border-radius:var(--r);border:2px solid rgba(242,193,78,.5);background:rgba(242,193,78,.15);cursor:crosshair;transition:.1s;}
+.gcell:hover{background:rgba(242,193,78,.45);border-color:var(--accent);}
+.wgrid{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:200px;gap:10px;}
+.wcell{position:relative;z-index:1;}
+.wcell.picked{outline:3px solid var(--accent);outline-offset:3px;z-index:2;}
+.wh-move,.wh-size{display:none;background:rgba(242,193,78,.2);border:1px solid rgba(242,193,78,.5);border-radius:5px;padding:3px 7px;cursor:pointer;font-size:.7rem;color:var(--accent);font-weight:700;user-select:none;}
+body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;}
+
+/* WIDGET */
+.widget{background:var(--bg2);border:1px solid var(--line2);border-radius:var(--r);display:flex;flex-direction:column;height:100%;overflow:hidden;}
+.whdr{padding:9px 12px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:7px;flex-shrink:0;}
+.whdr h2{font-size:.88rem;flex:1;font-family:Georgia,serif;}
+.wbody{padding:10px 12px;overflow-y:auto;flex:1;}
+
+/* TASKS content */
+.tadd{display:flex;gap:6px;margin-bottom:7px;}
+.tadd input{flex:1;background:var(--bg);border:1px solid var(--line);color:var(--chalk);border-radius:6px;padding:6px 9px;font-size:.8rem;}
+.tlist{display:flex;flex-direction:column;gap:4px;max-height:120px;overflow-y:auto;}
+.titem{display:flex;align-items:center;gap:7px;padding:6px 9px;background:var(--bg3);border:1px solid var(--line);border-radius:7px;}
+.tck{width:16px;height:16px;border-radius:4px;border:2px solid var(--line);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:transparent;}
+.tck.on{background:var(--green);border-color:var(--green);}
+.tck.on::after{content:'✓';font-size:.65rem;color:#0f1117;font-weight:700;}
+.ttxt{flex:1;font-size:.78rem;}
+.tdl{font-size:.68rem;color:var(--dim);cursor:pointer;opacity:0;padding:2px 4px;border-radius:4px;border:1px solid transparent;}
+.titem:hover .tdl{opacity:1;}
+.tdl:hover{border-color:var(--red);color:var(--red);}
+.empty{text-align:center;padding:12px;color:var(--dim);font-size:.78rem;}
+
+/* SIZE MODAL */
+.ov{position:fixed;inset:0;background:rgba(10,16,12,.7);display:none;align-items:center;justify-content:center;z-index:300;padding:14px;}
+.ov.op{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--line2);border-radius:var(--r);padding:18px;width:100%;max-width:300px;}
+.modal h3{color:var(--accent);margin-bottom:10px;}
+.modal-act{display:flex;justify-content:flex-end;margin-top:10px;}
+.pills{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;}
+.pill{background:var(--bg3);border:1px solid var(--line);color:var(--dim);border-radius:6px;padding:4px 10px;font-size:.75rem;font-weight:700;cursor:pointer;transition:.15s;}
+.pill.on{background:var(--accent);color:#21321f;border-color:var(--accent);}
+.clbl{font-size:.7rem;color:var(--dim);margin-bottom:4px;font-weight:600;}
+</style>
+</head>
+<body>
+<h1>Test — 3 widgets Tâches</h1>
+<div id="status">Clique sur ✏️ Disposition pour activer le mode, puis ✥ pour déplacer, ⊞ pour redimensionner.</div>
+<button class="btn" id="btn-edit">✏️ Disposition</button>
+
+<div class="grid-wrap">
+  <div class="ghost-layer" id="ghost-layer"></div>
+  <div class="wgrid" id="wgrid">
+
+    <div class="wcell" id="wc-t1" style="grid-column:1/span 2;grid-row:1/span 2;">
+      <div class="widget">
+        <div class="whdr">
+          <span>✅</span><h2>Tâches 1</h2>
+          <button class="wh-move" id="wmv-t1">✥</button>
+          <button class="wh-size" id="wsz-t1">⊞</button>
+        </div>
+        <div class="wbody">
+          <div class="tadd"><input type="text" id="inp-t1" placeholder="Ajouter…"><button class="btn prim" id="add-t1">+</button></div>
+          <div class="tlist" id="list-t1"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wcell" id="wc-t2" style="grid-column:3/span 2;grid-row:1/span 2;">
+      <div class="widget">
+        <div class="whdr">
+          <span>✅</span><h2>Tâches 2</h2>
+          <button class="wh-move" id="wmv-t2">✥</button>
+          <button class="wh-size" id="wsz-t2">⊞</button>
+        </div>
+        <div class="wbody">
+          <div class="tadd"><input type="text" id="inp-t2" placeholder="Ajouter…"><button class="btn prim" id="add-t2">+</button></div>
+          <div class="tlist" id="list-t2"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wcell" id="wc-t3" style="grid-column:1/span 2;grid-row:3/span 2;">
+      <div class="widget">
+        <div class="whdr">
+          <span>✅</span><h2>Tâches 3</h2>
+          <button class="wh-move" id="wmv-t3">✥</button>
+          <button class="wh-size" id="wsz-t3">⊞</button>
+        </div>
+        <div class="wbody">
+          <div class="tadd"><input type="text" id="inp-t3" placeholder="Ajouter…"><button class="btn prim" id="add-t3">+</button></div>
+          <div class="tlist" id="list-t3"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- SIZE MODAL -->
+<div class="ov" id="ov-size">
+  <div class="modal">
+    <h3>⊞ Taille</h3>
+    <div class="clbl">Largeur</div>
+    <div class="pills" id="sw"><button class="pill" data-w="1">1</button><button class="pill" data-w="2">2</button><button class="pill" data-w="3">3</button><button class="pill" data-w="4">4</button></div>
+    <div class="clbl">Hauteur</div>
+    <div class="pills" id="sh"><button class="pill" data-h="1">Petite</button><button class="pill" data-h="2">Moyenne</button><button class="pill" data-h="3">Grande</button></div>
+    <div class="modal-act"><button class="btn prim" id="szdone">Fermer</button></div>
+  </div>
+</div>
+
+<script>
+const log = m => document.getElementById('status').textContent = m;
+const $ = id => document.getElementById(id);
+
+const WIDGETS = ['t1','t2','t3'];
+const layout = {t1:{c:1,r:1,w:2,h:2}, t2:{c:3,r:1,w:2,h:2}, t3:{c:1,r:3,w:2,h:2}};
+const tasks = {t1:[], t2:[], t3:[]};
+let gedit = false, selW = null, sizingId = null;
+
+/* ── TASKS ── */
+WIDGETS.forEach(id => {
+  $('add-'+id).onclick = () => {
+    const inp = $('inp-'+id);
+    const text = inp.value.trim();
+    if(!text) return;
+    tasks[id].push({id:'i'+Date.now(), text, done:false});
+    inp.value = '';
+    renderList(id);
+  };
+  $('inp-'+id).addEventListener('keydown', e => { if(e.key==='Enter') $('add-'+id).click(); });
+  $('list-'+id).addEventListener('click', e => {
+    const ck = e.target.closest('[data-ck]');
+    if(ck){ const t=tasks[id].find(x=>x.id===ck.dataset.ck); if(t){t.done=!t.done;renderList(id);} return; }
+    const dl = e.target.closest('[data-dl]');
+    if(dl){ tasks[id]=tasks[id].filter(x=>x.id!==dl.dataset.dl); renderList(id); }
+  });
+  renderList(id);
+});
+
+function renderList(id){
+  const list = $('list-'+id);
+  if(!tasks[id].length){ list.innerHTML='<div class="empty">Vide</div>'; return; }
+  list.innerHTML = tasks[id].map(t =>
+    `<div class="titem"><div class="tck${t.done?' on':''}" data-ck="${t.id}"></div><div class="ttxt${t.done?' sk':''}">${t.text}</div><div class="tdl" data-dl="${t.id}">✕</div></div>`
+  ).join('');
+}
+
+/* ── GRID ── */
+function applyLayout(){
+  const maxR = Math.max(...WIDGETS.map(id=>layout[id].r+layout[id].h-1), 4);
+  $('wgrid').style.gridTemplateRows = `repeat(${maxR},200px)`;
+  WIDGETS.forEach(id => {
+    const p = layout[id];
+    const cell = $('wc-'+id);
+    cell.style.gridColumn = `${p.c}/span ${p.w}`;
+    cell.style.gridRow = `${p.r}/span ${p.h}`;
+  });
+}
+
+function buildGhosts(){
+  const layer = $('ghost-layer');
+  layer.innerHTML = '';
+  const maxR = Math.max(...WIDGETS.map(id=>layout[id].r+layout[id].h-1), 4);
+  layer.style.gridTemplateRows = `repeat(${maxR},200px)`;
+  layer.style.height = (maxR*200+(maxR-1)*10)+'px';
+  for(let r=1;r<=maxR;r++) for(let c=1;c<=4;c++){
+    const gc = document.createElement('div');
+    gc.className = 'gcell';
+    gc.style.gridColumn = c;
+    gc.style.gridRow = r;
+    gc.addEventListener('click', () => {
+      if(!selW) return;
+      layout[selW].c = c; layout[selW].r = r;
+      hideGhosts(); selW = null;
+      WIDGETS.forEach(i=>$('wc-'+i).classList.remove('picked'));
+      applyLayout();
+      log(`✅ Déplacé vers col=${c} row=${r}`);
+    });
+    layer.appendChild(gc);
+  }
+}
+function showGhosts(){ buildGhosts(); $('ghost-layer').classList.add('active'); }
+function hideGhosts(){ $('ghost-layer').classList.remove('active'); }
+
+/* ── EDIT MODE ── */
+$('btn-edit').addEventListener('click', () => {
+  gedit = !gedit;
+  $('btn-edit').classList.toggle('act', gedit);
+  document.body.classList.toggle('gedit', gedit);
+  if(!gedit){ selW=null; hideGhosts(); WIDGETS.forEach(i=>$('wc-'+i).classList.remove('picked')); }
+  log(gedit ? '✏️ Mode disposition actif — clique ✥ pour sélectionner' : 'Mode normal');
+});
+
+/* ── WIRE HANDLES — called once after page load ── */
+function wireHandles(){
+  WIDGETS.forEach(id => {
+    const mv = $('wmv-'+id), sz = $('wsz-'+id);
+    mv.onclick = e => {
+      e.stopPropagation();
+      if(selW===id){ selW=null; hideGhosts(); WIDGETS.forEach(i=>$('wc-'+i).classList.remove('picked')); log('Désélectionné'); }
+      else { selW=id; WIDGETS.forEach(i=>$('wc-'+i).classList.remove('picked')); $('wc-'+id).classList.add('picked'); showGhosts(); log('✥ '+id+' sélectionné — clique une case jaune'); }
+    };
+    sz.onclick = e => {
+      e.stopPropagation();
+      sizingId = id;
+      const p = layout[id];
+      document.querySelectorAll('#sw .pill').forEach(b=>b.classList.toggle('on',Number(b.dataset.w)===p.w));
+      document.querySelectorAll('#sh .pill').forEach(b=>b.classList.toggle('on',Number(b.dataset.h)===p.h));
+      $('ov-size').classList.add('op');
+      log('⊞ Taille de '+id);
+    };
+  });
+  log('Prêt — clique ✏️ Disposition pour commencer');
+}
+
+$('sw').addEventListener('click', e => {
+  const b = e.target.closest('.pill[data-w]'); if(!b||!sizingId) return;
+  layout[sizingId].w = Number(b.dataset.w);
+  document.querySelectorAll('#sw .pill').forEach(x=>x.classList.toggle('on',x===b));
+  applyLayout(); log('Largeur '+sizingId+' → '+layout[sizingId].w);
+});
+$('sh').addEventListener('click', e => {
+  const b = e.target.closest('.pill[data-h]'); if(!b||!sizingId) return;
+  layout[sizingId].h = Number(b.dataset.h);
+  document.querySelectorAll('#sh .pill').forEach(x=>x.classList.toggle('on',x===b));
+  applyLayout(); log('Hauteur '+sizingId+' → '+layout[sizingId].h);
+});
+$('szdone').addEventListener('click', () => $('ov-size').classList.remove('op'));
+
+document.addEventListener('click', e => {
+  if(!selW) return;
+  if(e.target.closest('.wcell')||e.target.closest('#ghost-layer')||e.target.closest('.ov')) return;
+  selW=null; hideGhosts(); WIDGETS.forEach(i=>$('wc-'+i).classList.remove('picked'));
+});
+
+// Init
+applyLayout();
+wireHandles();
+</script>
+</body>
+</html>
