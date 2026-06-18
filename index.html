@@ -575,6 +575,26 @@ auth.onAuthStateChanged(async user=>{
   $('page').classList.remove('hi');
   applyLayout();
   renderMods();
+  // Wire move/size buttons — must be after page is visible
+  ['sport','tasks'].forEach(id=>{
+    const mv=$('wmv-'+id), sz=$('wsz-'+id);
+    if(!mv||!sz) return;
+    mv.onclick = e=>{
+      e.stopPropagation();
+      if(!gedit) return;
+      if(selW===id) deselW(); else selW2(id);
+    };
+    sz.onclick = e=>{
+      e.stopPropagation();
+      if(!gedit) return;
+      sizW=id;
+      const p=wLayout[id]||{w:2,h:2};
+      document.querySelectorAll('#sw-pills .pill').forEach(b=>b.classList.toggle('on',Number(b.dataset.w)===p.w));
+      document.querySelectorAll('#sh-pills .pill').forEach(b=>b.classList.toggle('on',Number(b.dataset.h)===p.h));
+      $('ov-size').classList.add('op');
+    };
+  });
+
   updateQStats();updateQInfo();
   renderSport();
   renderSport();
@@ -652,24 +672,7 @@ document.addEventListener('click',e=>{
   deselW();
 });
 
-/* Wire move/resize buttons */
-['sport','tasks'].forEach(id=>{
-  const mv=$('wmv-'+id), sz=$('wsz-'+id);
-  mv.addEventListener('click',e=>{
-    e.stopPropagation();
-    if(!gedit)return;
-    if(selW===id)deselW();else selW2(id);
-  });
-  sz.addEventListener('click',e=>{
-    e.stopPropagation();
-    if(!gedit)return;
-    sizW=id;
-    const p=wLayout[id]||{w:2,h:2};
-    document.querySelectorAll('#sw-pills .pill').forEach(b=>b.classList.toggle('on',Number(b.dataset.w)===p.w));
-    document.querySelectorAll('#sh-pills .pill').forEach(b=>b.classList.toggle('on',Number(b.dataset.h)===p.h));
-    $('ov-size').classList.add('op');
-  });
-});
+/* move/size wiring moved inside Firebase init */
 
 /* Size pills */
 $('sw-pills').addEventListener('click',e=>{
