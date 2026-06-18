@@ -239,7 +239,7 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 }
 </style>
 </head>
-<body>
+<body class="gedit">
 
 <div class="ls" id="ls"><div class="lbox"><div class="spin"></div><p>Connexion…</p></div></div>
 
@@ -468,7 +468,7 @@ let planState=null, planDoc=null;
 let spData={weights:[],goal:SPORT_GOAL,startWeight:SPORT_START_W}, spDoc=null;
 let tData={tasks:[],cats:[]}, tDoc=null, tT=null;
 let wLayout=JSON.parse(JSON.stringify(DEFAULT_LAYOUT)), layDoc=null, layT=null;
-let gedit=false, selWidget=null, sizingId=null;
+let gedit=true, selWidget=null, sizingId=null;
 let tTab='todo', tFilt='', tPrio='🔴';
 let curTheme='foret';
 
@@ -593,7 +593,6 @@ function wireHandles(){
     if(!mv||!sz) return;
     mv.onclick=e=>{
       e.stopPropagation();
-      if(!gedit) return;
       if(selWidget===id){
         selWidget=null; hideGhosts();
         document.querySelectorAll('.wcell').forEach(c=>c.classList.remove('picked'));
@@ -606,7 +605,6 @@ function wireHandles(){
     };
     sz.onclick=e=>{
       e.stopPropagation();
-      if(!gedit) return;
       sizingId=id;
       const p=wLayout[id]||{w:2,h:3};
       document.querySelectorAll('#sw-pills .pill').forEach(b=>b.classList.toggle('on',Number(b.dataset.w)===p.w));
