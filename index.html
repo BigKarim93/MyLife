@@ -583,15 +583,16 @@ auth.onAuthStateChanged(async user=>{
   // Wire move/size buttons — must be after page is visible
   document.getElementById('debug-msg').textContent = '✅ Firebase OK — user: '+(user.email||'?');
   document.getElementById('debug-move').onclick = ()=>{
+    // Simulate clicking wmv-sport directly
     const el = document.getElementById('wmv-sport');
     if(!el){document.getElementById('debug-msg').textContent='wmv-sport NOT FOUND';return;}
-    const msg = [
-      'gedit='+gedit,
-      'selW='+selW,
-      'body.gedit='+ document.body.classList.contains('gedit'),
-      'wc-sport exists='+ !!document.getElementById('wc-sport'),
-    ].join(' | ');
-    document.getElementById('debug-msg').textContent = msg;
+    // Call selW2 directly
+    try {
+      selW2('sport');
+      document.getElementById('debug-msg').textContent = 'selW2 called — selW='+selW+' | wc-sport.sel='+document.getElementById('wc-sport').classList.contains('sel')+' | gcells='+document.querySelectorAll('.gcell').length;
+    } catch(e) {
+      document.getElementById('debug-msg').textContent = 'ERROR: '+e.message;
+    }
   };
   ['sport','tasks'].forEach(id=>{
     const mv=$('wmv-'+id), sz=$('wsz-'+id);
