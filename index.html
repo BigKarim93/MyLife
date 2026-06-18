@@ -305,6 +305,11 @@ body.gedit .wcell.sel .wh-move{background:var(--accent);color:#21321f;border-col
 </style>
 </head>
 <body class="gedit">
+<div id="debug-bar" style="background:#f2c14e;color:#21321f;padding:6px 12px;font-size:.8rem;font-weight:700;display:flex;gap:12px;align-items:center;">
+  <span id="debug-msg">⏳ JS en cours...</span>
+  <button onclick="document.getElementById('debug-msg').textContent='✅ JS OK — clique sur ✥'" style="background:#21321f;color:#f2c14e;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;">Test JS</button>
+  <button id="debug-move" style="background:#21321f;color:#f2c14e;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;">Test wmv-sport</button>
+</div>
 
 <div class="ls" id="ls"><div class="lbox"><div class="spin"></div><p>Connexion…</p></div></div>
 
@@ -576,6 +581,11 @@ auth.onAuthStateChanged(async user=>{
   applyLayout();
   renderMods();
   // Wire move/size buttons — must be after page is visible
+  document.getElementById('debug-msg').textContent = '✅ Firebase OK — user: '+(user.email||'?');
+  document.getElementById('debug-move').onclick = ()=>{
+    const el = document.getElementById('wmv-sport');
+    document.getElementById('debug-msg').textContent = el ? 'wmv-sport FOUND, onclick='+(el.onclick?'SET':'NULL') : 'wmv-sport NOT FOUND';
+  };
   ['sport','tasks'].forEach(id=>{
     const mv=$('wmv-'+id), sz=$('wsz-'+id);
     if(!mv||!sz) return;
