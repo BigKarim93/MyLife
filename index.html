@@ -349,119 +349,7 @@ body.gedit .wcell.sel .wh-move{background:var(--accent);color:#21321f;border-col
     <div class="edit-hint">✥ Sélectionner → cliquer une case pour déplacer &nbsp;·&nbsp; ⊞ Changer la taille</div>
     <div class="wgrid" id="wgrid">
       <!-- QCM -->
-      <div class="wcell" id="wc-qcm" style="grid-column:1/span 2;grid-row:1/span 3;z-index:1;">
-        <div class="widget">
-          <div class="whdr">
-            <span>🧠</span><h2>QCM Arabe</h2>
-            <button class="wh-move" id="wmv-qcm">✥</button>
-            <button class="wh-size" id="wsz-qcm">⊞</button>
-            <span id="qsync" style="font-size:.8rem;opacity:.4;margin-left:auto;">☁️</span>
-          </div>
-          <div class="wbody">
-            <div id="qhome">
-              <div class="glbl">
-                <span id="qlg" style="color:var(--green);font-size:.65rem">0 ✅</span>
-                <span id="qlb" style="color:var(--blue);font-size:.65rem">0 🔵</span>
-                <span style="color:var(--dim);font-size:.65rem">463</span>
-                <span id="qlr" style="color:var(--red);font-size:.65rem">0 ❌</span>
-              </div>
-              <div class="gauge"><div class="gg" id="qgg"></div><div class="gb" id="qgb"></div><div class="gr" id="qgr"></div></div>
-              <div class="qcols">
-                <div>
-                  <div class="clbl">Questions</div>
-                  <div class="pills" id="qcpills">
-                    <button class="pill" data-cnt="10">10</button>
-                    <button class="pill on" data-cnt="15">15</button>
-                    <button class="pill" data-cnt="20">20</button>
-                    <button class="pill" data-cnt="30">30</button>
-                  </div>
-                  <div class="clbl">Mode</div>
-                  <div class="pills" id="qmpills">
-                    <button class="pill on" data-mode="all">🎲 Tout</button>
-                    <button class="pill" data-mode="review">🔵 Revoir</button>
-                    <button class="pill" data-mode="errors">❌ Erreurs</button>
-                    <button class="pill" data-mode="srs">🧠 Smart</button>
-                  </div>
-                </div>
-                <div>
-                  <div class="clbl">Sens</div>
-                  <div class="pills" id="qdpills">
-                    <button class="pill on" data-dir="ar2fr">🇸🇦→🇫🇷</button>
-                    <button class="pill" data-dir="fr2ar">🇫🇷→🇸🇦</button>
-                    <button class="pill" data-dir="mix">🔀</button>
-                  </div>
-                  <div class="sinfo" id="qinfo"></div>
-                  <button class="btn prim" id="qstart" style="width:100%;justify-content:center;margin-bottom:4px;">▶ Lancer</button>
-                  <button class="btn" id="qbmaster" style="width:100%;justify-content:center;margin-bottom:3px;">⭐ Maîtrisés (<span id="qmc">0</span>)</button>
-                  <button class="btn" id="qberr" style="width:100%;justify-content:center;">❌ Erreurs (<span id="qec">0</span>)</button>
-                </div>
-              </div>
-              <div id="qmpanel" class="hi" style="margin-top:7px;">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
-                  <span style="font-size:.75rem;font-weight:700;color:var(--green);">⭐ Maîtrisés</span>
-                  <button class="btn sm" id="qmclose">✕</button>
-                </div>
-                <div class="mlist" id="qmlist"></div>
-              </div>
-              <div id="qepanel" class="hi" style="margin-top:7px;">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
-                  <span style="font-size:.75rem;font-weight:700;color:var(--red);">❌ Erreurs</span>
-                  <button class="btn sm" id="qeclose">✕</button>
-                </div>
-                <div class="mlist" id="qelist"></div>
-              </div>
-            </div>
-            <div id="qquiz" class="hi">
-              <div class="qprog"><div class="qpw"><div class="qpb" id="qpbar"></div></div><div class="qcnt" id="qcnt"></div><div class="qstr" id="qstr"></div></div>
-              <div class="qcard"><div class="qlbl" id="qlbl"></div><div class="qmain" id="qmain"></div><div class="qles" id="qles"></div></div>
-              <div class="qopts" id="qopts"></div>
-              <div class="qfb" id="qfb"></div>
-              <div style="display:flex;gap:5px;margin-bottom:5px;">
-                <button class="brev hi" id="qrevbtn">🔵 À revoir</button>
-                <button class="btn prim hi" id="qnext" style="flex:1;justify-content:center;">Suivant →</button>
-              </div>
-              <button class="btn" id="qstop" style="width:100%;justify-content:center;">✕ Arrêter</button>
-            </div>
-            <div id="qres" class="hi">
-              <div class="rcard"><span class="rem" id="qre">🌟</span><div class="rsc" id="qrs"></div>
-                <div class="rrow">
-                  <div class="ri"><strong id="qrg" style="color:var(--green)">0</strong>Bon</div>
-                  <div class="ri"><strong id="qrb" style="color:var(--blue)">0</strong>Revoir</div>
-                  <div class="ri"><strong id="qrr" style="color:var(--red)">0</strong>Erreur</div>
-                  <div class="ri"><strong id="qrst">0</strong>Série</div>
-                </div>
-              </div>
-              <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:5px;">
-                <button class="btn prim" id="qreplay">🔁</button>
-                <button class="btn" id="qrevall">🔵 Réviser</button>
-                <button class="btn" id="qrhome">🏠</button>
-              </div>
-              <div class="mlist hi" id="qmissw"><h4>Manqués</h4><div id="qmissl"></div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- EDT -->
-      <div class="wcell" id="wc-edt" style="grid-column:3/span 2;grid-row:1/span 3;z-index:1;">
-        <div class="widget">
-          <div class="whdr">
-            <span>📋</span><h2>EDT</h2>
-            <button class="wh-move" id="wmv-edt">✥</button>
-            <button class="wh-size" id="wsz-edt">⊞</button>
-            <div class="etnav" style="margin-left:auto;">
-              <button class="btn sm" id="edt-prev">◀</button>
-              <span class="etnlbl" id="etlbl"></span>
-              <button class="btn sm" id="edt-next">▶</button>
-              <button class="btn sm" id="edt-today">Auj.</button>
-            </div>
-          </div>
-          <div class="wbody" style="padding:6px;"><div class="edtw"><div class="edtg" id="edtgrid"></div></div></div>
-        </div>
-      </div>
-
-      <!-- SPORT -->
-      <div class="wcell" id="wc-sport" style="grid-column:1/span 2;grid-row:4/span 2;z-index:1;">
+      <div class="wcell" id="wc-sport" style="grid-column:1/span 2;grid-row:1/span 3;z-index:1;">
         <div class="widget">
           <div class="whdr">
             <span>💪</span><h2>Sport</h2>
@@ -474,7 +362,7 @@ body.gedit .wcell.sel .wh-move{background:var(--accent);color:#21321f;border-col
       </div>
 
       <!-- TASKS -->
-      <div class="wcell" id="wc-tasks" style="grid-column:3/span 2;grid-row:4/span 2;z-index:1;">
+      <div class="wcell" id="wc-tasks" style="grid-column:3/span 2;grid-row:1/span 3;z-index:1;">
         <div class="widget">
           <div class="whdr">
             <span>✅</span><h2>Tâches</h2>
@@ -599,7 +487,7 @@ const ETYH=13,EDT_PPM=ETYH/60,EDT_START=7,EDT_END=25;
 const SPORT_KW=['musculation','musculations','muscul','sport','muscu'];
 const SPORT_GOAL=83,SPORT_START_W=97.2,SPORT_TARGET=3,SPORT_MS=2,SPORT_FROM='2026-06-01';
 const MFR=['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
-const DEFAULT_LAYOUT={qcm:{c:1,r:1,w:2,h:3},edt:{c:3,r:1,w:2,h:3},sport:{c:1,r:4,w:2,h:2},tasks:{c:3,r:4,w:2,h:2}};
+const DEFAULT_LAYOUT={sport:{c:1,r:1,w:2,h:3},tasks:{c:3,r:1,w:2,h:3}};
 const EMOJI_CATS={
   'Études':['📋','📖','📚','📝','✏️','📊','📈','🧠','💡','🔬','🎓','📐','💻'],
   'Sport':['💪','🏋️','⚽','🏀','🎾','🏊','🚴','🤸','🧘','🏃','💊','🏥','❤️','⚖️'],
@@ -688,10 +576,10 @@ auth.onAuthStateChanged(async user=>{
   applyLayout();
   renderMods();
   updateQStats();updateQInfo();
-  renderEdt();
+  renderSport();
   renderSport();
   renderTasks();
-  setInterval(()=>{renderEdt();renderSport();},60000);
+  setInterval(()=>{renderSport();},60000);
 });
 
 /* ── AUTH ── */
@@ -765,7 +653,7 @@ document.addEventListener('click',e=>{
 });
 
 /* Wire move/resize buttons */
-['qcm','edt','sport','tasks'].forEach(id=>{
+['sport','tasks'].forEach(id=>{
   const mv=$('wmv-'+id), sz=$('wsz-'+id);
   mv.addEventListener('click',e=>{
     e.stopPropagation();
@@ -944,53 +832,6 @@ $('qreplay').addEventListener('click',()=>startQcm());
 $('qrevall').addEventListener('click',()=>startQcm('review'));
 $('qrhome').addEventListener('click',showQHome);
 $('qmlist').addEventListener('click',e=>{const b=e.target.closest('.torv');if(!b)return;moveToReview(b.dataset.ar);});
-
-/* ════════════════════════════════════════
-   EDT
-════════════════════════════════════════ */
-const DN=['Lu','Ma','Me','Je','Ve','Sa','Di'];
-function edtLetter(){
-  if(!planState)return 'A';
-  const a=planState.weekAnchor||{monday:dK(monOf(new Date())),letter:'A'};
-  const ad=new Date(a.monday+'T00:00:00'),tm=monOf(addD(new Date(),edtOff*7));
-  const dw=Math.round((tm-ad)/604800000),p=((dw%2)+2)%2;
-  return p===0?a.letter:(a.letter==='A'?'B':'A');
-}
-function renderEdt(){
-  const grid=$('edtgrid');
-  if(!planState){grid.innerHTML='<div style="padding:6px;color:var(--dim);font-size:.7rem">Non chargé.</div>';return;}
-  const evs=planState.events||[],exc=planState.exceptions||[],letter=edtLetter();
-  const monday=monOf(addD(new Date(),edtOff*7)),tK=dK(new Date()),isNow=edtOff===0;
-  const nowMin=new Date().getHours()*60+new Date().getMinutes();
-  const nowExt=nowMin<(EDT_END-24)*60?nowMin+1440:nowMin;
-  const visH=(EDT_END-EDT_START)*ETYH;
-  $('etlbl').textContent='S'+letter+' '+fmtS(monday)+'-'+fmtS(addD(monday,6));
-  let hdr='<div class="ethdr"><div class="etth"></div>';
-  for(let d=0;d<7;d++){const dt=addD(monday,d),k=dK(dt),isT=isNow&&k===tK,isPast=isNow&&k<tK;hdr+=`<div class="etdh${isT?' tdy':''}${isPast?' pst':''}">${DN[d]}<br><span style="font-size:.5rem">${fmtS(dt)}</span></div>`;}
-  hdr+='</div>';
-  let tc='<div class="ettc" style="height:'+visH+'px">';
-  for(let h=EDT_START;h<EDT_END;h++)tc+=`<div class="ettl" style="top:${(h-EDT_START)*ETYH}px">${h%24}h</div>`;
-  tc+='</div>';
-  let dc='<div class="etds" style="height:'+visH+'px">';
-  for(let d=0;d<7;d++){
-    const dt=addD(monday,d),k=dK(dt),isT=isNow&&k===tK,isPast=isNow&&k<tK;
-    let ch=`<div class="etdc${isT?' tdy':''}${isPast?' pst':''}" style="height:${visH}px">`;
-    evs.filter(e=>{if(e.day!==d)return false;if(exc.includes(e.id+'@'+k))return false;if(e.onlyDate)return e.onlyDate===k;if(!e.week||e.week==='')return true;return e.week===letter;}).forEach(ev=>{
-      const s=tmM(ev.start),en=tmM(ev.end),sA=s<EDT_START*60?s+1440:s,enA=en<=sA?en+1440:en;
-      const top=(sA-EDT_START*60)*EDT_PPM,h2=Math.max(5,(enA-sA)*EDT_PPM);
-      if(top<0||top>=visH)return;
-      const past=(isT&&enA<=nowExt)||isPast?'opacity:.3;filter:grayscale(.6);':'';
-      ch+=`<div class="etev ev-${ev.type}" style="top:${top}px;height:${h2}px;${past}${ev.color?'background:'+ev.color+'28;border-color:'+ev.color:''}">${esc(ev.title)}</div>`;
-    });
-    if(isT){const tn=(nowExt-EDT_START*60)*EDT_PPM;if(tn>=0&&tn<visH)ch+=`<div class="etnl" style="top:${tn}px"></div>`;}
-    ch+='</div>';dc+=ch;
-  }
-  dc+='</div>';
-  grid.innerHTML=hdr+'<div style="display:flex">'+tc+dc+'</div>';
-}
-$('edt-prev').addEventListener('click',()=>{edtOff--;renderEdt();});
-$('edt-next').addEventListener('click',()=>{edtOff++;renderEdt();});
-$('edt-today').addEventListener('click',()=>{edtOff=0;renderEdt();});
 
 /* ════════════════════════════════════════
    SPORT
