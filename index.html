@@ -191,10 +191,9 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 
         <div class="wcell" id="wc-t2" style="grid-column:3/span 2;grid-row:1/span 2;">
           <div class="widget">
-            <div class="whdr"><span>✅</span><h2>Tâches 2</h2><button class="wh-move" id="wmv-t2">✥</button><button class="wh-size" id="wsz-t2">⊞</button></div>
+            <div class="whdr"><span>💪</span><h2>Sport</h2><button class="wh-move" id="wmv-t2">✥</button><button class="wh-size" id="wsz-t2">⊞</button><button class="btn sm" id="wbtn-weigh" style="margin-left:auto;">⚖️ Peser</button></div>
             <div class="wbody">
-              <div class="tadd"><input type="text" id="inp-t2" placeholder="Ajouter une tâche…"><button class="btn prim" id="add-t2">+</button></div>
-              <div class="tlist" id="list-t2"></div>
+              <div id="spbody"></div>
             </div>
           </div>
         </div>
@@ -228,6 +227,14 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
   </div>
 </div>
 
+<div class="ov" id="ov-weigh">
+  <div class="modal" style="max-width:300px;">
+    <h3>⚖️ Peser</h3>
+    <div class="fld"><label>Poids (kg)</label><input type="number" id="wval" step="0.1" min="40" max="200" placeholder="96.8" style="font-size:1.1rem;"></div>
+    <div class="fld"><label>Date</label><input type="date" id="wdat"></div>
+    <div class="modal-act"><button class="btn" id="wcancel">Annuler</button><button class="btn prim" id="wsave">Enregistrer</button></div>
+  </div>
+</div>
 <div class="ov" id="ov-size">
   <div class="modal" style="max-width:300px;">
     <h3>⊞ Taille</h3>
@@ -253,15 +260,17 @@ const LAYOUT_DEFAULT={t1:{c:1,r:1,w:2,h:2},t2:{c:3,r:1,w:2,h:2},t3:{c:1,r:3,w:2,
 const EMOJI_CATS={'Études':['📋','📖','📚','📝','✏️','📊','🧠','💡','🔬','🎓','💻'],'Sport':['💪','🏋️','⚽','🏀','🎾','🏊','🚴','🤸','🧘','🏃','⚖️'],'Voyage':['✈️','🌍','🗺️','🏖️','⛰️','🎵','🎮','🎬','📷','🚗','🏕️'],'Maison':['🏠','🍕','🍎','☕','🛒','💰','📱','🔑','🌱','🐶','🌸'],'Symboles':['⭐','🌟','🔥','✅','❌','⚡','🎯','🏆','💎','🎉','🔵','🟡','🟢']};
 const THEMES=[{id:'foret',n:'🌿 Forêt',bg:'#16261e',bg2:'#1f3a2c',bg3:'#274a37',ac:'#f2c14e',tl:'#2dd4bf',gr:'#4ade80',rd:'#f87171',bl:'#60a5fa',ch:'#f1efe4'},{id:'ocean',n:'🌊 Océan',bg:'#0d1f2d',bg2:'#122534',bg3:'#193040',ac:'#22d3ee',tl:'#06b6d4',gr:'#34d399',rd:'#f87171',bl:'#38bdf8',ch:'#e0f4ff'},{id:'violet',n:'🌙 Nuit violette',bg:'#1a1228',bg2:'#221535',bg3:'#2d1d48',ac:'#c084fc',tl:'#e879f9',gr:'#a78bfa',rd:'#f472b6',bl:'#818cf8',ch:'#ede9fe'},{id:'ember',n:'🔥 Ember',bg:'#1c1208',bg2:'#271a0c',bg3:'#332212',ac:'#fb923c',tl:'#fbbf24',gr:'#84cc16',rd:'#ef4444',bl:'#f97316',ch:'#fff7ed'},{id:'ardoise',n:'🤍 Ardoise',bg:'#1a1f2e',bg2:'#222840',bg3:'#2a3050',ac:'#e2e8f0',tl:'#94a3b8',gr:'#64748b',rd:'#f87171',bl:'#93c5fd',ch:'#f8fafc'},{id:'sakura',n:'🌸 Sakura',bg:'#1f1218',bg2:'#2a1a22',bg3:'#38222e',ac:'#f9a8d4',tl:'#fb7185',gr:'#86efac',rd:'#fca5a5',bl:'#f0abfc',ch:'#fdf2f8'},{id:'electro',n:'⚡ Électrique',bg:'#080808',bg2:'#111111',bg3:'#1a1a1a',ac:'#facc15',tl:'#3b82f6',gr:'#22c55e',rd:'#ef4444',bl:'#60a5fa',ch:'#f9fafb'},{id:'desert',n:'🏜️ Désert',bg:'#1e1610',bg2:'#271e14',bg3:'#332819',ac:'#d97706',tl:'#b45309',gr:'#84cc16',rd:'#ef4444',bl:'#f59e0b',ch:'#fef3c7'},{id:'autumn',n:'🍂 Automne',bg:'#1c1008',bg2:'#271608',bg3:'#361e0a',ac:'#f97316',tl:'#dc2626',gr:'#fbbf24',rd:'#ef4444',bl:'#fb923c',ch:'#fff7ed'},{id:'arctic',n:'🧊 Arctique',bg:'#0f1923',bg2:'#172433',bg3:'#1e3045',ac:'#bfdbfe',tl:'#7dd3fc',gr:'#a5f3fc',rd:'#fca5a5',bl:'#93c5fd',ch:'#f0f9ff'},{id:'tropic',n:'🌺 Tropique',bg:'#0a1f12',bg2:'#0f2918',bg3:'#173520',ac:'#f0abfc',tl:'#4ade80',gr:'#86efac',rd:'#f9a8d4',bl:'#a78bfa',ch:'#f0fdf4'},{id:'minuit',n:'🖤 Minuit',bg:'#000000',bg2:'#111111',bg3:'#1c1c1c',ac:'#ffffff',tl:'#a3a3a3',gr:'#737373',rd:'#ef4444',bl:'#6b7280',ch:'#f5f5f5'},{id:'neon',n:'🟣 Néon',bg:'#0a0010',bg2:'#10001a',bg3:'#18002a',ac:'#d946ef',tl:'#a855f7',gr:'#34d399',rd:'#f43f5e',bl:'#818cf8',ch:'#fdf4ff'},{id:'ble',n:'🌾 Blé',bg:'#1e1a10',bg2:'#272212',bg3:'#332d18',ac:'#fde68a',tl:'#d97706',gr:'#a3e635',rd:'#ef4444',bl:'#fcd34d',ch:'#fffbeb'}];
 
+const SPORT_KW=['musculation','musculations','muscul','sport','muscu'];
+const SPORT_GOAL=83,SPORT_START_W=97.2,SPORT_TARGET=3,SPORT_MS=2,SPORT_FROM='2026-06-01';
+const MFR=['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const pad=n=>String(n).padStart(2,'0');
-const dK=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
-
 /* STATE */
 let mods=null,modEdit=false,modEditId=null,modDragIdx=null,hubDoc=null,modT=null;
 let tData={tasks:[],cats:[]},tDoc=null,tT=null;
+let spData={weights:[],goal:SPORT_GOAL,startWeight:SPORT_START_W},spDoc=null;
 let wLayout=JSON.parse(JSON.stringify(LAYOUT_DEFAULT)),layDoc=null,layT=null;
+let planState=null,planDoc=null;
 let gedit=false,selW=null,sizingId=null,curTheme='foret';
 let tTab='todo',tFilt='',tPrio='🔴';
 
@@ -276,6 +285,8 @@ auth.onAuthStateChanged(async user=>{
   $('tbr').classList.remove('hi');
   hubDoc=db.collection('users').doc(user.uid).collection('modules').doc('hub');
   tDoc=db.collection('users').doc(user.uid).collection('modules').doc('tasks');
+  spDoc=db.collection('users').doc(user.uid).collection('modules').doc('sport');
+  planDoc=db.collection('users').doc(user.uid).collection('modules').doc('planning');
   layDoc=db.collection('users').doc(user.uid).collection('modules').doc('dashboard-layout');
   try{
     const[h,t,l]=await Promise.all([hubDoc.get(),tDoc.get(),layDoc.get()]);
@@ -285,6 +296,8 @@ auth.onAuthStateChanged(async user=>{
       {id:'m3',icon:'🧠',name:'QCM Arabe',desc:'Vocabulaire.',url:'qcm-arabe.html'},
       {id:'m4',icon:'✈️',name:'PPL Aviation',desc:'Bientôt.',url:'',disabled:true}
     ];
+    const sp=await spDoc.get();if(sp.exists)spData=Object.assign({weights:[],goal:SPORT_GOAL,startWeight:SPORT_START_W},sp.data());
+    const pl=await planDoc.get();if(pl.exists)planState=pl.data();
     if(t.exists){tData=Object.assign({tasks:[],cats:[]},t.data());const n7=new Date();n7.setDate(n7.getDate()-7);tData.tasks=tData.tasks.filter(x=>!x.done||(x.doneAt&&new Date(x.doneAt)>n7));}
     if(l.exists){const ld=l.data();wLayout=Object.assign(JSON.parse(JSON.stringify(LAYOUT_DEFAULT)),ld);if(ld.theme)applyTheme(ld.theme);}
     if(!h.exists)hubDoc.set({modules:mods}).catch(()=>{});
@@ -295,6 +308,7 @@ auth.onAuthStateChanged(async user=>{
   applyLayout();
   renderMods();
   renderTasks();
+  renderSport();
   wireHandles();
 });
 
@@ -423,6 +437,81 @@ WIDGETS.forEach(id=>{
     const ck=e.target.closest('[data-ck]');if(ck){const t=tData.tasks.find(x=>x.id===ck.dataset.ck);if(t){t.done=!t.done;t.doneAt=t.done?new Date().toISOString():null;saveTasks();renderTasks();}return;}
     const dl=e.target.closest('[data-dl]');if(dl){tData.tasks=tData.tasks.filter(x=>x.id!==dl.dataset.dl);saveTasks();renderTasks();}
   });
+});
+
+
+/* SPORT */
+function isSportEv(ev){return SPORT_KW.includes((ev.title||'').toLowerCase().trim());}
+function computeSessions(){
+  if(!planState)return[];
+  const evs=(planState.events||[]).filter(isSportEv),exc=planState.exceptions||[];
+  const today=new Date();today.setHours(23,59,59,999);
+  const a=planState.weekAnchor||{monday:dK(monOf(new Date())),letter:'A'};
+  const ad=new Date(a.monday+'T00:00:00'),sd=new Date(SPORT_FROM+'T00:00:00');
+  const sessions=[];
+  for(let w=-60;w<=0;w++){
+    const mon=monOf(addD(ad,w*7));if(mon<sd)continue;
+    const dw=Math.round((mon-ad)/604800000),p=((dw%2)+2)%2;
+    const letter=p===0?a.letter:(a.letter==='A'?'B':'A');
+    for(let d=0;d<7;d++){
+      const dt=addD(mon,d),k=dK(dt);if(dt>today)continue;
+      evs.forEach(ev=>{
+        if(ev.day!==d)return;if(ev.onlyDate&&ev.onlyDate!==k)return;
+        if(!ev.onlyDate&&ev.week&&ev.week!==letter)return;if(exc.includes(ev.id+'@'+k))return;
+        const e2=new Date(dt);const[eh,em]=ev.end.split(':').map(Number);e2.setHours(eh,em);
+        if(e2<=today)sessions.push({date:k});
+      });
+    }
+  }
+  const seen=new Set();return sessions.filter(s=>{if(seen.has(s.date))return false;seen.add(s.date);return true;});
+}
+function getMon(ds){return dK(monOf(new Date(ds+'T12:00:00')));}
+const jsD=d=>(d+6)%7;
+const monOf=d=>{const x=new Date(d);x.setHours(0,0,0,0);x.setDate(x.getDate()-jsD(x.getDay()));return x;};
+const addD=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x;};
+const fmtS=d=>d.getDate()+'/'+(d.getMonth()+1);
+
+function renderSport(){
+  const sb=$('spbody');if(!sb)return;
+  const sessions=computeSessions(),now=new Date();
+  const weights=spData.weights||[],goal=spData.goal||SPORT_GOAL,startW=spData.startWeight||SPORT_START_W;
+  const lastW=weights.length>0?weights[weights.length-1].w:startW;
+  const pct=Math.max(0,Math.min(100,(startW-lastW)/(startW-goal)*100));
+  let html=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span style="font-size:.75rem;color:var(--dim)">${weights.length?`<strong style="color:var(--chalk)">${lastW}kg</strong>`:'Aucune pesée'}</span><div style="flex:1;height:7px;background:var(--line);border-radius:4px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#4ade80,#2dd4bf);border-radius:4px;"></div></div><span style="font-size:.65rem;color:var(--accent);">${goal}kg</span></div>`;
+  const ms=[];for(let m=Math.floor((startW-1)/SPORT_MS)*SPORT_MS;m>=goal;m-=SPORT_MS)ms.push(Math.round(m*10)/10);
+  html+='<div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:8px;">'+ms.map(m=>{const done=lastW<=m;const isNext=!done&&ms.findIndex(x=>lastW>x)===ms.indexOf(m);return`<div style="font-size:.6rem;padding:2px 5px;border-radius:10px;border:1px solid ${done?'#4ade80':isNext?'#2dd4bf':'var(--line)'};color:${done?'#4ade80':isNext?'#2dd4bf':'var(--dim)'};${done?'background:rgba(74,222,128,.13)':isNext?'background:rgba(45,212,191,.12)':''}">${m}${done?'✓':''}</div>`;}).join('')+'</div>';
+  const wkMap={};sessions.forEach(s=>{const mk=getMon(s.date);if(!wkMap[mk])wkMap[mk]=[];wkMap[mk].push(s.date);});
+  const sd2=new Date(SPORT_FROM+'T00:00:00');sd2.setDate(1);
+  const months=[];const cur2=new Date(sd2);while(cur2<=now){months.push(new Date(cur2));cur2.setMonth(cur2.getMonth()+1);}
+  months.slice(-2).forEach(md=>{
+    const y=md.getFullYear(),mo=md.getMonth();
+    const first=new Date(y,mo,1),last=new Date(y,mo+1,0);
+    const mTotal=sessions.filter(s=>s.date>=dK(first)&&s.date<=dK(last)).length;
+    html+=`<div style="margin-bottom:6px;"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;"><span style="font-family:'Kalam',cursive;font-size:.85rem;color:var(--accent)">${MFR[mo]} ${y}</span><span style="font-size:.68rem;color:var(--dim)">${mTotal} séance${mTotal>1?'s':''}</span></div><div style="display:flex;flex-direction:column;gap:3px;">`;
+    let wS=monOf(first),wN=1;
+    while(wS<=last){
+      const mk=dK(wS),done=(wkMap[mk]||[]).length,isFut=wS>now;
+      const dots=[];for(let i=0;i<SPORT_TARGET;i++){const cls=isFut?'fu':i<done?'dn':'mi';dots.push(`<div style="width:15px;height:15px;border-radius:50%;border:1px solid ${cls==='dn'?'#4ade80':cls==='mi'?'#f87171':'var(--line)'};background:${cls==='dn'?'rgba(74,222,128,.13)':cls==='mi'?'rgba(248,113,113,.13)':'var(--bg3)'};display:flex;align-items:center;justify-content:center;font-size:.52rem;color:${cls==='dn'?'#4ade80':cls==='mi'?'#f87171':'var(--dim)'}">${cls==='dn'?'✓':cls==='mi'?'✕':''}</div>`);}
+      html+=`<div style="display:flex;align-items:center;gap:5px;"><span style="width:28px;font-size:.62rem;color:var(--dim)">S${wN}</span><div style="display:flex;gap:3px;">${dots.join('')}</div></div>`;
+      wS=addD(wS,7);wN++;
+    }
+    html+='</div></div>';
+  });
+  const thisMk=dK(monOf(now)),thisDone=Math.min(SPORT_TARGET,(wkMap[thisMk]||[]).length);
+  const wc=thisDone>=SPORT_TARGET?'#4ade80':thisDone>0?'var(--accent)':'var(--chalk)';
+  html+=`<div style="display:flex;gap:6px;padding-top:8px;border-top:1px solid var(--line);"><div style="flex:1;text-align:center;background:var(--bg3);border:1px solid var(--line);border-radius:6px;padding:5px 3px;"><div style="font-family:'Kalam',cursive;font-size:.95rem;color:${wc}">${thisDone}/${SPORT_TARGET}</div><div style="font-size:.58rem;color:var(--dim)">Cette sem.</div></div><div style="flex:1;text-align:center;background:var(--bg3);border:1px solid var(--line);border-radius:6px;padding:5px 3px;"><div style="font-family:'Kalam',cursive;font-size:.95rem">${sessions.length}</div><div style="font-size:.58rem;color:var(--dim)">Total</div></div></div>`;
+  sb.innerHTML=html;
+}
+$('wbtn-weigh').addEventListener('click',()=>{$('wval').value='';$('wdat').value=dK(new Date());$('ov-weigh').classList.add('op');});
+$('wcancel').addEventListener('click',()=>$('ov-weigh').classList.remove('op'));
+$('wsave').addEventListener('click',()=>{
+  const val=parseFloat($('wval').value),date=$('wdat').value;
+  if(!val||isNaN(val)||!date){alert('Poids invalide.');return;}
+  spData.weights=spData.weights.filter(w=>w.d!==date);
+  spData.weights.push({d:date,w:Math.round(val*10)/10});
+  spData.weights.sort((a,b)=>a.d.localeCompare(b.d));
+  if(spDoc)spDoc.set(spData).catch(()=>{});
+  $('ov-weigh').classList.remove('op');renderSport();
 });
 
 /* THEMES */
