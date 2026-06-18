@@ -304,7 +304,7 @@ body.gedit .wcell.sel .wh-move{background:var(--accent);color:#21321f;border-col
 }
 </style>
 </head>
-<body>
+<body class="gedit">
 
 <div class="ls" id="ls"><div class="lbox"><div class="spin"></div><p>Connexion…</p></div></div>
 
@@ -523,7 +523,7 @@ let spData={weights:[],goal:SPORT_GOAL,startWeight:SPORT_START_W}, spDoc=null;
 let tData={tasks:[],cats:[]}, tDoc=null, tT=null;
 let wLayout=JSON.parse(JSON.stringify(DEFAULT_LAYOUT)), layDoc=null, layT=null;
 let edtOff=0;
-let gedit=false, selW=null, sizW=null;
+let gedit=true, selW=null, sizW=null;
 let qCnt=15,qMode='all',qDir='ar2fr',qQ=[],qI=0,qSc=0,qMi=[],qBl=[],qStr=0,qMs=0,curQ=null;
 let tTab='todo',tFilt='',tPrio='🔴';
 
