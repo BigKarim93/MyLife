@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Grid Test</title>
+<style>
+body{background:#16261e;color:#f1efe4;font-family:sans-serif;padding:16px;}
+h2{color:#f2c14e;margin-bottom:12px;}
+#status{background:#1f3a2c;padding:10px;border-radius:8px;margin-bottom:12px;font-size:.9rem;}
+.btn{background:#274a37;border:1px solid rgba(238,241,234,.2);color:#f1efe4;padding:8px 14px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.9rem;}
+.btn.act{background:#f2c14e;color:#21321f;}
+
+/* THE GRID */
+.grid-wrap{position:relative;margin-top:16px;}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  grid-auto-rows:120px;
+  gap:8px;
+  min-height:360px;
+}
+/* Ghost cells */
+.gc{
+  border-radius:8px;
+  border:1px dashed rgba(238,241,234,.15);
+  background:rgba(238,241,234,.03);
+  z-index:0;
+}
+.gc.lit{
+  background:rgba(242,193,78,.3) !important;
+  border:2px solid #f2c14e !important;
+  cursor:crosshair;
+  z-index:10 !important;
+}
+.gc.lit:hover{background:rgba(242,193,78,.5) !important;}
+
+/* Widget cells */
+.wcell{
+  z-index:1;
+  border-radius:8px;
+  overflow:hidden;
+}
+.wcell.picked{outline:3px solid #f2c14e;outline-offset:2px;}
+.widget{
+  background:#1f3a2c;
+  border:1px solid rgba(238,241,234,.18);
+  border-radius:8px;
+  height:100%;
+  display:flex;flex-direction:column;
+}
+.whdr{
+  padding:8px 12px;
+  border-bottom:1px solid rgba(238,241,234,.09);
+  display:flex;align-items:center;gap:8px;
+}
+.whdr h3{flex:1;font-size:.9rem;}
+.mvbtn{
+  background:rgba(242,193,78,.2);
+  border:1px solid rgba(242,193,78,.5);
+  color:#f2c14e;
+  padding:3px 8px;
+  border-radius:5px;
+  font-size:.75rem;
+  cursor:pointer;
+  font-weight:700;
+}
+.wbody{padding:10px;font-size:.8rem;color:#aebcb1;}
+</style>
+</head>
+<body>
+<h2>Test grille</h2>
+<div id="status">Clique sur ✥ pour sélectionner un widget, puis sur une case jaune pour le déplacer.</div>
+<button class="btn" id="resetbtn">Réinitialiser positions</button>
+
+<div class="grid-wrap">
+  <div class="grid" id="grid"></div>
+</div>
+
+<script>
+const log = msg => document.getElementById('status').textContent = msg;
+
+// Layout state
+let layout = {
+  sport: {c:1, r:1, w:2, h:2},
+  tasks: {c:3, r:1, w:2, h:2}
+};
+let selected = null;
+
+const COLS = 4, ROWS = 4;
+
+// Build widgets
+const WIDGETS = {
+  sport: {icon:'💪', title:'Sport', body:'Tes séances de musculation'},
+  tasks: {icon:'✅', title:'Tâches', body:'Ta liste de tâches'},
+};
+
+function applyLayout() {
+  const grid = document.getElementById('grid');
+  
+  // Remove existing ghost cells and widgets
+  grid.innerHTML = '';
+  
+  // Add ghost cells first (z-index 0, behind widgets)
+  for(let r=1; r<=ROWS; r++) {
+    for(let c=1; c<=COLS; c++) {
+      const gc = document.createElement('div');
+      gc.className = 'gc';
+      gc.style.gridColumn = c;
+      gc.style.gridRow = r;
+      gc.dataset.c = c;
+      gc.dataset.r = r;
+      gc.addEventListener('click', () => {
+        if(!selected) return;
+        layout[selected].c = c;
+        layout[selected].r = r;
+        log('✅ ' + selected + ' déplacé en col='+c+' row='+r);
+        selected = null;
+        applyLayout();
+      });
+      grid.appendChild(gc);
+    }
+  }
+  
+  // Add widgets on top (z-index 1)
+  Object.entries(WIDGETS).forEach(([id, w]) => {
+    const p = layout[id];
+    const cell = document.createElement('div');
+    cell.className = 'wcell' + (selected===id ? ' picked' : '');
+    cell.id = 'wc-'+id;
+    cell.style.gridColumn = p.c + '/span ' + p.w;
+    cell.style.gridRow = p.r + '/span ' + p.h;
+    cell.style.zIndex = '1';
+    cell.innerHTML = `
+      <div class="widget">
+        <div class="whdr">
+          <span>${w.icon}</span>
+          <h3>${w.title}</h3>
+          <button class="mvbtn" data-id="${id}">✥ Déplacer</button>
+        </div>
+        <div class="wbody">${w.body}</div>
+      </div>`;
+    
+    cell.querySelector('.mvbtn').addEventListener('click', e => {
+      e.stopPropagation();
+      if(selected === id) {
+        // Deselect
+        selected = null;
+        document.querySelectorAll('.gc').forEach(g=>g.classList.remove('lit'));
+        log('Désélectionné');
+      } else {
+        // Select
+        selected = id;
+        document.querySelectorAll('.gc').forEach(g=>g.classList.add('lit'));
+        log('✥ ' + id + ' sélectionné — clique sur une case jaune pour déplacer');
+      }
+      applyLayout(); // redraw to update 'picked' class
+    });
+    
+    grid.appendChild(cell);
+  });
+}
+
+document.getElementById('resetbtn').addEventListener('click', () => {
+  layout = {sport:{c:1,r:1,w:2,h:2}, tasks:{c:3,r:1,w:2,h:2}};
+  selected = null;
+  applyLayout();
+  log('Positions réinitialisées');
+});
+
+// Init
+applyLayout();
+</script>
+</body>
+</html>
