@@ -7,169 +7,245 @@
 <style>
 body{background:#16261e;color:#f1efe4;font-family:sans-serif;padding:16px;}
 h2{color:#f2c14e;margin-bottom:12px;}
-#status{background:#1f3a2c;padding:10px;border-radius:8px;margin-bottom:12px;font-size:.9rem;}
-.btn{background:#274a37;border:1px solid rgba(238,241,234,.2);color:#f1efe4;padding:8px 14px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.9rem;}
-.btn.act{background:#f2c14e;color:#21321f;}
+#status{background:#1f3a2c;padding:10px;border-radius:8px;margin-bottom:12px;font-size:.9rem;min-height:36px;}
 
-/* THE GRID */
+.btn{background:#274a37;border:1px solid rgba(238,241,234,.2);color:#f1efe4;padding:8px 14px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.9rem;margin-right:6px;}
+
+/* THE GRID — position:relative so absolute overlays work */
 .grid-wrap{position:relative;margin-top:16px;}
+
 .grid{
   display:grid;
   grid-template-columns:repeat(4,1fr);
   grid-auto-rows:120px;
   gap:8px;
-  min-height:360px;
 }
-/* Ghost cells */
+
+/* Ghost overlay — same grid, position:absolute on top of everything */
+.ghost-layer{
+  display:none;
+  position:absolute;
+  inset:0;
+  grid-template-columns:repeat(4,1fr);
+  grid-auto-rows:120px;
+  gap:8px;
+  z-index:100;
+  pointer-events:none;
+}
+.ghost-layer.active{display:grid;pointer-events:all;}
+
 .gc{
   border-radius:8px;
-  border:1px dashed rgba(238,241,234,.15);
-  background:rgba(238,241,234,.03);
-  z-index:0;
-}
-.gc.lit{
-  background:rgba(242,193,78,.3) !important;
-  border:2px solid #f2c14e !important;
+  border:2px solid rgba(242,193,78,.5);
+  background:rgba(242,193,78,.15);
   cursor:crosshair;
-  z-index:10 !important;
+  transition:.1s;
 }
-.gc.lit:hover{background:rgba(242,193,78,.5) !important;}
+.gc:hover{background:rgba(242,193,78,.4);border-color:#f2c14e;}
 
 /* Widget cells */
-.wcell{
-  z-index:1;
-  border-radius:8px;
-  overflow:hidden;
-}
-.wcell.picked{outline:3px solid #f2c14e;outline-offset:2px;}
-.widget{
-  background:#1f3a2c;
-  border:1px solid rgba(238,241,234,.18);
-  border-radius:8px;
-  height:100%;
-  display:flex;flex-direction:column;
-}
-.whdr{
-  padding:8px 12px;
-  border-bottom:1px solid rgba(238,241,234,.09);
-  display:flex;align-items:center;gap:8px;
-}
-.whdr h3{flex:1;font-size:.9rem;}
-.mvbtn{
-  background:rgba(242,193,78,.2);
-  border:1px solid rgba(242,193,78,.5);
-  color:#f2c14e;
-  padding:3px 8px;
-  border-radius:5px;
-  font-size:.75rem;
-  cursor:pointer;
-  font-weight:700;
-}
-.wbody{padding:10px;font-size:.8rem;color:#aebcb1;}
+.wcell{z-index:1;border-radius:8px;overflow:hidden;}
+.wcell.picked{outline:3px solid #f2c14e;outline-offset:3px;z-index:2;}
+.widget{background:#1f3a2c;border:1px solid rgba(238,241,234,.18);border-radius:8px;height:100%;display:flex;flex-direction:column;}
+.whdr{padding:8px 12px;border-bottom:1px solid rgba(238,241,234,.09);display:flex;align-items:center;gap:6px;}
+.whdr h3{flex:1;font-size:.88rem;}
+.mvbtn,.szbtn{background:rgba(242,193,78,.2);border:1px solid rgba(242,193,78,.5);color:#f2c14e;padding:3px 7px;border-radius:5px;font-size:.72rem;cursor:pointer;font-weight:700;}
+.wbody{padding:10px;font-size:.8rem;color:#aebcb1;flex:1;}
+
+/* Size modal */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center;}
+.modal-bg.open{display:flex;}
+.modal{background:#1f3a2c;border:1px solid rgba(238,241,234,.25);border-radius:12px;padding:18px;min-width:280px;}
+.modal h3{color:#f2c14e;margin-bottom:14px;}
+.mlbl{font-size:.75rem;color:#aebcb1;margin-bottom:5px;font-weight:700;}
+.pills{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
+.pill{background:#274a37;border:1px solid rgba(238,241,234,.15);color:#aebcb1;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:.82rem;font-weight:700;}
+.pill.on{background:#f2c14e;color:#21321f;border-color:#f2c14e;}
+.modal-act{display:flex;justify-content:flex-end;}
 </style>
 </head>
 <body>
-<h2>Test grille</h2>
-<div id="status">Clique sur ✥ pour sélectionner un widget, puis sur une case jaune pour le déplacer.</div>
-<button class="btn" id="resetbtn">Réinitialiser positions</button>
+<h2>Test grille — déplacement + taille</h2>
+<div id="status">Clique sur ✥ pour sélectionner, puis une case. Clique sur ⊞ pour changer la taille.</div>
+<button class="btn" id="resetbtn">↺ Réinitialiser</button>
 
 <div class="grid-wrap">
+  <!-- Ghost overlay — shown when a widget is selected -->
+  <div class="ghost-layer" id="ghost-layer"></div>
+  <!-- Widgets -->
   <div class="grid" id="grid"></div>
+</div>
+
+<!-- Size modal -->
+<div class="modal-bg" id="modal-bg">
+  <div class="modal">
+    <h3>⊞ Taille du widget</h3>
+    <div class="mlbl">Largeur (colonnes)</div>
+    <div class="pills" id="w-pills">
+      <button class="pill" data-w="1">1</button>
+      <button class="pill" data-w="2">2</button>
+      <button class="pill" data-w="3">3</button>
+      <button class="pill" data-w="4">4</button>
+    </div>
+    <div class="mlbl">Hauteur</div>
+    <div class="pills" id="h-pills">
+      <button class="pill" data-h="1">Petite</button>
+      <button class="pill" data-h="2">Moyenne</button>
+      <button class="pill" data-h="3">Grande</button>
+    </div>
+    <div class="modal-act">
+      <button class="btn" id="modal-close">Fermer</button>
+    </div>
+  </div>
 </div>
 
 <script>
 const log = msg => document.getElementById('status').textContent = msg;
 
-// Layout state
 let layout = {
   sport: {c:1, r:1, w:2, h:2},
-  tasks: {c:3, r:1, w:2, h:2}
+  tasks: {c:3, r:1, w:2, h:2},
 };
 let selected = null;
-
-const COLS = 4, ROWS = 4;
-
-// Build widgets
+let sizingId = null;
+const COLS = 4, ROWS = 5;
 const WIDGETS = {
-  sport: {icon:'💪', title:'Sport', body:'Tes séances de musculation'},
-  tasks: {icon:'✅', title:'Tâches', body:'Ta liste de tâches'},
+  sport: {icon:'💪', title:'Sport'},
+  tasks: {icon:'✅', title:'Tâches'},
 };
 
-function applyLayout() {
+/* ── GHOST LAYER ── */
+function buildGhostLayer() {
+  const layer = document.getElementById('ghost-layer');
+  layer.innerHTML = '';
+  // Size the layer to match the grid
   const grid = document.getElementById('grid');
-  
-  // Remove existing ghost cells and widgets
-  grid.innerHTML = '';
-  
-  // Add ghost cells first (z-index 0, behind widgets)
-  for(let r=1; r<=ROWS; r++) {
+  const maxRow = Math.max(...Object.values(layout).map(p=>p.r+p.h-1), ROWS);
+  layer.style.gridTemplateRows = `repeat(${maxRow},120px)`;
+  grid.style.gridTemplateRows = `repeat(${maxRow},120px)`;
+
+  for(let r=1; r<=maxRow; r++) {
     for(let c=1; c<=COLS; c++) {
       const gc = document.createElement('div');
       gc.className = 'gc';
       gc.style.gridColumn = c;
       gc.style.gridRow = r;
-      gc.dataset.c = c;
-      gc.dataset.r = r;
       gc.addEventListener('click', () => {
         if(!selected) return;
         layout[selected].c = c;
         layout[selected].r = r;
-        log('✅ ' + selected + ' déplacé en col='+c+' row='+r);
+        log(`✅ ${selected} → col ${c}, row ${r}`);
+        hideGhosts();
         selected = null;
-        applyLayout();
+        renderWidgets();
       });
-      grid.appendChild(gc);
+      layer.appendChild(gc);
     }
   }
-  
-  // Add widgets on top (z-index 1)
+}
+
+function showGhosts() {
+  buildGhostLayer();
+  document.getElementById('ghost-layer').classList.add('active');
+}
+function hideGhosts() {
+  document.getElementById('ghost-layer').classList.remove('active');
+}
+
+/* ── WIDGETS ── */
+function renderWidgets() {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  const maxRow = Math.max(...Object.values(layout).map(p=>p.r+p.h-1), ROWS);
+  grid.style.gridTemplateRows = `repeat(${maxRow},120px)`;
+
   Object.entries(WIDGETS).forEach(([id, w]) => {
     const p = layout[id];
     const cell = document.createElement('div');
     cell.className = 'wcell' + (selected===id ? ' picked' : '');
     cell.id = 'wc-'+id;
-    cell.style.gridColumn = p.c + '/span ' + p.w;
-    cell.style.gridRow = p.r + '/span ' + p.h;
-    cell.style.zIndex = '1';
+    cell.style.gridColumn = `${p.c}/span ${p.w}`;
+    cell.style.gridRow    = `${p.r}/span ${p.h}`;
+
     cell.innerHTML = `
       <div class="widget">
         <div class="whdr">
           <span>${w.icon}</span>
           <h3>${w.title}</h3>
-          <button class="mvbtn" data-id="${id}">✥ Déplacer</button>
+          <button class="mvbtn" data-id="${id}">✥</button>
+          <button class="szbtn" data-id="${id}">⊞</button>
         </div>
-        <div class="wbody">${w.body}</div>
+        <div class="wbody">Widget ${w.title} — ${p.w} col × ${p.h} lignes</div>
       </div>`;
-    
+
+    // Move button
     cell.querySelector('.mvbtn').addEventListener('click', e => {
       e.stopPropagation();
       if(selected === id) {
-        // Deselect
         selected = null;
-        document.querySelectorAll('.gc').forEach(g=>g.classList.remove('lit'));
+        hideGhosts();
+        renderWidgets();
         log('Désélectionné');
       } else {
-        // Select
         selected = id;
-        document.querySelectorAll('.gc').forEach(g=>g.classList.add('lit'));
-        log('✥ ' + id + ' sélectionné — clique sur une case jaune pour déplacer');
+        renderWidgets(); // redraw to show 'picked'
+        showGhosts();    // show overlay AFTER redraw
+        log(`✥ ${id} sélectionné — clique sur une case jaune`);
       }
-      applyLayout(); // redraw to update 'picked' class
     });
-    
+
+    // Size button
+    cell.querySelector('.szbtn').addEventListener('click', e => {
+      e.stopPropagation();
+      sizingId = id;
+      const p2 = layout[id];
+      document.querySelectorAll('#w-pills .pill').forEach(b=>b.classList.toggle('on', Number(b.dataset.w)===p2.w));
+      document.querySelectorAll('#h-pills .pill').forEach(b=>b.classList.toggle('on', Number(b.dataset.h)===p2.h));
+      document.getElementById('modal-bg').classList.add('open');
+      log(`⊞ Taille de ${id} : ${p2.w}×${p2.h}`);
+    });
+
     grid.appendChild(cell);
   });
 }
 
+/* ── SIZE MODAL ── */
+document.getElementById('w-pills').addEventListener('click', e => {
+  const b = e.target.closest('.pill[data-w]');
+  if(!b || !sizingId) return;
+  layout[sizingId].w = Number(b.dataset.w);
+  document.querySelectorAll('#w-pills .pill').forEach(x=>x.classList.toggle('on', x===b));
+  renderWidgets();
+  log(`Largeur ${sizingId} → ${layout[sizingId].w} col`);
+});
+document.getElementById('h-pills').addEventListener('click', e => {
+  const b = e.target.closest('.pill[data-h]');
+  if(!b || !sizingId) return;
+  layout[sizingId].h = Number(b.dataset.h);
+  document.querySelectorAll('#h-pills .pill').forEach(x=>x.classList.toggle('on', x===b));
+  renderWidgets();
+  log(`Hauteur ${sizingId} → ${layout[sizingId].h} lignes`);
+});
+document.getElementById('modal-close').addEventListener('click', () => {
+  document.getElementById('modal-bg').classList.remove('open');
+});
+
+/* ── RESET ── */
 document.getElementById('resetbtn').addEventListener('click', () => {
   layout = {sport:{c:1,r:1,w:2,h:2}, tasks:{c:3,r:1,w:2,h:2}};
-  selected = null;
-  applyLayout();
-  log('Positions réinitialisées');
+  selected = null; hideGhosts(); renderWidgets();
+  log('Réinitialisé');
+});
+
+/* ── CLICK OUTSIDE DESELECTS ── */
+document.addEventListener('click', e => {
+  if(!selected) return;
+  if(e.target.closest('.wcell') || e.target.closest('.ghost-layer') || e.target.closest('.modal-bg')) return;
+  selected = null; hideGhosts(); renderWidgets();
 });
 
 // Init
-applyLayout();
+renderWidgets();
 </script>
 </body>
 </html>
