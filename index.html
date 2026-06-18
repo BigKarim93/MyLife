@@ -88,24 +88,31 @@ body.gedit .edit-hint{display:block;}
   position:relative;
 }
 /* Ghost cells injected by JS into wgrid */
+/* Ghost overlay layer */
+.ghost-layer{
+  display:none;
+  position:absolute;
+  inset:0;
+  grid-template-columns:repeat(4,1fr);
+  grid-auto-rows:160px;
+  gap:10px;
+  z-index:100;
+  pointer-events:none;
+}
+.ghost-layer.active{display:grid;pointer-events:all;}
 .gcell{
-  background:transparent;border:1px dashed transparent;
-  border-radius:var(--r);z-index:0;pointer-events:none;transition:.12s;
-}
-body.gedit .gcell{background:rgba(242,193,78,.04);border-color:rgba(242,193,78,.2);}
-body.gedit .gcell:hover{background:rgba(242,193,78,.1);border-color:rgba(242,193,78,.5);}
-.gcell.hi{
-  background:rgba(242,193,78,.25)!important;
-  border-color:var(--accent)!important;
-  border-style:solid!important;
-  pointer-events:all!important;
+  border-radius:var(--r);
+  border:2px solid rgba(242,193,78,.5);
+  background:rgba(242,193,78,.15);
   cursor:crosshair;
-  z-index:10!important;
+  transition:.1s;
 }
+.gcell:hover{background:rgba(242,193,78,.4);border-color:var(--accent);}
 
 /* ─ WIDGET CELL ─ */
 .wcell{position:relative;z-index:1;min-width:0;min-height:0;}
-.wcell.sel{outline:2px solid var(--accent);outline-offset:2px;border-radius:var(--r);}
+.wcell.picked{outline:3px solid var(--accent);outline-offset:3px;z-index:2;}
+
 
 /* Handle buttons — shown only in edit mode, inside widget-hdr */
 .wh-move,.wh-size{
@@ -359,7 +366,9 @@ body.gedit .wcell.sel .wh-move{background:var(--accent);color:#21321f;border-col
   <!-- Widgets -->
   <div class="grid-col">
     <div class="edit-hint">✥ Sélectionner → cliquer une case pour déplacer &nbsp;·&nbsp; ⊞ Changer la taille</div>
-    <div class="wgrid" id="wgrid">
+    <div style="position:relative;">
+      <div class="ghost-layer" id="ghost-layer"></div>
+      <div class="wgrid" id="wgrid">
       <!-- QCM -->
       <div class="wcell" id="wc-sport" style="grid-column:1/span 2;grid-row:1/span 3;z-index:1;">
         <div class="widget">
@@ -411,7 +420,8 @@ body.gedit .wcell.sel .wh-move{background:var(--accent);color:#21321f;border-col
           </div>
         </div>
       </div>
-    </div>
+      </div><!-- end wgrid -->
+    </div><!-- end grid-wrap -->
   </div>
 </div>
 
@@ -586,9 +596,9 @@ auth.onAuthStateChanged(async user=>{
   $('auth-wrap').classList.add('hi');
   $('page').classList.remove('hi');
   applyLayout();
+  wireGridHandles();
   renderMods();
-  // Wire move/size buttons — must be after page is visible
-  document.getElementById('debug-msg').textContent = '✅ Firebase OK — user: '+(user.email||'?');
+  document.getElementById('debug-msg').textContent = '✅ Firebase OK';
   document.getElementById('debug-move').onclick = ()=>{
     // Simulate clicking wmv-sport directly
     const el = document.getElementById('wmv-sport');
@@ -639,88 +649,105 @@ function clearAE(){$('aerr').style.display='none';}
 /* ════════════════════════════════════════
    GRID LAYOUT
 ════════════════════════════════════════ */
-function applyLayout(){
-  const maxR=Math.max(...Object.values(wLayout).filter(p=>p&&p.r).map(p=>p.r+p.h-1),6);
-  Object.entries(wLayout).forEach(([id,p])=>{
-    if(!p||!p.c)return;
-    const cell=$('wc-'+id);
-    if(!cell)return;
-    cell.style.gridColumn=p.c+'/span '+p.w;
-    cell.style.gridRow=p.r+'/span '+p.h;
-    cell.style.zIndex='1';
-  });
-  $('wgrid').style.gridTemplateRows='repeat('+(maxR+2)+',160px)';
-  rebuildGhosts(maxR+2);
-}
-function saveLayout(){if(!layDoc)return;clearTimeout(layT);layT=setTimeout(()=>layDoc.set(wLayout).catch(()=>{}),600);}
+// DEFAULT_LAYOUT declared above
+let selected=null, sizingId=null;
 
-function rebuildGhosts(rows){
-  document.querySelectorAll('#wgrid .gcell').forEach(g=>g.remove());
-  const g=$('wgrid');
-  for(let r=1;r<=rows;r++) for(let c=1;c<=4;c++){
-    const el=document.createElement('div');
-    el.className='gcell';
-    el.style.gridColumn=c;el.style.gridRow=r;
-    el.dataset.c=c;el.dataset.r=r;
-    el.addEventListener('click',()=>{
-      if(!selW)return;
-      wLayout[selW].c=c;wLayout[selW].r=r;
-      applyLayout();saveLayout();deselW();
+function buildGhostLayer(){
+  const layer=$('ghost-layer');
+  layer.innerHTML='';
+  const maxR=Math.max(...Object.values(wLayout).filter(p=>p&&p.r).map(p=>p.r+p.h-1),4);
+  layer.style.gridTemplateRows='repeat('+maxR+',160px)';
+  $('wgrid').style.gridTemplateRows='repeat('+maxR+',160px)';
+  for(let r=1;r<=maxR;r++) for(let c=1;c<=4;c++){
+    const gc=document.createElement('div');
+    gc.className='gcell';
+    gc.style.gridColumn=c; gc.style.gridRow=r;
+    gc.addEventListener('click',()=>{
+      if(!selected)return;
+      wLayout[selected].c=c; wLayout[selected].r=r;
+      hideGhosts(); selected=null;
+      renderWidgetPositions(); saveLayout();
     });
-    g.appendChild(el);
+    layer.appendChild(gc);
   }
 }
+function showGhosts(){buildGhostLayer();$('ghost-layer').classList.add('active');}
+function hideGhosts(){$('ghost-layer').classList.remove('active');}
 
-/* Edit mode */
+function renderWidgetPositions(){
+  ['sport','tasks'].forEach(id=>{
+    const p=wLayout[id];
+    const cell=$('wc-'+id);
+    if(!cell||!p)return;
+    cell.style.gridColumn=p.c+'/span '+p.w;
+    cell.style.gridRow=p.r+'/span '+p.h;
+    cell.classList.toggle('picked', selected===id);
+  });
+}
+
+function applyLayout(){
+  if(!wLayout.sport) wLayout=JSON.parse(JSON.stringify(DEFAULT_LAYOUT));
+  renderWidgetPositions();
+}
+
+function saveLayout(){
+  if(!layDoc)return;
+  clearTimeout(layT);
+  layT=setTimeout(()=>layDoc.set(wLayout).catch(()=>{}),600);
+}
+
+// Wire move/size buttons — called after Firebase init
+function wireGridHandles(){
+  ['sport','tasks'].forEach(id=>{
+    const mv=$('wmv-'+id), sz=$('wsz-'+id);
+    if(!mv||!sz)return;
+    mv.onclick=e=>{
+      e.stopPropagation();
+      if(!gedit)return;
+      if(selected===id){selected=null;hideGhosts();renderWidgetPositions();}
+      else{selected=id;renderWidgetPositions();showGhosts();}
+    };
+    sz.onclick=e=>{
+      e.stopPropagation();
+      if(!gedit)return;
+      sizingId=id;
+      const p=wLayout[id]||{w:2,h:2};
+      document.querySelectorAll('#sw-pills .pill').forEach(b=>b.classList.toggle('on',Number(b.dataset.w)===p.w));
+      document.querySelectorAll('#sh-pills .pill').forEach(b=>b.classList.toggle('on',Number(b.dataset.h)===p.h));
+      $('ov-size').classList.add('op');
+    };
+  });
+}
+
+// Edit mode toggle
 $('btn-gedit').addEventListener('click',()=>{
   gedit=!gedit;
   $('btn-gedit').classList.toggle('act',gedit);
   document.body.classList.toggle('gedit',gedit);
-  if(!gedit)deselW();
+  if(!gedit){selected=null;hideGhosts();renderWidgetPositions();}
 });
 
-function selW2(id){
-  deselW();selW=id;
-  $('wc-'+id).classList.add('sel');
-  document.querySelectorAll('.gcell').forEach(g=>{
-    g.classList.add('hi');
-    g.style.pointerEvents='all';
-    g.style.zIndex='10';
-  });
-}
-function deselW(){
-  selW=null;
-  document.querySelectorAll('.wcell').forEach(c=>c.classList.remove('sel'));
-  document.querySelectorAll('.gcell').forEach(g=>{
-    g.classList.remove('hi');
-    g.style.pointerEvents='';
-    g.style.zIndex='';
-  });
-}
-document.addEventListener('click',e=>{
-  if(!selW)return;
-  if(e.target.closest('.wcell')||e.target.closest('.gcell')||e.target.closest('.ov'))return;
-  deselW();
-});
-
-/* move/size wiring moved inside Firebase init */
-
-/* Size pills */
+// Size pills
 $('sw-pills').addEventListener('click',e=>{
-  const b=e.target.closest('.pill[data-w]');if(!b||!sizW)return;
-  const w=Number(b.dataset.w);
-  wLayout[sizW].w=w;
-  document.querySelectorAll('#sw-pills .pill').forEach(x=>x.classList.toggle('on',Number(x.dataset.w)===w));
-  applyLayout();saveLayout();
+  const b=e.target.closest('.pill[data-w]');if(!b||!sizingId)return;
+  wLayout[sizingId].w=Number(b.dataset.w);
+  document.querySelectorAll('#sw-pills .pill').forEach(x=>x.classList.toggle('on',x===b));
+  renderWidgetPositions(); saveLayout();
 });
 $('sh-pills').addEventListener('click',e=>{
-  const b=e.target.closest('.pill[data-h]');if(!b||!sizW)return;
-  const h=Number(b.dataset.h);
-  wLayout[sizW].h=h;
-  document.querySelectorAll('#sh-pills .pill').forEach(x=>x.classList.toggle('on',Number(x.dataset.h)===h));
-  applyLayout();saveLayout();
+  const b=e.target.closest('.pill[data-h]');if(!b||!sizingId)return;
+  wLayout[sizingId].h=Number(b.dataset.h);
+  document.querySelectorAll('#sh-pills .pill').forEach(x=>x.classList.toggle('on',x===b));
+  renderWidgetPositions(); saveLayout();
 });
 $('szdone').addEventListener('click',()=>$('ov-size').classList.remove('op'));
+
+// Click outside deselects
+document.addEventListener('click',e=>{
+  if(!selected)return;
+  if(e.target.closest('.wcell')||e.target.closest('#ghost-layer')||e.target.closest('.ov'))return;
+  selected=null; hideGhosts(); renderWidgetPositions();
+});
 
 /* ════════════════════════════════════════
    MODULES
