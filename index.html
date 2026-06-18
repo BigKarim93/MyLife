@@ -5,15 +5,14 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>MyLife</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@700&family=Scheherazade+New:wght@400;700&family=Work+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@700&family=Work+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#16261e;--bg2:#1f3a2c;--bg3:#274a37;
   --line:rgba(238,241,234,.09);--line2:rgba(238,241,234,.18);
   --chalk:#f1efe4;--dim:#aebcb1;--accent:#f2c14e;
   --green:#4ade80;--gl:rgba(74,222,128,.13);
-  --blue:#60a5fa;--bl:rgba(96,165,250,.13);
-  --red:#f87171;--rl:rgba(248,113,113,.13);
+  --blue:#60a5fa;--red:#f87171;--rl:rgba(248,113,113,.13);
   --teal:#2dd4bf;--tl:rgba(45,212,191,.12);
   --r:12px;
 }
@@ -21,22 +20,17 @@
 body{font-family:'Work Sans',sans-serif;background:var(--bg);color:var(--chalk);min-height:100vh;}
 h1,h2,h3{font-family:'Kalam',cursive;}
 input,button,select{font-family:inherit;}
+.btn{background:var(--bg3);border:1px solid var(--line);color:var(--chalk);padding:6px 12px;border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;}
+.btn:hover{border-color:var(--accent);}
+.btn.prim{background:var(--accent);color:#21321f;border-color:var(--accent);}
+.btn.sm{padding:4px 8px;font-size:.72rem;}
+.btn.dn{background:#5a2b2b;border-color:#7a3a3a;}
 
 /* TOPBAR */
 .tb{position:sticky;top:0;z-index:50;background:linear-gradient(var(--bg2),rgba(31,58,44,.95));
   border-bottom:2px solid var(--line2);padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;backdrop-filter:blur(4px);}
 .tb h1{font-size:1.3rem;color:var(--accent);}
 .tb-r{margin-left:auto;display:flex;align-items:center;gap:8px;}
-
-/* BUTTONS */
-.btn{background:var(--bg3);border:1px solid var(--line);color:var(--chalk);padding:6px 12px;
-  border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer;transition:.15s;
-  display:inline-flex;align-items:center;gap:5px;white-space:nowrap;}
-.btn:hover{border-color:var(--accent);}
-.btn.prim{background:var(--accent);color:#21321f;border-color:var(--accent);}
-.btn.act{background:var(--accent);color:#21321f;border-color:var(--accent);}
-.btn.sm{padding:4px 8px;font-size:.72rem;}
-.btn.dn{background:#5a2b2b;border-color:#7a3a3a;}
 
 /* AUTH */
 .auth-wrap{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 62px);padding:20px;}
@@ -56,108 +50,44 @@ input,button,select{font-family:inherit;}
 /* PAGE */
 .page{display:flex;gap:12px;padding:12px;align-items:flex-start;}
 
-/* MODULES COL */
+/* MODULES */
 .mod-col{width:190px;flex-shrink:0;display:flex;flex-direction:column;gap:7px;}
 .mod-col-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;}
 .mod-col-hdr h2{font-size:.9rem;}
-.mtile{background:var(--bg2);border:1px solid var(--line2);border-radius:9px;padding:10px;
-  color:var(--chalk);display:flex;align-items:center;gap:8px;position:relative;transition:.15s;cursor:pointer;}
+.mtile{background:var(--bg2);border:1px solid var(--line2);border-radius:9px;padding:10px;color:var(--chalk);display:flex;align-items:center;gap:8px;position:relative;transition:.15s;cursor:pointer;}
 .mtile:hover{border-color:var(--accent);}
 .mico{font-size:1.3rem;line-height:1;flex-shrink:0;}
 .minfo h3{font-size:.83rem;font-family:'Kalam',cursive;}
 .minfo p{font-size:.65rem;color:var(--dim);}
-.mdel{position:absolute;top:-6px;right:-6px;width:17px;height:17px;border-radius:50%;
-  background:#c0392b;color:#fff;border:2px solid var(--bg);font-size:9px;
-  display:none;align-items:center;justify-content:center;cursor:pointer;z-index:5;}
-.mtile.drag-over{border-color:var(--accent);background:rgba(242,193,78,.07);}
+.mdel{position:absolute;top:-6px;right:-6px;width:17px;height:17px;border-radius:50%;background:#c0392b;color:#fff;border:2px solid var(--bg);font-size:9px;display:none;align-items:center;justify-content:center;cursor:pointer;z-index:5;}
+.mtile.drag-over{border-color:var(--accent);}
 .mtile.dragging{opacity:.4;}
 .mtile.dis{opacity:.4;}
-.add-mod{background:transparent;border:2px dashed var(--line);border-radius:9px;padding:9px;
-  display:flex;align-items:center;justify-content:center;gap:5px;cursor:pointer;
-  color:var(--dim);font-size:.8rem;font-weight:600;transition:.15s;width:100%;}
+.add-mod{background:transparent;border:2px dashed var(--line);border-radius:9px;padding:9px;display:flex;align-items:center;justify-content:center;gap:5px;cursor:pointer;color:var(--dim);font-size:.8rem;font-weight:600;transition:.15s;width:100%;}
 .add-mod:hover{border-color:var(--accent);color:var(--accent);}
 
-/* GRID AREA */
+/* === GRID (copied from grid_test.html) === */
 .grid-col{flex:1;min-width:0;}
-
-/* Wrapper for position:relative so ghost overlay works */
 .grid-wrap{position:relative;}
-
-/* Ghost overlay — shown on top of everything when a widget is selected */
 .ghost-layer{
-  display:none;
-  position:absolute;
-  top:0;left:0;right:0;bottom:0;
-  grid-template-columns:repeat(4,1fr);
-  grid-auto-rows:160px;
-  gap:10px;
-  z-index:100;
-  pointer-events:none;
+  display:none;position:absolute;top:0;left:0;right:0;bottom:0;
+  grid-template-columns:repeat(4,1fr);grid-auto-rows:160px;gap:10px;
+  z-index:100;pointer-events:none;
 }
 .ghost-layer.active{display:grid;pointer-events:all;}
-.gcell{
-  border-radius:var(--r);
-  border:2px solid rgba(242,193,78,.5);
-  background:rgba(242,193,78,.15);
-  cursor:crosshair;
-  transition:.1s;
-}
+.gcell{border-radius:var(--r);border:2px solid rgba(242,193,78,.5);background:rgba(242,193,78,.15);cursor:crosshair;transition:.1s;}
 .gcell:hover{background:rgba(242,193,78,.45);border-color:var(--accent);}
-
-/* Widget grid */
-.wgrid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  grid-auto-rows:160px;
-  gap:10px;
-}
-
-/* Widget cells */
+.wgrid{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:160px;gap:10px;}
 .wcell{position:relative;z-index:1;min-width:0;min-height:0;}
 .wcell.picked{outline:3px solid var(--accent);outline-offset:3px;z-index:2;}
+.wh-move,.wh-size{display:none;background:rgba(242,193,78,.2);border:1px solid rgba(242,193,78,.5);border-radius:5px;padding:3px 7px;cursor:pointer;font-size:.7rem;color:var(--accent);font-weight:700;user-select:none;}
+body.gedit .wh-move,body.gedit .wh-size{display:inline-flex;align-items:center;}
 
-/* Handle buttons inside widget header */
-.wh-move,.wh-size{
-  display:none;
-  background:rgba(242,193,78,.2);border:1px solid rgba(242,193,78,.5);
-  border-radius:5px;padding:3px 7px;cursor:pointer;font-size:.7rem;color:var(--accent);
-  font-weight:700;user-select:none;
-}
-body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;}
-
-/* Widget */
-.widget{background:var(--bg2);border:1px solid var(--line2);border-radius:var(--r);
-  display:flex;flex-direction:column;height:100%;overflow:hidden;}
+/* WIDGET */
+.widget{background:var(--bg2);border:1px solid var(--line2);border-radius:var(--r);display:flex;flex-direction:column;height:100%;overflow:hidden;}
 .whdr{padding:9px 12px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:7px;flex-shrink:0;}
 .whdr h2{font-size:.88rem;flex:1;}
 .wbody{padding:10px 12px;overflow-y:auto;flex:1;min-height:0;}
-
-/* SPORT */
-.spwr{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
-.spwl{font-size:.75rem;color:var(--dim);}
-.spwl strong{color:var(--chalk);}
-.wbar{flex:1;height:7px;background:var(--line);border-radius:4px;overflow:hidden;}
-.wbf{height:100%;background:linear-gradient(90deg,var(--green),var(--teal));border-radius:4px;transition:width .6s;}
-.msrow{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:8px;}
-.ms{font-size:.6rem;padding:2px 5px;border-radius:10px;border:1px solid var(--line);color:var(--dim);}
-.ms.dn{background:var(--gl);border-color:var(--green);color:var(--green);font-weight:700;}
-.ms.nx{background:var(--tl);border-color:var(--teal);color:var(--teal);font-weight:700;}
-.smon{margin-bottom:8px;}
-.smhdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
-.smname{font-family:'Kalam',cursive;font-size:.85rem;color:var(--accent);}
-.smcnt{font-size:.68rem;color:var(--dim);}
-.swks{display:flex;flex-direction:column;gap:3px;}
-.swrow{display:flex;align-items:center;gap:5px;}
-.swlbl{width:28px;font-size:.62rem;color:var(--dim);flex-shrink:0;}
-.sdots{display:flex;gap:3px;}
-.sdot{width:15px;height:15px;border-radius:50%;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:.52rem;}
-.sdot.dn{background:var(--gl);border-color:var(--green);color:var(--green);}
-.sdot.mi{background:var(--rl);border-color:var(--red);color:var(--red);}
-.sdot.fu{background:var(--bg3);}
-.sstats{display:flex;gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid var(--line);}
-.sstat{flex:1;text-align:center;background:var(--bg3);border:1px solid var(--line);border-radius:6px;padding:5px 3px;}
-.ssv{font-family:'Kalam',cursive;font-size:.95rem;font-weight:700;}
-.ssl{font-size:.58rem;color:var(--dim);margin-top:1px;}
 
 /* TASKS */
 .ttabs{display:flex;gap:6px;margin-bottom:8px;border-bottom:1px solid var(--line);padding-bottom:7px;}
@@ -173,11 +103,10 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 .tcats{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px;}
 .tcpill{font-size:.65rem;padding:2px 7px;border-radius:12px;border:1px solid var(--line);color:var(--dim);cursor:pointer;background:var(--bg3);transition:.15s;}
 .tcpill.on{border-color:var(--accent);color:var(--accent);}
-.tlist{display:flex;flex-direction:column;gap:4px;max-height:240px;overflow-y:auto;}
+.tlist{display:flex;flex-direction:column;gap:4px;max-height:220px;overflow-y:auto;}
 .titem{display:flex;align-items:center;gap:7px;padding:7px 9px;background:var(--bg3);border:1px solid var(--line);border-radius:7px;cursor:grab;}
 .titem:hover{border-color:var(--line2);}
 .titem.done-item{opacity:.5;}
-.titem.drag-ov{border-color:var(--accent)!important;background:rgba(242,193,78,.06)!important;}
 .tck{width:16px;height:16px;border-radius:4px;border:2px solid var(--line);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:transparent;}
 .tck.on{background:var(--green);border-color:var(--green);}
 .tck.on::after{content:'✓';font-size:.65rem;color:#0f1117;font-weight:700;}
@@ -190,13 +119,35 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 .tbadge{font-size:.6rem;padding:1px 5px;border-radius:8px;border:1px solid var(--line);color:var(--dim);flex-shrink:0;}
 .empty{text-align:center;padding:20px;color:var(--dim);font-size:.78rem;}
 
+/* SPORT */
+.wbar{height:7px;background:var(--line);border-radius:4px;overflow:hidden;margin:4px 0 8px;}
+.wbf{height:100%;background:linear-gradient(90deg,var(--green),var(--teal));border-radius:4px;transition:width .6s;}
+.msrow{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:8px;}
+.ms{font-size:.6rem;padding:2px 5px;border-radius:10px;border:1px solid var(--line);color:var(--dim);}
+.ms.dn{background:var(--gl);border-color:var(--green);color:var(--green);font-weight:700;}
+.ms.nx{background:var(--tl);border-color:var(--teal);color:var(--teal);font-weight:700;}
+.smhdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.smname{font-family:'Kalam',cursive;font-size:.85rem;color:var(--accent);}
+.smcnt{font-size:.68rem;color:var(--dim);}
+.swks{display:flex;flex-direction:column;gap:3px;margin-bottom:8px;}
+.swrow{display:flex;align-items:center;gap:5px;}
+.swlbl{width:28px;font-size:.62rem;color:var(--dim);flex-shrink:0;}
+.sdots{display:flex;gap:3px;}
+.sdot{width:15px;height:15px;border-radius:50%;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:.52rem;}
+.sdot.dn{background:var(--gl);border-color:var(--green);color:var(--green);}
+.sdot.mi{background:var(--rl);border-color:var(--red);color:var(--red);}
+.sdot.fu{background:var(--bg3);}
+.sstats{display:flex;gap:6px;padding-top:8px;border-top:1px solid var(--line);}
+.sstat{flex:1;text-align:center;background:var(--bg3);border:1px solid var(--line);border-radius:6px;padding:5px 3px;}
+.ssv{font-family:'Kalam',cursive;font-size:.95rem;font-weight:700;}
+.ssl{font-size:.58rem;color:var(--dim);margin-top:1px;}
+
 /* EMOJI PICKER */
 .epf{position:relative;}
 .epr{display:flex;gap:5px;align-items:center;}
 .epinp{width:46px;font-size:1.2rem;text-align:center;background:var(--bg);border:1px solid var(--line);color:var(--chalk);border-radius:6px;padding:4px;}
 .eptog{background:var(--bg3);border:1px solid var(--line);color:var(--dim);border-radius:6px;padding:4px 9px;cursor:pointer;font-size:.75rem;}
-.epdd{display:none;position:absolute;left:0;top:calc(100% + 4px);background:var(--bg2);border:1px solid var(--line2);
-  border-radius:9px;padding:10px;z-index:200;width:290px;max-height:200px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.45);}
+.epdd{display:none;position:absolute;left:0;top:calc(100% + 4px);background:var(--bg2);border:1px solid var(--line2);border-radius:9px;padding:10px;z-index:200;width:290px;max-height:200px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.45);}
 .epdd.op{display:block;}
 .ecatlbl{font-size:.62rem;color:var(--dim);font-weight:700;text-transform:uppercase;margin:5px 0 3px;}
 .ecatlbl:first-child{margin-top:0;}
@@ -231,15 +182,10 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 .lbox p{margin-top:10px;font-size:.88rem;}
 .spin{width:30px;height:30px;border-radius:50%;border:3px solid var(--line2);border-top-color:var(--accent);margin:0 auto;animation:sp .8s linear infinite;}
 @keyframes sp{to{transform:rotate(360deg)}}
-
-@media(max-width:700px){
-  .page{flex-direction:column;}
-  .mod-col{width:100%;}
-  .wgrid{grid-template-columns:repeat(2,1fr);}
-}
+@media(max-width:700px){.page{flex-direction:column;}.mod-col{width:100%;}.wgrid{grid-template-columns:repeat(2,1fr);}}
 </style>
 </head>
-<body class="gedit">
+<body>
 
 <div class="ls" id="ls"><div class="lbox"><div class="spin"></div><p>Connexion…</p></div></div>
 
@@ -253,7 +199,6 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
   </div>
 </div>
 
-<!-- AUTH -->
 <div class="auth-wrap hi" id="auth-wrap">
   <div class="auth-box">
     <h2>MyLife</h2><p class="auth-sub">Connecte-toi pour accéder à tes modules.</p>
@@ -270,23 +215,18 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
   </div>
 </div>
 
-<!-- MAIN -->
 <div class="page hi" id="page">
-
-  <!-- Modules -->
   <div class="mod-col">
     <div class="mod-col-hdr"><h2>Modules</h2><button class="btn sm" id="btn-medit">✏️</button></div>
     <div id="mlist"></div>
     <button class="add-mod" id="btn-addm">＋ Ajouter</button>
   </div>
-
-  <!-- Widgets -->
   <div class="grid-col">
     <div class="grid-wrap">
       <div class="ghost-layer" id="ghost-layer"></div>
       <div class="wgrid" id="wgrid">
 
-        <!-- SPORT -->
+        <!-- TACHES -->
         <div class="wcell" id="wc-tasks" style="grid-column:1/span 2;grid-row:1/span 3;">
           <div class="widget">
             <div class="whdr">
@@ -313,10 +253,7 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
                 <div class="tcats" id="tcatfilt"></div>
                 <div class="tlist" id="tlist"></div>
               </div>
-              <div id="tab-done" class="hi">
-                <div style="font-size:.68rem;color:var(--dim);margin-bottom:6px;">Supprimées après 7 jours.</div>
-                <div class="tlist" id="tdlist"></div>
-              </div>
+              <div id="tab-done" class="hi"><div style="font-size:.68rem;color:var(--dim);margin-bottom:6px;">Supprimées après 7 jours.</div><div class="tlist" id="tdlist"></div></div>
               <div id="tab-cats" class="hi">
                 <div class="tadd"><input type="text" id="catinp" placeholder="Nouvelle catégorie…" maxlength="30"><button class="btn prim" id="catadd">+</button></div>
                 <div class="tlist" id="tclist"></div>
@@ -325,84 +262,17 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
           </div>
         </div>
 
-      </div>
-    </div>
-
-        <div class="wcell" id="wc-tasks2" style="grid-column:1/span 2;grid-row:4/span 3;">
+        <!-- SPORT -->
+        <div class="wcell" id="wc-sport" style="grid-column:3/span 2;grid-row:1/span 3;">
           <div class="widget">
             <div class="whdr">
-              <span>✅</span><h2>Tâches 2</h2>
-              <button class="wh-move" id="wmv-tasks2">✥</button>
-              <button class="wh-size" id="wsz-tasks2">⊞</button>
+              <span>💪</span><h2>Sport</h2>
+              <button class="wh-move" id="wmv-sport">✥</button>
+              <button class="wh-size" id="wsz-sport">⊞</button>
             </div>
             <div class="wbody">
-              <div class="ttabs">
-                <button class="ttab on" id="ttab2-todo">À faire</button>
-                <button class="ttab" id="ttab2-done">Effectuées</button>
-                <button class="ttab" id="ttab2-cats">Catégories</button>
-              </div>
-              <div id="tab2-todo">
-                <div class="tadd"><input type="text" id="tinp2" placeholder="Nouvelle tâche…" maxlength="80"><button class="btn prim" id="tadd2-btn">+</button></div>
-                <div class="topt">
-                  <div class="tpsel">
-                    <button class="tpbtn on" data-p="🔴">🔴</button>
-                    <button class="tpbtn" data-p="🟡">🟡</button>
-                    <button class="tpbtn" data-p="🟢">🟢</button>
-                  </div>
-                  <select class="tcat-sel" id="tcatsel2"><option value="">Aucune catégorie</option></select>
-                </div>
-                <div class="tcats" id="tcatfilt2"></div>
-                <div class="tlist" id="tlist2"></div>
-              </div>
-              <div id="tab2-done" class="hi">
-                <div style="font-size:.68rem;color:var(--dim);margin-bottom:6px;">Supprimées après 7 jours.</div>
-                <div class="tlist" id="tdlist2"></div>
-              </div>
-              <div id="tab2-cats" class="hi">
-                <div class="tadd"><input type="text" id="catinp2" placeholder="Nouvelle catégorie…" maxlength="30"><button class="btn prim" id="catadd2">+</button></div>
-                <div class="tlist" id="tclist2"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-        <div class="wcell" id="wc-tasks3" style="grid-column:3/span 2;grid-row:4/span 3;">
-          <div class="widget">
-            <div class="whdr">
-              <span>✅</span><h2>Tâches 3</h2>
-              <button class="wh-move" id="wmv-tasks3">✥</button>
-              <button class="wh-size" id="wsz-tasks3">⊞</button>
-            </div>
-            <div class="wbody">
-              <div class="ttabs">
-                <button class="ttab on" id="ttab3-todo">À faire</button>
-                <button class="ttab" id="ttab3-done">Effectuées</button>
-                <button class="ttab" id="ttab3-cats">Catégories</button>
-              </div>
-              <div id="tab3-todo">
-                <div class="tadd"><input type="text" id="tinp3" placeholder="Nouvelle tâche…" maxlength="80"><button class="btn prim" id="tadd3-btn">+</button></div>
-                <div class="topt">
-                  <div class="tpsel">
-                    <button class="tpbtn on" data-p="🔴">🔴</button>
-                    <button class="tpbtn" data-p="🟡">🟡</button>
-                    <button class="tpbtn" data-p="🟢">🟢</button>
-                  </div>
-                  <select class="tcat-sel" id="tcatsel3"><option value="">Aucune catégorie</option></select>
-                </div>
-                <div class="tcats" id="tcatfilt3"></div>
-                <div class="tlist" id="tlist3"></div>
-              </div>
-              <div id="tab3-done" class="hi">
-                <div style="font-size:.68rem;color:var(--dim);margin-bottom:6px;">Supprimées après 7 jours.</div>
-                <div class="tlist" id="tdlist3"></div>
-              </div>
-              <div id="tab3-cats" class="hi">
-                <div class="tadd"><input type="text" id="catinp3" placeholder="Nouvelle catégorie…" maxlength="30"><button class="btn prim" id="catadd3">+</button></div>
-                <div class="tlist" id="tclist3"></div>
-              </div>
+              <button class="btn sm" id="wbtn-weigh" style="margin-bottom:8px;">⚖️ Peser</button>
+              <div id="spbody"></div>
             </div>
           </div>
         </div>
@@ -412,15 +282,12 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
   </div>
 </div>
 
-<!-- MODULE MODAL -->
+<!-- MODALS -->
 <div class="ov" id="ov-mod">
   <div class="modal">
     <h3 id="modtitle">Ajouter</h3>
     <div class="fld"><label>Emoji</label>
-      <div class="epf">
-        <div class="epr"><input type="text" id="moji" class="epinp" maxlength="4" placeholder="📦"><button type="button" class="eptog" id="etogg">Choisir ▾</button></div>
-        <div class="epdd" id="epdd"></div>
-      </div>
+      <div class="epf"><div class="epr"><input type="text" id="moji" class="epinp" maxlength="4" placeholder="📦"><button type="button" class="eptog" id="etogg">Choisir ▾</button></div><div class="epdd" id="epdd"></div></div>
     </div>
     <div class="fld"><label>Nom</label><input type="text" id="mname" maxlength="30"></div>
     <div class="fld"><label>Description</label><input type="text" id="mdesc" maxlength="60"></div>
@@ -432,51 +299,34 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
     </div>
   </div>
 </div>
-
-<!-- WEIGH MODAL -->
 <div class="ov" id="ov-weigh">
   <div class="modal" style="max-width:300px;">
     <h3>⚖️ Peser</h3>
     <div class="fld"><label>Poids (kg)</label><input type="number" id="wval" step="0.1" min="40" max="200" placeholder="96.8" style="font-size:1.1rem;"></div>
     <div class="fld"><label>Date</label><input type="date" id="wdat"></div>
-    <div class="modal-act">
-      <button class="btn" id="wcancel">Annuler</button>
-      <button class="btn prim" id="wsave">Enregistrer</button>
-    </div>
+    <div class="modal-act"><button class="btn" id="wcancel">Annuler</button><button class="btn prim" id="wsave">Enregistrer</button></div>
   </div>
 </div>
-
-<!-- SIZE MODAL -->
 <div class="ov" id="ov-size">
   <div class="modal" style="max-width:300px;">
-    <h3>⊞ Taille du widget</h3>
+    <h3>⊞ Taille</h3>
     <div class="fld"><label>Largeur (colonnes)</label>
       <div class="pills" id="sw-pills">
-        <button class="pill" data-w="1">1</button>
-        <button class="pill" data-w="2">2</button>
-        <button class="pill" data-w="3">3</button>
-        <button class="pill" data-w="4">4</button>
+        <button class="pill" data-w="1">1</button><button class="pill" data-w="2">2</button>
+        <button class="pill" data-w="3">3</button><button class="pill" data-w="4">4</button>
       </div>
     </div>
     <div class="fld"><label>Hauteur</label>
       <div class="pills" id="sh-pills">
-        <button class="pill" data-h="1">Petite</button>
-        <button class="pill" data-h="2">Moyenne</button>
-        <button class="pill" data-h="3">Grande</button>
-        <button class="pill" data-h="4">Très grande</button>
+        <button class="pill" data-h="1">Petite</button><button class="pill" data-h="2">Moyenne</button>
+        <button class="pill" data-h="3">Grande</button><button class="pill" data-h="4">Très grande</button>
       </div>
     </div>
     <div class="modal-act"><button class="btn prim" id="szdone">Fermer</button></div>
   </div>
 </div>
-
-<!-- THEME MODAL -->
 <div class="ov" id="ov-theme">
-  <div class="modal" style="max-width:500px;">
-    <h3>🎨 Thème</h3>
-    <div class="tgrid" id="tgrid"></div>
-    <div class="modal-act"><button class="btn prim" id="thclose">Fermer</button></div>
-  </div>
+  <div class="modal" style="max-width:500px;"><h3>🎨 Thème</h3><div class="tgrid" id="tgrid"></div><div class="modal-act"><button class="btn prim" id="thclose">Fermer</button></div></div>
 </div>
 
 <script src="firebase-config.js"></script>
@@ -484,37 +334,28 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
-const VOCAB =
-[{"ar": "أَنَا", "fr": "Je / Moi", "type": "pronom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "أَنْتَ", "fr": "Tu (masc.)", "type": "pronom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "أَنْتِ", "fr": "Tu (fém.)", "type": "pronom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "هُوَ", "fr": "Il", "type": "pronom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "هِيَ", "fr": "Elle", "type": "pronom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "نَحْنُ", "fr": "Nous", "type": "pronom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "اسْمِي", "fr": "Mon nom est / Je m\\", "type": "mot", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "اَلسَّلَامُ عَلَيْكُمْ", "fr": "Paix sur vous (salutation)", "type": "formule", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "وَعَلَيْكُمُ السَّلَامُ", "fr": "Et sur vous la paix (réponse)", "type": "formule", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "كَيْفَ حَالُكَ؟", "fr": "Comment vas-tu ? (masc.)", "type": "question", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "بِخَيْرٍ", "fr": "Bien", "type": "réponse", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "طَالِبٌ", "fr": "Étudiant (masc.)", "type": "nom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "طَالِبَةٌ", "fr": "Étudiante (fém.)", "type": "nom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "مُعَلِّمٌ", "fr": "Enseignant (masc.)", "type": "nom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "مُعَلِّمَةٌ", "fr": "Enseignante (fém.)", "type": "nom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "طَبِيبٌ / طَبِيبَةٌ", "fr": "Médecin (masc./fém.)", "type": "métier", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "مُهَنْدِسٌ", "fr": "Ingénieur", "type": "métier", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "مُحَامٍ", "fr": "Avocat", "type": "métier", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "أُسْتَاذٌ / أُسْتَاذَةٌ", "fr": "Professeur (masc./fém.)", "type": "métier", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "هُمْ", "fr": "Ils", "type": "pronom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "أَنْتُمْ", "fr": "Vous", "type": "pronom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "تَعَارُفٌ", "fr": "Présentation / Connaissance mutuelle", "type": "nom", "lesson": "ar01", "lessonTitle": "Les pronoms personnels"}, {"ar": "اَلْكِتَابُ", "fr": "Le livre", "type": "nom masc.", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "اَلْبَيْتُ", "fr": "La maison", "type": "nom masc.", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "اَلْوَلَدُ", "fr": "Le garçon", "type": "nom masc.", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "اَلْبِنْتُ", "fr": "La fille", "type": "nom fém.", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "الشَّمْسُ", "fr": "Le soleil (lettre solaire)", "type": "nom fém.", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "الْقَمَرُ", "fr": "La lune (lettre lunaire)", "type": "nom masc.", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "الرَّجُلُ", "fr": "L\\", "type": "mot", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "الْمَرْأَةُ", "fr": "La femme", "type": "nom fém.", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "الْمَدْرَسَةُ", "fr": "L\\", "type": "mot", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "الْقَلَمُ", "fr": "Le stylo", "type": "nom masc.", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "الطَّاوِلَةُ", "fr": "La table (lettre solaire)", "type": "nom fém.", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "الْبَابُ", "fr": "La porte", "type": "nom masc.", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "تَعْرِيفٌ", "fr": "Définition / Article défini", "type": "grammaire", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "حَرْفٌ شَمْسِيٌّ", "fr": "Lettre solaire", "type": "grammaire", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "حَرْفٌ قَمَرِيٌّ", "fr": "Lettre lunaire", "type": "grammaire", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "تَنْوِينٌ", "fr": "Tanwin (nunation)", "type": "grammaire", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "الْعَلَمُ", "fr": "Le drapeau", "type": "nom", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "النَّجْمُ", "fr": "L\\", "type": "mot", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "السَّمَاءُ", "fr": "Le ciel", "type": "nom", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "النُّورُ", "fr": "La lumière", "type": "nom", "lesson": "ar02", "lessonTitle": "L\\"}, {"ar": "الْغُرْفَةُ", "fr": "La chambre", "type": "nom", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "السَّرِيرُ", "fr": "Le lit", "type": "nom", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "الْمَكْتَبُ", "fr": "Le bureau", "type": "nom", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "الْكُرْسِيُّ", "fr": "La chaise", "type": "nom", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "النَّافِذَةُ", "fr": "La fenêtre", "type": "nom", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "الْحَقِيبَةُ", "fr": "Le sac", "type": "nom", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "فِي", "fr": "Dans / En", "type": "préposition", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "عَلَى", "fr": "Sur", "type": "préposition", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "تَحْتَ", "fr": "Sous", "type": "préposition", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "فَوْقَ", "fr": "Au-dessus de", "type": "préposition", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "أَمَامَ", "fr": "Devant", "type": "préposition", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "وَرَاءَ", "fr": "Derrière", "type": "préposition", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "الْمَطْبَخُ", "fr": "La cuisine", "type": "pièce", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "الْحَمَّامُ", "fr": "La salle de bain", "type": "pièce", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "الصَّالُونُ", "fr": "Le salon", "type": "pièce", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "الْفِنَاءُ", "fr": "La cour", "type": "pièce", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "الدَّرَجُ", "fr": "Les escaliers", "type": "nom", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "الْجَارُ", "fr": "Le voisin", "type": "nom", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "الشَّارِعُ", "fr": "La rue", "type": "nom", "lesson": "ar03", "lessonTitle": "Vocabulaire de la maison"}, {"ar": "كَتَبَ", "fr": "Il écrivit / a écrit", "type": "verbe", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "قَرَأَ", "fr": "Il lut / a lu", "type": "verbe", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "ذَهَبَ", "fr": "Il alla / est allé", "type": "verbe", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "أَكَلَ", "fr": "Il mangea / a mangé", "type": "verbe", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "شَرِبَ", "fr": "Il but / a bu", "type": "verbe", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "دَرَسَ", "fr": "Il étudia / a étudié", "type": "verbe", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "جَلَسَ", "fr": "Il s\\", "type": "mot", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "خَرَجَ", "fr": "Il sortit", "type": "verbe", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "دَخَلَ", "fr": "Il entra", "type": "verbe", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "فَهِمَ", "fr": "Il comprit", "type": "verbe", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "سَمِعَ", "fr": "Il entendit", "type": "verbe", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "فَتَحَ", "fr": "Il ouvrit", "type": "verbe", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "أَغْلَقَ", "fr": "Il ferma", "type": "verbe passé", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "وَصَلَ", "fr": "Il arriva", "type": "verbe passé", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "رَجَعَ", "fr": "Il retourna", "type": "verbe passé", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "بَدَأَ", "fr": "Il commença", "type": "verbe passé", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "انْتَهَى", "fr": "Il finit / Il termina", "type": "verbe passé", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "جَاءَ", "fr": "Il vint", "type": "verbe passé", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "أَخَذَ", "fr": "Il prit", "type": "verbe passé", "lesson": "ar04", "lessonTitle": "La racine trilitère arabe"}, {"ar": "أَبٌ / أَبِي", "fr": "Père / Mon père", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "أُمٌّ / أُمِّي", "fr": "Mère / Ma mère", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "أَخٌ / أَخِي", "fr": "Frère / Mon frère", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "أُخْتٌ / أُخْتِي", "fr": "Sœur / Ma sœur", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "جَدٌّ / جَدِّي", "fr": "Grand-père / Mon grand-père", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "جَدَّةٌ / جَدَّتِي", "fr": "Grand-mère / Ma grand-mère", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "ابْنٌ / ابْنِي", "fr": "Fils / Mon fils", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "بِنْتٌ / بِنْتِي", "fr": "Fille / Ma fille", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "زَوْجٌ / زَوْجِي", "fr": "Mari / Mon mari", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "عَمٌّ / عَمِّي", "fr": "Oncle paternel / Mon oncle", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "خَالٌ / خَالِي", "fr": "Oncle maternel / Mon oncle", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "عَائِلَةٌ / عَائِلَتِي", "fr": "Famille / Ma famille", "type": "nom", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "خَالَةٌ / خَالَتِي", "fr": "Tante maternelle / Ma tante", "type": "famille", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "عَمَّةٌ / عَمَّتِي", "fr": "Tante paternelle / Ma tante", "type": "famille", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "ابْنُ عَمٍّ", "fr": "Cousin (fils d\\", "type": "mot", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "حَفِيدٌ / حَفِيدَةٌ", "fr": "Petit-fils / Petite-fille", "type": "famille", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "أَصْغَرُ / الصَّغِيرُ", "fr": "Le plus jeune / Cadet", "type": "famille", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "أَكْبَرُ / الْكَبِيرُ", "fr": "Le plus âgé / Aîné", "type": "famille", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "عَائِلَةٌ كَبِيرَةٌ", "fr": "Grande famille", "type": "expression", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "أَبُو", "fr": "Père de... (dans un nom)", "type": "grammaire", "lesson": "ar05", "lessonTitle": "Le vocabulaire de la famille"}, {"ar": "كَبِيرٌ / كَبِيرَةٌ", "fr": "Grand(e)", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "صَغِيرٌ / صَغِيرَةٌ", "fr": "Petit(e)", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "جَمِيلٌ / جَمِيلَةٌ", "fr": "Beau / Belle", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "جَدِيدٌ / جَدِيدَةٌ", "fr": "Nouveau / Nouvelle", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "قَدِيمٌ / قَدِيمَةٌ", "fr": "Ancien(ne) / Vieux", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "طَوِيلٌ / طَوِيلَةٌ", "fr": "Grand(e) / Long(ue)", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "قَصِيرٌ / قَصِيرَةٌ", "fr": "Court(e) / Petit(e)", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "حَسَنٌ / حَسَنَةٌ", "fr": "Bon(ne) / Bien", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "ذَكِيٌّ / ذَكِيَّةٌ", "fr": "Intelligent(e)", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "مَفْتُوحٌ / مَفْتُوحَةٌ", "fr": "Ouvert(e)", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "مُغْلَقٌ / مُغْلَقَةٌ", "fr": "Fermé(e)", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "كَرِيمٌ / كَرِيمَةٌ", "fr": "Généreux / Généreuse", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "قَبِيحٌ / قَبِيحَةٌ", "fr": "Laid(e)", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "سَرِيعٌ / سَرِيعَةٌ", "fr": "Rapide", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "بَطِيءٌ / بَطِيئَةٌ", "fr": "Lent(e)", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "قَرِيبٌ / قَرِيبَةٌ", "fr": "Proche", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "بَعِيدٌ / بَعِيدَةٌ", "fr": "Loin / Éloigné(e)", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "نَظِيفٌ / نَظِيفَةٌ", "fr": "Propre", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "وَسِخٌ / وَسِخَةٌ", "fr": "Sale", "type": "adjectif", "lesson": "ar06", "lessonTitle": "L\\"}, {"ar": "طَالِبٌ → طُلَّابٌ", "fr": "Étudiant → Étudiants", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "كِتَابٌ → كُتُبٌ", "fr": "Livre → Livres", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "وَلَدٌ → أَوْلَادٌ", "fr": "Garçon → Garçons", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "بَيْتٌ → بُيُوتٌ", "fr": "Maison → Maisons", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "قَلَمٌ → أَقْلَامٌ", "fr": "Stylo → Stylos", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "رَجُلٌ → رِجَالٌ", "fr": "Homme → Hommes", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "مُعَلِّمٌ → مُعَلِّمُونَ", "fr": "Enseignant → Enseignants", "type": "pluriel sain masc.", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "مُعَلِّمَةٌ → مُعَلِّمَاتٌ", "fr": "Enseignante → Enseignantes", "type": "pluriel sain fém.", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "مُسْلِمٌ → مُسْلِمُونَ", "fr": "Musulman → Musulmans", "type": "pluriel sain masc.", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "طَالِبَةٌ → طَالِبَاتٌ", "fr": "Étudiante → Étudiantes", "type": "pluriel sain fém.", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "مَدْرَسَةٌ → مَدَارِسُ", "fr": "École → Écoles", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "غُرْفَةٌ → غُرَفٌ", "fr": "Chambre → Chambres", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "دُرُوسٌ", "fr": "Leçons (pl. de دَرْسٌ)", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "بُيُوتٌ", "fr": "Maisons (pl. de بَيْتٌ)", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "رِجَالٌ", "fr": "Hommes (pl. de رَجُلٌ)", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "نِسَاءٌ", "fr": "Femmes (pl. de امْرَأَةٌ)", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "أَطْفَالٌ", "fr": "Enfants (pl. de طِفْلٌ)", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "مَسَاجِدُ", "fr": "Mosquées (pl. de مَسْجِدٌ)", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "أَصْدِقَاءُ", "fr": "Amis (pl. de صَدِيقٌ)", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "أَسْمَاءُ", "fr": "Noms (pl. de اسْمٌ)", "type": "pluriel brisé", "lesson": "ar07", "lessonTitle": "Le pluriel sain"}, {"ar": "هَذَا", "fr": "Ceci / Ce ...-ci (masc.)", "type": "démonstratif proche", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "هَذِهِ", "fr": "Ceci / Cette ...-ci (fém.)", "type": "démonstratif proche", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "ذَلِكَ", "fr": "Cela / Ce ...-là (masc.)", "type": "démonstratif lointain", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "تِلْكَ", "fr": "Cela / Cette ...-là (fém.)", "type": "démonstratif lointain", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "مَنْ هَذَا؟", "fr": "Qui est-ce ?", "type": "question", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "مَا هَذَا؟", "fr": "Qu\\", "type": "mot", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "مَا هَذِهِ؟", "fr": "Qu\\", "type": "mot", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "هَذَا هُوَ", "fr": "C\\", "type": "mot", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "هَذَا الْكِتَابُ", "fr": "Ce livre-ci", "type": "groupe nominal", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "تِلْكَ الْمَدْرَسَةُ", "fr": "Cette école-là", "type": "groupe nominal", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "هَؤُلَاءِ", "fr": "Ceux-ci / Ces gens (pl. proche)", "type": "démonstratif", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "أُولَئِكَ", "fr": "Ceux-là (pl. lointain)", "type": "démonstratif", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "هَذَانِ / هَاتَانِ", "fr": "Ces deux-ci (masc./fém.)", "type": "démonstratif duel", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "السَّيَّارَةُ", "fr": "La voiture", "type": "nom", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "الطَّائِرَةُ", "fr": "L\\", "type": "mot", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "الْقِطَارُ", "fr": "Le train", "type": "nom", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "الْحَقِيبَةُ", "fr": "Le sac / La valise", "type": "nom", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "الْهَاتِفُ", "fr": "Le téléphone", "type": "nom", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "الْحَاسُوبُ", "fr": "L\\", "type": "mot", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "الْمِفْتَاحُ", "fr": "La clé", "type": "nom", "lesson": "ar08", "lessonTitle": "Démonstratifs du proche"}, {"ar": "مَنْ؟", "fr": "Qui ?", "type": "interrogatif", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "مَا؟ / مَاذَا؟", "fr": "Quoi ? / Qu\\", "type": "mot", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "أَيْنَ؟", "fr": "Où ?", "type": "interrogatif", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "مَتَى؟", "fr": "Quand ?", "type": "interrogatif", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "كَيْفَ؟", "fr": "Comment ?", "type": "interrogatif", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "كَمْ؟", "fr": "Combien ?", "type": "interrogatif", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "لِمَاذَا؟", "fr": "Pourquoi ?", "type": "interrogatif", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "هَلْ؟", "fr": "Est-ce que ? (oui/non)", "type": "interrogatif", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "نَعَمْ", "fr": "Oui", "type": "réponse", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "لَا", "fr": "Non", "type": "réponse", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "بَلَى", "fr": "Si ! (réponse à négation)", "type": "réponse", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "مَا اسْمُكَ؟", "fr": "Quel est ton nom ?", "type": "expression", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "كَمْ عُمْرُكَ؟", "fr": "Quel âge as-tu ?", "type": "expression", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "مِنْ أَيْنَ أَنْتَ؟", "fr": "D\\", "type": "mot", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "مَاذَا تُرِيدُ؟", "fr": "Que veux-tu ?", "type": "expression", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "كَيْفَ ذَلِكَ؟", "fr": "Comment ça ?", "type": "expression", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "مَتَى وَصَلْتَ؟", "fr": "Quand es-tu arrivé ?", "type": "expression", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "لِمَاذَا لَا؟", "fr": "Pourquoi pas ?", "type": "expression", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "هَلْ تَفْهَمُ؟", "fr": "Tu comprends ?", "type": "expression", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "نَعَمْ، أَفْهَمُ", "fr": "Oui, je comprends", "type": "expression", "lesson": "ar09", "lessonTitle": "Les particules interrogatives"}, {"ar": "وَاحِدٌ / وَاحِدَةٌ", "fr": "Un / Une", "type": "cardinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "اثْنَانِ / اثْنَتَانِ", "fr": "Deux (masc./fém.)", "type": "cardinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "ثَلَاثَةٌ / ثَلَاثٌ", "fr": "Trois", "type": "cardinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "أَرْبَعَةٌ / أَرْبَعٌ", "fr": "Quatre", "type": "cardinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "خَمْسَةٌ / خَمْسٌ", "fr": "Cinq", "type": "cardinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "سِتَّةٌ / سِتٌّ", "fr": "Six", "type": "cardinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "سَبْعَةٌ / سَبْعٌ", "fr": "Sept", "type": "cardinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "ثَمَانِيَةٌ / ثَمَانٍ", "fr": "Huit", "type": "cardinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "تِسْعَةٌ / تِسْعٌ", "fr": "Neuf", "type": "cardinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "عَشَرَةٌ / عَشْرٌ", "fr": "Dix", "type": "cardinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "الْأَوَّلُ / الْأُولَى", "fr": "Premier / Première", "type": "ordinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "الثَّانِي / الثَّانِيَةُ", "fr": "Deuxième", "type": "ordinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "عِنْدِي", "fr": "J\\", "type": "mot", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "عِشْرُونَ", "fr": "Vingt", "type": "nombre", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "ثَلَاثُونَ", "fr": "Trente", "type": "nombre", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "مِئَةٌ", "fr": "Cent", "type": "nombre", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "أَلْفٌ", "fr": "Mille", "type": "nombre", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "نِصْفٌ", "fr": "Moitié / Demi", "type": "nombre", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "رُبْعٌ", "fr": "Quart", "type": "nombre", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "الثَّالِثُ عَشَرَ", "fr": "Treizième", "type": "ordinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "الْعِشْرُونَ", "fr": "Vingtième", "type": "ordinal", "lesson": "ar10", "lessonTitle": "Les nombres de 1 à 10"}, {"ar": "أَحْمَرُ / حَمْرَاءُ", "fr": "Rouge", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "أَخْضَرُ / خَضْرَاءُ", "fr": "Vert(e)", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "أَزْرَقُ / زَرْقَاءُ", "fr": "Bleu(e)", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "أَصْفَرُ / صَفْرَاءُ", "fr": "Jaune", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "أَبْيَضُ / بَيْضَاءُ", "fr": "Blanc / Blanche", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "أَسْوَدُ / سَوْدَاءُ", "fr": "Noir(e)", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "بُنِّيٌّ", "fr": "Marron / Brun", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "بُرْتُقَالِيٌّ", "fr": "Orange", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "رَمَادِيٌّ", "fr": "Gris(e)", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "وَرْدِيٌّ", "fr": "Rose", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "مَا لَوْنُهُ؟", "fr": "De quelle couleur est-il ?", "type": "question", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "لَوْنٌ", "fr": "Couleur", "type": "nom", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "بَنَفْسَجِيٌّ", "fr": "Violet", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "زَيْتُونِيٌّ", "fr": "Kaki / Vert olive", "type": "couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "فَاتِحٌ", "fr": "Clair (couleur)", "type": "adjectif couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "غَامِقٌ", "fr": "Foncé (couleur)", "type": "adjectif couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "أَزْرَقُ فَاتِحٌ", "fr": "Bleu clair", "type": "expression couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "أَخْضَرُ غَامِقٌ", "fr": "Vert foncé", "type": "expression couleur", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "مُلَوَّنٌ", "fr": "Coloré / Multicolore", "type": "adjectif", "lesson": "ar11", "lessonTitle": "Les couleurs et leur accord"}, {"ar": "يَكْتُبُ", "fr": "Il écrit", "type": "présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَقْرَأُ", "fr": "Il lit", "type": "présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَذْهَبُ", "fr": "Il va", "type": "présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَدْرُسُ", "fr": "Il étudie", "type": "présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَأْكُلُ", "fr": "Il mange", "type": "présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَشْرَبُ", "fr": "Il boit", "type": "présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَعْمَلُ", "fr": "Il travaille", "type": "présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَسْكُنُ", "fr": "Il habite", "type": "présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يُحِبُّ", "fr": "Il aime", "type": "présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَفْهَمُ", "fr": "Il comprend", "type": "présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَتَكَلَّمُ", "fr": "Il parle", "type": "présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "كُلَّ يَوْمٍ", "fr": "Chaque jour", "type": "expression", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "الْآنَ", "fr": "Maintenant", "type": "adverbe", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "دَائِمًا", "fr": "Toujours", "type": "adverbe", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَذْهَبُ إِلَى", "fr": "Il va à", "type": "expression", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَرْجِعُ مِنْ", "fr": "Il revient de", "type": "expression", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يُرِيدُ", "fr": "Il veut", "type": "verbe présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَسْتَطِيعُ", "fr": "Il peut", "type": "verbe présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَعْرِفُ", "fr": "Il sait / Il connaît", "type": "verbe présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَظُنُّ", "fr": "Il pense / Il croit", "type": "verbe présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَقُولُ", "fr": "Il dit", "type": "verbe présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "يَسْأَلُ", "fr": "Il demande", "type": "verbe présent", "lesson": "ar12", "lessonTitle": "Formation du présent"}, {"ar": "لَا", "fr": "Ne... pas (présent)", "type": "négation", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "لَمْ", "fr": "Ne... pas (passé) + apocopé", "type": "négation", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "لَيْسَ / لَيْسَتْ", "fr": "N\\", "type": "mot", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "لَنْ", "fr": "Ne... pas (futur)", "type": "négation", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "لَا أَفْهَمُ", "fr": "Je ne comprends pas", "type": "expression", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "لَمْ أَذْهَبْ", "fr": "Je ne suis pas allé", "type": "expression", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "لَيْسَ هُنَا", "fr": "Il n\\", "type": "mot", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "أَمْسِ", "fr": "Hier", "type": "adverbe", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "غَدًا", "fr": "Demain", "type": "adverbe", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "أَبَدًا", "fr": "Jamais", "type": "adverbe", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "لَا شَيْءَ", "fr": "Rien", "type": "expression négative", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "لَا أَحَدَ", "fr": "Personne", "type": "expression négative", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "مَا زَالَ", "fr": "Il est encore / Il continue", "type": "expression", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "لَمْ يَعُدْ", "fr": "Il n\\", "type": "mot", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "بَعِيدًا عَنْ", "fr": "Loin de", "type": "expression", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "لَيْسَ فَقَطْ", "fr": "Pas seulement", "type": "expression", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "غَيْرُ", "fr": "Non / Pas / Autre que", "type": "négation", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "بِدُونَ", "fr": "Sans", "type": "préposition", "lesson": "ar13", "lessonTitle": "Négation au présent — لَا"}, {"ar": "الْيَوْمَ", "fr": "Aujourd\\", "type": "mot", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "أَحْيَانًا", "fr": "Parfois", "type": "adv. fréquence", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "هُنَا", "fr": "Ici", "type": "adv. lieu", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "هُنَاكَ", "fr": "Là-bas", "type": "adv. lieu", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "جَيِّدًا", "fr": "Bien (adv.)", "type": "adv. manière", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "كَثِيرًا", "fr": "Beaucoup", "type": "adv. quantité", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "قَلِيلًا", "fr": "Peu", "type": "adv. quantité", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "سَرِيعًا", "fr": "Vite", "type": "adv. manière", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "بَعْدَ", "fr": "Après", "type": "préposition temps", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "قَبْلَ", "fr": "Avant", "type": "préposition temps", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "مُنْذُ", "fr": "Depuis", "type": "préposition temps", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "خِلَالَ", "fr": "Pendant / Durant", "type": "préposition temps", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "فِي الْبِدَايَةِ", "fr": "Au début", "type": "expression", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "فِي النِّهَايَةِ", "fr": "À la fin", "type": "expression", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "فَجْأَةً", "fr": "Soudainement", "type": "adverbe", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "أَحْيَانًا مَا", "fr": "Quelquefois", "type": "adverbe", "lesson": "ar14", "lessonTitle": "Adverbes de temps"}, {"ar": "وَ", "fr": "Et (collé)", "type": "conjonction", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "فَ", "fr": "Et puis / Donc", "type": "conjonction", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "ثُمَّ", "fr": "Puis / Ensuite", "type": "conjonction", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "أَوْ", "fr": "Ou", "type": "conjonction", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "لَكِنْ", "fr": "Mais", "type": "conjonction", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "بَلْ", "fr": "Mais au contraire", "type": "conjonction", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "لِأَنَّ", "fr": "Parce que", "type": "subordination", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "إِذَا", "fr": "Si / Quand (futur)", "type": "subordination", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "عِنْدَمَا", "fr": "Quand / Lorsque", "type": "subordination", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "مَسْرُورٌ", "fr": "Content / Heureux", "type": "adjectif", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "لِأَنَّهُ", "fr": "Parce qu\\", "type": "mot", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "كَسُولٌ", "fr": "Paresseux", "type": "adjectif", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "إِذَنْ", "fr": "Donc / Alors", "type": "conjonction", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "لِذَلِكَ", "fr": "C\\", "type": "mot", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "وَمَعَ ذَلِكَ", "fr": "Cependant / Néanmoins", "type": "conjonction", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "عَلَى الرَّغْمِ مِنْ", "fr": "Malgré", "type": "préposition", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "طَالَمَا", "fr": "Tant que / Aussi longtemps que", "type": "subordination", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "كُلَّمَا", "fr": "Chaque fois que / Plus... plus", "type": "subordination", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "بِحَيْثُ", "fr": "De telle sorte que", "type": "subordination", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "مَعَ أَنَّ", "fr": "Bien que / Quoique", "type": "subordination", "lesson": "ar15", "lessonTitle": "Conjonctions de coordination"}, {"ar": "كِتَابَانِ", "fr": "Deux livres", "type": "duel masc.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "طَالِبَانِ", "fr": "Deux étudiants", "type": "duel masc.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "طَالِبَتَانِ", "fr": "Deux étudiantes", "type": "duel fém.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "يَوْمَانِ", "fr": "Deux jours", "type": "duel masc.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "سَاعَتَانِ", "fr": "Deux heures", "type": "duel fém.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "وَلَدَانِ", "fr": "Deux garçons", "type": "duel masc.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "بِنْتَانِ", "fr": "Deux filles", "type": "duel fém.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "أَخَوَانِ", "fr": "Deux frères", "type": "duel masc.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "يَدَانِ", "fr": "Deux mains", "type": "duel fém.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "عَيْنَانِ", "fr": "Deux yeux", "type": "duel fém.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "رِجْلَانِ", "fr": "Deux jambes", "type": "duel fém.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "بَيْتَانِ", "fr": "Deux maisons", "type": "duel masc.", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "الْفَمُ / فَمِي", "fr": "La bouche / Ma bouche", "type": "corps (duel possible)", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "الْأُذُنَانِ", "fr": "Les deux oreilles", "type": "duel", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "الرُّكْبَتَانِ", "fr": "Les deux genoux", "type": "duel", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "الْكَتِفَانِ", "fr": "Les deux épaules", "type": "duel", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "صَدِيقَانِ", "fr": "Deux amis", "type": "duel", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "طَالِبَانِ مُجْتَهِدَانِ", "fr": "Deux étudiants studieux", "type": "exemple duel", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "كِلَاهُمَا", "fr": "Tous les deux (masc.)", "type": "pronom duel", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "كِلْتَاهُمَا", "fr": "Toutes les deux (fém.)", "type": "pronom duel", "lesson": "ar16", "lessonTitle": "Formation du duel"}, {"ar": "اُكْتُبْ", "fr": "Écris ! (masc.)", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "اِقْرَأْ", "fr": "Lis ! (masc.)", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "اِذْهَبْ", "fr": "Va ! (masc.)", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "اِجْلِسْ", "fr": "Assieds-toi ! (masc.)", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "تَعَالَ", "fr": "Viens ! (masc.)", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "اِسْمَعْ", "fr": "Écoute ! (masc.)", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "اُنْظُرْ", "fr": "Regarde ! (masc.)", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "قُلْ", "fr": "Dis ! (masc.)", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "لَا تَذْهَبْ", "fr": "Ne pars pas !", "type": "interdiction", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "لَا تَتَكَلَّمْ", "fr": "Ne parle pas !", "type": "interdiction", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "اُكْتُبِي", "fr": "Écris ! (fém.)", "type": "impératif fém.", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "اُكْتُبُوا", "fr": "Écrivez ! (plur.)", "type": "impératif plur.", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "اِسْمَعْ / اِسْمَعِي", "fr": "Écoute ! (masc./fém.)", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "اِنْتَبِهْ", "fr": "Fais attention !", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "اِفْتَحْ / اِفْتَحِي", "fr": "Ouvre ! (masc./fém.)", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "أَغْلِقْ", "fr": "Ferme !", "type": "impératif", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "اِجْلِسُوا", "fr": "Asseyez-vous !", "type": "impératif plur.", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "قُومُوا", "fr": "Levez-vous !", "type": "impératif plur.", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "لَا تَتَأَخَّرْ", "fr": "Ne sois pas en retard !", "type": "interdiction", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "لَا تَنْسَ", "fr": "N\\", "type": "mot", "lesson": "ar17", "lessonTitle": "Formation de l\\"}, {"ar": "كِتَابَةٌ", "fr": "Écriture / Écrire", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "دِرَاسَةٌ", "fr": "Étude / Étudier", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "قِرَاءَةٌ", "fr": "Lecture / Lire", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "ذَهَابٌ", "fr": "Action d\\", "type": "mot", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "أَكْلٌ", "fr": "Action de manger", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "شُرْبٌ", "fr": "Action de boire", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "عَمَلٌ", "fr": "Travail / Action", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "فَهْمٌ", "fr": "Compréhension", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "تَكَلُّمٌ", "fr": "Parole / Le fait de parler", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "مُهِمٌّ", "fr": "Important(e)", "type": "adjectif", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "سَهْلٌ", "fr": "Facile", "type": "adjectif", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "صَعْبٌ", "fr": "Difficile", "type": "adjectif", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "تَعْلِيمٌ", "fr": "Enseignement / Éducation", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "تَدْرِيسٌ", "fr": "L\\", "type": "mot", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "سَفَرٌ", "fr": "Voyage", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "تَفْكِيرٌ", "fr": "Réflexion / Pensée", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "صَلَاةٌ", "fr": "Prière", "type": "masdar/nom", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "صِيَامٌ / صَوْمٌ", "fr": "Jeûne", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "حُبٌّ", "fr": "Amour", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "كَرَاهِيَةٌ", "fr": "Haine", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "صَبْرٌ", "fr": "Patience", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "شُكْرٌ", "fr": "Gratitude / Remerciement", "type": "masdar", "lesson": "ar18", "lessonTitle": "Le masdar"}, {"ar": "كَاتِبٌ / كَاتِبَةٌ", "fr": "Écrivain(e)", "type": "participe actif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "دَارِسٌ / دَارِسَةٌ", "fr": "Étudiant(e)/studieux", "type": "participe actif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مُسَافِرٌ / مُسَافِرَةٌ", "fr": "Voyageur/euse", "type": "participe actif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مَكْتُوبٌ / مَكْتُوبَةٌ", "fr": "Écrit(e)", "type": "participe passif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مَعْرُوفٌ / مَعْرُوفَةٌ", "fr": "Connu(e)", "type": "participe passif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مَشْهُورٌ / مَشْهُورَةٌ", "fr": "Célèbre", "type": "adjectif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "نَاجِحٌ / نَاجِحَةٌ", "fr": "Qui réussit", "type": "participe actif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "رِسَالَةٌ", "fr": "Lettre / Message", "type": "nom", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مُسَافِرٌ", "fr": "Voyageur (participe actif)", "type": "participe actif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مُقِيمٌ", "fr": "Résident (qui réside)", "type": "participe actif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مَسْمُوعٌ", "fr": "Entendu / Audible", "type": "participe passif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مَفْهُومٌ", "fr": "Compris / Compréhensible", "type": "participe passif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مَشْرُوبٌ", "fr": "Boisson / Ce qui est bu", "type": "participe passif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مَأْكُولٌ", "fr": "Nourriture / Ce qui est mangé", "type": "participe passif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مَحْبُوبٌ", "fr": "Aimé / Bien-aimé", "type": "participe passif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مَذْكُورٌ", "fr": "Mentionné / Cité", "type": "participe passif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مَعْلُومٌ", "fr": "Connu / Notoire", "type": "participe passif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "مَجْهُولٌ", "fr": "Inconnu / Ignoré", "type": "participe passif", "lesson": "ar19", "lessonTitle": "Participe actif — فَاعِلٌ"}, {"ar": "الْأَحَدُ", "fr": "Dimanche", "type": "jour", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الِاثْنَيْنِ", "fr": "Lundi", "type": "jour", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الثُّلَاثَاءُ", "fr": "Mardi", "type": "jour", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الْأَرْبِعَاءُ", "fr": "Mercredi", "type": "jour", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الْخَمِيسُ", "fr": "Jeudi", "type": "jour", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الْجُمُعَةُ", "fr": "Vendredi (prière)", "type": "jour", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "السَّبْتُ", "fr": "Samedi", "type": "jour", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الشَّمَالُ", "fr": "Le Nord", "type": "direction", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الْجَنُوبُ", "fr": "Le Sud", "type": "direction", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الشَّرْقُ", "fr": "L\\", "type": "mot", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الْغَرْبُ", "fr": "L\\", "type": "mot", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الصَّبَاحُ", "fr": "Le matin", "type": "temps", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الْمَسَاءُ", "fr": "Le soir", "type": "temps", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "صَبَاحُ الْخَيْرِ", "fr": "Bonjour (matin)", "type": "salutation", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "مَسَاءُ الْخَيْرِ", "fr": "Bonsoir", "type": "salutation", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الرَّبِيعُ", "fr": "Le printemps", "type": "saison", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الصَّيْفُ", "fr": "L\\", "type": "mot", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الْخَرِيفُ", "fr": "L\\", "type": "mot", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الشِّتَاءُ", "fr": "L\\", "type": "mot", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الْفَجْرُ", "fr": "L\\", "type": "mot", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الظُّهْرُ", "fr": "Midi", "type": "moment de la journée", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الْعَصْرُ", "fr": "L\\", "type": "mot", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الْعِشَاءُ", "fr": "La nuit (début)", "type": "moment de la journée", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "الْمَغْرِبُ", "fr": "Le coucher du soleil", "type": "moment de la journée", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "مُنْتَصَفُ اللَّيْلِ", "fr": "Minuit", "type": "expression temporelle", "lesson": "ar20", "lessonTitle": "Les jours de la semaine"}, {"ar": "بِسْمِ اللَّهِ", "fr": "Au nom de Dieu (basmala)", "type": "formule religieuse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "الْحَمْدُ لِلَّهِ", "fr": "Louange à Dieu", "type": "formule religieuse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "إِنْ شَاءَ اللَّهُ", "fr": "Si Dieu le veut", "type": "formule religieuse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "مَاشَاءَ اللَّهُ", "fr": "Que Dieu l\\", "type": "mot", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "سُبْحَانَ اللَّهِ", "fr": "Gloire à Dieu", "type": "formule religieuse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "اللَّهُ أَكْبَرُ", "fr": "Dieu est le plus grand", "type": "formule religieuse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "شُكْرًا", "fr": "Merci", "type": "politesse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "جَزَاكَ اللَّهُ خَيْرًا", "fr": "Que Dieu te récompense (merci)", "type": "politesse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "عَفْوًا", "fr": "De rien / Pardon", "type": "politesse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "مِنْ فَضْلِكَ", "fr": "S\\", "type": "mot", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "آسِفٌ", "fr": "Désolé (masc.)", "type": "politesse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "أَهْلًا وَسَهْلًا", "fr": "Bienvenue", "type": "salutation", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "اَللَّهُمَّ", "fr": "Ô mon Dieu !", "type": "invocation", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "رَبُّنَا", "fr": "Notre Seigneur", "type": "nom de Dieu", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "إِنَّا لِلَّهِ وَإِنَّا إِلَيْهِ رَاجِعُونَ", "fr": "Inna lillah (formule de deuil)", "type": "formule religieuse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ", "fr": "Que la paix soit sur lui (après le nom du Prophète)", "type": "formule religieuse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "رَضِيَ اللَّهُ عَنْهُ", "fr": "Que Dieu soit satisfait de lui", "type": "formule religieuse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "أَعُوذُ بِاللَّهِ", "fr": "Je cherche refuge en Dieu", "type": "formule religieuse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "حَسْبُنَا اللَّهُ", "fr": "Dieu nous suffit", "type": "formule religieuse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "تَوَكَّلْتُ عَلَى اللَّهِ", "fr": "Je me confie à Dieu", "type": "formule religieuse", "lesson": "ar21", "lessonTitle": "Formules religieuses essentielles"}, {"ar": "أَوَّلًا", "fr": "Premièrement", "type": "connecteur", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "ثَانِيًا", "fr": "Deuxièmement", "type": "connecteur", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "أَخِيرًا", "fr": "Finalement", "type": "connecteur", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "بِالْإِضَافَةِ", "fr": "De plus / En outre", "type": "connecteur", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "عَلَى سَبِيلِ الْمِثَالِ", "fr": "Par exemple", "type": "connecteur", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "فِي الْخُلَاصَةِ", "fr": "En résumé", "type": "connecteur", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "الرَّفْعُ", "fr": "Nominatif (sujet)", "type": "grammaire", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "النَّصْبُ", "fr": "Accusatif (objet)", "type": "grammaire", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "الْجَرُّ", "fr": "Génitif (après prép.)", "type": "grammaire", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "مَشْغُولٌ", "fr": "Occupé(e)", "type": "adjectif", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "فَرِحٌ / فَرِحَةٌ", "fr": "Content(e)", "type": "adjectif", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "الْإِعْرَابُ", "fr": "La déclinaison", "type": "grammaire", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "مِنَ الْمَعْلُومِ أَنَّ", "fr": "Il est connu que...", "type": "connecteur", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "مِنَ الْجَدِيرِ بِالذِّكْرِ", "fr": "Il convient de mentionner", "type": "connecteur", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "يَجِبُ أَنْ", "fr": "Il faut que / On doit", "type": "expression", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "يَنْبَغِي أَنْ", "fr": "Il convient de", "type": "expression", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "مِنَ الضَّرُورِيِّ", "fr": "Il est nécessaire", "type": "expression", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "مِنَ الْمُمْكِنِ", "fr": "Il est possible", "type": "expression", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "مُبْتَدَأٌ", "fr": "Sujet (terme grammatical)", "type": "grammaire", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "خَبَرٌ", "fr": "Prédicat (terme grammatical)", "type": "grammaire", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "فِعْلٌ", "fr": "Verbe", "type": "grammaire", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "فَاعِلٌ", "fr": "Sujet verbal (agent)", "type": "grammaire", "lesson": "ar22", "lessonTitle": "Connecteurs de discours"}, {"ar": "مُجْتَهِدٌ / مُجْتَهِدَةٌ", "fr": "Studieux / Appliqué(e)", "type": "adjectif", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "كَسُولٌ / كَسُولَةٌ", "fr": "Paresseux / Paresseuse", "type": "adjectif", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "قَوِيٌّ / قَوِيَّةٌ", "fr": "Fort(e)", "type": "adjectif", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "ضَعِيفٌ / ضَعِيفَةٌ", "fr": "Faible", "type": "adjectif", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "سَعِيدٌ / سَعِيدَةٌ", "fr": "Heureux / Heureuse", "type": "adjectif", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "حَزِينٌ / حَزِينَةٌ", "fr": "Triste", "type": "adjectif", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "مَرِيضٌ / مَرِيضَةٌ", "fr": "Malade", "type": "adjectif", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "صَحِيحٌ / صَحِيحَةٌ", "fr": "Correct(e) / En bonne santé", "type": "adjectif", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "فَرِحٌ / فَرِحَةٌ", "fr": "Content(e) / Joyeux", "type": "adjectif", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "الْجَوَابُ الصَّحِيحُ", "fr": "La bonne réponse", "type": "expression", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "أُبَارِكُ لَكَ", "fr": "Je te félicite", "type": "expression", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "مُرَاجَعَةٌ", "fr": "Révision", "type": "nom", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "خُلَاصَةٌ", "fr": "Résumé / Synthèse", "type": "nom", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "قَاعِدَةٌ", "fr": "Règle / Base", "type": "nom", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "اسْتِثْنَاءٌ", "fr": "Exception", "type": "nom", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "مِثَالٌ", "fr": "Exemple", "type": "nom", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "تَدْرِيبٌ", "fr": "Entraînement / Exercice", "type": "nom", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "إِتْقَانٌ", "fr": "Maîtrise / Perfectionnement", "type": "nom", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "مُسْتَوَى", "fr": "Niveau", "type": "nom", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "تَقَدُّمٌ", "fr": "Progrès", "type": "nom", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}, {"ar": "نَجَاحٌ", "fr": "Succès / Réussite", "type": "nom", "lesson": "ar23", "lessonTitle": "Récap — Phrase nominale"}]
-;
-
 /* ── CONSTANTS ── */
 const SPORT_KW=['musculation','musculations','muscul','sport','muscu'];
 const SPORT_GOAL=83,SPORT_START_W=97.2,SPORT_TARGET=3,SPORT_MS=2,SPORT_FROM='2026-06-01';
 const MFR=['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
-const DEFAULT_LAYOUT={tasks:{c:1,r:1,w:2,h:3},tasks2:{c:3,r:1,w:2,h:3},tasks3:{c:1,r:4,w:2,h:3}};
-const EMOJI_CATS={
-  'Études':['📋','📖','📚','📝','✏️','📊','🧠','💡','🔬','🎓','💻'],
-  'Sport':['💪','🏋️','⚽','🏀','🎾','🏊','🚴','🤸','🧘','🏃','⚖️'],
-  'Voyage':['✈️','🌍','🗺️','🏖️','⛰️','🎵','🎮','🎬','📷','🚗','🏕️'],
-  'Maison':['🏠','🍕','🍎','☕','🛒','💰','📱','🔑','🌱','🐶','🌸'],
-  'Symboles':['⭐','🌟','🔥','✅','❌','⚡','🎯','🏆','💎','🎉','🔵','🟡','🟢']
-};
+const LAYOUT_DEFAULT={tasks:{c:1,r:1,w:2,h:3},sport:{c:3,r:1,w:2,h:3}};
+const WIDGET_IDS=['tasks','sport'];
+const EMOJI_CATS={'Études':['📋','📖','📚','📝','✏️','📊','🧠','💡','🔬','🎓','💻'],'Sport':['💪','🏋️','⚽','🏀','🎾','🏊','🚴','🤸','🧘','🏃','⚖️'],'Voyage':['✈️','🌍','🗺️','🏖️','⛰️','🎵','🎮','🎬','📷','🚗','🏕️'],'Maison':['🏠','🍕','🍎','☕','🛒','💰','📱','🔑','🌱','🐶','🌸'],'Symboles':['⭐','🌟','🔥','✅','❌','⚡','🎯','🏆','💎','🎉','🔵','🟡','🟢']};
 const THEMES=[
-  {id:'foret',   n:'🌿 Forêt',       bg:'#16261e',bg2:'#1f3a2c',bg3:'#274a37',ac:'#f2c14e',tl:'#2dd4bf',gr:'#4ade80',rd:'#f87171',bl:'#60a5fa',ch:'#f1efe4'},
-  {id:'ocean',   n:'🌊 Océan',        bg:'#0d1f2d',bg2:'#122534',bg3:'#193040',ac:'#22d3ee',tl:'#06b6d4',gr:'#34d399',rd:'#f87171',bl:'#38bdf8',ch:'#e0f4ff'},
-  {id:'violet',  n:'🌙 Nuit violette',bg:'#1a1228',bg2:'#221535',bg3:'#2d1d48',ac:'#c084fc',tl:'#e879f9',gr:'#a78bfa',rd:'#f472b6',bl:'#818cf8',ch:'#ede9fe'},
-  {id:'ember',   n:'🔥 Ember',        bg:'#1c1208',bg2:'#271a0c',bg3:'#332212',ac:'#fb923c',tl:'#fbbf24',gr:'#84cc16',rd:'#ef4444',bl:'#f97316',ch:'#fff7ed'},
-  {id:'ardoise', n:'🤍 Ardoise',      bg:'#1a1f2e',bg2:'#222840',bg3:'#2a3050',ac:'#e2e8f0',tl:'#94a3b8',gr:'#64748b',rd:'#f87171',bl:'#93c5fd',ch:'#f8fafc'},
-  {id:'sakura',  n:'🌸 Sakura',       bg:'#1f1218',bg2:'#2a1a22',bg3:'#38222e',ac:'#f9a8d4',tl:'#fb7185',gr:'#86efac',rd:'#fca5a5',bl:'#f0abfc',ch:'#fdf2f8'},
-  {id:'electro', n:'⚡ Électrique',   bg:'#080808',bg2:'#111111',bg3:'#1a1a1a',ac:'#facc15',tl:'#3b82f6',gr:'#22c55e',rd:'#ef4444',bl:'#60a5fa',ch:'#f9fafb'},
-  {id:'desert',  n:'🏜️ Désert',       bg:'#1e1610',bg2:'#271e14',bg3:'#332819',ac:'#d97706',tl:'#b45309',gr:'#84cc16',rd:'#ef4444',bl:'#f59e0b',ch:'#fef3c7'},
-  {id:'autumn',  n:'🍂 Automne',      bg:'#1c1008',bg2:'#271608',bg3:'#361e0a',ac:'#f97316',tl:'#dc2626',gr:'#fbbf24',rd:'#ef4444',bl:'#fb923c',ch:'#fff7ed'},
-  {id:'arctic',  n:'🧊 Arctique',     bg:'#0f1923',bg2:'#172433',bg3:'#1e3045',ac:'#bfdbfe',tl:'#7dd3fc',gr:'#a5f3fc',rd:'#fca5a5',bl:'#93c5fd',ch:'#f0f9ff'},
-  {id:'tropic',  n:'🌺 Tropique',     bg:'#0a1f12',bg2:'#0f2918',bg3:'#173520',ac:'#f0abfc',tl:'#4ade80',gr:'#86efac',rd:'#f9a8d4',bl:'#a78bfa',ch:'#f0fdf4'},
-  {id:'minuit',  n:'🖤 Minuit',       bg:'#000000',bg2:'#111111',bg3:'#1c1c1c',ac:'#ffffff',tl:'#a3a3a3',gr:'#737373',rd:'#ef4444',bl:'#6b7280',ch:'#f5f5f5'},
-  {id:'neon',    n:'🟣 Néon',         bg:'#0a0010',bg2:'#10001a',bg3:'#18002a',ac:'#d946ef',tl:'#a855f7',gr:'#34d399',rd:'#f43f5e',bl:'#818cf8',ch:'#fdf4ff'},
-  {id:'ble',     n:'🌾 Blé',          bg:'#1e1a10',bg2:'#272212',bg3:'#332d18',ac:'#fde68a',tl:'#d97706',gr:'#a3e635',rd:'#ef4444',bl:'#fcd34d',ch:'#fffbeb'},
+  {id:'foret',n:'🌿 Forêt',bg:'#16261e',bg2:'#1f3a2c',bg3:'#274a37',ac:'#f2c14e',tl:'#2dd4bf',gr:'#4ade80',rd:'#f87171',bl:'#60a5fa',ch:'#f1efe4'},
+  {id:'ocean',n:'🌊 Océan',bg:'#0d1f2d',bg2:'#122534',bg3:'#193040',ac:'#22d3ee',tl:'#06b6d4',gr:'#34d399',rd:'#f87171',bl:'#38bdf8',ch:'#e0f4ff'},
+  {id:'violet',n:'🌙 Nuit violette',bg:'#1a1228',bg2:'#221535',bg3:'#2d1d48',ac:'#c084fc',tl:'#e879f9',gr:'#a78bfa',rd:'#f472b6',bl:'#818cf8',ch:'#ede9fe'},
+  {id:'ember',n:'🔥 Ember',bg:'#1c1208',bg2:'#271a0c',bg3:'#332212',ac:'#fb923c',tl:'#fbbf24',gr:'#84cc16',rd:'#ef4444',bl:'#f97316',ch:'#fff7ed'},
+  {id:'ardoise',n:'🤍 Ardoise',bg:'#1a1f2e',bg2:'#222840',bg3:'#2a3050',ac:'#e2e8f0',tl:'#94a3b8',gr:'#64748b',rd:'#f87171',bl:'#93c5fd',ch:'#f8fafc'},
+  {id:'sakura',n:'🌸 Sakura',bg:'#1f1218',bg2:'#2a1a22',bg3:'#38222e',ac:'#f9a8d4',tl:'#fb7185',gr:'#86efac',rd:'#fca5a5',bl:'#f0abfc',ch:'#fdf2f8'},
+  {id:'electro',n:'⚡ Électrique',bg:'#080808',bg2:'#111111',bg3:'#1a1a1a',ac:'#facc15',tl:'#3b82f6',gr:'#22c55e',rd:'#ef4444',bl:'#60a5fa',ch:'#f9fafb'},
+  {id:'desert',n:'🏜️ Désert',bg:'#1e1610',bg2:'#271e14',bg3:'#332819',ac:'#d97706',tl:'#b45309',gr:'#84cc16',rd:'#ef4444',bl:'#f59e0b',ch:'#fef3c7'},
+  {id:'autumn',n:'🍂 Automne',bg:'#1c1008',bg2:'#271608',bg3:'#361e0a',ac:'#f97316',tl:'#dc2626',gr:'#fbbf24',rd:'#ef4444',bl:'#fb923c',ch:'#fff7ed'},
+  {id:'arctic',n:'🧊 Arctique',bg:'#0f1923',bg2:'#172433',bg3:'#1e3045',ac:'#bfdbfe',tl:'#7dd3fc',gr:'#a5f3fc',rd:'#fca5a5',bl:'#93c5fd',ch:'#f0f9ff'},
+  {id:'tropic',n:'🌺 Tropique',bg:'#0a1f12',bg2:'#0f2918',bg3:'#173520',ac:'#f0abfc',tl:'#4ade80',gr:'#86efac',rd:'#f9a8d4',bl:'#a78bfa',ch:'#f0fdf4'},
+  {id:'minuit',n:'🖤 Minuit',bg:'#000000',bg2:'#111111',bg3:'#1c1c1c',ac:'#ffffff',tl:'#a3a3a3',gr:'#737373',rd:'#ef4444',bl:'#6b7280',ch:'#f5f5f5'},
+  {id:'neon',n:'🟣 Néon',bg:'#0a0010',bg2:'#10001a',bg3:'#18002a',ac:'#d946ef',tl:'#a855f7',gr:'#34d399',rd:'#f43f5e',bl:'#818cf8',ch:'#fdf4ff'},
+  {id:'ble',n:'🌾 Blé',bg:'#1e1a10',bg2:'#272212',bg3:'#332d18',ac:'#fde68a',tl:'#d97706',gr:'#a3e635',rd:'#ef4444',bl:'#fcd34d',ch:'#fffbeb'},
 ];
 
 /* ── HELPERS ── */
@@ -522,27 +363,25 @@ const $=id=>document.getElementById(id);
 const pad=n=>String(n).padStart(2,'0');
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const dK=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
-const tmM=t=>{const[h,m]=t.split(':').map(Number);return h*60+m;};
 const jsD=d=>(d+6)%7;
 const monOf=d=>{const x=new Date(d);x.setHours(0,0,0,0);x.setDate(x.getDate()-jsD(x.getDay()));return x;};
 const addD=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x;};
 const fmtS=d=>d.getDate()+'/'+(d.getMonth()+1);
 const shuf=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const tmM=t=>{const[h,m]=t.split(':').map(Number);return h*60+m;};
 
 /* ── STATE ── */
-let mods=null, modEdit=false, modEditId=null, modDragIdx=null;
-let hubDoc=null, modT=null;
-let planState=null, planDoc=null;
-let spData={weights:[],goal:SPORT_GOAL,startWeight:SPORT_START_W}, spDoc=null;
-let tData={tasks:[],cats:[]}, tDoc=null, tT=null;
-let wLayout=JSON.parse(JSON.stringify(DEFAULT_LAYOUT)), layDoc=null, layT=null;
-let gedit=true, selWidget=null, sizingId=null;
-let tTab='todo', tFilt='', tPrio='🔴';
-let curTheme='foret';
+let mods=null,modEdit=false,modEditId=null,modDragIdx=null,hubDoc=null,modT=null;
+let planState=null,planDoc=null;
+let spData={weights:[],goal:SPORT_GOAL,startWeight:SPORT_START_W},spDoc=null;
+let tData={tasks:[],cats:[]},tDoc=null,tT=null;
+let wLayout=JSON.parse(JSON.stringify(LAYOUT_DEFAULT)),layDoc=null,layT=null;
+let gedit=false,selWidget=null,sizingId=null;
+let tTab='todo',tFilt='',tPrio='🔴',curTheme='foret';
 
 /* ── FIREBASE ── */
 firebase.initializeApp(window.FIREBASE_CONFIG);
-const auth=firebase.auth(), db=firebase.firestore();
+const auth=firebase.auth(),db=firebase.firestore();
 try{db.enablePersistence({synchronizeTabs:true}).catch(()=>{});}catch(e){}
 
 auth.onAuthStateChanged(async user=>{
@@ -564,32 +403,17 @@ auth.onAuthStateChanged(async user=>{
     ];
     if(p.exists) planState=p.data();
     if(s.exists) spData=Object.assign({weights:[],goal:SPORT_GOAL,startWeight:SPORT_START_W},s.data());
-    if(t.exists) tData=Object.assign({tasks:[],cats:[]},t.data());
-    if(l.exists){
-      const ld=l.data();
-      wLayout=Object.assign(JSON.parse(JSON.stringify(DEFAULT_LAYOUT)),ld);
-      if(ld.theme) applyTheme(ld.theme);
-    }
-    if(!h.exists) hubDoc.set({modules:mods}).catch(()=>{});
-    const now7=new Date();now7.setDate(now7.getDate()-7);
-    tData.tasks=tData.tasks.filter(t=>!t.done||(t.doneAt&&new Date(t.doneAt)>now7));
-  }catch(e){
-    mods=[
-      {id:'m1',icon:'📋',name:'Mon Planning',desc:'',url:'planning.html'},
-      {id:'m2',icon:'📖',name:'Arabe Médine',desc:'',url:'arabe.html'}
-    ];
-  }
+    if(t.exists){tData=Object.assign({tasks:[],cats:[]},t.data());const n7=new Date();n7.setDate(n7.getDate()-7);tData.tasks=tData.tasks.filter(t=>!t.done||(t.doneAt&&new Date(t.doneAt)>n7));}
+    if(l.exists){const ld=l.data();wLayout=Object.assign(JSON.parse(JSON.stringify(LAYOUT_DEFAULT)),ld);if(ld.theme)applyTheme(ld.theme);}
+    if(!h.exists)hubDoc.set({modules:mods}).catch(()=>{});
+  }catch(e){mods=[{id:'m1',icon:'📋',name:'Mon Planning',desc:'',url:'planning.html'},{id:'m2',icon:'📖',name:'Arabe Médine',desc:'',url:'arabe.html'}];}
   $('ls').classList.add('hi');
   $('auth-wrap').classList.add('hi');
   $('page').classList.remove('hi');
-  // Apply saved layout positions
   applyLayout();
   renderMods();
   renderSport();
   renderTasks();
-  initTasksWidget(2);
-  initTasksWidget(3);
-  // Wire grid handles NOW — after DOM is visible
   wireHandles();
 });
 
@@ -602,76 +426,59 @@ $('btn-logout').addEventListener('click',()=>auth.signOut());
 function showAE(m){const e=$('aerr');e.textContent=m;e.style.display='block';}
 function clearAE(){$('aerr').style.display='none';}
 
-/* ── GRID LAYOUT ── (same mechanism as grid_test.html) ── */
+/* ── GRID (exact copy of grid_test.html logic) ── */
 function applyLayout(){
-  ['tasks','tasks2','tasks3'].forEach(id=>{
+  WIDGET_IDS.forEach(id=>{
     const p=wLayout[id];
     const cell=$('wc-'+id);
-    if(!cell||!p) return;
+    if(!cell||!p)return;
     cell.style.gridColumn=p.c+'/span '+p.w;
     cell.style.gridRow=p.r+'/span '+p.h;
   });
-  const maxR=Math.max(...Object.values(wLayout).filter(p=>p&&p.r).map(p=>p.r+p.h-1),4);
+  const maxR=Math.max(...WIDGET_IDS.map(id=>wLayout[id]?wLayout[id].r+wLayout[id].h-1:4),4);
   $('wgrid').style.gridTemplateRows='repeat('+maxR+',160px)';
 }
-function saveLayout(){
-  if(!layDoc) return;
-  clearTimeout(layT);
-  layT=setTimeout(()=>layDoc.set(wLayout).catch(()=>{}),600);
-}
+function saveLayout(){if(!layDoc)return;clearTimeout(layT);layT=setTimeout(()=>layDoc.set(wLayout).catch(()=>{}),600);}
+
 function buildGhostLayer(){
   const layer=$('ghost-layer');
   layer.innerHTML='';
-  const maxR=Math.max(...Object.values(wLayout).filter(p=>p&&p.r).map(p=>p.r+p.h-1),4);
+  const maxR=Math.max(...WIDGET_IDS.map(id=>wLayout[id]?wLayout[id].r+wLayout[id].h-1:4),4);
   layer.style.gridTemplateRows='repeat('+maxR+',160px)';
-  layer.style.bottom='auto';
   layer.style.height=(maxR*160+(maxR-1)*10)+'px';
-  for(let r=1;r<=maxR;r++){
-    for(let c=1;c<=4;c++){
-      const gc=document.createElement('div');
-      gc.className='gcell';
-      gc.style.gridColumn=c;
-      gc.style.gridRow=r;
-      gc.addEventListener('click',()=>{
-        if(!selWidget) return;
-        wLayout[selWidget].c=c;
-        wLayout[selWidget].r=r;
-        hideGhosts();
-        selWidget=null;
-        applyLayout();
-        saveLayout();
-        document.querySelectorAll('.wcell').forEach(c=>c.classList.remove('picked'));
-      });
-      layer.appendChild(gc);
-    }
+  for(let r=1;r<=maxR;r++) for(let c=1;c<=4;c++){
+    const gc=document.createElement('div');
+    gc.className='gcell';
+    gc.style.gridColumn=c;
+    gc.style.gridRow=r;
+    gc.addEventListener('click',()=>{
+      if(!selWidget)return;
+      wLayout[selWidget].c=c;wLayout[selWidget].r=r;
+      hideGhosts();selWidget=null;
+      applyLayout();saveLayout();
+      WIDGET_IDS.forEach(id=>$('wc-'+id).classList.remove('picked'));
+    });
+    layer.appendChild(gc);
   }
 }
 function showGhosts(){buildGhostLayer();$('ghost-layer').classList.add('active');}
 function hideGhosts(){$('ghost-layer').classList.remove('active');}
 
-/* ── EDIT MODE ── */
 $('btn-gedit').addEventListener('click',()=>{
   gedit=!gedit;
   $('btn-gedit').classList.toggle('act',gedit);
   document.body.classList.toggle('gedit',gedit);
-  if(!gedit){selWidget=null;hideGhosts();document.querySelectorAll('.wcell').forEach(c=>c.classList.remove('picked'));}
+  if(!gedit){selWidget=null;hideGhosts();WIDGET_IDS.forEach(id=>$('wc-'+id).classList.remove('picked'));}
 });
 
 function wireHandles(){
-  ['tasks','tasks2','tasks3'].forEach(id=>{
-    const mv=$('wmv-'+id), sz=$('wsz-'+id);
-    if(!mv||!sz) return;
+  WIDGET_IDS.forEach(id=>{
+    const mv=$('wmv-'+id),sz=$('wsz-'+id);
+    if(!mv||!sz)return;
     mv.onclick=e=>{
       e.stopPropagation();
-      if(selWidget===id){
-        selWidget=null; hideGhosts();
-        document.querySelectorAll('.wcell').forEach(c=>c.classList.remove('picked'));
-      } else {
-        selWidget=id;
-        document.querySelectorAll('.wcell').forEach(c=>c.classList.remove('picked'));
-        $('wc-'+id).classList.add('picked');
-        showGhosts();
-      }
+      if(selWidget===id){selWidget=null;hideGhosts();WIDGET_IDS.forEach(i=>$('wc-'+i).classList.remove('picked'));}
+      else{selWidget=id;WIDGET_IDS.forEach(i=>$('wc-'+i).classList.remove('picked'));$('wc-'+id).classList.add('picked');showGhosts();}
     };
     sz.onclick=e=>{
       e.stopPropagation();
@@ -683,36 +490,16 @@ function wireHandles(){
     };
   });
 }
-
-// Size pills
-$('sw-pills').addEventListener('click',e=>{
-  const b=e.target.closest('.pill[data-w]'); if(!b||!sizingId) return;
-  wLayout[sizingId].w=Number(b.dataset.w);
-  document.querySelectorAll('#sw-pills .pill').forEach(x=>x.classList.toggle('on',x===b));
-  applyLayout(); saveLayout();
-});
-$('sh-pills').addEventListener('click',e=>{
-  const b=e.target.closest('.pill[data-h]'); if(!b||!sizingId) return;
-  wLayout[sizingId].h=Number(b.dataset.h);
-  document.querySelectorAll('#sh-pills .pill').forEach(x=>x.classList.toggle('on',x===b));
-  applyLayout(); saveLayout();
-});
+$('sw-pills').addEventListener('click',e=>{const b=e.target.closest('.pill[data-w]');if(!b||!sizingId)return;wLayout[sizingId].w=Number(b.dataset.w);document.querySelectorAll('#sw-pills .pill').forEach(x=>x.classList.toggle('on',x===b));applyLayout();saveLayout();});
+$('sh-pills').addEventListener('click',e=>{const b=e.target.closest('.pill[data-h]');if(!b||!sizingId)return;wLayout[sizingId].h=Number(b.dataset.h);document.querySelectorAll('#sh-pills .pill').forEach(x=>x.classList.toggle('on',x===b));applyLayout();saveLayout();});
 $('szdone').addEventListener('click',()=>$('ov-size').classList.remove('op'));
-
-// Click outside deselects
-document.addEventListener('click',e=>{
-  if(!selWidget) return;
-  if(e.target.closest('.wcell')||e.target.closest('#ghost-layer')||e.target.closest('.ov')) return;
-  selWidget=null; hideGhosts();
-  document.querySelectorAll('.wcell').forEach(c=>c.classList.remove('picked'));
-});
+document.addEventListener('click',e=>{if(!selWidget)return;if(e.target.closest('.wcell')||e.target.closest('#ghost-layer')||e.target.closest('.ov'))return;selWidget=null;hideGhosts();WIDGET_IDS.forEach(id=>$('wc-'+id).classList.remove('picked'));});
 
 /* ── MODULES ── */
 function renderMods(){
-  const list=$('mlist'); list.innerHTML='';
+  const list=$('mlist');list.innerHTML='';
   mods.forEach((m,idx)=>{
-    const el=document.createElement('div');
-    el.className='mtile'+(m.disabled?' dis':'');
+    const el=document.createElement('div');el.className='mtile'+(m.disabled?' dis':'');
     el.innerHTML=`<button class="mdel">✕</button><div class="mico">${m.icon||'📦'}</div><div class="minfo"><h3>${esc(m.name)}</h3>${m.desc?`<p>${esc(m.desc)}</p>`:''}</div>`;
     el.querySelector('.mdel').addEventListener('click',e=>{e.stopPropagation();removeMod(m.id);});
     if(modEdit){
@@ -725,7 +512,7 @@ function renderMods(){
       el.addEventListener('dragleave',()=>el.classList.remove('drag-over'));
       el.addEventListener('drop',e=>{e.preventDefault();if(modDragIdx!==null&&modDragIdx!==idx){const mv=mods.splice(modDragIdx,1)[0];mods.splice(idx,0,mv);saveMods();renderMods();}});
     } else {
-      if(m.url&&!m.disabled) el.addEventListener('click',()=>location.href=m.url);
+      if(m.url&&!m.disabled)el.addEventListener('click',()=>location.href=m.url);
       else el.addEventListener('click',()=>openMod(m));
     }
     list.appendChild(el);
@@ -734,269 +521,98 @@ function renderMods(){
 function saveMods(){if(!hubDoc)return;clearTimeout(modT);modT=setTimeout(()=>hubDoc.set({modules:mods}).catch(()=>{}),600);}
 $('btn-medit').addEventListener('click',()=>{modEdit=!modEdit;$('btn-medit').classList.toggle('act',modEdit);renderMods();});
 $('btn-addm').addEventListener('click',()=>openMod(null));
-function openMod(m){
-  modEditId=m?m.id:null;
-  $('modtitle').textContent=m?'Modifier':'Ajouter';
-  $('moji').value=m?(m.icon||''):'';
-  $('mname').value=m?m.name:'';
-  $('mdesc').value=m?(m.desc||''):'';
-  $('murl').value=m?(m.url||''):'';
-  $('mdel').style.display=m?'inline-flex':'none';
-  $('ov-mod').classList.add('op');
-}
+function openMod(m){modEditId=m?m.id:null;$('modtitle').textContent=m?'Modifier':'Ajouter';$('moji').value=m?(m.icon||''):'';$('mname').value=m?m.name:'';$('mdesc').value=m?(m.desc||''):'';$('murl').value=m?(m.url||''):'';$('mdel').style.display=m?'inline-flex':'none';$('ov-mod').classList.add('op');}
 $('mcancel').addEventListener('click',()=>$('ov-mod').classList.remove('op'));
-$('msave').addEventListener('click',()=>{
-  const name=$('mname').value.trim(); if(!name){alert('Nom requis');return;}
-  const data={id:modEditId||'m'+Date.now(),icon:$('moji').value.trim()||'📦',name,desc:$('mdesc').value.trim(),url:$('murl').value.trim(),disabled:!$('murl').value.trim()};
-  if(modEditId){const i=mods.findIndex(m=>m.id===modEditId);if(i>-1)mods[i]=data;}else mods.push(data);
-  saveMods();$('ov-mod').classList.remove('op');renderMods();
-});
+$('msave').addEventListener('click',()=>{const name=$('mname').value.trim();if(!name){alert('Nom requis');return;}const data={id:modEditId||'m'+Date.now(),icon:$('moji').value.trim()||'📦',name,desc:$('mdesc').value.trim(),url:$('murl').value.trim(),disabled:!$('murl').value.trim()};if(modEditId){const i=mods.findIndex(m=>m.id===modEditId);if(i>-1)mods[i]=data;}else mods.push(data);saveMods();$('ov-mod').classList.remove('op');renderMods();});
 $('mdel').addEventListener('click',()=>{if(!modEditId||!confirm('Supprimer ?'))return;mods=mods.filter(m=>m.id!==modEditId);saveMods();$('ov-mod').classList.remove('op');renderMods();});
 function removeMod(id){if(!confirm('Supprimer ?'))return;mods=mods.filter(m=>m.id!==id);saveMods();renderMods();}
-
-// Emoji picker
-(function(){
-  const dd=$('epdd');
-  Object.entries(EMOJI_CATS).forEach(([cat,emojis])=>{
-    const lbl=document.createElement('div');lbl.className='ecatlbl';lbl.textContent=cat;dd.appendChild(lbl);
-    const g=document.createElement('div');g.className='epg';
-    emojis.forEach(e=>{const ep=document.createElement('div');ep.className='ep';ep.textContent=e;ep.addEventListener('click',()=>{$('moji').value=e;dd.classList.remove('op');});g.appendChild(ep);});
-    dd.appendChild(g);
-  });
-})();
+(function(){const dd=$('epdd');Object.entries(EMOJI_CATS).forEach(([cat,emojis])=>{const lbl=document.createElement('div');lbl.className='ecatlbl';lbl.textContent=cat;dd.appendChild(lbl);const g=document.createElement('div');g.className='epg';emojis.forEach(e=>{const ep=document.createElement('div');ep.className='ep';ep.textContent=e;ep.addEventListener('click',()=>{$('moji').value=e;dd.classList.remove('op');});g.appendChild(ep);});dd.appendChild(g);});})();
 $('etogg').addEventListener('click',e=>{e.stopPropagation();$('epdd').classList.toggle('op');});
 document.addEventListener('click',e=>{if(!e.target.closest('.epf'))$('epdd').classList.remove('op');});
 
 /* ── SPORT ── */
 function isSportEv(ev){return SPORT_KW.includes((ev.title||'').toLowerCase().trim());}
 function computeSessions(){
-  if(!planState) return [];
-  const evs=(planState.events||[]).filter(isSportEv), exc=planState.exceptions||[];
-  const today=new Date(); today.setHours(23,59,59,999);
+  if(!planState)return[];
+  const evs=(planState.events||[]).filter(isSportEv),exc=planState.exceptions||[];
+  const today=new Date();today.setHours(23,59,59,999);
   const a=planState.weekAnchor||{monday:dK(monOf(new Date())),letter:'A'};
-  const ad=new Date(a.monday+'T00:00:00'), sd=new Date(SPORT_FROM+'T00:00:00');
+  const ad=new Date(a.monday+'T00:00:00'),sd=new Date(SPORT_FROM+'T00:00:00');
   const sessions=[];
   for(let w=-60;w<=0;w++){
-    const mon=monOf(addD(ad,w*7)); if(mon<sd) continue;
-    const dw=Math.round((mon-ad)/604800000), p=((dw%2)+2)%2;
+    const mon=monOf(addD(ad,w*7));if(mon<sd)continue;
+    const dw=Math.round((mon-ad)/604800000),p=((dw%2)+2)%2;
     const letter=p===0?a.letter:(a.letter==='A'?'B':'A');
     for(let d=0;d<7;d++){
-      const dt=addD(mon,d), k=dK(dt); if(dt>today) continue;
+      const dt=addD(mon,d),k=dK(dt);if(dt>today)continue;
       evs.forEach(ev=>{
-        if(ev.day!==d) return;
-        if(ev.onlyDate&&ev.onlyDate!==k) return;
-        if(!ev.onlyDate&&ev.week&&ev.week!==letter) return;
-        if(exc.includes(ev.id+'@'+k)) return;
-        const e2=new Date(dt); const[eh,em]=ev.end.split(':').map(Number); e2.setHours(eh,em);
-        if(e2<=today) sessions.push({date:k});
+        if(ev.day!==d)return;if(ev.onlyDate&&ev.onlyDate!==k)return;if(!ev.onlyDate&&ev.week&&ev.week!==letter)return;if(exc.includes(ev.id+'@'+k))return;
+        const e2=new Date(dt);const[eh,em]=ev.end.split(':').map(Number);e2.setHours(eh,em);
+        if(e2<=today)sessions.push({date:k});
       });
     }
   }
-  const seen=new Set(); return sessions.filter(s=>{if(seen.has(s.date))return false;seen.add(s.date);return true;});
+  const seen=new Set();return sessions.filter(s=>{if(seen.has(s.date))return false;seen.add(s.date);return true;});
 }
 function getMon(ds){return dK(monOf(new Date(ds+'T12:00:00')));}
 function renderSport(){
-  const sessions=computeSessions(), now=new Date();
-  const weights=spData.weights||[], goal=spData.goal||SPORT_GOAL, startW=spData.startWeight||SPORT_START_W;
+  const sessions=computeSessions(),now=new Date();
+  const weights=spData.weights||[],goal=spData.goal||SPORT_GOAL,startW=spData.startWeight||SPORT_START_W;
   const lastW=weights.length>0?weights[weights.length-1].w:startW;
   const pct=Math.max(0,Math.min(100,(startW-lastW)/(startW-goal)*100));
-  let html=`<div class="spwr"><div class="spwl">${weights.length?`<strong>${lastW}kg</strong>`:'Aucune pesée'}</div><div class="wbar"><div class="wbf" style="width:${pct}%"></div></div><div style="font-size:.65rem;color:var(--accent);margin-left:5px;">${goal}kg</div></div>`;
-  const ms=[]; for(let m=Math.floor((startW-1)/SPORT_MS)*SPORT_MS;m>=goal;m-=SPORT_MS) ms.push(Math.round(m*10)/10);
+  let html=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><span style="font-size:.75rem;color:var(--dim);">${weights.length?`<strong style="color:var(--chalk)">${lastW}kg</strong>`:'Aucune pesée'}</span><div class="wbar" style="flex:1"><div class="wbf" style="width:${pct}%"></div></div><span style="font-size:.65rem;color:var(--accent);">${goal}kg</span></div>`;
+  const ms=[];for(let m=Math.floor((startW-1)/SPORT_MS)*SPORT_MS;m>=goal;m-=SPORT_MS)ms.push(Math.round(m*10)/10);
   html+='<div class="msrow">'+ms.map(m=>{const done=lastW<=m;const isNext=!done&&ms.findIndex(x=>lastW>x)===ms.indexOf(m);return`<div class="ms${done?' dn':isNext?' nx':''}">${m}${done?'✓':''}</div>`;}).join('')+'</div>';
-  const wkMap={}; sessions.forEach(s=>{const mk=getMon(s.date);if(!wkMap[mk])wkMap[mk]=[];wkMap[mk].push(s.date);});
-  const sd2=new Date(SPORT_FROM+'T00:00:00'); sd2.setDate(1);
-  const months=[]; const cur2=new Date(sd2); while(cur2<=now){months.push(new Date(cur2));cur2.setMonth(cur2.getMonth()+1);}
+  const wkMap={};sessions.forEach(s=>{const mk=getMon(s.date);if(!wkMap[mk])wkMap[mk]=[];wkMap[mk].push(s.date);});
+  const sd2=new Date(SPORT_FROM+'T00:00:00');sd2.setDate(1);
+  const months=[];const cur2=new Date(sd2);while(cur2<=now){months.push(new Date(cur2));cur2.setMonth(cur2.getMonth()+1);}
   months.slice(-2).forEach(md=>{
-    const y=md.getFullYear(), mo=md.getMonth();
-    const first=new Date(y,mo,1), last=new Date(y,mo+1,0);
+    const y=md.getFullYear(),mo=md.getMonth();
+    const first=new Date(y,mo,1),last=new Date(y,mo+1,0);
     const mTotal=sessions.filter(s=>s.date>=dK(first)&&s.date<=dK(last)).length;
-    html+=`<div class="smon"><div class="smhdr"><span class="smname">${MFR[mo]} ${y}</span><span class="smcnt">${mTotal} séance${mTotal>1?'s':''}</span></div><div class="swks">`;
-    let wS=monOf(first), wN=1;
+    html+=`<div style="margin-bottom:2px;"><div class="smhdr"><span class="smname">${MFR[mo]} ${y}</span><span class="smcnt">${mTotal} séance${mTotal>1?'s':''}</span></div><div class="swks">`;
+    let wS=monOf(first),wN=1;
     while(wS<=last){
-      const mk=dK(wS), done=(wkMap[mk]||[]).length, isFut=wS>now;
-      const dots=[]; for(let i=0;i<SPORT_TARGET;i++){const cls=isFut?'fu':i<done?'dn':'mi';dots.push(`<div class="sdot ${cls}">${cls==='dn'?'✓':cls==='mi'?'✕':''}</div>`);}
+      const mk=dK(wS),done=(wkMap[mk]||[]).length,isFut=wS>now;
+      const dots=[];for(let i=0;i<SPORT_TARGET;i++){const cls=isFut?'fu':i<done?'dn':'mi';dots.push(`<div class="sdot ${cls}">${cls==='dn'?'✓':cls==='mi'?'✕':''}</div>`);}
       html+=`<div class="swrow"><span class="swlbl">S${wN}</span><div class="sdots">${dots.join('')}</div></div>`;
-      wS=addD(wS,7); wN++;
+      wS=addD(wS,7);wN++;
     }
     html+='</div></div>';
   });
-  const thisMk=dK(monOf(now)), thisDone=Math.min(SPORT_TARGET,(wkMap[thisMk]||[]).length);
+  const thisMk=dK(monOf(now)),thisDone=Math.min(SPORT_TARGET,(wkMap[thisMk]||[]).length);
   const wc=thisDone>=SPORT_TARGET?'var(--green)':thisDone>0?'var(--accent)':'var(--chalk)';
   html+=`<div class="sstats"><div class="sstat"><div class="ssv" style="color:${wc}">${thisDone}/${SPORT_TARGET}</div><div class="ssl">Cette sem.</div></div><div class="sstat"><div class="ssv">${sessions.length}</div><div class="ssl">Total</div></div></div>`;
   $('spbody').innerHTML=html;
 }
 $('wbtn-weigh').addEventListener('click',()=>{$('wval').value='';$('wdat').value=dK(new Date());$('ov-weigh').classList.add('op');});
 $('wcancel').addEventListener('click',()=>$('ov-weigh').classList.remove('op'));
-$('wsave').addEventListener('click',()=>{
-  const val=parseFloat($('wval').value), date=$('wdat').value;
-  if(!val||isNaN(val)||!date){alert('Poids invalide.');return;}
-  spData.weights=spData.weights.filter(w=>w.d!==date);
-  spData.weights.push({d:date,w:Math.round(val*10)/10});
-  spData.weights.sort((a,b)=>a.d.localeCompare(b.d));
-  if(spDoc) spDoc.set(spData).catch(()=>{});
-  $('ov-weigh').classList.remove('op'); renderSport();
-});
+$('wsave').addEventListener('click',()=>{const val=parseFloat($('wval').value),date=$('wdat').value;if(!val||isNaN(val)||!date){alert('Poids invalide.');return;}spData.weights=spData.weights.filter(w=>w.d!==date);spData.weights.push({d:date,w:Math.round(val*10)/10});spData.weights.sort((a,b)=>a.d.localeCompare(b.d));if(spDoc)spDoc.set(spData).catch(()=>{});$('ov-weigh').classList.remove('op');renderSport();});
 
 /* ── TASKS ── */
 function saveTasks(){if(!tDoc)return;clearTimeout(tT);tT=setTimeout(()=>tDoc.set(tData).catch(()=>{}),600);}
-function switchTab(tab){
-  tTab=tab;
-  ['todo','done','cats'].forEach(t=>{$(t==='todo'?'tab-todo':t==='done'?'tab-done':'tab-cats').classList.toggle('hi',t!==tab);});
-  document.querySelectorAll('.ttab').forEach(b=>b.classList.toggle('on',b.id==='ttab-'+tab));
-  renderTasks();
-}
+function switchTab(tab){tTab=tab;['todo','done','cats'].forEach(t=>{$('tab-'+t).classList.toggle('hi',t!==tab);});document.querySelectorAll('.ttab').forEach(b=>b.classList.toggle('on',b.id==='ttab-'+tab));renderTasks();}
 ['todo','done','cats'].forEach(t=>$('ttab-'+t).addEventListener('click',()=>switchTab(t)));
 function renderTasks(){renderTCatFilt();renderTCatSel();if(tTab==='todo')renderTodo();else if(tTab==='done')renderDone();else renderCats();}
-function renderTCatFilt(){
-  const c=$('tcatfilt');
-  c.innerHTML=`<div class="tcpill${tFilt===''?' on':''}" data-f="">Tout</div>`;
-  (tData.cats||[]).forEach(cat=>{c.innerHTML+=`<div class="tcpill${tFilt===cat?' on':''}" data-f="${esc(cat)}">${esc(cat)}</div>`;});
-}
-function renderTCatSel(){
-  const s=$('tcatsel');s.innerHTML='<option value="">Aucune catégorie</option>';
-  (tData.cats||[]).forEach(cat=>{s.innerHTML+=`<option value="${esc(cat)}">${esc(cat)}</option>`;});
-}
-function renderTodo(){
-  const list=$('tlist');
-  const tasks=(tData.tasks||[]).filter(t=>!t.done&&(tFilt===''||t.cat===tFilt));
-  const sorted=[...tasks].sort((a,b)=>({'🔴':0,'🟡':1,'🟢':2}[a.prio]||1)-({'🔴':0,'🟡':1,'🟢':2}[b.prio]||1));
-  if(!sorted.length){list.innerHTML='<div class="empty">Aucune tâche 🎉</div>';return;}
-  list.innerHTML='';
-  sorted.forEach(task=>{
-    const el=document.createElement('div');el.className='titem';el.dataset.id=task.id;
-    el.innerHTML=`<div class="tck" data-ck="${task.id}"></div><div class="tpr" data-cp="${task.id}">${task.prio||'🟡'}</div><div class="ttxt">${esc(task.text)}</div>${task.cat?`<div class="tbadge">${esc(task.cat)}</div>`:''}<div class="tdl" data-dl="${task.id}">✕</div>`;
-    el.draggable=true;
-    el.addEventListener('dragstart',()=>el.classList.add('dragging'));
-    el.addEventListener('dragend',()=>el.classList.remove('dragging'));
-    el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('drag-ov');});
-    el.addEventListener('dragleave',()=>el.classList.remove('drag-ov'));
-    el.addEventListener('drop',e=>{e.preventDefault();el.classList.remove('drag-ov');const srcId=document.querySelector('.titem.dragging')?.dataset.id;if(srcId&&srcId!==task.id){const si=tData.tasks.findIndex(t=>t.id===srcId),di=tData.tasks.findIndex(t=>t.id===task.id);if(si>-1&&di>-1){const mv=tData.tasks.splice(si,1)[0];tData.tasks.splice(di,0,mv);saveTasks();renderTasks();}}});
-    list.appendChild(el);
-  });
-}
-function renderDone(){
-  const list=$('tdlist');
-  const tasks=(tData.tasks||[]).filter(t=>t.done&&(tFilt===''||t.cat===tFilt));
-  if(!tasks.length){list.innerHTML='<div class="empty">Aucune tâche effectuée.</div>';return;}
-  list.innerHTML='';
-  tasks.forEach(task=>{
-    const el=document.createElement('div');el.className='titem done-item';
-    el.innerHTML=`<div class="tck on" data-ck="${task.id}"></div><div class="tpr">${task.prio||'🟡'}</div><div class="ttxt sk">${esc(task.text)}</div>${task.cat?`<div class="tbadge">${esc(task.cat)}</div>`:''}<div class="tdl" data-dl="${task.id}">✕</div>`;
-    list.appendChild(el);
-  });
-}
-function renderCats(){
-  const list=$('tclist'); const cats=tData.cats||[];
-  if(!cats.length){list.innerHTML='<div class="empty">Aucune catégorie.</div>';return;}
-  list.innerHTML='';
-  cats.forEach((cat,i)=>{const el=document.createElement('div');el.className='titem';el.innerHTML=`<div class="ttxt">${esc(cat)}</div><div class="tdl" data-dcat="${i}">✕</div>`;list.appendChild(el);});
-}
+function renderTCatFilt(){const c=$('tcatfilt');c.innerHTML=`<div class="tcpill${tFilt===''?' on':''}" data-f="">Tout</div>`+(tData.cats||[]).map(cat=>`<div class="tcpill${tFilt===cat?' on':''}" data-f="${esc(cat)}">${esc(cat)}</div>`).join('');}
+function renderTCatSel(){const s=$('tcatsel');s.innerHTML='<option value="">Aucune catégorie</option>'+(tData.cats||[]).map(cat=>`<option value="${esc(cat)}">${esc(cat)}</option>`).join('');}
+function renderTodo(){const list=$('tlist');const tasks=(tData.tasks||[]).filter(t=>!t.done&&(tFilt===''||t.cat===tFilt));const sorted=[...tasks].sort((a,b)=>({'🔴':0,'🟡':1,'🟢':2}[a.prio]||1)-({'🔴':0,'🟡':1,'🟢':2}[b.prio]||1));if(!sorted.length){list.innerHTML='<div class="empty">Aucune tâche 🎉</div>';return;}list.innerHTML='';sorted.forEach(task=>{const el=document.createElement('div');el.className='titem';el.dataset.id=task.id;el.innerHTML=`<div class="tck" data-ck="${task.id}"></div><div class="tpr" data-cp="${task.id}">${task.prio||'🟡'}</div><div class="ttxt">${esc(task.text)}</div>${task.cat?`<div class="tbadge">${esc(task.cat)}</div>`:''}<div class="tdl" data-dl="${task.id}">✕</div>`;list.appendChild(el);});}
+function renderDone(){const list=$('tdlist');const tasks=(tData.tasks||[]).filter(t=>t.done&&(tFilt===''||t.cat===tFilt));if(!tasks.length){list.innerHTML='<div class="empty">Aucune effectuée.</div>';return;}list.innerHTML='';tasks.forEach(task=>{const el=document.createElement('div');el.className='titem done-item';el.innerHTML=`<div class="tck on" data-ck="${task.id}"></div><div class="tpr">${task.prio||'🟡'}</div><div class="ttxt sk">${esc(task.text)}</div>${task.cat?`<div class="tbadge">${esc(task.cat)}</div>`:''}<div class="tdl" data-dl="${task.id}">✕</div>`;list.appendChild(el);});}
+function renderCats(){const list=$('tclist');const cats=tData.cats||[];if(!cats.length){list.innerHTML='<div class="empty">Aucune catégorie.</div>';return;}list.innerHTML='';cats.forEach((cat,i)=>{const el=document.createElement('div');el.className='titem';el.innerHTML=`<div class="ttxt">${esc(cat)}</div><div class="tdl" data-dcat="${i}">✕</div>`;list.appendChild(el);});}
 function addTask(){const inp=$('tinp'),text=inp.value.trim();if(!text)return;const cat=$('tcatsel').value;tData.tasks.push({id:'t'+Date.now(),text,prio:tPrio,cat,done:false,createdAt:new Date().toISOString()});inp.value='';saveTasks();renderTasks();}
 $('tadd-btn').addEventListener('click',addTask);
 $('tinp').addEventListener('keydown',e=>{if(e.key==='Enter')addTask();});
 $('catadd').addEventListener('click',()=>{const inp=$('catinp'),v=inp.value.trim();if(!v)return;if(!tData.cats)tData.cats=[];if(!tData.cats.includes(v)){tData.cats.push(v);inp.value='';saveTasks();renderTasks();}});
 $('catinp').addEventListener('keydown',e=>{if(e.key==='Enter')$('catadd').click();});
-$('tlist').addEventListener('click',e=>{
-  const ck=e.target.closest('[data-ck]');if(ck){const t=tData.tasks.find(t=>t.id===ck.dataset.ck);if(t){t.done=!t.done;t.doneAt=t.done?new Date().toISOString():null;saveTasks();renderTasks();}return;}
-  const cp=e.target.closest('[data-cp]');if(cp){const t=tData.tasks.find(t=>t.id===cp.dataset.cp);if(t){const cy={'🔴':'🟡','🟡':'🟢','🟢':'🔴'};t.prio=cy[t.prio]||'🟡';saveTasks();renderTasks();}return;}
-  const dl=e.target.closest('[data-dl]');if(dl){tData.tasks=tData.tasks.filter(t=>t.id!==dl.dataset.dl);saveTasks();renderTasks();}
-});
-$('tdlist').addEventListener('click',e=>{
-  const ck=e.target.closest('[data-ck]');if(ck){const t=tData.tasks.find(t=>t.id===ck.dataset.ck);if(t){t.done=false;t.doneAt=null;saveTasks();renderTasks();}return;}
-  const dl=e.target.closest('[data-dl]');if(dl){tData.tasks=tData.tasks.filter(t=>t.id!==dl.dataset.dl);saveTasks();renderTasks();}
-});
+$('tlist').addEventListener('click',e=>{const ck=e.target.closest('[data-ck]');if(ck){const t=tData.tasks.find(t=>t.id===ck.dataset.ck);if(t){t.done=!t.done;t.doneAt=t.done?new Date().toISOString():null;saveTasks();renderTasks();}return;}const cp=e.target.closest('[data-cp]');if(cp){const t=tData.tasks.find(t=>t.id===cp.dataset.cp);if(t){const cy={'🔴':'🟡','🟡':'🟢','🟢':'🔴'};t.prio=cy[t.prio]||'🟡';saveTasks();renderTasks();}return;}const dl=e.target.closest('[data-dl]');if(dl){tData.tasks=tData.tasks.filter(t=>t.id!==dl.dataset.dl);saveTasks();renderTasks();}});
+$('tdlist').addEventListener('click',e=>{const ck=e.target.closest('[data-ck]');if(ck){const t=tData.tasks.find(t=>t.id===ck.dataset.ck);if(t){t.done=false;t.doneAt=null;saveTasks();renderTasks();}return;}const dl=e.target.closest('[data-dl]');if(dl){tData.tasks=tData.tasks.filter(t=>t.id!==dl.dataset.dl);saveTasks();renderTasks();}});
 $('tclist').addEventListener('click',e=>{const dc=e.target.closest('[data-dcat]');if(dc){tData.cats.splice(Number(dc.dataset.dcat),1);saveTasks();renderTasks();}});
 $('tcatfilt').addEventListener('click',e=>{const p=e.target.closest('[data-f]');if(!p)return;tFilt=p.dataset.f;renderTasks();});
 $('topt').addEventListener('click',e=>{const b=e.target.closest('.tpbtn[data-p]');if(!b)return;tPrio=b.dataset.p;document.querySelectorAll('.tpbtn').forEach(x=>x.classList.toggle('on',x.dataset.p===tPrio));});
 
-/* ── TASKS 2 & 3 (duplicate listeners) ── */
-function initTasksWidget(n){
-  const sfx = n===1?'':''+n;
-  const tab = (t)=>$('ttab'+sfx+'-'+t);
-  const inp = ()=>$('tinp'+sfx);
-  const addBtn = ()=>$('tadd'+sfx+'-btn');
-  const catInp = ()=>$('catinp'+sfx);
-  const catAdd = ()=>$('catadd'+sfx);
-  const list = ()=>$('tlist'+sfx);
-  const dlist = ()=>$('tdlist'+sfx);
-  const clist = ()=>$('tclist'+sfx);
-  const filt = ()=>$('tcatfilt'+sfx);
-  const catsel = ()=>$('tcatsel'+sfx);
-  
-  if(!tab('todo')) return; // widget not present
-  
-  let curTab='todo', curFilt='', curPrio='🔴';
-  
-  function switchT(t){
-    curTab=t;
-    ['todo','done','cats'].forEach(x=>$('tab'+sfx+'-'+x).classList.toggle('hi',x!==t));
-    ['todo','done','cats'].forEach(x=>tab(x)&&tab(x).classList.toggle('on',x===t));
-  }
-  ['todo','done','cats'].forEach(t=>{const b=tab(t);if(b)b.addEventListener('click',()=>switchT(t));});
-  
-  function addT(){const v=inp().value.trim();if(!v)return;tData.tasks.push({id:'t'+Date.now()+n,text:v,prio:curPrio,cat:catsel().value,done:false,createdAt:new Date().toISOString()});inp().value='';saveTasks();renderAll();}
-  if(addBtn()) addBtn().addEventListener('click',addT);
-  if(inp()) inp().addEventListener('keydown',e=>{if(e.key==='Enter')addT();});
-  if(catAdd()) catAdd().addEventListener('click',()=>{const v=catInp().value.trim();if(!v)return;if(!tData.cats.includes(v)){tData.cats.push(v);catInp().value='';saveTasks();renderAll();}});
-  if(catInp()) catInp().addEventListener('keydown',e=>{if(e.key==='Enter')catAdd().click();});
-  
-  function renderAll(){
-    // catfilt
-    filt().innerHTML=`<div class="tcpill${curFilt===''?' on':''}" data-f="">Tout</div>`+(tData.cats||[]).map(c=>`<div class="tcpill${curFilt===c?' on':''}" data-f="${esc(c)}">${esc(c)}</div>`).join('');
-    catsel().innerHTML='<option value="">Aucune catégorie</option>'+(tData.cats||[]).map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');
-    // todo
-    const tasks=(tData.tasks||[]).filter(t=>!t.done&&(curFilt===''||t.cat===curFilt));
-    const sorted=[...tasks].sort((a,b)=>({'🔴':0,'🟡':1,'🟢':2}[a.prio]||1)-({'🔴':0,'🟡':1,'🟢':2}[b.prio]||1));
-    list().innerHTML=!sorted.length?'<div class="empty">Aucune tâche 🎉</div>':sorted.map(t=>`<div class="titem" data-id="${t.id}"><div class="tck${t.done?' on':''}" data-ck="${t.id}"></div><div class="tpr" data-cp="${t.id}">${t.prio||'🟡'}</div><div class="ttxt">${esc(t.text)}</div>${t.cat?`<div class="tbadge">${esc(t.cat)}</div>`:''}<div class="tdl" data-dl="${t.id}">✕</div></div>`).join('');
-    const done=(tData.tasks||[]).filter(t=>t.done);
-    dlist().innerHTML=!done.length?'<div class="empty">Aucune effectuée.</div>':done.map(t=>`<div class="titem done-item"><div class="tck on" data-ck="${t.id}"></div><div class="tpr">${t.prio||'🟡'}</div><div class="ttxt sk">${esc(t.text)}</div>${t.cat?`<div class="tbadge">${esc(t.cat)}</div>`:''}<div class="tdl" data-dl="${t.id}">✕</div></div>`).join('');
-    const cats=tData.cats||[];
-    clist().innerHTML=!cats.length?'<div class="empty">Aucune catégorie.</div>':cats.map((c,i)=>`<div class="titem"><div class="ttxt">${esc(c)}</div><div class="tdl" data-dcat="${i}">✕</div></div>`).join('');
-  }
-  
-  list().addEventListener('click',e=>{
-    const ck=e.target.closest('[data-ck]');if(ck){const t=tData.tasks.find(x=>x.id===ck.dataset.ck);if(t){t.done=!t.done;t.doneAt=t.done?new Date().toISOString():null;saveTasks();renderAll();}return;}
-    const cp=e.target.closest('[data-cp]');if(cp){const t=tData.tasks.find(x=>x.id===cp.dataset.cp);if(t){const cy={'🔴':'🟡','🟡':'🟢','🟢':'🔴'};t.prio=cy[t.prio]||'🟡';saveTasks();renderAll();}return;}
-    const dl=e.target.closest('[data-dl]');if(dl){tData.tasks=tData.tasks.filter(x=>x.id!==dl.dataset.dl);saveTasks();renderAll();}
-  });
-  dlist().addEventListener('click',e=>{
-    const ck=e.target.closest('[data-ck]');if(ck){const t=tData.tasks.find(x=>x.id===ck.dataset.ck);if(t){t.done=false;t.doneAt=null;saveTasks();renderAll();}return;}
-    const dl=e.target.closest('[data-dl]');if(dl){tData.tasks=tData.tasks.filter(x=>x.id!==dl.dataset.dl);saveTasks();renderAll();}
-  });
-  clist().addEventListener('click',e=>{const dc=e.target.closest('[data-dcat]');if(dc){tData.cats.splice(Number(dc.dataset.dcat),1);saveTasks();renderAll();}});
-  filt().addEventListener('click',e=>{const p=e.target.closest('[data-f]');if(!p)return;curFilt=p.dataset.f;renderAll();});
-  $('topt') && document.querySelectorAll('.tpbtn[data-p]').forEach(b=>b.addEventListener('click',()=>{curPrio=b.dataset.p;}));
-  renderAll();
-}
-
 /* ── THEMES ── */
-function applyTheme(id){
-  const t=THEMES.find(x=>x.id===id)||THEMES[0];
-  const r=document.documentElement.style;
-  r.setProperty('--bg',t.bg);r.setProperty('--bg2',t.bg2);r.setProperty('--bg3',t.bg3);
-  r.setProperty('--accent',t.ac);r.setProperty('--teal',t.tl);r.setProperty('--tl',t.tl+'22');
-  r.setProperty('--green',t.gr);r.setProperty('--gl',t.gr+'22');
-  r.setProperty('--red',t.rd);r.setProperty('--rl',t.rd+'22');
-  r.setProperty('--blue',t.bl);r.setProperty('--bl',t.bl+'22');
-  r.setProperty('--chalk',t.ch);r.setProperty('--dim',t.ch+'99');
-  r.setProperty('--line',t.ch+'17');r.setProperty('--line2',t.ch+'2e');
-  curTheme=id;try{localStorage.setItem('mlt',id);}catch(e){}
-}
-function buildThemeGrid(){
-  const g=$('tgrid');g.innerHTML='';
-  THEMES.forEach(t=>{
-    const b=document.createElement('button');
-    b.className='tbtn';
-    b.style.cssText=`background:${t.bg2};border-color:${curTheme===t.id?t.ac:'transparent'};`;
-    b.innerHTML=`<div class="tdots"><div class="tdot" style="background:${t.ac}"></div><div class="tdot" style="background:${t.tl}"></div><div class="tdot" style="background:${t.gr}"></div></div><div style="font-size:.82rem;font-weight:700;color:${t.ch}">${t.n}</div>${curTheme===t.id?`<div style="margin-left:auto;color:${t.ac};font-size:.8rem;">✓</div>`:''}`;
-    b.addEventListener('click',()=>{
-      applyTheme(t.id);
-      if(layDoc) layDoc.set(Object.assign({},wLayout,{theme:t.id})).catch(()=>{});
-      buildThemeGrid();
-    });
-    g.appendChild(b);
-  });
-}
+function applyTheme(id){const t=THEMES.find(x=>x.id===id)||THEMES[0];const r=document.documentElement.style;r.setProperty('--bg',t.bg);r.setProperty('--bg2',t.bg2);r.setProperty('--bg3',t.bg3);r.setProperty('--accent',t.ac);r.setProperty('--teal',t.tl);r.setProperty('--tl',t.tl+'22');r.setProperty('--green',t.gr);r.setProperty('--gl',t.gr+'22');r.setProperty('--red',t.rd);r.setProperty('--rl',t.rd+'22');r.setProperty('--blue',t.bl);r.setProperty('--chalk',t.ch);r.setProperty('--dim',t.ch+'99');r.setProperty('--line',t.ch+'17');r.setProperty('--line2',t.ch+'2e');curTheme=id;try{localStorage.setItem('mlt',id);}catch(e){}}
+function buildThemeGrid(){const g=$('tgrid');g.innerHTML='';THEMES.forEach(t=>{const b=document.createElement('button');b.className='tbtn';b.style.cssText=`background:${t.bg2};border-color:${curTheme===t.id?t.ac:'transparent'};`;b.innerHTML=`<div class="tdots"><div class="tdot" style="background:${t.ac}"></div><div class="tdot" style="background:${t.tl}"></div><div class="tdot" style="background:${t.gr}"></div></div><div style="font-size:.82rem;font-weight:700;color:${t.ch}">${t.n}</div>${curTheme===t.id?`<div style="margin-left:auto;color:${t.ac};font-size:.8rem;">✓</div>`:''}`;b.addEventListener('click',()=>{applyTheme(t.id);if(layDoc)layDoc.set(Object.assign({},wLayout,{theme:t.id})).catch(()=>{});buildThemeGrid();});g.appendChild(b);});}
 $('btn-theme').addEventListener('click',()=>{buildThemeGrid();$('ov-theme').classList.add('op');});
 $('thclose').addEventListener('click',()=>$('ov-theme').classList.remove('op'));
 (()=>{try{const s=localStorage.getItem('mlt');if(s)applyTheme(s);}catch(e){}})();
