@@ -584,7 +584,14 @@ auth.onAuthStateChanged(async user=>{
   document.getElementById('debug-msg').textContent = '✅ Firebase OK — user: '+(user.email||'?');
   document.getElementById('debug-move').onclick = ()=>{
     const el = document.getElementById('wmv-sport');
-    document.getElementById('debug-msg').textContent = el ? 'wmv-sport FOUND, onclick='+(el.onclick?'SET':'NULL') : 'wmv-sport NOT FOUND';
+    if(!el){document.getElementById('debug-msg').textContent='wmv-sport NOT FOUND';return;}
+    const msg = [
+      'gedit='+gedit,
+      'selW='+selW,
+      'body.gedit='+ document.body.classList.contains('gedit'),
+      'wc-sport exists='+ !!document.getElementById('wc-sport'),
+    ].join(' | ');
+    document.getElementById('debug-msg').textContent = msg;
   };
   ['sport','tasks'].forEach(id=>{
     const mv=$('wmv-'+id), sz=$('wsz-'+id);
