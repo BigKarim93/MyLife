@@ -75,7 +75,7 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 .widget{background:var(--bg2);border:1px solid var(--line2);border-radius:var(--r);display:flex;flex-direction:column;height:100%;overflow:hidden;}
 .whdr{padding:9px 12px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:7px;flex-shrink:0;}
 .whdr h2{font-size:.88rem;flex:1;}
-.wbody{padding:10px 12px;overflow-y:auto;flex:1;min-height:0;}
+.wbody{padding:8px 10px;overflow-y:auto;flex:1;min-height:0;}
 
 /* TASKS */
 .tadd{display:flex;gap:6px;margin-bottom:7px;}
@@ -165,9 +165,9 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 .ev-perso{background:rgba(240,169,120,.2);border-color:#f0a978;}
 
 /* ROUTINE */
-.rbox{position:relative;background:var(--bg3);border:2px solid var(--line);border-radius:9px;padding:8px 6px;text-align:center;cursor:pointer;transition:.15s;min-height:50px;display:flex;align-items:center;justify-content:center;}
+.rbox{position:relative;background:var(--bg3);border:2px solid var(--line);border-radius:7px;padding:5px 4px;text-align:center;cursor:pointer;transition:.15s;min-height:34px;display:flex;align-items:center;justify-content:center;}
 .rbox.done{background:rgba(74,222,128,.18);border-color:var(--green);}
-.rbox span{font-size:.74rem;line-height:1.25;color:var(--chalk);word-break:break-word;}
+.rbox span{font-size:.66rem;line-height:1.2;color:var(--chalk);word-break:break-word;}
 .rbox.done span{color:var(--green);font-weight:700;}
 .rbox .rdel{position:absolute;top:-6px;right:-6px;width:16px;height:16px;border-radius:50%;background:#c0392b;color:#fff;border:2px solid var(--bg);font-size:8px;display:none;align-items:center;justify-content:center;cursor:pointer;}
 .rbox:hover .rdel{display:flex;}
@@ -231,32 +231,32 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
           <div class="widget">
             <div class="whdr"><span>💪</span><h2>Sport</h2><button class="wh-move" id="wmv-t2">✥</button><button class="wh-size" id="wsz-t2">⊞</button></div>
             <div class="wbody">
-              <div style="display:flex;align-items:center;gap:8px;">
-                <span id="cur-weight" style="font-size:.78rem;color:var(--dim);">97.2kg</span>
-                <div style="flex:1;height:8px;background:var(--line);border-radius:4px;overflow:hidden;"><div id="wbf" style="height:100%;width:0%;background:linear-gradient(90deg,var(--green),#2dd4bf);border-radius:4px;transition:width .6s;"></div></div>
-                <span style="color:var(--accent);font-size:.78rem;">83kg</span>
-                <button class="btn sm" id="wbtn-weigh">⚖️ Peser</button>
+              <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px;">
+                <span id="cur-weight" style="font-size:.68rem;color:var(--dim);">97.2kg</span>
+                <div style="flex:1;height:6px;background:var(--line);border-radius:3px;overflow:hidden;"><div id="wbf" style="height:100%;width:0%;background:linear-gradient(90deg,var(--green),#2dd4bf);border-radius:3px;transition:width .6s;"></div></div>
+                <span style="color:var(--accent);font-size:.68rem;">83kg</span>
+                <button class="btn sm" id="wbtn-weigh" style="padding:2px 6px;font-size:.62rem;">⚖️</button>
               </div>
-              <div id="ms-row" style="display:flex;flex-wrap:wrap;gap:3px;margin:8px 0 10px;"></div>
+              <div id="ms-row" style="display:flex;flex-wrap:wrap;gap:2px;margin-bottom:6px;"></div>
 
-              <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:4px;">
-                <button class="btn sm" id="sp-month-prev" style="padding:2px 6px;">◀</button>
-                <span id="sp-month-lbl" style="font-family:'Kalam',cursive;font-size:.78rem;color:var(--accent);min-width:90px;text-align:center;"></span>
-                <button class="btn sm" id="sp-month-next" style="padding:2px 6px;">▶</button>
+              <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px;">
+                <button class="btn sm" id="sp-month-prev" style="padding:1px 5px;font-size:.62rem;">◀</button>
+                <span id="sp-month-lbl" style="font-family:'Kalam',cursive;font-size:.68rem;color:var(--accent);flex:1;text-align:center;"></span>
+                <button class="btn sm" id="sp-month-next" style="padding:1px 5px;font-size:.62rem;">▶</button>
               </div>
 
-              <div style="display:flex;gap:10px;align-items:flex-start;">
-                <div style="display:flex;flex-direction:column;gap:4px;">
-                  <div style="text-align:center;background:var(--bg3);border:1px solid var(--line);border-radius:6px;padding:2px 8px;">
-                    <div id="stat-week" style="font-family:'Kalam',cursive;font-size:.85rem;">0/3</div>
-                    <div style="font-size:.55rem;color:var(--dim);">Cette sem.</div>
+              <div style="display:flex;gap:6px;align-items:flex-start;">
+                <div style="display:flex;flex-direction:column;gap:3px;flex-shrink:0;">
+                  <div style="text-align:center;background:var(--bg3);border:1px solid var(--line);border-radius:5px;padding:1px 6px;">
+                    <div id="stat-week" style="font-family:'Kalam',cursive;font-size:.7rem;">0/3</div>
+                    <div style="font-size:.48rem;color:var(--dim);">Sem.</div>
                   </div>
-                  <div style="text-align:center;background:var(--bg3);border:1px solid var(--line);border-radius:6px;padding:2px 8px;">
-                    <div id="stat-total" style="font-family:'Kalam',cursive;font-size:.85rem;">0</div>
-                    <div style="font-size:.55rem;color:var(--dim);">Total</div>
+                  <div style="text-align:center;background:var(--bg3);border:1px solid var(--line);border-radius:5px;padding:1px 6px;">
+                    <div id="stat-total" style="font-family:'Kalam',cursive;font-size:.7rem;">0</div>
+                    <div style="font-size:.48rem;color:var(--dim);">Total</div>
                   </div>
                 </div>
-                <div id="sport-weeks" style="flex:1;"></div>
+                <div id="sport-weeks" style="flex:1;min-width:0;"></div>
               </div>
             </div>
           </div>
@@ -350,7 +350,7 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
           <div class="widget">
             <div class="whdr"><span>🔁</span><h2>Routine du jour</h2><button class="wh-move" id="wmv-t5">✥</button><button class="wh-size" id="wsz-t5">⊞</button></div>
             <div class="wbody">
-              <div id="routine-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;"></div>
+              <div id="routine-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:6px;"></div>
               <div style="display:flex;gap:6px;">
                 <input type="text" id="routine-inp" placeholder="Nouvelle routine…" style="flex:1;background:var(--bg);border:1px solid var(--line);color:var(--chalk);border-radius:6px;padding:6px 9px;font-size:.78rem;">
                 <button class="btn prim" id="routine-add">+</button>
@@ -838,9 +838,9 @@ function renderSport(){
       const isDone=j<done;
       const color=isFuture?'var(--line)':isDone?'#4ade80':'var(--line)';
       const bg=isFuture?'var(--bg3)':isDone?'rgba(74,222,128,.13)':'var(--bg3)';
-      dots.push(`<div style="width:14px;height:14px;border-radius:50%;border:1px solid ${color};background:${bg};display:flex;align-items:center;justify-content:center;font-size:.5rem;color:${color};flex-shrink:0;">${isDone&&!isFuture?'✓':''}</div>`);
+      dots.push(`<div style="width:12px;height:12px;border-radius:50%;border:1px solid ${color};background:${bg};display:flex;align-items:center;justify-content:center;font-size:.42rem;color:${color};flex-shrink:0;">${isDone&&!isFuture?'✓':''}</div>`);
     }
-    weeksHtml+=`<div style="display:flex;align-items:center;gap:5px;margin-bottom:2px;"><span style="width:22px;font-size:.6rem;color:var(--dim);">S${weekNum}</span><div style="display:flex;gap:3px;flex-wrap:wrap;">${dots.join('')}</div></div>`;
+    weeksHtml+=`<div style="display:flex;align-items:center;gap:4px;margin-bottom:2px;"><span style="width:18px;font-size:.55rem;color:var(--dim);">S${weekNum}</span><div style="display:flex;gap:2px;flex-wrap:wrap;">${dots.join('')}</div></div>`;
     wS=addDays(wS,7);weekNum++;
   }
   weeksDiv.innerHTML=weeksHtml;
