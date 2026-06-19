@@ -163,6 +163,14 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 .ev-4e{background:rgba(146,199,237,.2);border-color:#92c7ed;}
 .ev-lycee{background:rgba(217,166,230,.15);border-color:#d9a6e6;border-left-style:dashed;}
 .ev-perso{background:rgba(240,169,120,.2);border-color:#f0a978;}
+
+/* ROUTINE */
+.rbox{position:relative;background:var(--bg3);border:2px solid var(--line);border-radius:9px;padding:8px 6px;text-align:center;cursor:pointer;transition:.15s;min-height:50px;display:flex;align-items:center;justify-content:center;}
+.rbox.done{background:rgba(74,222,128,.18);border-color:var(--green);}
+.rbox span{font-size:.74rem;line-height:1.25;color:var(--chalk);word-break:break-word;}
+.rbox.done span{color:var(--green);font-weight:700;}
+.rbox .rdel{position:absolute;top:-6px;right:-6px;width:16px;height:16px;border-radius:50%;background:#c0392b;color:#fff;border:2px solid var(--bg);font-size:8px;display:none;align-items:center;justify-content:center;cursor:pointer;}
+.rbox:hover .rdel{display:flex;}
 </style>
 </head>
 <body>
@@ -231,13 +239,19 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
               </div>
               <div id="ms-row" style="display:flex;flex-wrap:wrap;gap:3px;margin:8px 0 10px;"></div>
 
+              <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:4px;">
+                <button class="btn sm" id="sp-month-prev" style="padding:2px 6px;">◀</button>
+                <span id="sp-month-lbl" style="font-family:'Kalam',cursive;font-size:.78rem;color:var(--accent);min-width:90px;text-align:center;"></span>
+                <button class="btn sm" id="sp-month-next" style="padding:2px 6px;">▶</button>
+              </div>
+
               <div style="display:flex;gap:10px;align-items:flex-start;">
-                <div style="display:flex;flex-direction:column;gap:6px;">
-                  <div style="text-align:center;background:var(--bg3);border:1px solid var(--line);border-radius:6px;padding:4px 8px;">
+                <div style="display:flex;flex-direction:column;gap:4px;">
+                  <div style="text-align:center;background:var(--bg3);border:1px solid var(--line);border-radius:6px;padding:2px 8px;">
                     <div id="stat-week" style="font-family:'Kalam',cursive;font-size:.85rem;">0/3</div>
                     <div style="font-size:.55rem;color:var(--dim);">Cette sem.</div>
                   </div>
-                  <div style="text-align:center;background:var(--bg3);border:1px solid var(--line);border-radius:6px;padding:4px 8px;">
+                  <div style="text-align:center;background:var(--bg3);border:1px solid var(--line);border-radius:6px;padding:2px 8px;">
                     <div id="stat-total" style="font-family:'Kalam',cursive;font-size:.85rem;">0</div>
                     <div style="font-size:.55rem;color:var(--dim);">Total</div>
                   </div>
@@ -328,6 +342,19 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
             </div>
             <div class="wbody" style="padding:6px;overflow-x:auto;">
               <div id="edt-grid" style="min-width:280px;font-size:.6rem;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="wcell" id="wc-t5" style="grid-column:3/span 2;grid-row:3/span 2;">
+          <div class="widget">
+            <div class="whdr"><span>🔁</span><h2>Routine du jour</h2><button class="wh-move" id="wmv-t5">✥</button><button class="wh-size" id="wsz-t5">⊞</button></div>
+            <div class="wbody">
+              <div id="routine-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;"></div>
+              <div style="display:flex;gap:6px;">
+                <input type="text" id="routine-inp" placeholder="Nouvelle routine…" style="flex:1;background:var(--bg);border:1px solid var(--line);color:var(--chalk);border-radius:6px;padding:6px 9px;font-size:.78rem;">
+                <button class="btn prim" id="routine-add">+</button>
+              </div>
             </div>
           </div>
         </div>
@@ -542,8 +569,8 @@ function showQResults(){
 }
 function shuf(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
 
-const WIDGETS=['t1','t2','t3','t4'];
-const LAYOUT_DEFAULT={t1:{c:1,r:1,w:2,h:2},t2:{c:3,r:1,w:2,h:2},t3:{c:5,r:1,w:2,h:2},t4:{c:1,r:3,w:2,h:2}};
+const WIDGETS=['t1','t2','t3','t4','t5'];
+const LAYOUT_DEFAULT={t1:{c:1,r:1,w:2,h:2},t2:{c:3,r:1,w:2,h:2},t3:{c:5,r:1,w:2,h:2},t4:{c:1,r:3,w:2,h:2},t5:{c:3,r:3,w:2,h:2}};
 const EMOJI_CATS={'Études':['📋','📖','📚','📝','✏️','📊','🧠','💡','🔬','🎓','💻'],'Sport':['💪','🏋️','⚽','🏀','🎾','🏊','🚴','🤸','🧘','🏃','⚖️'],'Voyage':['✈️','🌍','🗺️','🏖️','⛰️','🎵','🎮','🎬','📷','🚗','🏕️'],'Maison':['🏠','🍕','🍎','☕','🛒','💰','📱','🔑','🌱','🐶','🌸'],'Symboles':['⭐','🌟','🔥','✅','❌','⚡','🎯','🏆','💎','🎉','🔵','🟡','🟢']};
 const THEMES=[{id:'foret',n:'🌿 Forêt',bg:'#16261e',bg2:'#1f3a2c',bg3:'#274a37',ac:'#f2c14e',tl:'#2dd4bf',gr:'#4ade80',rd:'#f87171',bl:'#60a5fa',ch:'#f1efe4'},{id:'ocean',n:'🌊 Océan',bg:'#0d1f2d',bg2:'#122534',bg3:'#193040',ac:'#22d3ee',tl:'#06b6d4',gr:'#34d399',rd:'#f87171',bl:'#38bdf8',ch:'#e0f4ff'},{id:'violet',n:'🌙 Nuit violette',bg:'#1a1228',bg2:'#221535',bg3:'#2d1d48',ac:'#c084fc',tl:'#e879f9',gr:'#a78bfa',rd:'#f472b6',bl:'#818cf8',ch:'#ede9fe'},{id:'ember',n:'🔥 Ember',bg:'#1c1208',bg2:'#271a0c',bg3:'#332212',ac:'#fb923c',tl:'#fbbf24',gr:'#84cc16',rd:'#ef4444',bl:'#f97316',ch:'#fff7ed'},{id:'ardoise',n:'🤍 Ardoise',bg:'#1a1f2e',bg2:'#222840',bg3:'#2a3050',ac:'#e2e8f0',tl:'#94a3b8',gr:'#64748b',rd:'#f87171',bl:'#93c5fd',ch:'#f8fafc'},{id:'sakura',n:'🌸 Sakura',bg:'#1f1218',bg2:'#2a1a22',bg3:'#38222e',ac:'#f9a8d4',tl:'#fb7185',gr:'#86efac',rd:'#fca5a5',bl:'#f0abfc',ch:'#fdf2f8'},{id:'electro',n:'⚡ Électrique',bg:'#080808',bg2:'#111111',bg3:'#1a1a1a',ac:'#facc15',tl:'#3b82f6',gr:'#22c55e',rd:'#ef4444',bl:'#60a5fa',ch:'#f9fafb'},{id:'desert',n:'🏜️ Désert',bg:'#1e1610',bg2:'#271e14',bg3:'#332819',ac:'#d97706',tl:'#b45309',gr:'#84cc16',rd:'#ef4444',bl:'#f59e0b',ch:'#fef3c7'},{id:'autumn',n:'🍂 Automne',bg:'#1c1008',bg2:'#271608',bg3:'#361e0a',ac:'#f97316',tl:'#dc2626',gr:'#fbbf24',rd:'#ef4444',bl:'#fb923c',ch:'#fff7ed'},{id:'arctic',n:'🧊 Arctique',bg:'#0f1923',bg2:'#172433',bg3:'#1e3045',ac:'#bfdbfe',tl:'#7dd3fc',gr:'#a5f3fc',rd:'#fca5a5',bl:'#93c5fd',ch:'#f0f9ff'},{id:'tropic',n:'🌺 Tropique',bg:'#0a1f12',bg2:'#0f2918',bg3:'#173520',ac:'#f0abfc',tl:'#4ade80',gr:'#86efac',rd:'#f9a8d4',bl:'#a78bfa',ch:'#f0fdf4'},{id:'minuit',n:'🖤 Minuit',bg:'#000000',bg2:'#111111',bg3:'#1c1c1c',ac:'#ffffff',tl:'#a3a3a3',gr:'#737373',rd:'#ef4444',bl:'#6b7280',ch:'#f5f5f5'},{id:'neon',n:'🟣 Néon',bg:'#0a0010',bg2:'#10001a',bg3:'#18002a',ac:'#d946ef',tl:'#a855f7',gr:'#34d399',rd:'#f43f5e',bl:'#818cf8',ch:'#fdf4ff'},{id:'ble',n:'🌾 Blé',bg:'#1e1a10',bg2:'#272212',bg3:'#332d18',ac:'#fde68a',tl:'#d97706',gr:'#a3e635',rd:'#ef4444',bl:'#fcd34d',ch:'#fffbeb'}];
 
@@ -575,6 +602,7 @@ auth.onAuthStateChanged(async user=>{
   planDoc=db.collection('users').doc(user.uid).collection('modules').doc('planning');
   layDoc=db.collection('users').doc(user.uid).collection('modules').doc('dashboard-layout');
   qcmDoc=db.collection('users').doc(user.uid).collection('modules').doc('qcm-arabe');
+  routineDoc=db.collection('users').doc(user.uid).collection('modules').doc('routines');
   try{
     const[h,t,l]=await Promise.all([hubDoc.get(),tDoc.get(),layDoc.get()]);
     mods=(h.exists&&h.data().modules)?h.data().modules:[
@@ -588,6 +616,7 @@ auth.onAuthStateChanged(async user=>{
     if(t.exists){tData=Object.assign({tasks:[],cats:[]},t.data());const n7=new Date();n7.setDate(n7.getDate()-7);tData.tasks=tData.tasks.filter(x=>!x.done||(x.doneAt&&new Date(x.doneAt)>n7));}
     if(l.exists){const ld=l.data();wLayout=Object.assign(JSON.parse(JSON.stringify(LAYOUT_DEFAULT)),ld);if(ld.theme)applyTheme(ld.theme);}
     const qSnap=await qcmDoc.get();if(qSnap.exists){const qd=qSnap.data();qProg={green:qd.green||{},blue:qd.blue||{},red:qd.red||{}};}
+    const rSnap=await routineDoc.get();if(rSnap.exists)routineData=Object.assign({items:[],doneDates:{}},rSnap.data());
     if(!h.exists)hubDoc.set({modules:mods}).catch(()=>{});
   }catch(e){mods=[{id:'m1',icon:'📋',name:'Mon Planning',desc:'',url:'planning.html'}];}
   $('ls').classList.add('hi');
@@ -600,6 +629,9 @@ auth.onAuthStateChanged(async user=>{
   renderEdt();
   wireQcm();
   wireEdt();
+  wireSportMonthNav();
+  renderRoutine();
+  wireRoutine();
   updateQStats();
   updateQInfo();
   wireHandles();
@@ -765,8 +797,11 @@ function computeSessions(){
 }
 function weekKeyOf(ds){return dateKeyOf(mondayOf(new Date(ds+'T12:00:00')));}
 
+const MFR=['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+let spMonthOffset=0; // 0 = mois actuel, -1 = mois précédent, etc.
+
 function renderSport(){
-  const wbf=$('wbf'),curW=$('cur-weight'),msRow=$('ms-row'),weeksDiv=$('sport-weeks'),statW=$('stat-week'),statT=$('stat-total');
+  const wbf=$('wbf'),curW=$('cur-weight'),msRow=$('ms-row'),weeksDiv=$('sport-weeks'),statW=$('stat-week'),statT=$('stat-total'),monthLbl=$('sp-month-lbl');
   if(!wbf)return; // widget not on this page
 
   const weights=spData.weights||[],goal=spData.goal||SPORT_GOAL,startW=spData.startWeight||SPORT_START_W;
@@ -786,26 +821,38 @@ function renderSport(){
   const sessions=computeSessions(),now=new Date();
   const wkMap={};sessions.forEach(s=>{const mk=weekKeyOf(s.date);if(!wkMap[mk])wkMap[mk]=[];wkMap[mk].push(s.date);});
 
+  // Mois affiché selon spMonthOffset
+  const viewDate=new Date(now.getFullYear(),now.getMonth()+spMonthOffset,1);
+  const y=viewDate.getFullYear(),mo=viewDate.getMonth();
+  monthLbl.textContent=MFR[mo]+' '+y;
+
+  const firstOfMonth=new Date(y,mo,1),lastOfMonth=new Date(y,mo+1,0);
   let weeksHtml='';
-  for(let w=-3;w<=0;w++){
-    const mon=mondayOf(addDays(now,w*7)),mk=dateKeyOf(mon),done=(wkMap[mk]||[]).length;
-    // Numéro de semaine RÉEL dans le mois (1ère semaine du mois = S1, etc.)
-    const weekNum=Math.ceil(mon.getDate()/7);
-    const dotCount=Math.max(SPORT_TARGET,done); // affiche un point en plus si on dépasse l'objectif
+  let wS=mondayOf(firstOfMonth),weekNum=1;
+  while(wS<=lastOfMonth){
+    const mk=dateKeyOf(wS),done=(wkMap[mk]||[]).length;
+    const isFuture=wS>now;
+    const dotCount=Math.max(SPORT_TARGET,done);
     const dots=[];
     for(let j=0;j<dotCount;j++){
       const isDone=j<done;
-      const color=isDone?'#4ade80':'var(--line)';
-      const bg=isDone?'rgba(74,222,128,.13)':'var(--bg3)';
-      dots.push(`<div style="width:15px;height:15px;border-radius:50%;border:1px solid ${color};background:${bg};display:flex;align-items:center;justify-content:center;font-size:.52rem;color:${color};flex-shrink:0;">${isDone?'✓':''}</div>`);
+      const color=isFuture?'var(--line)':isDone?'#4ade80':'var(--line)';
+      const bg=isFuture?'var(--bg3)':isDone?'rgba(74,222,128,.13)':'var(--bg3)';
+      dots.push(`<div style="width:14px;height:14px;border-radius:50%;border:1px solid ${color};background:${bg};display:flex;align-items:center;justify-content:center;font-size:.5rem;color:${color};flex-shrink:0;">${isDone&&!isFuture?'✓':''}</div>`);
     }
-    weeksHtml+=`<div style="display:flex;align-items:center;gap:5px;margin-bottom:3px;"><span style="width:24px;font-size:.62rem;color:var(--dim);">S${weekNum}</span><div style="display:flex;gap:3px;flex-wrap:wrap;">${dots.join('')}</div></div>`;
+    weeksHtml+=`<div style="display:flex;align-items:center;gap:5px;margin-bottom:2px;"><span style="width:22px;font-size:.6rem;color:var(--dim);">S${weekNum}</span><div style="display:flex;gap:3px;flex-wrap:wrap;">${dots.join('')}</div></div>`;
+    wS=addDays(wS,7);weekNum++;
   }
   weeksDiv.innerHTML=weeksHtml;
 
   const thisMk=dateKeyOf(mondayOf(now)),thisDone=(wkMap[thisMk]||[]).length;
   statW.textContent=thisDone+'/'+SPORT_TARGET;
   statT.textContent=sessions.length;
+}
+function wireSportMonthNav(){
+  if(!$('sp-month-prev'))return;
+  $('sp-month-prev').addEventListener('click',()=>{spMonthOffset--;renderSport();});
+  $('sp-month-next').addEventListener('click',()=>{spMonthOffset++;renderSport();});
 }
 
 $('wbtn-weigh').addEventListener('click',()=>{
@@ -871,6 +918,64 @@ function wireEdt(){
   $('edt-prev').addEventListener('click',()=>{edtOff--;renderEdt();});
   $('edt-next').addEventListener('click',()=>{edtOff++;renderEdt();});
   $('edt-today').addEventListener('click',()=>{edtOff=0;renderEdt();});
+}
+/* ROUTINE DU JOUR — cases cochables, remises à zéro chaque jour automatiquement */
+let routineData={items:[],doneDates:{}}; // doneDates: { "2026-06-20": ["routineId1","routineId2"] }
+let routineDoc=null,routineT=null;
+
+function saveRoutine(){
+  if(!routineDoc)return;
+  clearTimeout(routineT);
+  routineT=setTimeout(()=>routineDoc.set(routineData).catch(()=>{}),600);
+}
+function todayKeyR(){return dateKeyOf(new Date());}
+function renderRoutine(){
+  const grid=$('routine-grid');if(!grid)return;
+  const tk=todayKeyR();
+  const doneToday=routineData.doneDates[tk]||[];
+  if(!routineData.items.length){
+    grid.innerHTML='<div class="empty" style="grid-column:1/-1;">Ajoute tes routines ci-dessous.</div>';
+    return;
+  }
+  grid.innerHTML=routineData.items.map(item=>{
+    const isDone=doneToday.includes(item.id);
+    return `<div class="rbox${isDone?' done':''}" data-id="${item.id}"><span>${esc(item.name)}</span><div class="rdel" data-del="${item.id}">✕</div></div>`;
+  }).join('');
+}
+function wireRoutine(){
+  const grid=$('routine-grid');if(!grid)return;
+  grid.addEventListener('click',e=>{
+    const del=e.target.closest('[data-del]');
+    if(del){
+      routineData.items=routineData.items.filter(i=>i.id!==del.dataset.del);
+      // nettoie aussi les références dans doneDates
+      Object.keys(routineData.doneDates).forEach(k=>{routineData.doneDates[k]=routineData.doneDates[k].filter(id=>id!==del.dataset.del);});
+      saveRoutine();renderRoutine();
+      return;
+    }
+    const box=e.target.closest('.rbox');
+    if(box){
+      const id=box.dataset.id,tk=todayKeyR();
+      if(!routineData.doneDates[tk])routineData.doneDates[tk]=[];
+      const idx=routineData.doneDates[tk].indexOf(id);
+      if(idx>-1) routineData.doneDates[tk].splice(idx,1);
+      else routineData.doneDates[tk].push(id);
+      saveRoutine();renderRoutine();
+    }
+  });
+  $('routine-add').addEventListener('click',()=>{
+    const inp=$('routine-inp'),name=inp.value.trim();
+    if(!name)return;
+    routineData.items.push({id:'r'+Date.now(),name});
+    inp.value='';
+    saveRoutine();renderRoutine();
+  });
+  $('routine-inp').addEventListener('keydown',e=>{if(e.key==='Enter')$('routine-add').click();});
+
+  // Nettoyage : on garde seulement les 14 derniers jours de doneDates pour ne pas alourdir le document
+  const cutoff=new Date();cutoff.setDate(cutoff.getDate()-14);
+  const cutoffKey=dateKeyOf(cutoff);
+  Object.keys(routineData.doneDates).forEach(k=>{ if(k<cutoffKey) delete routineData.doneDates[k]; });
 }
 
 /* THEMES */
