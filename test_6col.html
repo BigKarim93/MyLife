@@ -171,6 +171,14 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 .rbox.done span{color:var(--green);font-weight:700;}
 .rbox .rdel{position:absolute;top:-6px;right:-6px;width:16px;height:16px;border-radius:50%;background:#c0392b;color:#fff;border:2px solid var(--bg);font-size:8px;display:none;align-items:center;justify-content:center;cursor:pointer;}
 .rbox:hover .rdel{display:flex;}
+
+/* PRAYER TIMES */
+.pbox{background:var(--bg3);border:1px solid var(--line);border-radius:7px;padding:6px 3px;text-align:center;}
+.pbox.next{border-color:var(--accent);background:rgba(242,193,78,.12);}
+.pbox .pname{font-size:.6rem;color:var(--dim);margin-bottom:2px;}
+.pbox.next .pname{color:var(--accent);font-weight:700;}
+.pbox .ptime{font-family:'Kalam',cursive;font-size:.85rem;color:var(--chalk);}
+.pbox.next .ptime{color:var(--accent);}
 </style>
 </head>
 <body>
@@ -355,6 +363,15 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
                 <input type="text" id="routine-inp" placeholder="Nouvelle routine…" style="flex:1;background:var(--bg);border:1px solid var(--line);color:var(--chalk);border-radius:6px;padding:6px 9px;font-size:.78rem;">
                 <button class="btn prim" id="routine-add">+</button>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="wcell" id="wc-t6" style="grid-column:5/span 2;grid-row:3/span 2;">
+          <div class="widget">
+            <div class="whdr"><span>🕌</span><h2>Prières</h2><button class="wh-move" id="wmv-t6">✥</button><button class="wh-size" id="wsz-t6">⊞</button></div>
+            <div class="wbody">
+              <div id="prayer-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;"></div>
             </div>
           </div>
         </div>
@@ -569,8 +586,8 @@ function showQResults(){
 }
 function shuf(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
 
-const WIDGETS=['t1','t2','t3','t4','t5'];
-const LAYOUT_DEFAULT={t1:{c:1,r:1,w:2,h:2},t2:{c:3,r:1,w:2,h:2},t3:{c:5,r:1,w:2,h:2},t4:{c:1,r:3,w:2,h:2},t5:{c:3,r:3,w:2,h:2}};
+const WIDGETS=['t1','t2','t3','t4','t5','t6'];
+const LAYOUT_DEFAULT={t1:{c:1,r:1,w:2,h:2},t2:{c:3,r:1,w:2,h:2},t3:{c:5,r:1,w:2,h:2},t4:{c:1,r:3,w:2,h:2},t5:{c:3,r:3,w:2,h:2},t6:{c:5,r:3,w:2,h:2}};
 const EMOJI_CATS={'Études':['📋','📖','📚','📝','✏️','📊','🧠','💡','🔬','🎓','💻'],'Sport':['💪','🏋️','⚽','🏀','🎾','🏊','🚴','🤸','🧘','🏃','⚖️'],'Voyage':['✈️','🌍','🗺️','🏖️','⛰️','🎵','🎮','🎬','📷','🚗','🏕️'],'Maison':['🏠','🍕','🍎','☕','🛒','💰','📱','🔑','🌱','🐶','🌸'],'Symboles':['⭐','🌟','🔥','✅','❌','⚡','🎯','🏆','💎','🎉','🔵','🟡','🟢']};
 const THEMES=[{id:'foret',n:'🌿 Forêt',bg:'#16261e',bg2:'#1f3a2c',bg3:'#274a37',ac:'#f2c14e',tl:'#2dd4bf',gr:'#4ade80',rd:'#f87171',bl:'#60a5fa',ch:'#f1efe4'},{id:'ocean',n:'🌊 Océan',bg:'#0d1f2d',bg2:'#122534',bg3:'#193040',ac:'#22d3ee',tl:'#06b6d4',gr:'#34d399',rd:'#f87171',bl:'#38bdf8',ch:'#e0f4ff'},{id:'violet',n:'🌙 Nuit violette',bg:'#1a1228',bg2:'#221535',bg3:'#2d1d48',ac:'#c084fc',tl:'#e879f9',gr:'#a78bfa',rd:'#f472b6',bl:'#818cf8',ch:'#ede9fe'},{id:'ember',n:'🔥 Ember',bg:'#1c1208',bg2:'#271a0c',bg3:'#332212',ac:'#fb923c',tl:'#fbbf24',gr:'#84cc16',rd:'#ef4444',bl:'#f97316',ch:'#fff7ed'},{id:'ardoise',n:'🤍 Ardoise',bg:'#1a1f2e',bg2:'#222840',bg3:'#2a3050',ac:'#e2e8f0',tl:'#94a3b8',gr:'#64748b',rd:'#f87171',bl:'#93c5fd',ch:'#f8fafc'},{id:'sakura',n:'🌸 Sakura',bg:'#1f1218',bg2:'#2a1a22',bg3:'#38222e',ac:'#f9a8d4',tl:'#fb7185',gr:'#86efac',rd:'#fca5a5',bl:'#f0abfc',ch:'#fdf2f8'},{id:'electro',n:'⚡ Électrique',bg:'#080808',bg2:'#111111',bg3:'#1a1a1a',ac:'#facc15',tl:'#3b82f6',gr:'#22c55e',rd:'#ef4444',bl:'#60a5fa',ch:'#f9fafb'},{id:'desert',n:'🏜️ Désert',bg:'#1e1610',bg2:'#271e14',bg3:'#332819',ac:'#d97706',tl:'#b45309',gr:'#84cc16',rd:'#ef4444',bl:'#f59e0b',ch:'#fef3c7'},{id:'autumn',n:'🍂 Automne',bg:'#1c1008',bg2:'#271608',bg3:'#361e0a',ac:'#f97316',tl:'#dc2626',gr:'#fbbf24',rd:'#ef4444',bl:'#fb923c',ch:'#fff7ed'},{id:'arctic',n:'🧊 Arctique',bg:'#0f1923',bg2:'#172433',bg3:'#1e3045',ac:'#bfdbfe',tl:'#7dd3fc',gr:'#a5f3fc',rd:'#fca5a5',bl:'#93c5fd',ch:'#f0f9ff'},{id:'tropic',n:'🌺 Tropique',bg:'#0a1f12',bg2:'#0f2918',bg3:'#173520',ac:'#f0abfc',tl:'#4ade80',gr:'#86efac',rd:'#f9a8d4',bl:'#a78bfa',ch:'#f0fdf4'},{id:'minuit',n:'🖤 Minuit',bg:'#000000',bg2:'#111111',bg3:'#1c1c1c',ac:'#ffffff',tl:'#a3a3a3',gr:'#737373',rd:'#ef4444',bl:'#6b7280',ch:'#f5f5f5'},{id:'neon',n:'🟣 Néon',bg:'#0a0010',bg2:'#10001a',bg3:'#18002a',ac:'#d946ef',tl:'#a855f7',gr:'#34d399',rd:'#f43f5e',bl:'#818cf8',ch:'#fdf4ff'},{id:'ble',n:'🌾 Blé',bg:'#1e1a10',bg2:'#272212',bg3:'#332d18',ac:'#fde68a',tl:'#d97706',gr:'#a3e635',rd:'#ef4444',bl:'#fcd34d',ch:'#fffbeb'}];
 
@@ -632,6 +649,7 @@ auth.onAuthStateChanged(async user=>{
   wireSportMonthNav();
   renderRoutine();
   wireRoutine();
+  fetchPrayerTimes();
   updateQStats();
   updateQInfo();
   wireHandles();
@@ -893,7 +911,7 @@ function tmMinOf(t){const[h,m]=t.split(':').map(Number);return h*60+m;}
 function renderEdt(){
   const grid=$('edt-grid');if(!grid)return;
   if(!planState){grid.innerHTML='<div style="padding:6px;color:var(--dim);font-size:.65rem">Planning non chargé.</div>';return;}
-  const EDT_START=7,EDT_END=25,ETYH=20,EDT_PPM=ETYH/60;
+  const EDT_START=7,EDT_END=25,ETYH=16,EDT_PPM=ETYH/60;
   const evs=planState.events||[],exc=planState.exceptions||[],letter=edtLetter();
   const monday=mondayOf(addDays(new Date(),edtOff*7)),todayKey=dateKeyOf(new Date()),isNow=edtOff===0;
   const nowMin=new Date().getHours()*60+new Date().getMinutes();
@@ -986,6 +1004,65 @@ function wireRoutine(){
   const cutoff=new Date();cutoff.setDate(cutoff.getDate()-14);
   const cutoffKey=dateKeyOf(cutoff);
   Object.keys(routineData.doneDates).forEach(k=>{ if(k<cutoffKey) delete routineData.doneDates[k]; });
+}
+
+
+/* PRIÈRES — API AlAdhan, méthode 12 (UOIF, référence en France), cache localStorage 1x/jour */
+const PRAYER_LAT=48.8566, PRAYER_LON=2.3522; // Paris / Île-de-France
+const PRAYER_METHOD=12; // UOIF
+const PRAYER_NAMES=[['Fajr','FAJR'],['Sunrise','CHOUROUK'],['Dhuhr','DHOR'],['Asr','ASR'],['Maghrib','MAGHREB'],['Isha','ISHAA']];
+
+async function fetchPrayerTimes(){
+  const grid=$('prayer-grid');if(!grid)return;
+  const todayKey=dateKeyOf(new Date());
+  const cacheKey='prayer_cache_'+todayKey;
+  let timings=null;
+  try{
+    const cached=localStorage.getItem(cacheKey);
+    if(cached) timings=JSON.parse(cached);
+  }catch(e){}
+
+  if(!timings){
+    try{
+      const url=`https://api.aladhan.com/v1/timings?latitude=${PRAYER_LAT}&longitude=${PRAYER_LON}&method=${PRAYER_METHOD}`;
+      const res=await fetch(url);
+      const data=await res.json();
+      if(data&&data.data&&data.data.timings){
+        timings=data.data.timings;
+        try{
+          // nettoie les anciens caches
+          Object.keys(localStorage).forEach(k=>{ if(k.startsWith('prayer_cache_')&&k!==cacheKey) localStorage.removeItem(k); });
+          localStorage.setItem(cacheKey, JSON.stringify(timings));
+        }catch(e){}
+      }
+    }catch(e){
+      grid.innerHTML='<div class="empty" style="grid-column:1/-1;">Horaires indisponibles.</div>';
+      return;
+    }
+  }
+  renderPrayerGrid(timings);
+}
+
+function renderPrayerGrid(timings){
+  const grid=$('prayer-grid');if(!grid||!timings)return;
+  const now=new Date();
+  const nowMin=now.getHours()*60+now.getMinutes();
+
+  // trouve la prochaine prière (Sunrise exclu de la logique "next" car ce n'est pas une prière)
+  const prayerOnly=PRAYER_NAMES.filter(([k])=>k!=='Sunrise');
+  let nextKey=null;
+  for(const [key] of prayerOnly){
+    const t=timings[key]; if(!t) continue;
+    const [h,m]=t.split(':').map(Number);
+    if(h*60+m>nowMin){ nextKey=key; break; }
+  }
+  if(!nextKey) nextKey=prayerOnly[0][0]; // après Isha, la prochaine est Fajr du lendemain
+
+  grid.innerHTML=PRAYER_NAMES.map(([key,label])=>{
+    const t=timings[key]||'--:--';
+    const isNext=key===nextKey;
+    return `<div class="pbox${isNext?' next':''}"><div class="pname">${label}</div><div class="ptime">${t}</div></div>`;
+  }).join('');
 }
 
 /* THEMES */
