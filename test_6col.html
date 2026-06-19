@@ -206,20 +206,21 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
                 <span id="cur-weight" style="font-size:.78rem;color:var(--dim);">97.2kg</span>
                 <div style="flex:1;height:8px;background:var(--line);border-radius:4px;overflow:hidden;"><div id="wbf" style="height:100%;width:0%;background:linear-gradient(90deg,var(--green),#2dd4bf);border-radius:4px;transition:width .6s;"></div></div>
                 <span style="color:var(--accent);font-size:.78rem;">83kg</span>
+                <button class="btn sm" id="wbtn-weigh">⚖️ Peser</button>
               </div>
-              <div id="ms-row" style="display:flex;flex-wrap:wrap;gap:3px;margin:8px 0;"></div>
-              <button class="btn sm" id="wbtn-weigh" style="margin-bottom:10px;">⚖️ Peser</button>
+              <div id="ms-row" style="display:flex;flex-wrap:wrap;gap:3px;margin:8px 0 10px;"></div>
 
-              <div id="sport-weeks"></div>
-
-              <div style="display:flex;gap:6px;padding-top:8px;border-top:1px solid var(--line);">
-                <div style="flex:1;text-align:center;background:var(--bg3);border:1px solid var(--line);border-radius:6px;padding:5px 3px;">
-                  <div id="stat-week" style="font-family:'Kalam',cursive;font-size:.95rem;">0/3</div>
-                  <div style="font-size:.58rem;color:var(--dim);">Cette sem.</div>
-                </div>
-                <div style="flex:1;text-align:center;background:var(--bg3);border:1px solid var(--line);border-radius:6px;padding:5px 3px;">
-                  <div id="stat-total" style="font-family:'Kalam',cursive;font-size:.95rem;">0</div>
-                  <div style="font-size:.58rem;color:var(--dim);">Total</div>
+              <div style="display:flex;gap:10px;align-items:flex-start;">
+                <div id="sport-weeks" style="flex:1;"></div>
+                <div style="display:flex;flex-direction:column;gap:6px;">
+                  <div style="text-align:center;background:var(--bg3);border:1px solid var(--line);border-radius:6px;padding:5px 8px;">
+                    <div id="stat-week" style="font-family:'Kalam',cursive;font-size:.95rem;">0/3</div>
+                    <div style="font-size:.58rem;color:var(--dim);">Cette sem.</div>
+                  </div>
+                  <div style="text-align:center;background:var(--bg3);border:1px solid var(--line);border-radius:6px;padding:5px 8px;">
+                    <div id="stat-total" style="font-family:'Kalam',cursive;font-size:.95rem;">0</div>
+                    <div style="font-size:.58rem;color:var(--dim);">Total</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -751,18 +752,21 @@ function renderSport(){
   let weeksHtml='';
   for(let w=-3;w<=0;w++){
     const mon=mondayOf(addDays(now,w*7)),mk=dateKeyOf(mon),done=(wkMap[mk]||[]).length;
+    // Numéro de semaine RÉEL dans le mois (1ère semaine du mois = S1, etc.)
+    const weekNum=Math.ceil(mon.getDate()/7);
+    const dotCount=Math.max(SPORT_TARGET,done); // affiche un point en plus si on dépasse l'objectif
     const dots=[];
-    for(let j=0;j<SPORT_TARGET;j++){
+    for(let j=0;j<dotCount;j++){
       const isDone=j<done;
       const color=isDone?'#4ade80':'var(--line)';
       const bg=isDone?'rgba(74,222,128,.13)':'var(--bg3)';
-      dots.push(`<div style="width:15px;height:15px;border-radius:50%;border:1px solid ${color};background:${bg};display:flex;align-items:center;justify-content:center;font-size:.52rem;color:${color};">${isDone?'✓':''}</div>`);
+      dots.push(`<div style="width:15px;height:15px;border-radius:50%;border:1px solid ${color};background:${bg};display:flex;align-items:center;justify-content:center;font-size:.52rem;color:${color};flex-shrink:0;">${isDone?'✓':''}</div>`);
     }
-    weeksHtml+=`<div style="display:flex;align-items:center;gap:5px;margin-bottom:3px;"><span style="width:28px;font-size:.62rem;color:var(--dim);">S${w+4}</span><div style="display:flex;gap:3px;">${dots.join('')}</div></div>`;
+    weeksHtml+=`<div style="display:flex;align-items:center;gap:5px;margin-bottom:3px;"><span style="width:24px;font-size:.62rem;color:var(--dim);">S${weekNum}</span><div style="display:flex;gap:3px;flex-wrap:wrap;">${dots.join('')}</div></div>`;
   }
   weeksDiv.innerHTML=weeksHtml;
 
-  const thisMk=dateKeyOf(mondayOf(now)),thisDone=Math.min(SPORT_TARGET,(wkMap[thisMk]||[]).length);
+  const thisMk=dateKeyOf(mondayOf(now)),thisDone=(wkMap[thisMk]||[]).length;
   statW.textContent=thisDone+'/'+SPORT_TARGET;
   statT.textContent=sessions.length;
 }
