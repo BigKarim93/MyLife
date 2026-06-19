@@ -82,7 +82,22 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
             <div style="flex:1;height:8px;background:var(--line);border-radius:4px;overflow:hidden;"><div id="wbf" style="height:100%;width:0%;background:linear-gradient(90deg,var(--green),#2dd4bf);border-radius:4px;transition:width .6s;"></div></div>
             <span style="color:var(--accent);font-size:.78rem;">83kg</span>
           </div>
-          <button class="btn" id="btn-test-weight" style="margin-top:10px;">⚖️ Tester (poids aléatoire)</button>
+          <div id="ms-row" style="display:flex;flex-wrap:wrap;gap:3px;margin:8px 0;"></div>
+          <button class="btn" id="btn-test-weight" style="margin-bottom:10px;">⚖️ Tester (poids aléatoire)</button>
+
+          <div id="sport-weeks"></div>
+          <button class="btn" id="btn-test-session" style="margin:8px 0;">🏋️ Tester (ajouter une séance)</button>
+
+          <div style="display:flex;gap:6px;padding-top:8px;border-top:1px solid var(--line);">
+            <div style="flex:1;text-align:center;background:var(--bg3);border:1px solid var(--line);border-radius:6px;padding:5px 3px;">
+              <div id="stat-week" style="font-family:Georgia,serif;font-size:.95rem;">0/3</div>
+              <div style="font-size:.58rem;color:var(--dim);">Cette sem.</div>
+            </div>
+            <div style="flex:1;text-align:center;background:var(--bg3);border:1px solid var(--line);border-radius:6px;padding:5px 3px;">
+              <div id="stat-total" style="font-family:Georgia,serif;font-size:.95rem;">0</div>
+              <div style="font-size:.58rem;color:var(--dim);">Total</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -162,11 +177,21 @@ WIDGETS.forEach(id => {
 
 /* SPORT WEIGHT BAR — replaces task list in widget t1 */
 let currentWeight = 97.2;
-const GOAL = 83, START = 97.2;
+const GOAL = 83, START = 97.2, MS_STEP = 2, TARGET_PER_WEEK = 3;
 function renderWeight(){
   const pct = Math.max(0, Math.min(100, (START-currentWeight)/(START-GOAL)*100));
   $('cur-weight').textContent = currentWeight.toFixed(1)+'kg';
   $('wbf').style.width = pct+'%';
+  // milestones
+  const ms = [];
+  for(let m=Math.floor((START-1)/MS_STEP)*MS_STEP; m>=GOAL; m-=MS_STEP) ms.push(Math.round(m*10)/10);
+  $('ms-row').innerHTML = ms.map(m=>{
+    const done = currentWeight<=m;
+    const isNext = !done && ms.findIndex(x=>currentWeight>x)===ms.indexOf(m);
+    const color = done?'#4ade80':isNext?'#2dd4bf':'var(--dim)';
+    const bg = done?'rgba(74,222,128,.13)':isNext?'rgba(45,212,191,.12)':'transparent';
+    return `<div style="font-size:.6rem;padding:2px 5px;border-radius:10px;border:1px solid ${color};color:${color};background:${bg};">${m}${done?'✓':''}</div>`;
+  }).join('');
 }
 $('btn-test-weight').addEventListener('click', () => {
   currentWeight = Math.round((Math.random()*(97-83)+83)*10)/10;
@@ -174,6 +199,33 @@ $('btn-test-weight').addEventListener('click', () => {
   log('Poids test : '+currentWeight+'kg');
 });
 renderWeight();
+
+/* SPORT — séances hebdo (simulées) */
+let weekSessions = [2, 3, 1, 0]; // S1..S4, nb de séances faites sur 4 dernières semaines
+function renderWeeks(){
+  const html = weekSessions.map((done, i) => {
+    const dots = [];
+    for(let j=0;j<TARGET_PER_WEEK;j++){
+      const isDone = j<done;
+      const color = isDone?'#4ade80':'var(--line)';
+      const bg = isDone?'rgba(74,222,128,.13)':'var(--bg3)';
+      dots.push(`<div style="width:15px;height:15px;border-radius:50%;border:1px solid ${color};background:${bg};display:flex;align-items:center;justify-content:center;font-size:.52rem;color:${color};">${isDone?'✓':''}</div>`);
+    }
+    return `<div style="display:flex;align-items:center;gap:5px;margin-bottom:3px;"><span style="width:28px;font-size:.62rem;color:var(--dim);">S${i+1}</span><div style="display:flex;gap:3px;">${dots.join('')}</div></div>`;
+  }).join('');
+  $('sport-weeks').innerHTML = html;
+
+  const thisWeekDone = weekSessions[weekSessions.length-1];
+  $('stat-week').textContent = thisWeekDone+'/'+TARGET_PER_WEEK;
+  $('stat-total').textContent = weekSessions.reduce((a,b)=>a+b,0);
+}
+$('btn-test-session').addEventListener('click', () => {
+  const lastIdx = weekSessions.length-1;
+  weekSessions[lastIdx] = Math.min(TARGET_PER_WEEK, weekSessions[lastIdx]+1);
+  renderWeeks();
+  log('Séance ajoutée — semaine actuelle : '+weekSessions[lastIdx]+'/'+TARGET_PER_WEEK);
+});
+renderWeeks();
 
 function renderList(id){
   const list = $('list-'+id);
