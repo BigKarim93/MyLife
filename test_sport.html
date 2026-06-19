@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Test Sport</title>
+<title>Test 3 widgets</title>
 <style>
-:root{--bg:#16261e;--bg2:#1f3a2c;--bg3:#274a37;--line:rgba(238,241,234,.09);--line2:rgba(238,241,234,.18);--chalk:#f1efe4;--dim:#aebcb1;--accent:#f2c14e;--green:#4ade80;--teal:#2dd4bf;--r:12px;}
+:root{--bg:#16261e;--bg2:#1f3a2c;--bg3:#274a37;--line:rgba(238,241,234,.09);--line2:rgba(238,241,234,.18);--chalk:#f1efe4;--dim:#aebcb1;--accent:#f2c14e;--green:#4ade80;--gl:rgba(74,222,128,.13);--red:#f87171;--r:12px;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Work Sans',sans-serif;background:var(--bg);color:var(--chalk);padding:12px;}
 h1{font-family:Georgia,serif;color:var(--accent);margin-bottom:12px;font-size:1.2rem;}
@@ -13,8 +13,10 @@ h1{font-family:Georgia,serif;color:var(--accent);margin-bottom:12px;font-size:1.
 .btn{background:var(--bg3);border:1px solid var(--line);color:var(--chalk);padding:6px 12px;border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:5px;}
 .btn:hover{border-color:var(--accent);}
 .btn.prim{background:var(--accent);color:#21321f;border-color:var(--accent);}
+.btn.sm{padding:4px 8px;font-size:.72rem;}
 .btn.act{background:var(--accent);color:#21321f;}
 
+/* GRID — exact copy from grid_test.html */
 .grid-wrap{position:relative;margin-top:12px;}
 .ghost-layer{display:none;position:absolute;top:0;left:0;right:0;bottom:0;grid-template-columns:repeat(4,1fr);grid-auto-rows:200px;gap:10px;z-index:100;pointer-events:none;}
 .ghost-layer.active{display:grid;pointer-events:all;}
@@ -26,31 +28,40 @@ h1{font-family:Georgia,serif;color:var(--accent);margin-bottom:12px;font-size:1.
 .wh-move,.wh-size{display:none;background:rgba(242,193,78,.2);border:1px solid rgba(242,193,78,.5);border-radius:5px;padding:3px 7px;cursor:pointer;font-size:.7rem;color:var(--accent);font-weight:700;user-select:none;}
 body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;}
 
+/* WIDGET */
 .widget{background:var(--bg2);border:1px solid var(--line2);border-radius:var(--r);display:flex;flex-direction:column;height:100%;overflow:hidden;}
 .whdr{padding:9px 12px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:7px;flex-shrink:0;}
 .whdr h2{font-size:.88rem;flex:1;font-family:Georgia,serif;}
 .wbody{padding:10px 12px;overflow-y:auto;flex:1;}
 
-/* SPORT — juste la barre de poids pour ce test */
-.wbar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin:6px 0;}
-.wbf{height:100%;background:linear-gradient(90deg,var(--green),var(--teal));border-radius:4px;transition:width .6s;}
-.weight-row{display:flex;align-items:center;gap:8px;}
-.weight-row span{font-size:.78rem;color:var(--dim);}
-.btn-test{margin-top:10px;}
+/* TASKS content */
+.tadd{display:flex;gap:6px;margin-bottom:7px;}
+.tadd input{flex:1;background:var(--bg);border:1px solid var(--line);color:var(--chalk);border-radius:6px;padding:6px 9px;font-size:.8rem;}
+.tlist{display:flex;flex-direction:column;gap:4px;max-height:120px;overflow-y:auto;}
+.titem{display:flex;align-items:center;gap:7px;padding:6px 9px;background:var(--bg3);border:1px solid var(--line);border-radius:7px;}
+.tck{width:16px;height:16px;border-radius:4px;border:2px solid var(--line);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:transparent;}
+.tck.on{background:var(--green);border-color:var(--green);}
+.tck.on::after{content:'✓';font-size:.65rem;color:#0f1117;font-weight:700;}
+.ttxt{flex:1;font-size:.78rem;}
+.tdl{font-size:.68rem;color:var(--dim);cursor:pointer;opacity:0;padding:2px 4px;border-radius:4px;border:1px solid transparent;}
+.titem:hover .tdl{opacity:1;}
+.tdl:hover{border-color:var(--red);color:var(--red);}
+.empty{text-align:center;padding:12px;color:var(--dim);font-size:.78rem;}
 
+/* SIZE MODAL */
 .ov{position:fixed;inset:0;background:rgba(10,16,12,.7);display:none;align-items:center;justify-content:center;z-index:300;padding:14px;}
 .ov.op{display:flex;}
 .modal{background:var(--bg2);border:1px solid var(--line2);border-radius:var(--r);padding:18px;width:100%;max-width:300px;}
 .modal h3{color:var(--accent);margin-bottom:10px;}
 .modal-act{display:flex;justify-content:flex-end;margin-top:10px;}
 .pills{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;}
-.pill{background:var(--bg3);border:1px solid var(--line);color:var(--dim);border-radius:6px;padding:4px 10px;font-size:.75rem;font-weight:700;cursor:pointer;}
+.pill{background:var(--bg3);border:1px solid var(--line);color:var(--dim);border-radius:6px;padding:4px 10px;font-size:.75rem;font-weight:700;cursor:pointer;transition:.15s;}
 .pill.on{background:var(--accent);color:#21321f;border-color:var(--accent);}
 .clbl{font-size:.7rem;color:var(--dim);margin-bottom:4px;font-weight:600;}
 </style>
 </head>
 <body>
-<h1>Test — Widget Sport (étape 1 : barre de poids)</h1>
+<h1>Test — 3 widgets Tâches</h1>
 <div id="status">Clique sur ✏️ Disposition pour activer le mode, puis ✥ pour déplacer, ⊞ pour redimensionner.</div>
 <button class="btn" id="btn-edit">✏️ Disposition</button>
 
@@ -58,39 +69,56 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
   <div class="ghost-layer" id="ghost-layer"></div>
   <div class="wgrid" id="wgrid">
 
-    <div class="wcell" id="wc-sport" style="grid-column:1/span 2;grid-row:1/span 2;">
+    <div class="wcell" id="wc-t1" style="grid-column:1/span 2;grid-row:1/span 2;">
       <div class="widget">
         <div class="whdr">
           <span>💪</span><h2>Sport</h2>
-          <button class="wh-move" id="wmv-sport">✥</button>
-          <button class="wh-size" id="wsz-sport">⊞</button>
+          <button class="wh-move" id="wmv-t1">✥</button>
+          <button class="wh-size" id="wsz-t1">⊞</button>
         </div>
         <div class="wbody">
-          <div class="weight-row">
-            <span id="cur-weight">97.2kg</span>
-            <div class="wbar" style="flex:1;"><div class="wbf" id="wbf" style="width:0%"></div></div>
-            <span style="color:var(--accent);">83kg</span>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span id="cur-weight" style="font-size:.78rem;color:var(--dim);">97.2kg</span>
+            <div style="flex:1;height:8px;background:var(--line);border-radius:4px;overflow:hidden;"><div id="wbf" style="height:100%;width:0%;background:linear-gradient(90deg,var(--green),#2dd4bf);border-radius:4px;transition:width .6s;"></div></div>
+            <span style="color:var(--accent);font-size:.78rem;">83kg</span>
           </div>
-          <button class="btn btn-test" id="btn-test-weight">⚖️ Tester (poids aléatoire)</button>
+          <button class="btn" id="btn-test-weight" style="margin-top:10px;">⚖️ Tester (poids aléatoire)</button>
         </div>
       </div>
     </div>
 
-    <!-- Un widget Tâches à côté pour comparer le comportement -->
-    <div class="wcell" id="wc-other" style="grid-column:3/span 2;grid-row:1/span 2;">
+    <div class="wcell" id="wc-t2" style="grid-column:3/span 2;grid-row:1/span 2;">
       <div class="widget">
         <div class="whdr">
-          <span>✅</span><h2>Autre widget</h2>
-          <button class="wh-move" id="wmv-other">✥</button>
-          <button class="wh-size" id="wsz-other">⊞</button>
+          <span>✅</span><h2>Tâches 2</h2>
+          <button class="wh-move" id="wmv-t2">✥</button>
+          <button class="wh-size" id="wsz-t2">⊞</button>
         </div>
-        <div class="wbody">Widget de comparaison</div>
+        <div class="wbody">
+          <div class="tadd"><input type="text" id="inp-t2" placeholder="Ajouter…"><button class="btn prim" id="add-t2">+</button></div>
+          <div class="tlist" id="list-t2"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wcell" id="wc-t3" style="grid-column:1/span 2;grid-row:3/span 2;">
+      <div class="widget">
+        <div class="whdr">
+          <span>✅</span><h2>Tâches 3</h2>
+          <button class="wh-move" id="wmv-t3">✥</button>
+          <button class="wh-size" id="wsz-t3">⊞</button>
+        </div>
+        <div class="wbody">
+          <div class="tadd"><input type="text" id="inp-t3" placeholder="Ajouter…"><button class="btn prim" id="add-t3">+</button></div>
+          <div class="tlist" id="list-t3"></div>
+        </div>
       </div>
     </div>
 
   </div>
 </div>
 
+<!-- SIZE MODAL -->
 <div class="ov" id="ov-size">
   <div class="modal">
     <h3>⊞ Taille</h3>
@@ -106,11 +134,33 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 const log = m => document.getElementById('status').textContent = m;
 const $ = id => document.getElementById(id);
 
-const WIDGETS = ['sport','other'];
-const layout = {sport:{c:1,r:1,w:2,h:2}, other:{c:3,r:1,w:2,h:2}};
+const WIDGETS = ['t1','t2','t3'];
+const layout = {t1:{c:1,r:1,w:2,h:2}, t2:{c:3,r:1,w:2,h:2}, t3:{c:1,r:3,w:2,h:2}};
+const tasks = {t1:[], t2:[], t3:[]};
 let gedit = false, selW = null, sizingId = null;
 
-/* SPORT WEIGHT BAR */
+/* ── TASKS ── */
+WIDGETS.forEach(id => {
+  const addBtn = $('add-'+id), inp = $('inp-'+id), list = $('list-'+id);
+  if(!addBtn || !inp || !list) return; // skip t1 — it's now the Sport widget
+  addBtn.onclick = () => {
+    const text = inp.value.trim();
+    if(!text) return;
+    tasks[id].push({id:'i'+Date.now(), text, done:false});
+    inp.value = '';
+    renderList(id);
+  };
+  inp.addEventListener('keydown', e => { if(e.key==='Enter') addBtn.click(); });
+  list.addEventListener('click', e => {
+    const ck = e.target.closest('[data-ck]');
+    if(ck){ const t=tasks[id].find(x=>x.id===ck.dataset.ck); if(t){t.done=!t.done;renderList(id);} return; }
+    const dl = e.target.closest('[data-dl]');
+    if(dl){ tasks[id]=tasks[id].filter(x=>x.id!==dl.dataset.dl); renderList(id); }
+  });
+  renderList(id);
+});
+
+/* SPORT WEIGHT BAR — replaces task list in widget t1 */
 let currentWeight = 97.2;
 const GOAL = 83, START = 97.2;
 function renderWeight(){
@@ -125,7 +175,16 @@ $('btn-test-weight').addEventListener('click', () => {
 });
 renderWeight();
 
-/* GRID — identique à test3.html */
+function renderList(id){
+  const list = $('list-'+id);
+  if(!list) return; // t1 has no task list anymore (it's Sport)
+  if(!tasks[id].length){ list.innerHTML='<div class="empty">Vide</div>'; return; }
+  list.innerHTML = tasks[id].map(t =>
+    `<div class="titem"><div class="tck${t.done?' on':''}" data-ck="${t.id}"></div><div class="ttxt${t.done?' sk':''}">${t.text}</div><div class="tdl" data-dl="${t.id}">✕</div></div>`
+  ).join('');
+}
+
+/* ── GRID ── */
 function applyLayout(){
   const maxR = Math.max(...WIDGETS.map(id=>layout[id].r+layout[id].h-1), 4);
   $('wgrid').style.gridTemplateRows = `repeat(${maxR},200px)`;
@@ -136,6 +195,7 @@ function applyLayout(){
     cell.style.gridRow = `${p.r}/span ${p.h}`;
   });
 }
+
 function buildGhosts(){
   const layer = $('ghost-layer');
   layer.innerHTML = '';
@@ -161,21 +221,23 @@ function buildGhosts(){
 function showGhosts(){ buildGhosts(); $('ghost-layer').classList.add('active'); }
 function hideGhosts(){ $('ghost-layer').classList.remove('active'); }
 
+/* ── EDIT MODE ── */
 $('btn-edit').addEventListener('click', () => {
   gedit = !gedit;
   $('btn-edit').classList.toggle('act', gedit);
   document.body.classList.toggle('gedit', gedit);
   if(!gedit){ selW=null; hideGhosts(); WIDGETS.forEach(i=>$('wc-'+i).classList.remove('picked')); }
-  log(gedit ? '✏️ Mode disposition actif' : 'Mode normal');
+  log(gedit ? '✏️ Mode disposition actif — clique ✥ pour sélectionner' : 'Mode normal');
 });
 
+/* ── WIRE HANDLES — called once after page load ── */
 function wireHandles(){
   WIDGETS.forEach(id => {
     const mv = $('wmv-'+id), sz = $('wsz-'+id);
     mv.onclick = e => {
       e.stopPropagation();
       if(selW===id){ selW=null; hideGhosts(); WIDGETS.forEach(i=>$('wc-'+i).classList.remove('picked')); log('Désélectionné'); }
-      else { selW=id; WIDGETS.forEach(i=>$('wc-'+i).classList.remove('picked')); $('wc-'+id).classList.add('picked'); showGhosts(); log('✥ '+id+' sélectionné'); }
+      else { selW=id; WIDGETS.forEach(i=>$('wc-'+i).classList.remove('picked')); $('wc-'+id).classList.add('picked'); showGhosts(); log('✥ '+id+' sélectionné — clique une case jaune'); }
     };
     sz.onclick = e => {
       e.stopPropagation();
@@ -189,6 +251,7 @@ function wireHandles(){
   });
   log('Prêt — clique ✏️ Disposition pour commencer');
 }
+
 $('sw').addEventListener('click', e => {
   const b = e.target.closest('.pill[data-w]'); if(!b||!sizingId) return;
   layout[sizingId].w = Number(b.dataset.w);
@@ -202,12 +265,14 @@ $('sh').addEventListener('click', e => {
   applyLayout(); log('Hauteur '+sizingId+' → '+layout[sizingId].h);
 });
 $('szdone').addEventListener('click', () => $('ov-size').classList.remove('op'));
+
 document.addEventListener('click', e => {
   if(!selW) return;
   if(e.target.closest('.wcell')||e.target.closest('#ghost-layer')||e.target.closest('.ov')) return;
   selW=null; hideGhosts(); WIDGETS.forEach(i=>$('wc-'+i).classList.remove('picked'));
 });
 
+// Init
 applyLayout();
 wireHandles();
 </script>
