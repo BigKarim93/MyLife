@@ -80,7 +80,7 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 /* TASKS */
 .tadd{display:flex;gap:6px;margin-bottom:7px;}
 .tadd input{flex:1;background:var(--bg);border:1px solid var(--line);color:var(--chalk);border-radius:6px;padding:6px 9px;font-size:.8rem;}
-.tlist{display:flex;flex-direction:column;gap:4px;max-height:140px;overflow-y:auto;}
+.tlist{display:flex;flex-direction:column;gap:4px;}
 .titem{display:flex;align-items:center;gap:7px;padding:6px 9px;background:var(--bg3);border:1px solid var(--line);border-radius:7px;}
 .titem:hover{border-color:var(--line2);}
 .tck{width:16px;height:16px;border-radius:4px;border:2px solid var(--line);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:transparent;}
@@ -231,9 +231,8 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 
         <div class="wcell" id="wc-t1" style="grid-column:1/span 2;grid-row:1/span 2;">
           <div class="widget">
-            <div class="whdr"><span>✅</span><h2>Tâches 1</h2><button class="wh-move" id="wmv-t1">✥</button><button class="wh-size" id="wsz-t1">⊞</button></div>
+            <div class="whdr"><span>✅</span><h2>Tâches</h2><button class="btn sm" id="t1-open-add" style="padding:3px 8px;">➕</button><button class="wh-move" id="wmv-t1">✥</button><button class="wh-size" id="wsz-t1">⊞</button></div>
             <div class="wbody">
-              <div class="tadd"><input type="text" id="inp-t1" placeholder="Ajouter une tâche…"><button class="btn prim" id="add-t1">+</button></div>
               <div class="tlist" id="list-t1"></div>
             </div>
           </div>
@@ -408,6 +407,13 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
     <h3>🔁 Nouvelle routine</h3>
     <div class="fld"><label>Nom</label><input type="text" id="routine-inp" placeholder="ex : Lecture, Sport, Médicaments…" maxlength="30"></div>
     <div class="modal-act"><button class="btn" id="routine-cancel">Annuler</button><button class="btn prim" id="routine-save">Ajouter</button></div>
+  </div>
+</div>
+<div class="ov" id="ov-t1">
+  <div class="modal" style="max-width:300px;">
+    <h3>✅ Nouvelle tâche</h3>
+    <div class="fld"><label>Texte</label><input type="text" id="t1-inp" placeholder="ex : Acheter du pain…" maxlength="80"></div>
+    <div class="modal-act"><button class="btn" id="t1-cancel">Annuler</button><button class="btn prim" id="t1-save">Ajouter</button></div>
   </div>
 </div>
 <div class="ov" id="ov-size">
@@ -780,6 +786,31 @@ WIDGETS.forEach(id=>{
     const dl=e.target.closest('[data-dl]');if(dl){tData.tasks=tData.tasks.filter(x=>x.id!==dl.dataset.dl);saveTasks();renderTasks();}
   });
 });
+
+/* t1 — ajout via modale (pas de formulaire inline) */
+function wireT1Modal(){
+  const list1=$('list-t1');if(!list1)return;
+  list1.addEventListener('click',e=>{
+    const ck=e.target.closest('[data-ck]');if(ck){const t=tData.tasks.find(x=>x.id===ck.dataset.ck);if(t){t.done=!t.done;t.doneAt=t.done?new Date().toISOString():null;saveTasks();renderTasks();}return;}
+    const dl=e.target.closest('[data-dl]');if(dl){tData.tasks=tData.tasks.filter(x=>x.id!==dl.dataset.dl);saveTasks();renderTasks();}
+  });
+  $('t1-open-add').addEventListener('click',()=>{
+    $('t1-inp').value='';
+    $('ov-t1').classList.add('op');
+    $('t1-inp').focus();
+  });
+  $('t1-cancel').addEventListener('click',()=>$('ov-t1').classList.remove('op'));
+  function saveNewT1(){
+    const text=$('t1-inp').value.trim();
+    if(!text)return;
+    tData.tasks.push({id:'t'+Date.now(),text,done:false,createdAt:new Date().toISOString()});
+    saveTasks();renderTasks();
+    $('ov-t1').classList.remove('op');
+  }
+  $('t1-save').addEventListener('click',saveNewT1);
+  $('t1-inp').addEventListener('keydown',e=>{if(e.key==='Enter')saveNewT1();});
+}
+wireT1Modal();
 
 
 /* SPORT — connecté à Firestore et au vrai planning */
