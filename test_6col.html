@@ -166,6 +166,7 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 
 /* ROUTINE */
 .rbox{position:relative;background:var(--bg3);border:1px solid var(--line);border-radius:7px;padding:6px 9px;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:8px;}
+#routine-grid.cols2{display:grid !important;grid-template-columns:1fr 1fr;gap:4px;}
 .rbox:hover{border-color:var(--line2);}
 .rbox.done{background:rgba(74,222,128,.13);border-color:var(--green);}
 .rbox .rck{width:16px;height:16px;border-radius:4px;border:2px solid var(--line);flex-shrink:0;display:flex;align-items:center;justify-content:center;background:transparent;}
@@ -458,7 +459,7 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 
         <div class="wcell" id="wc-t5" style="grid-column:3/span 2;grid-row:3/span 2;">
           <div class="widget">
-            <div class="whdr"><span>🔁</span><h2>Routine du jour</h2><button class="btn sm" id="routine-open-add" style="padding:3px 8px;">➕</button><button class="wh-move" id="wmv-t5">✥</button><button class="wh-size" id="wsz-t5">⊞</button></div>
+            <div class="whdr"><span>🔁</span><h2>Routine du jour</h2><button class="btn sm" id="routine-open-add" style="padding:3px 8px;">➕</button><button class="btn sm" id="routine-toggle-cols" style="padding:3px 8px;" title="Affichage 1 ou 2 colonnes">▦</button><button class="wh-move" id="wmv-t5">✥</button><button class="wh-size" id="wsz-t5">⊞</button></div>
             <div class="wbody">
               <div id="routine-grid" style="display:flex;flex-direction:column;gap:4px;"></div>
             </div>
@@ -774,7 +775,7 @@ auth.onAuthStateChanged(async user=>{
     }
     if(l.exists){const ld=l.data();wLayout=Object.assign(JSON.parse(JSON.stringify(LAYOUT_DEFAULT)),ld);if(ld.theme)applyTheme(ld.theme);}
     const qSnap=await qcmDoc.get();if(qSnap.exists){const qd=qSnap.data();qProg={green:qd.green||{},blue:qd.blue||{},red:qd.red||{}};}
-    const rSnap=await routineDoc.get();if(rSnap.exists)routineData=Object.assign({items:[],doneDates:{}},rSnap.data());
+    const rSnap=await routineDoc.get();if(rSnap.exists)routineData=Object.assign({items:[],doneDates:{},cols2:false},rSnap.data());
     if(!h.exists)hubDoc.set({modules:mods}).catch(()=>{});
   }catch(e){mods=[{id:'m1',icon:'📋',name:'Mon Planning',desc:'',url:'planning.html'}];}
   $('ls').classList.add('hi');
@@ -1342,7 +1343,7 @@ function wireEdt(){
   $('edt-today').addEventListener('click',()=>{edtOff=0;renderEdt();});
 }
 /* ROUTINE DU JOUR — cases cochables, remises à zéro chaque jour automatiquement */
-let routineData={items:[],doneDates:{}}; // doneDates: { "2026-06-20": ["routineId1","routineId2"] }
+let routineData={items:[],doneDates:{},cols2:false}; // doneDates: { "2026-06-20": ["routineId1","routineId2"] }
 let routineDoc=null,routineT=null;
 
 function saveRoutine(){
@@ -1353,6 +1354,7 @@ function saveRoutine(){
 function todayKeyR(){return dateKeyOf(new Date());}
 function renderRoutine(){
   const grid=$('routine-grid');if(!grid)return;
+  grid.classList.toggle('cols2', !!routineData.cols2);
   const tk=todayKeyR();
   const doneToday=routineData.doneDates[tk]||[];
   if(!routineData.items.length){
@@ -1367,6 +1369,18 @@ function renderRoutine(){
 function wireRoutine(){
   const grid=$('routine-grid');if(!grid)return;
   let clickTimer=null;
+
+  const toggleBtn=$('routine-toggle-cols');
+  if(toggleBtn){
+    toggleBtn.classList.toggle('act', !!routineData.cols2);
+    toggleBtn.addEventListener('click',()=>{
+      routineData.cols2=!routineData.cols2;
+      toggleBtn.classList.toggle('act', routineData.cols2);
+      saveRoutine();
+      renderRoutine();
+    });
+  }
+
   grid.addEventListener('click',e=>{
     const del=e.target.closest('[data-del]');
     if(del){
