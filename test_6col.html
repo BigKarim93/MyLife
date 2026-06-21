@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Test 6 colonnes</title>
+<title>MyLife</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@700&family=Work+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
@@ -165,11 +165,15 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 .ev-perso{background:rgba(240,169,120,.2);border-color:#f0a978;}
 
 /* ROUTINE */
-.rbox{position:relative;background:var(--bg3);border:2px solid var(--line);border-radius:8px;padding:7px 5px;text-align:center;cursor:pointer;transition:.15s;min-height:42px;display:flex;align-items:center;justify-content:center;}
-.rbox.done{background:rgba(74,222,128,.18);border-color:var(--green);}
-.rbox span{font-size:.72rem;line-height:1.25;color:var(--chalk);word-break:break-word;}
-.rbox.done span{color:var(--green);font-weight:700;}
-.rbox .rdel{position:absolute;top:-6px;right:-6px;width:16px;height:16px;border-radius:50%;background:#c0392b;color:#fff;border:2px solid var(--bg);font-size:8px;display:none;align-items:center;justify-content:center;cursor:pointer;}
+.rbox{position:relative;background:var(--bg3);border:1px solid var(--line);border-radius:7px;padding:6px 9px;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:8px;}
+.rbox:hover{border-color:var(--line2);}
+.rbox.done{background:rgba(74,222,128,.13);border-color:var(--green);}
+.rbox .rck{width:16px;height:16px;border-radius:4px;border:2px solid var(--line);flex-shrink:0;display:flex;align-items:center;justify-content:center;background:transparent;}
+.rbox.done .rck{background:var(--green);border-color:var(--green);}
+.rbox.done .rck::after{content:'✓';font-size:.65rem;color:#0f1117;font-weight:700;}
+.rbox span{font-size:.76rem;line-height:1.25;color:var(--chalk);flex:1;text-align:left;}
+.rbox.done span{color:var(--green);font-weight:600;}
+.rbox .rdel{flex-shrink:0;width:16px;height:16px;border-radius:50%;background:#c0392b;color:#fff;border:none;font-size:8px;display:none;align-items:center;justify-content:center;cursor:pointer;}
 .rbox:hover .rdel{display:flex;}
 
 /* PRAYER TIMES */
@@ -358,7 +362,7 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
           <div class="widget">
             <div class="whdr"><span>🔁</span><h2>Routine du jour</h2><button class="wh-move" id="wmv-t5">✥</button><button class="wh-size" id="wsz-t5">⊞</button></div>
             <div class="wbody">
-              <div id="routine-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:7px;"></div>
+              <div id="routine-grid" style="display:flex;flex-direction:column;gap:4px;margin-bottom:7px;"></div>
               <div style="display:flex;gap:6px;">
                 <input type="text" id="routine-inp" placeholder="Nouvelle routine…" style="flex:1;background:var(--bg);border:1px solid var(--line);color:var(--chalk);border-radius:6px;padding:6px 9px;font-size:.78rem;">
                 <button class="btn prim" id="routine-add">+</button>
@@ -962,12 +966,12 @@ function renderRoutine(){
   const tk=todayKeyR();
   const doneToday=routineData.doneDates[tk]||[];
   if(!routineData.items.length){
-    grid.innerHTML='<div class="empty" style="grid-column:1/-1;">Ajoute tes routines ci-dessous.</div>';
+    grid.innerHTML='<div class="empty">Ajoute tes routines ci-dessous.</div>';
     return;
   }
   grid.innerHTML=routineData.items.map(item=>{
     const isDone=doneToday.includes(item.id);
-    return `<div class="rbox${isDone?' done':''}" data-id="${item.id}"><span>${esc(item.name)}</span><div class="rdel" data-del="${item.id}">✕</div></div>`;
+    return `<div class="rbox${isDone?' done':''}" data-id="${item.id}"><div class="rck"></div><span>${esc(item.name)}</span><div class="rdel" data-del="${item.id}">✕</div></div>`;
   }).join('');
 }
 function wireRoutine(){
