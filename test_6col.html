@@ -360,13 +360,9 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 
         <div class="wcell" id="wc-t5" style="grid-column:3/span 2;grid-row:3/span 2;">
           <div class="widget">
-            <div class="whdr"><span>🔁</span><h2>Routine du jour</h2><button class="wh-move" id="wmv-t5">✥</button><button class="wh-size" id="wsz-t5">⊞</button></div>
+            <div class="whdr"><span>🔁</span><h2>Routine du jour</h2><button class="btn sm" id="routine-open-add" style="padding:3px 8px;">➕</button><button class="wh-move" id="wmv-t5">✥</button><button class="wh-size" id="wsz-t5">⊞</button></div>
             <div class="wbody">
-              <div id="routine-grid" style="display:flex;flex-direction:column;gap:4px;margin-bottom:7px;"></div>
-              <div style="display:flex;gap:6px;">
-                <input type="text" id="routine-inp" placeholder="Nouvelle routine…" style="flex:1;background:var(--bg);border:1px solid var(--line);color:var(--chalk);border-radius:6px;padding:6px 9px;font-size:.78rem;">
-                <button class="btn prim" id="routine-add">+</button>
-              </div>
+              <div id="routine-grid" style="display:flex;flex-direction:column;gap:4px;"></div>
             </div>
           </div>
         </div>
@@ -407,12 +403,11 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
     <div class="modal-act"><button class="btn" id="wcancel">Annuler</button><button class="btn prim" id="wsave">Enregistrer</button></div>
   </div>
 </div>
-<div class="ov" id="ov-weigh">
+<div class="ov" id="ov-routine">
   <div class="modal" style="max-width:300px;">
-    <h3>⚖️ Peser</h3>
-    <div class="fld"><label>Poids (kg)</label><input type="number" id="wval" step="0.1" min="40" max="200" placeholder="96.8" style="font-size:1.1rem;"></div>
-    <div class="fld"><label>Date</label><input type="date" id="wdat"></div>
-    <div class="modal-act"><button class="btn" id="wcancel">Annuler</button><button class="btn prim" id="wsave">Enregistrer</button></div>
+    <h3>🔁 Nouvelle routine</h3>
+    <div class="fld"><label>Nom</label><input type="text" id="routine-inp" placeholder="ex : Lecture, Sport, Médicaments…" maxlength="30"></div>
+    <div class="modal-act"><button class="btn" id="routine-cancel">Annuler</button><button class="btn prim" id="routine-save">Ajouter</button></div>
   </div>
 </div>
 <div class="ov" id="ov-size">
@@ -995,14 +990,21 @@ function wireRoutine(){
       saveRoutine();renderRoutine();
     }
   });
-  $('routine-add').addEventListener('click',()=>{
+  $('routine-open-add').addEventListener('click',()=>{
+    $('routine-inp').value='';
+    $('ov-routine').classList.add('op');
+    $('routine-inp').focus();
+  });
+  $('routine-cancel').addEventListener('click',()=>$('ov-routine').classList.remove('op'));
+  function saveNewRoutine(){
     const inp=$('routine-inp'),name=inp.value.trim();
     if(!name)return;
     routineData.items.push({id:'r'+Date.now(),name});
-    inp.value='';
     saveRoutine();renderRoutine();
-  });
-  $('routine-inp').addEventListener('keydown',e=>{if(e.key==='Enter')$('routine-add').click();});
+    $('ov-routine').classList.remove('op');
+  }
+  $('routine-save').addEventListener('click',saveNewRoutine);
+  $('routine-inp').addEventListener('keydown',e=>{if(e.key==='Enter')saveNewRoutine();});
 
   // Nettoyage : on garde seulement les 14 derniers jours de doneDates pour ne pas alourdir le document
   const cutoff=new Date();cutoff.setDate(cutoff.getDate()-14);
