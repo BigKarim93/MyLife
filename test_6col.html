@@ -782,11 +782,11 @@ auth.onAuthStateChanged(async user=>{
   $('page').classList.remove('hi');
   // Réactive les widgets Tâches/Note dupliqués lors d'une session précédente
   // Nettoyage ponctuel : retire les entrées de layout créées par erreur lors des tests (slots jamais vraiment dupliqués par l'utilisateur)
-  if(!wLayout._cleanedDupSlots){
+  if(!wLayout._cleanedDupSlots2){
     ['task2','task3','task4','task5','task6','note2','note3','note4','note5','note6'].forEach(slot=>{
       delete wLayout[slot];
     });
-    wLayout._cleanedDupSlots=true;
+    wLayout._cleanedDupSlots2=true;
     saveLayout();
   }
   TASK_SLOTS.forEach(slot=>{ if(wLayout[slot]) document.getElementById('wc-'+slot).classList.remove('hi'); else document.getElementById('wc-'+slot).classList.add('hi'); });
