@@ -165,8 +165,8 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 .ev-perso{background:rgba(240,169,120,.2);border-color:#f0a978;}
 
 /* ROUTINE */
-.rbox{position:relative;background:var(--bg3);border:1px solid var(--line);border-radius:7px;padding:6px 9px;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:8px;min-height:30px;}
-#routine-grid.cols2{display:grid !important;grid-template-columns:1fr 1fr;grid-auto-rows:minmax(30px,auto);gap:4px;align-items:stretch;}
+.rbox{position:relative;background:var(--bg3);border:1px solid var(--line);border-radius:7px;padding:3px 7px;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:6px;min-height:20px;}
+#routine-grid.cols2{display:grid !important;grid-template-columns:1fr 1fr;grid-auto-rows:minmax(20px,auto);gap:3px;align-items:stretch;}
 #routine-grid.cols2 .rbox{height:100%;}
 .rbox:hover{border-color:var(--line2);}
 .rbox.done{background:rgba(74,222,128,.13);border-color:var(--green);}
@@ -462,7 +462,7 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
           <div class="widget">
             <div class="whdr"><span>🔁</span><h2>Routine du jour</h2><button class="btn sm" id="routine-open-add" style="padding:3px 8px;">➕</button><button class="btn sm" id="routine-toggle-cols" style="padding:3px 8px;" title="Affichage 1 ou 2 colonnes">▦</button><button class="wh-move" id="wmv-t5">✥</button><button class="wh-size" id="wsz-t5">⊞</button></div>
             <div class="wbody">
-              <div id="routine-grid" style="display:flex;flex-direction:column;gap:4px;"></div>
+              <div id="routine-grid" style="display:flex;flex-direction:column;gap:3px;"></div>
             </div>
           </div>
         </div>
@@ -782,13 +782,22 @@ auth.onAuthStateChanged(async user=>{
   $('ls').classList.add('hi');
   $('auth-wrap').classList.add('hi');
   $('page').classList.remove('hi');
-  // Réactive les widgets Tâches/Note dupliqués lors d'une session précédente
-  // Nettoyage ponctuel : retire les entrées de layout créées par erreur lors des tests (slots jamais vraiment dupliqués par l'utilisateur)
-  if(!wLayout._cleanedDupSlots2){
-    ['task2','task3','task4','task5','task6','note2','note3','note4','note5','note6'].forEach(slot=>{
-      delete wLayout[slot];
+  // Nettoyage intelligent : ne garde actif que les widgets Tâches/Note qui ont réellement du contenu
+  // (tâches, texte, ou titre renommé par l'utilisateur) — protège tes widgets volontaires comme "Aujourd'hui"
+  if(!wLayout._cleanedDupSlots3){
+    TASK_SLOTS.forEach(slot=>{
+      if(slot==='task1')return; // widget principal, jamais touché
+      const key=taskDataKey(slot);
+      const hasData=(tData[key]&&tData[key].length>0)||(tData.titles&&tData.titles[slot]);
+      if(!hasData) delete wLayout[slot];
     });
-    wLayout._cleanedDupSlots2=true;
+    NOTE_SLOTS.forEach(slot=>{
+      if(slot==='note1')return; // widget principal, jamais touché
+      const key=noteDataKey(slot);
+      const hasData=(noteData[key]&&noteData[key].trim())||(noteData.titles&&noteData.titles[slot]);
+      if(!hasData) delete wLayout[slot];
+    });
+    wLayout._cleanedDupSlots3=true;
     saveLayout();
   }
   TASK_SLOTS.forEach(slot=>{ if(wLayout[slot]) document.getElementById('wc-'+slot).classList.remove('hi'); else document.getElementById('wc-'+slot).classList.add('hi'); });
