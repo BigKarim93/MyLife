@@ -218,6 +218,7 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
   <div class="tb-r hi" id="tbr">
     <span id="uem" style="font-size:.78rem;color:var(--dim);"></span>
     <button class="btn" id="btn-gedit">✏️ Disposition</button>
+    <button class="btn hi" id="btn-clean-empty" style="display:none;">🧹 Nettoyer</button>
     <button class="btn" id="btn-theme">🎨 Thème</button>
     <button class="btn" id="btn-logout">Déconnexion</button>
   </div>
@@ -902,6 +903,37 @@ function hideGhosts(){$('ghost-layer').classList.remove('active');}
 $('btn-gedit').addEventListener('click',()=>{
   gedit=!gedit;$('btn-gedit').classList.toggle('act',gedit);document.body.classList.toggle('gedit',gedit);
   if(!gedit){selW=null;hideGhosts();WIDGETS.forEach(i=>$('wc-'+i).classList.remove('picked'));}
+  $('btn-clean-empty').style.display=gedit?'inline-flex':'none';
+});
+$('btn-clean-empty').addEventListener('click',()=>{
+  let removed=0;
+  TASK_SLOTS.forEach(slot=>{
+    if(slot==='task1')return; // widget principal, jamais touché
+    const key=taskDataKey(slot);
+    const hasData=(tData[key]&&tData[key].length>0)||(tData.titles&&tData.titles[slot]);
+    if(!hasData && wLayout[slot]){
+      delete wLayout[slot];
+      document.getElementById('wc-'+slot).classList.add('hi');
+      removed++;
+    }
+  });
+  NOTE_SLOTS.forEach(slot=>{
+    if(slot==='note1')return; // widget principal, jamais touché
+    const key=noteDataKey(slot);
+    const hasData=(noteData[key]&&noteData[key].trim())||(noteData.titles&&noteData.titles[slot]);
+    if(!hasData && wLayout[slot]){
+      delete wLayout[slot];
+      document.getElementById('wc-'+slot).classList.add('hi');
+      removed++;
+    }
+  });
+  if(removed>0){
+    if(layDoc) layDoc.set(wLayout).catch(()=>{});
+    applyLayout();
+    alert(removed+' widget'+(removed>1?'s vides supprimés':' vide supprimé')+'.');
+  } else {
+    alert('Aucun widget vide à supprimer.');
+  }
 });
 
 function wireHandles(){
@@ -1728,6 +1760,18 @@ function playAlarmSound(soundKey){
     });
   }catch(e){}
 }
+// Débloque l'AudioContext dès la première interaction sur la page — indispensable pour que
+// les alarmes automatiques (déclenchées sans clic direct) puissent jouer un son plus tard.
+function unlockAlarmAudio(){
+  if(!alarmAudioCtx){
+    try{ alarmAudioCtx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){return;}
+  }
+  if(alarmAudioCtx.state==='suspended') alarmAudioCtx.resume();
+  document.removeEventListener('click', unlockAlarmAudio);
+  document.removeEventListener('touchstart', unlockAlarmAudio);
+}
+document.addEventListener('click', unlockAlarmAudio, {once:true});
+document.addEventListener('touchstart', unlockAlarmAudio, {once:true});
 
 function checkPrayerAlarms(nowSec){
   if(!lastPrayerTimings)return;
