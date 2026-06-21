@@ -478,9 +478,8 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 
         <div class="wcell" id="wc-t6" style="grid-column:5/span 2;grid-row:3/span 2;">
           <div class="widget">
-            <div class="whdr"><span>🕌</span><h2>Prières</h2><button class="wh-move" id="wmv-t6">✥</button><button class="wh-size" id="wsz-t6">⊞</button></div>
+            <div class="whdr"><span>🕌</span><h2>Prières</h2><span id="prayer-countdown" style="font-size:.7rem;color:var(--accent);margin-left:6px;"></span><button class="wh-move" id="wmv-t6">✥</button><button class="wh-size" id="wsz-t6">⊞</button></div>
             <div class="wbody">
-              <div id="prayer-countdown" style="text-align:center;font-family:'Kalam',cursive;font-size:1rem;color:var(--accent);margin-bottom:8px;"></div>
               <div id="prayer-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;"></div>
             </div>
           </div>
@@ -1637,12 +1636,11 @@ function renderPrayerGrid(timings){
 }
 function renderPrayerCountdown(nextKey, nextMin, nowMin){
   const el=$('prayer-countdown');if(!el)return;
-  const label=(PRAYER_NAMES.find(([k])=>k===nextKey)||[,''])[1];
   let diff=nextMin-nowMin;
   if(diff<0)diff+=1440;
   const h=Math.floor(diff/60), m=diff%60;
   const hStr=h>0?h+'h ':'';
-  el.textContent=`${label} dans ${hStr}${m}min`;
+  el.textContent=`(dans ${hStr}${m}min)`;
 }
 function tickPrayerCountdown(){
   if(!lastPrayerTimings)return;
