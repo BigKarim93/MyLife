@@ -928,9 +928,12 @@ $('btn-clean-empty').addEventListener('click',()=>{
     }
   });
   if(removed>0){
-    if(layDoc) layDoc.set(wLayout).catch(()=>{});
+    if(layDoc){
+      layDoc.set(wLayout)
+        .then(()=>{ alert(removed+' widget'+(removed>1?'s vides supprimés':' vide supprimé')+' (sauvegardé ✅).'); })
+        .catch(err=>{ alert('Erreur de sauvegarde : '+err.message); });
+    }
     applyLayout();
-    alert(removed+' widget'+(removed>1?'s vides supprimés':' vide supprimé')+'.');
   } else {
     alert('Aucun widget vide à supprimer.');
   }
