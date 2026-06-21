@@ -1036,7 +1036,7 @@ function renderRoutine(){
   }
   grid.innerHTML=routineData.items.map(item=>{
     const isDone=doneToday.includes(item.id);
-    return `<div class="rbox${isDone?' done':''}" data-id="${item.id}"><div class="rck"></div><span>${esc(item.name)}</span><div class="rdel" data-del="${item.id}">✕</div></div>`;
+    return `<div class="rbox${isDone?' done':''}" data-id="${item.id}" draggable="true"><div class="rck"></div><span data-rename="${item.id}">${esc(item.name)}</span><div class="rdel" data-del="${item.id}">✕</div></div>`;
   }).join('');
 }
 function wireRoutine(){
@@ -1059,6 +1059,54 @@ function wireRoutine(){
       else routineData.doneDates[tk].push(id);
       saveRoutine();renderRoutine();
     }
+  });
+  // Renommage par double-clic sur le texte
+  grid.addEventListener('dblclick',e=>{
+    const span=e.target.closest('[data-rename]');
+    if(!span)return;
+    const item=routineData.items.find(i=>i.id===span.dataset.rename);
+    if(!item)return;
+    const newName=prompt('Nouveau nom de la routine :', item.name);
+    if(newName&&newName.trim()){
+      item.name=newName.trim();
+      saveRoutine();renderRoutine();
+    }
+  });
+  // Glisser-déposer pour réordonner
+  let dragSrcId=null;
+  grid.addEventListener('dragstart',e=>{
+    const box=e.target.closest('.rbox');
+    if(!box)return;
+    dragSrcId=box.dataset.id;
+    box.style.opacity='.4';
+  });
+  grid.addEventListener('dragend',e=>{
+    const box=e.target.closest('.rbox');
+    if(box) box.style.opacity='';
+  });
+  grid.addEventListener('dragover',e=>{
+    e.preventDefault();
+    const box=e.target.closest('.rbox');
+    if(box) box.style.borderColor='var(--accent)';
+  });
+  grid.addEventListener('dragleave',e=>{
+    const box=e.target.closest('.rbox');
+    if(box) box.style.borderColor='';
+  });
+  grid.addEventListener('drop',e=>{
+    e.preventDefault();
+    const box=e.target.closest('.rbox');
+    if(!box||!dragSrcId)return;
+    box.style.borderColor='';
+    const targetId=box.dataset.id;
+    if(targetId===dragSrcId)return;
+    const srcIdx=routineData.items.findIndex(i=>i.id===dragSrcId);
+    const tgtIdx=routineData.items.findIndex(i=>i.id===targetId);
+    if(srcIdx<0||tgtIdx<0)return;
+    const [moved]=routineData.items.splice(srcIdx,1);
+    routineData.items.splice(tgtIdx,0,moved);
+    dragSrcId=null;
+    saveRoutine();renderRoutine();
   });
   $('routine-open-add').addEventListener('click',()=>{
     $('routine-inp').value='';
