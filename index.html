@@ -194,6 +194,19 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 .pbox.next .pname{color:var(--accent);font-weight:700;}
 .pbox .ptime{font-family:'Kalam',cursive;font-size:.85rem;color:var(--chalk);}
 .pbox.next .ptime{color:var(--accent);}
+
+/* ALARM SETTINGS */
+.alarm-row{background:var(--bg3);border:1px solid var(--line);border-radius:8px;padding:9px 10px;}
+.alarm-row-top{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.alarm-row-top .aname{flex:1;font-weight:700;font-size:.85rem;}
+.alarm-toggle{width:34px;height:19px;border-radius:10px;background:var(--line);border:none;cursor:pointer;position:relative;flex-shrink:0;transition:.15s;}
+.alarm-toggle.on{background:var(--accent);}
+.alarm-toggle::after{content:'';position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:var(--chalk);transition:.15s;}
+.alarm-toggle.on::after{transform:translateX(15px);}
+.alarm-opts{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.alarm-opts label{font-size:.68rem;color:var(--dim);}
+.alarm-opts select,.alarm-opts input{background:var(--bg);border:1px solid var(--line);color:var(--chalk);border-radius:5px;padding:4px 6px;font-size:.72rem;}
+.alarm-opts input[type=number]{width:50px;}
 </style>
 </head>
 <body>
@@ -478,7 +491,7 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 
         <div class="wcell" id="wc-t6" style="grid-column:5/span 2;grid-row:3/span 2;">
           <div class="widget">
-            <div class="whdr"><span>🕌</span><h2>Prières</h2><button class="wh-move" id="wmv-t6">✥</button><button class="wh-size" id="wsz-t6">⊞</button></div>
+            <div class="whdr"><span>🕌</span><h2>Prières</h2><button class="btn sm" id="prayer-alarm-btn" style="padding:3px 7px;" title="Régler les alarmes">🔔</button><button class="wh-move" id="wmv-t6">✥</button><button class="wh-size" id="wsz-t6">⊞</button></div>
             <div class="wbody">
               <div id="prayer-countdown" style="text-align:center;font-family:'Work Sans',sans-serif;font-weight:700;font-size:1.6rem;color:var(--accent);margin-bottom:8px;letter-spacing:.03em;"></div>
               <div id="prayer-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;"></div>
@@ -536,6 +549,14 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
   </div>
 </div>
 <div class="color-pop" id="color-pop"></div>
+<div class="ov" id="ov-prayer-alarm">
+  <div class="modal" style="max-width:360px;">
+    <h3>🔔 Alarmes de prière</h3>
+    <div style="font-size:.7rem;color:var(--dim);margin-bottom:10px;">Le son joue tant que cet onglet reste ouvert (même en arrière-plan).</div>
+    <div id="alarm-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+    <div class="modal-act"><button class="btn prim" id="alarm-close" style="width:100%;justify-content:center;">Fermer</button></div>
+  </div>
+</div>
 <div class="ov" id="ov-widget-manage">
   <div class="modal" style="max-width:300px;">
     <h3 id="wm-title">⧉ Gérer le widget</h3>
@@ -765,6 +786,7 @@ auth.onAuthStateChanged(async user=>{
   noteDoc=db.collection('users').doc(user.uid).collection('modules').doc('note');
   qcmDoc=db.collection('users').doc(user.uid).collection('modules').doc('qcm-arabe');
   routineDoc=db.collection('users').doc(user.uid).collection('modules').doc('routines');
+  alarmDoc=db.collection('users').doc(user.uid).collection('modules').doc('prayer-alarms');
   try{
     const[h,t,l]=await Promise.all([hubDoc.get(),tDoc.get(),layDoc.get()]);
     mods=(h.exists&&h.data().modules)?h.data().modules:[
@@ -788,6 +810,7 @@ auth.onAuthStateChanged(async user=>{
     if(l.exists){const ld=l.data();wLayout=Object.assign(JSON.parse(JSON.stringify(LAYOUT_DEFAULT)),ld);if(ld.theme)applyTheme(ld.theme);}
     const qSnap=await qcmDoc.get();if(qSnap.exists){const qd=qSnap.data();qProg={green:qd.green||{},blue:qd.blue||{},red:qd.red||{}};}
     const rSnap=await routineDoc.get();if(rSnap.exists)routineData=Object.assign({items:[],doneDates:{},cols2:false},rSnap.data());
+    const aSnap=await alarmDoc.get();if(aSnap.exists)alarmSettings=aSnap.data();
     if(!h.exists)hubDoc.set({modules:mods}).catch(()=>{});
   }catch(e){mods=[{id:'m1',icon:'📋',name:'Mon Planning',desc:'',url:'planning.html'}];}
   $('ls').classList.add('hi');
@@ -826,6 +849,7 @@ auth.onAuthStateChanged(async user=>{
   renderRoutine();
   wireRoutine();
   fetchPrayerTimes();
+  wirePrayerAlarmModal();
   updateQStats();
   updateQInfo();
   wireHandles();
@@ -1649,6 +1673,7 @@ function tickPrayerCountdown(){
   if(!lastPrayerTimings)return;
   const now=new Date();
   const nowMin=now.getHours()*60+now.getMinutes();
+  const nowSec=now.getHours()*3600+now.getMinutes()*60+now.getSeconds();
   const prayerOnly=PRAYER_NAMES.filter(([k])=>k!=='Sunrise');
   let nextKey=null, nextMin=null;
   for(const [key] of prayerOnly){
@@ -1659,8 +1684,121 @@ function tickPrayerCountdown(){
   }
   if(!nextKey){ nextKey=prayerOnly[0][0]; const [h,m]=lastPrayerTimings[nextKey].split(':').map(Number); nextMin=h*60+m+1440; }
   renderPrayerCountdown(nextKey, nextMin, nowMin);
+  checkPrayerAlarms(nowSec);
 }
-setInterval(tickPrayerCountdown, 60000);
+setInterval(tickPrayerCountdown, 10000);
+
+/* ═══ ALARMES DE PRIÈRE ═══ */
+const ALARM_SOUNDS={
+  bip:    { freq:880, type:'sine',     pattern:[[0,.15]] },
+  cloche: { freq:660, type:'triangle', pattern:[[0,.4],[.5,.4],[1,.6]] },
+  douce:  { freq:523, type:'sine',     pattern:[[0,.6],[.8,.6]] },
+};
+let alarmSettings={}; // { Fajr:{on:false,before:10,sound:'bip'}, ... }
+let alarmDoc=null, alarmT=null, alarmAudioCtx=null;
+let alarmFiredToday={}; // évite de sonner plusieurs fois la même minute { 'Fajr-2026-06-21':true }
+
+function initAlarmDefaults(){
+  PRAYER_NAMES.filter(([k])=>k!=='Sunrise').forEach(([key])=>{
+    if(!alarmSettings[key]) alarmSettings[key]={on:false, before:10, sound:'bip'};
+  });
+}
+function saveAlarmSettings(){
+  if(!alarmDoc)return;
+  clearTimeout(alarmT);
+  alarmT=setTimeout(()=>alarmDoc.set(alarmSettings).catch(()=>{}),600);
+}
+
+function playAlarmSound(soundKey){
+  try{
+    if(!alarmAudioCtx) alarmAudioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    const ctx=alarmAudioCtx;
+    if(ctx.state==='suspended') ctx.resume();
+    const cfg=ALARM_SOUNDS[soundKey]||ALARM_SOUNDS.bip;
+    cfg.pattern.forEach(([delay,dur])=>{
+      const osc=ctx.createOscillator();
+      const gain=ctx.createGain();
+      osc.type=cfg.type; osc.frequency.value=cfg.freq;
+      osc.connect(gain); gain.connect(ctx.destination);
+      const startAt=ctx.currentTime+delay;
+      gain.gain.setValueAtTime(0,startAt);
+      gain.gain.linearRampToValueAtTime(.35,startAt+.03);
+      gain.gain.exponentialRampToValueAtTime(.001,startAt+dur);
+      osc.start(startAt); osc.stop(startAt+dur+.05);
+    });
+  }catch(e){}
+}
+
+function checkPrayerAlarms(nowSec){
+  if(!lastPrayerTimings)return;
+  const todayKey=dateKeyOf(new Date());
+  PRAYER_NAMES.filter(([k])=>k!=='Sunrise').forEach(([key])=>{
+    const cfg=alarmSettings[key];
+    if(!cfg||!cfg.on)return;
+    const t=lastPrayerTimings[key]; if(!t)return;
+    const [h,m]=t.split(':').map(Number);
+    const prayerSec=h*3600+m*60;
+    const alarmSec=prayerSec-(cfg.before*60);
+    const fireKey=key+'-'+todayKey;
+    // Déclenche dans une fenêtre de 10s autour de l'heure cible (correspond au tick)
+    if(Math.abs(nowSec-alarmSec)<=10 && !alarmFiredToday[fireKey]){
+      alarmFiredToday[fireKey]=true;
+      playAlarmSound(cfg.sound);
+    }
+  });
+}
+
+function buildAlarmList(){
+  const list=$('alarm-list');if(!list)return;
+  initAlarmDefaults();
+  list.innerHTML=PRAYER_NAMES.filter(([k])=>k!=='Sunrise').map(([key,label])=>{
+    const cfg=alarmSettings[key];
+    return `<div class="alarm-row">
+      <div class="alarm-row-top">
+        <span class="aname">${label}</span>
+        <button class="alarm-toggle${cfg.on?' on':''}" data-toggle="${key}"></button>
+      </div>
+      <div class="alarm-opts">
+        <label>Avant :</label>
+        <input type="number" min="0" max="60" value="${cfg.before}" data-before="${key}">
+        <label>min</label>
+        <select data-sound="${key}">
+          <option value="bip" ${cfg.sound==='bip'?'selected':''}>🔔 Bip</option>
+          <option value="cloche" ${cfg.sound==='cloche'?'selected':''}>🛎️ Cloche</option>
+          <option value="douce" ${cfg.sound==='douce'?'selected':''}>🎐 Douce</option>
+        </select>
+        <button class="btn sm" data-test="${key}">▶ Tester</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function wirePrayerAlarmModal(){
+  $('prayer-alarm-btn').addEventListener('click',()=>{
+    buildAlarmList();
+    $('ov-prayer-alarm').classList.add('op');
+  });
+  $('alarm-close').addEventListener('click',()=>$('ov-prayer-alarm').classList.remove('op'));
+  $('alarm-list').addEventListener('click',e=>{
+    const toggle=e.target.closest('[data-toggle]');
+    if(toggle){
+      const key=toggle.dataset.toggle;
+      alarmSettings[key].on=!alarmSettings[key].on;
+      toggle.classList.toggle('on', alarmSettings[key].on);
+      saveAlarmSettings();
+      return;
+    }
+    const test=e.target.closest('[data-test]');
+    if(test){ playAlarmSound(alarmSettings[test.dataset.test].sound); return; }
+  });
+  $('alarm-list').addEventListener('input',e=>{
+    const before=e.target.closest('[data-before]');
+    if(before){ alarmSettings[before.dataset.before].before=Math.max(0,Math.min(60,Number(before.value)||0)); saveAlarmSettings(); return; }
+  });
+  $('alarm-list').addEventListener('change',e=>{
+    const sound=e.target.closest('[data-sound]');
+    if(sound){ alarmSettings[sound.dataset.sound].sound=sound.value; saveAlarmSettings(); }
+  });
+}
 
 /* THEMES */
 function applyTheme(id){const t=THEMES.find(x=>x.id===id)||THEMES[0];const r=document.documentElement.style;r.setProperty('--bg',t.bg);r.setProperty('--bg2',t.bg2);r.setProperty('--bg3',t.bg3);r.setProperty('--accent',t.ac);r.setProperty('--chalk',t.ch);r.setProperty('--dim',t.ch+'99');r.setProperty('--line',t.ch+'17');r.setProperty('--line2',t.ch+'2e');curTheme=id;try{localStorage.setItem('mlt',id);}catch(e){}}
