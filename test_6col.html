@@ -81,9 +81,9 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 .tadd{display:flex;gap:6px;margin-bottom:7px;}
 .tadd input{flex:1;background:var(--bg);border:1px solid var(--line);color:var(--chalk);border-radius:6px;padding:6px 9px;font-size:.8rem;}
 .tlist{display:flex;flex-direction:column;gap:3px;}
-.titem{display:flex;align-items:center;gap:7px;padding:5px 8px;background:var(--bg3);border:1px solid var(--line);border-radius:7px;}
+.titem{display:flex;align-items:center;gap:6px;padding:4px 7px;background:var(--bg3);border:1px solid var(--line);border-radius:6px;}
 .titem:hover{border-color:var(--line2);}
-.tck{width:16px;height:16px;border-radius:4px;border:2px solid var(--line);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:transparent;}
+.tck{width:14px;height:14px;border-radius:4px;border:2px solid var(--line);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:transparent;}
 .tck.on{background:var(--green);border-color:var(--green);}
 .tck.on::after{content:'✓';font-size:.65rem;color:#0f1117;font-weight:700;}
 .ttxt{flex:1;font-size:.75rem;}
@@ -231,9 +231,18 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 
         <div class="wcell" id="wc-t1" style="grid-column:1/span 2;grid-row:1/span 2;">
           <div class="widget">
-            <div class="whdr"><span>✅</span><h2>Tâches</h2><button class="btn sm" id="t1-open-add" style="padding:3px 8px;">➕</button><button class="wh-move" id="wmv-t1">✥</button><button class="wh-size" id="wsz-t1">⊞</button></div>
+            <div class="whdr"><span>✅</span><h2 id="t1-title" style="cursor:text;" title="Double-clic pour renommer">Tâches</h2><button class="btn sm" id="t1-open-add" style="padding:3px 8px;">➕</button><button class="wh-move" id="wmv-t1">✥</button><button class="wh-size" id="wsz-t1">⊞</button></div>
             <div class="wbody">
               <div class="tlist" id="list-t1"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="wcell" id="wc-t7" style="grid-column:1/span 2;grid-row:5/span 2;">
+          <div class="widget">
+            <div class="whdr"><span>✅</span><h2 id="t7-title" style="cursor:text;" title="Double-clic pour renommer">Tâches 2</h2><button class="btn sm" id="t7-open-add" style="padding:3px 8px;">➕</button><button class="wh-move" id="wmv-t7">✥</button><button class="wh-size" id="wsz-t7">⊞</button></div>
+            <div class="wbody">
+              <div class="tlist" id="list-t7"></div>
             </div>
           </div>
         </div>
@@ -416,6 +425,13 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
     <div class="modal-act"><button class="btn" id="t1-cancel">Annuler</button><button class="btn prim" id="t1-save">Ajouter</button></div>
   </div>
 </div>
+<div class="ov" id="ov-t7">
+  <div class="modal" style="max-width:300px;">
+    <h3>✅ Nouvelle tâche</h3>
+    <div class="fld"><label>Texte</label><input type="text" id="t7-inp" placeholder="ex : Acheter du pain…" maxlength="80"></div>
+    <div class="modal-act"><button class="btn" id="t7-cancel">Annuler</button><button class="btn prim" id="t7-save">Ajouter</button></div>
+  </div>
+</div>
 <div class="ov" id="ov-size">
   <div class="modal" style="max-width:300px;">
     <h3>⊞ Taille</h3>
@@ -591,8 +607,8 @@ function showQResults(){
 }
 function shuf(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
 
-const WIDGETS=['t1','t2','t3','t4','t5','t6'];
-const LAYOUT_DEFAULT={t1:{c:1,r:1,w:2,h:2},t2:{c:3,r:1,w:2,h:2},t3:{c:5,r:1,w:2,h:2},t4:{c:1,r:3,w:2,h:2},t5:{c:3,r:3,w:2,h:2},t6:{c:5,r:3,w:2,h:2}};
+const WIDGETS=['t1','t2','t3','t4','t5','t6','t7'];
+const LAYOUT_DEFAULT={t1:{c:1,r:1,w:2,h:2},t2:{c:3,r:1,w:2,h:2},t3:{c:5,r:1,w:2,h:2},t4:{c:1,r:3,w:2,h:2},t5:{c:3,r:3,w:2,h:2},t6:{c:5,r:3,w:2,h:2},t7:{c:1,r:5,w:2,h:2}};
 const EMOJI_CATS={'Études':['📋','📖','📚','📝','✏️','📊','🧠','💡','🔬','🎓','💻'],'Sport':['💪','🏋️','⚽','🏀','🎾','🏊','🚴','🤸','🧘','🏃','⚖️'],'Voyage':['✈️','🌍','🗺️','🏖️','⛰️','🎵','🎮','🎬','📷','🚗','🏕️'],'Maison':['🏠','🍕','🍎','☕','🛒','💰','📱','🔑','🌱','🐶','🌸'],'Symboles':['⭐','🌟','🔥','✅','❌','⚡','🎯','🏆','💎','🎉','🔵','🟡','🟢']};
 const THEMES=[{id:'foret',n:'🌿 Forêt',bg:'#16261e',bg2:'#1f3a2c',bg3:'#274a37',ac:'#f2c14e',tl:'#2dd4bf',gr:'#4ade80',rd:'#f87171',bl:'#60a5fa',ch:'#f1efe4'},{id:'ocean',n:'🌊 Océan',bg:'#0d1f2d',bg2:'#122534',bg3:'#193040',ac:'#22d3ee',tl:'#06b6d4',gr:'#34d399',rd:'#f87171',bl:'#38bdf8',ch:'#e0f4ff'},{id:'violet',n:'🌙 Nuit violette',bg:'#1a1228',bg2:'#221535',bg3:'#2d1d48',ac:'#c084fc',tl:'#e879f9',gr:'#a78bfa',rd:'#f472b6',bl:'#818cf8',ch:'#ede9fe'},{id:'ember',n:'🔥 Ember',bg:'#1c1208',bg2:'#271a0c',bg3:'#332212',ac:'#fb923c',tl:'#fbbf24',gr:'#84cc16',rd:'#ef4444',bl:'#f97316',ch:'#fff7ed'},{id:'ardoise',n:'🤍 Ardoise',bg:'#1a1f2e',bg2:'#222840',bg3:'#2a3050',ac:'#e2e8f0',tl:'#94a3b8',gr:'#64748b',rd:'#f87171',bl:'#93c5fd',ch:'#f8fafc'},{id:'sakura',n:'🌸 Sakura',bg:'#1f1218',bg2:'#2a1a22',bg3:'#38222e',ac:'#f9a8d4',tl:'#fb7185',gr:'#86efac',rd:'#fca5a5',bl:'#f0abfc',ch:'#fdf2f8'},{id:'electro',n:'⚡ Électrique',bg:'#080808',bg2:'#111111',bg3:'#1a1a1a',ac:'#facc15',tl:'#3b82f6',gr:'#22c55e',rd:'#ef4444',bl:'#60a5fa',ch:'#f9fafb'},{id:'desert',n:'🏜️ Désert',bg:'#1e1610',bg2:'#271e14',bg3:'#332819',ac:'#d97706',tl:'#b45309',gr:'#84cc16',rd:'#ef4444',bl:'#f59e0b',ch:'#fef3c7'},{id:'autumn',n:'🍂 Automne',bg:'#1c1008',bg2:'#271608',bg3:'#361e0a',ac:'#f97316',tl:'#dc2626',gr:'#fbbf24',rd:'#ef4444',bl:'#fb923c',ch:'#fff7ed'},{id:'arctic',n:'🧊 Arctique',bg:'#0f1923',bg2:'#172433',bg3:'#1e3045',ac:'#bfdbfe',tl:'#7dd3fc',gr:'#a5f3fc',rd:'#fca5a5',bl:'#93c5fd',ch:'#f0f9ff'},{id:'tropic',n:'🌺 Tropique',bg:'#0a1f12',bg2:'#0f2918',bg3:'#173520',ac:'#f0abfc',tl:'#4ade80',gr:'#86efac',rd:'#f9a8d4',bl:'#a78bfa',ch:'#f0fdf4'},{id:'minuit',n:'🖤 Minuit',bg:'#000000',bg2:'#111111',bg3:'#1c1c1c',ac:'#ffffff',tl:'#a3a3a3',gr:'#737373',rd:'#ef4444',bl:'#6b7280',ch:'#f5f5f5'},{id:'neon',n:'🟣 Néon',bg:'#0a0010',bg2:'#10001a',bg3:'#18002a',ac:'#d946ef',tl:'#a855f7',gr:'#34d399',rd:'#f43f5e',bl:'#818cf8',ch:'#fdf4ff'},{id:'ble',n:'🌾 Blé',bg:'#1e1a10',bg2:'#272212',bg3:'#332d18',ac:'#fde68a',tl:'#d97706',gr:'#a3e635',rd:'#ef4444',bl:'#fcd34d',ch:'#fffbeb'}];
 
@@ -602,7 +618,7 @@ const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 /* STATE */
 let mods=null,modEdit=false,modEditId=null,modDragIdx=null,hubDoc=null,modT=null;
-let tData={tasks:[],cats:[]},tDoc=null,tT=null;
+let tData={tasks:[],tasks7:[],cats:[],titles:{}},tDoc=null,tT=null;
 let spData={weights:[],goal:SPORT_GOAL,startWeight:SPORT_START_W},spDoc=null;
 let wLayout=JSON.parse(JSON.stringify(LAYOUT_DEFAULT)),layDoc=null,layT=null;
 let planState=null,planDoc=null;
@@ -635,7 +651,7 @@ auth.onAuthStateChanged(async user=>{
     ];
     const sp=await spDoc.get();if(sp.exists)spData=Object.assign({weights:[],goal:SPORT_GOAL,startWeight:SPORT_START_W},sp.data());
     const pl=await planDoc.get();if(pl.exists)planState=pl.data();
-    if(t.exists){tData=Object.assign({tasks:[],cats:[]},t.data());const n7=new Date();n7.setDate(n7.getDate()-7);tData.tasks=tData.tasks.filter(x=>!x.done||(x.doneAt&&new Date(x.doneAt)>n7));}
+    if(t.exists){tData=Object.assign({tasks:[],tasks7:[],cats:[],titles:{}},t.data());const n7=new Date();n7.setDate(n7.getDate()-7);tData.tasks=tData.tasks.filter(x=>!x.done||(x.doneAt&&new Date(x.doneAt)>n7));if(tData.tasks7)tData.tasks7=tData.tasks7.filter(x=>!x.done||(x.doneAt&&new Date(x.doneAt)>n7));}
     if(l.exists){const ld=l.data();wLayout=Object.assign(JSON.parse(JSON.stringify(LAYOUT_DEFAULT)),ld);if(ld.theme)applyTheme(ld.theme);}
     const qSnap=await qcmDoc.get();if(qSnap.exists){const qd=qSnap.data();qProg={green:qd.green||{},blue:qd.blue||{},red:qd.red||{}};}
     const rSnap=await routineDoc.get();if(rSnap.exists)routineData=Object.assign({items:[],doneDates:{}},rSnap.data());
@@ -768,13 +784,19 @@ document.addEventListener('click',e=>{if(!e.target.closest('.epf'))$('epdd').cla
 
 /* TASKS — partagées entre les 3 widgets */
 function saveTasks(){if(!tDoc)return;clearTimeout(tT);tT=setTimeout(()=>tDoc.set(tData).catch(()=>{}),600);}
+const TASK_LIST_MAP={t1:'tasks',t7:'tasks7'};
 function renderTasks(){
-  WIDGETS.forEach(id=>{
+  Object.entries(TASK_LIST_MAP).forEach(([id,key])=>{
     const list=$('list-'+id);if(!list)return;
-    const tasks=(tData.tasks||[]).filter(t=>!t.done);
+    const tasks=(tData[key]||[]).filter(t=>!t.done);
     if(!tasks.length){list.innerHTML='<div class="empty">Aucune tâche 🎉</div>';return;}
     list.innerHTML=tasks.map(t=>`<div class="titem"><div class="tck${t.done?' on':''}" data-ck="${t.id}"></div><div class="ttxt${t.done?' sk':''}">${esc(t.text)}</div><div class="tdl" data-dl="${t.id}">✕</div></div>`).join('');
   });
+  // titres personnalisés
+  if(tData.titles){
+    if(tData.titles.t1&&$('t1-title')) $('t1-title').textContent=tData.titles.t1;
+    if(tData.titles.t7&&$('t7-title')) $('t7-title').textContent=tData.titles.t7;
+  }
 }
 WIDGETS.forEach(id=>{
   const addBtn=$('add-'+id),inp=$('inp-'+id),list=$('list-'+id);
@@ -788,29 +810,46 @@ WIDGETS.forEach(id=>{
 });
 
 /* t1 — ajout via modale (pas de formulaire inline) */
-function wireT1Modal(){
-  const list1=$('list-t1');if(!list1)return;
-  list1.addEventListener('click',e=>{
-    const ck=e.target.closest('[data-ck]');if(ck){const t=tData.tasks.find(x=>x.id===ck.dataset.ck);if(t){t.done=!t.done;t.doneAt=t.done?new Date().toISOString():null;saveTasks();renderTasks();}return;}
-    const dl=e.target.closest('[data-dl]');if(dl){tData.tasks=tData.tasks.filter(x=>x.id!==dl.dataset.dl);saveTasks();renderTasks();}
+function wireTaskWidget(wid, dataKey){
+  const list=$('list-'+wid);if(!list)return;
+  list.addEventListener('click',e=>{
+    const ck=e.target.closest('[data-ck]');if(ck){const t=tData[dataKey].find(x=>x.id===ck.dataset.ck);if(t){t.done=!t.done;t.doneAt=t.done?new Date().toISOString():null;saveTasks();renderTasks();}return;}
+    const dl=e.target.closest('[data-dl]');if(dl){tData[dataKey]=tData[dataKey].filter(x=>x.id!==dl.dataset.dl);saveTasks();renderTasks();}
   });
-  $('t1-open-add').addEventListener('click',()=>{
-    $('t1-inp').value='';
-    $('ov-t1').classList.add('op');
-    $('t1-inp').focus();
+  $(wid+'-open-add').addEventListener('click',()=>{
+    $(wid+'-inp').value='';
+    $('ov-'+wid).classList.add('op');
+    $(wid+'-inp').focus();
   });
-  $('t1-cancel').addEventListener('click',()=>$('ov-t1').classList.remove('op'));
-  function saveNewT1(){
-    const text=$('t1-inp').value.trim();
+  $(wid+'-cancel').addEventListener('click',()=>$('ov-'+wid).classList.remove('op'));
+  function saveNewTask(){
+    const text=$(wid+'-inp').value.trim();
     if(!text)return;
-    tData.tasks.push({id:'t'+Date.now(),text,done:false,createdAt:new Date().toISOString()});
+    if(!tData[dataKey])tData[dataKey]=[];
+    tData[dataKey].push({id:'t'+Date.now(),text,done:false,createdAt:new Date().toISOString()});
     saveTasks();renderTasks();
-    $('ov-t1').classList.remove('op');
+    $('ov-'+wid).classList.remove('op');
   }
-  $('t1-save').addEventListener('click',saveNewT1);
-  $('t1-inp').addEventListener('keydown',e=>{if(e.key==='Enter')saveNewT1();});
+  $(wid+'-save').addEventListener('click',saveNewTask);
+  $(wid+'-inp').addEventListener('keydown',e=>{if(e.key==='Enter')saveNewTask();});
+
+  // Renommage du titre par double-clic
+  const titleEl=$(wid+'-title');
+  if(titleEl){
+    titleEl.addEventListener('dblclick',()=>{
+      const current=titleEl.textContent;
+      const newName=prompt('Nouveau nom du widget :', current);
+      if(newName&&newName.trim()){
+        if(!tData.titles)tData.titles={};
+        tData.titles[wid]=newName.trim();
+        titleEl.textContent=newName.trim();
+        saveTasks();
+      }
+    });
+  }
 }
-wireT1Modal();
+wireTaskWidget('t1','tasks');
+wireTaskWidget('t7','tasks7');
 
 
 /* SPORT — connecté à Firestore et au vrai planning */
