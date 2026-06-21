@@ -238,7 +238,7 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
           </div>
         </div>
 
-        <div id="wc-task2" class="wcell" style="grid-column:1/span 2;grid-row:1/span 2;">
+        <div id="wc-task2" class="wcell hi" style="grid-column:1/span 2;grid-row:1/span 2;">
           <div class="widget">
             <div class="whdr"><span>✅</span><h2 id="task2-title" style="cursor:text;" title="Double-clic pour renommer">Tâches 2</h2><button class="btn sm" id="task2-open-add" style="padding:3px 8px;">➕</button><button class="btn sm" id="task2-dup" style="padding:3px 6px;" title="Dupliquer">⧉</button><button class="btn sm" id="task2-done-btn" style="padding:3px 6px;font-size:.68rem;" title="Tâches effectuées">✅</button><button class="wh-move" id="wmv-task2">✥</button><button class="wh-size" id="wsz-task2">⊞</button></div>
             <div class="wbody">
@@ -771,8 +771,18 @@ auth.onAuthStateChanged(async user=>{
   $('auth-wrap').classList.add('hi');
   $('page').classList.remove('hi');
   // Réactive les widgets Tâches/Note dupliqués lors d'une session précédente
-  TASK_SLOTS.forEach(slot=>{ if(wLayout[slot]) document.getElementById('wc-'+slot).classList.remove('hi'); });
-  NOTE_SLOTS.forEach(slot=>{ if(wLayout[slot]) document.getElementById('wc-'+slot).classList.remove('hi'); });
+  // Nettoyage ponctuel : retire les entrées de layout créées par erreur lors des tests (slots jamais vraiment dupliqués par l'utilisateur)
+  if(!wLayout._cleanedDupSlots){
+    ['task2','task3','task4','task5','task6','note2','note3','note4','note5','note6'].forEach(slot=>{
+      delete wLayout[slot];
+    });
+    wLayout._cleanedDupSlots=true;
+    saveLayout();
+  }
+  TASK_SLOTS.forEach(slot=>{ if(wLayout[slot]) document.getElementById('wc-'+slot).classList.remove('hi'); else document.getElementById('wc-'+slot).classList.add('hi'); });
+  NOTE_SLOTS.forEach(slot=>{ if(wLayout[slot]) document.getElementById('wc-'+slot).classList.remove('hi'); else document.getElementById('wc-'+slot).classList.add('hi'); });
+  document.getElementById('wc-task1').classList.remove('hi');
+  document.getElementById('wc-note1').classList.remove('hi');
   applyLayout();
   renderMods();
   renderTasks();
