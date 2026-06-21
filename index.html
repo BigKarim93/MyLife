@@ -480,6 +480,7 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
           <div class="widget">
             <div class="whdr"><span>🕌</span><h2>Prières</h2><button class="wh-move" id="wmv-t6">✥</button><button class="wh-size" id="wsz-t6">⊞</button></div>
             <div class="wbody">
+              <div id="prayer-countdown" style="text-align:center;font-family:'Kalam',cursive;font-size:1rem;color:var(--accent);margin-bottom:8px;"></div>
               <div id="prayer-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;"></div>
             </div>
           </div>
@@ -794,20 +795,20 @@ auth.onAuthStateChanged(async user=>{
   $('page').classList.remove('hi');
   // Nettoyage intelligent : ne garde actif que les widgets Tâches/Note qui ont réellement du contenu
   // (tâches, texte, ou titre renommé par l'utilisateur) — protège tes widgets volontaires comme "Aujourd'hui"
-  if(!wLayout._cleanedDupSlots3){
+  if(!wLayout._cleanedDupSlots4){
     TASK_SLOTS.forEach(slot=>{
-      if(slot==='task1')return; // widget principal, jamais touché
+      if(slot==='task1')return;
       const key=taskDataKey(slot);
       const hasData=(tData[key]&&tData[key].length>0)||(tData.titles&&tData.titles[slot]);
       if(!hasData) delete wLayout[slot];
     });
     NOTE_SLOTS.forEach(slot=>{
-      if(slot==='note1')return; // widget principal, jamais touché
+      if(slot==='note1')return;
       const key=noteDataKey(slot);
       const hasData=(noteData[key]&&noteData[key].trim())||(noteData.titles&&noteData.titles[slot]);
       if(!hasData) delete wLayout[slot];
     });
-    wLayout._cleanedDupSlots3=true;
+    wLayout._cleanedDupSlots4=true;
     saveLayout();
   }
   TASK_SLOTS.forEach(slot=>{ if(wLayout[slot]) document.getElementById('wc-'+slot).classList.remove('hi'); else document.getElementById('wc-'+slot).classList.add('hi'); });
@@ -881,6 +882,8 @@ $('btn-gedit').addEventListener('click',()=>{
 
 function wireHandles(){
   WIDGETS.forEach(id=>{
+    const cell=$('wc-'+id);
+    if(cell&&cell.classList.contains('hi'))return; // ne câble jamais un widget caché — évite l'activation accidentelle
     const mv=$('wmv-'+id),sz=$('wsz-'+id);
     if(!mv||!sz)return;
     mv.onclick=e=>{
@@ -1152,6 +1155,7 @@ function duplicateTaskWidget(){
   if(!wLayout[nextSlot]) wLayout[nextSlot]=Object.assign({},LAYOUT_DEFAULT[nextSlot]);
   applyLayout();saveLayout();
   renderTasks();
+  wireHandles();
 }
 function deleteTaskWidget(wid){
   if(wid==='task1'){ alert('Le widget Tâches principal ne peut pas être supprimé.'); return; }
@@ -1244,6 +1248,7 @@ function duplicateNoteWidget(){
   document.getElementById('wc-'+nextSlot).classList.remove('hi');
   if(!wLayout[nextSlot]) wLayout[nextSlot]=Object.assign({},LAYOUT_DEFAULT[nextSlot]);
   applyLayout();saveLayout();
+  wireHandles();
 }
 function deleteNoteWidget(wid){
   if(wid==='note1'){ alert('Le widget Note principal ne peut pas être supprimé.'); return; }
@@ -1604,27 +1609,57 @@ async function fetchPrayerTimes(){
   renderPrayerGrid(timings);
 }
 
+let lastPrayerTimings=null; // mémorisé pour le rafraîchissement du compte à rebours
 function renderPrayerGrid(timings){
   const grid=$('prayer-grid');if(!grid||!timings)return;
+  lastPrayerTimings=timings;
   const now=new Date();
   const nowMin=now.getHours()*60+now.getMinutes();
 
   // trouve la prochaine prière (Sunrise exclu de la logique "next" car ce n'est pas une prière)
   const prayerOnly=PRAYER_NAMES.filter(([k])=>k!=='Sunrise');
-  let nextKey=null;
+  let nextKey=null, nextMin=null;
   for(const [key] of prayerOnly){
     const t=timings[key]; if(!t) continue;
     const [h,m]=t.split(':').map(Number);
-    if(h*60+m>nowMin){ nextKey=key; break; }
+    const totalMin=h*60+m;
+    if(totalMin>nowMin){ nextKey=key; nextMin=totalMin; break; }
   }
-  if(!nextKey) nextKey=prayerOnly[0][0]; // après Isha, la prochaine est Fajr du lendemain
+  if(!nextKey){ nextKey=prayerOnly[0][0]; const [h,m]=timings[nextKey].split(':').map(Number); nextMin=h*60+m+1440; } // après Isha, Fajr du lendemain (+24h)
 
   grid.innerHTML=PRAYER_NAMES.map(([key,label])=>{
     const t=timings[key]||'--:--';
     const isNext=key===nextKey;
     return `<div class="pbox${isNext?' next':''}"><div class="pname">${label}</div><div class="ptime">${t}</div></div>`;
   }).join('');
+
+  renderPrayerCountdown(nextKey, nextMin, nowMin);
 }
+function renderPrayerCountdown(nextKey, nextMin, nowMin){
+  const el=$('prayer-countdown');if(!el)return;
+  const label=(PRAYER_NAMES.find(([k])=>k===nextKey)||[,''])[1];
+  let diff=nextMin-nowMin;
+  if(diff<0)diff+=1440;
+  const h=Math.floor(diff/60), m=diff%60;
+  const hStr=h>0?h+'h ':'';
+  el.textContent=`${label} dans ${hStr}${m}min`;
+}
+function tickPrayerCountdown(){
+  if(!lastPrayerTimings)return;
+  const now=new Date();
+  const nowMin=now.getHours()*60+now.getMinutes();
+  const prayerOnly=PRAYER_NAMES.filter(([k])=>k!=='Sunrise');
+  let nextKey=null, nextMin=null;
+  for(const [key] of prayerOnly){
+    const t=lastPrayerTimings[key]; if(!t) continue;
+    const [h,m]=t.split(':').map(Number);
+    const totalMin=h*60+m;
+    if(totalMin>nowMin){ nextKey=key; nextMin=totalMin; break; }
+  }
+  if(!nextKey){ nextKey=prayerOnly[0][0]; const [h,m]=lastPrayerTimings[nextKey].split(':').map(Number); nextMin=h*60+m+1440; }
+  renderPrayerCountdown(nextKey, nextMin, nowMin);
+}
+setInterval(tickPrayerCountdown, 60000);
 
 /* THEMES */
 function applyTheme(id){const t=THEMES.find(x=>x.id===id)||THEMES[0];const r=document.documentElement.style;r.setProperty('--bg',t.bg);r.setProperty('--bg2',t.bg2);r.setProperty('--bg3',t.bg3);r.setProperty('--accent',t.ac);r.setProperty('--chalk',t.ch);r.setProperty('--dim',t.ch+'99');r.setProperty('--line',t.ch+'17');r.setProperty('--line2',t.ch+'2e');curTheme=id;try{localStorage.setItem('mlt',id);}catch(e){}}
