@@ -80,7 +80,7 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 /* TASKS */
 .tadd{display:flex;gap:6px;margin-bottom:7px;}
 .tadd input{flex:1;background:var(--bg);border:1px solid var(--line);color:var(--chalk);border-radius:6px;padding:6px 9px;font-size:.8rem;}
-.tlist{display:flex;flex-direction:column;gap:3px;}
+.tlist{display:flex;flex-direction:column;gap:3px;min-height:24px;}
 .titem{display:flex;align-items:center;gap:6px;padding:4px 7px;background:var(--bg3);border:1px solid var(--line);border-radius:6px;}
 .titem:hover{border-color:var(--line2);}
 .tck{width:14px;height:14px;border-radius:4px;border:2px solid var(--line);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:transparent;}
@@ -999,6 +999,7 @@ document.addEventListener('click',e=>{
   closeColorPop();
 });
 
+let taskDragSrc=null; // {id, fromKey} — partagé entre tous les widgets Tâches pour permettre le glisser-déposer inter-widgets
 function wireTaskWidget(wid){
   const dataKey=taskDataKey(wid);
   const list=$('list-'+wid);if(!list)return;
@@ -1039,11 +1040,10 @@ function wireTaskWidget(wid){
     if(newText&&newText.trim()){ t.text=newText.trim(); saveTasks(); renderTasks(); }
   });
 
-  let dragSrcId=null;
   list.addEventListener('dragstart',e=>{
     const item=e.target.closest('.titem');
     if(!item)return;
-    dragSrcId=item.dataset.id;
+    taskDragSrc={id:item.dataset.id, fromKey:dataKey};
     item.style.opacity='.4';
   });
   list.addEventListener('dragend',e=>{
@@ -1054,25 +1054,46 @@ function wireTaskWidget(wid){
     e.preventDefault();
     const item=e.target.closest('.titem');
     if(item) item.style.borderColor='var(--accent)';
+    else list.style.outline='2px dashed var(--accent)';
   });
   list.addEventListener('dragleave',e=>{
     const item=e.target.closest('.titem');
     if(item) item.style.borderColor='';
+    list.style.outline='';
   });
   list.addEventListener('drop',e=>{
     e.preventDefault();
+    list.style.outline='';
+    if(!taskDragSrc)return;
     const item=e.target.closest('.titem');
-    if(!item||!dragSrcId)return;
-    item.style.borderColor='';
-    const targetId=item.dataset.id;
-    if(targetId===dragSrcId)return;
-    const arr=tData[dataKey];
-    const srcIdx=arr.findIndex(x=>x.id===dragSrcId);
-    const tgtIdx=arr.findIndex(x=>x.id===targetId);
-    if(srcIdx<0||tgtIdx<0)return;
-    const [moved]=arr.splice(srcIdx,1);
-    arr.splice(tgtIdx,0,moved);
-    dragSrcId=null;
+    if(item) item.style.borderColor='';
+
+    const srcArr=tData[taskDragSrc.fromKey];
+    const srcIdx=srcArr ? srcArr.findIndex(x=>x.id===taskDragSrc.id) : -1;
+    if(srcIdx<0){ taskDragSrc=null; return; }
+
+    if(taskDragSrc.fromKey===dataKey){
+      // Réordonner dans le même widget
+      if(!item){ taskDragSrc=null; return; }
+      const targetId=item.dataset.id;
+      if(targetId===taskDragSrc.id){ taskDragSrc=null; return; }
+      const tgtIdx=srcArr.findIndex(x=>x.id===targetId);
+      if(tgtIdx<0){ taskDragSrc=null; return; }
+      const [moved]=srcArr.splice(srcIdx,1);
+      srcArr.splice(tgtIdx,0,moved);
+    } else {
+      // Déplacer vers un autre widget Tâches
+      const [moved]=srcArr.splice(srcIdx,1);
+      if(!tData[dataKey])tData[dataKey]=[];
+      if(item){
+        const targetId=item.dataset.id;
+        const tgtIdx=tData[dataKey].findIndex(x=>x.id===targetId);
+        tData[dataKey].splice(tgtIdx>-1?tgtIdx:tData[dataKey].length, 0, moved);
+      } else {
+        tData[dataKey].push(moved);
+      }
+    }
+    taskDragSrc=null;
     saveTasks();renderTasks();
   });
 
