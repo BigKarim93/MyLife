@@ -90,6 +90,13 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 .ttxt.sk{text-decoration:line-through;color:var(--dim);}
 .tdl{font-size:.68rem;color:var(--dim);cursor:pointer;opacity:0;padding:2px 4px;border-radius:4px;border:1px solid transparent;}
 .titem:hover .tdl{opacity:1;}
+.tcolor{width:13px;height:13px;border-radius:50%;border:2px solid var(--line);cursor:pointer;flex-shrink:0;opacity:0;transition:.15s;}
+.titem:hover .tcolor{opacity:1;}
+.color-pop{position:fixed;display:none;background:var(--bg2);border:1px solid var(--line2);border-radius:9px;padding:8px;z-index:400;box-shadow:0 8px 24px rgba(0,0,0,.45);}
+.color-pop.op{display:flex;gap:5px;flex-wrap:wrap;width:130px;}
+.color-pop .cdot{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;}
+.color-pop .cdot:hover{border-color:var(--chalk);}
+.color-pop .cdot.none{background:var(--bg3);border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:.6rem;color:var(--dim);}
 .tdl:hover{border-color:var(--red);color:var(--red);}
 .empty{text-align:center;padding:12px;color:var(--dim);font-size:.78rem;}
 
@@ -177,6 +184,8 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 .rbox.done span{color:var(--green);font-weight:600;}
 .rbox .rdel{flex-shrink:0;width:16px;height:16px;border-radius:50%;background:#c0392b;color:#fff;border:none;font-size:8px;display:none;align-items:center;justify-content:center;cursor:pointer;}
 .rbox:hover .rdel{display:flex;}
+.rcolor{width:12px;height:12px;border-radius:50%;border:2px solid var(--line);cursor:pointer;flex-shrink:0;opacity:0;transition:.15s;}
+.rbox:hover .rcolor{opacity:1;}
 
 /* PRAYER TIMES */
 .pbox{background:var(--bg3);border:1px solid var(--line);border-radius:7px;padding:6px 3px;text-align:center;}
@@ -525,6 +534,7 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
     <div class="modal-act"><button class="btn" id="task-done-close">Fermer</button></div>
   </div>
 </div>
+<div class="color-pop" id="color-pop"></div>
 <div class="ov" id="ov-widget-manage">
   <div class="modal" style="max-width:300px;">
     <h3 id="wm-title">⧉ Gérer le widget</h3>
@@ -937,12 +947,57 @@ function renderTasks(){
     const key=taskDataKey(slot);
     const tasks=(tData[key]||[]).filter(t=>!t.done);
     if(!tasks.length){list.innerHTML='<div class="empty">Aucune tâche 🎉</div>';return;}
-    list.innerHTML=tasks.map(t=>`<div class="titem" data-id="${t.id}" draggable="true"><div class="tck" data-ck="${t.id}"></div><div class="ttxt" data-rename="${t.id}">${esc(t.text)}</div><div class="tdl" data-dl="${t.id}">✕</div></div>`).join('');
+    list.innerHTML=tasks.map(t=>{
+      const col=t.color||'';
+      const style=col?`background:${col}2e;border-color:${col};`:'';
+      return `<div class="titem" data-id="${t.id}" draggable="true" style="${style}"><div class="tck" data-ck="${t.id}"></div><div class="ttxt" data-rename="${t.id}">${esc(t.text)}</div><div class="tcolor" data-color="${t.id}"></div><div class="tdl" data-dl="${t.id}">✕</div></div>`;
+    }).join('');
   });
   if(tData.titles){
     TASK_SLOTS.forEach(slot=>{ if(tData.titles[slot]&&$(slot+'-title')) $(slot+'-title').textContent=tData.titles[slot]; });
   }
 }
+
+/* SÉLECTEUR DE COULEUR — partagé entre Tâches et Routine */
+const TASK_COLORS=['#f87171','#fb923c','#fbbf24','#4ade80','#2dd4bf','#60a5fa','#a78bfa','#f472b6'];
+let colorPopTarget=null; // {type:'task'|'routine', id, dataKey}
+
+function buildColorPop(){
+  const pop=$('color-pop');
+  let html='<div class="cdot none" data-color="">✕</div>';
+  TASK_COLORS.forEach(c=>{ html+=`<div class="cdot" style="background:${c}" data-color="${c}"></div>`; });
+  pop.innerHTML=html;
+}
+buildColorPop();
+
+function openColorPop(target, anchorEl){
+  colorPopTarget=target;
+  const pop=$('color-pop');
+  const rect=anchorEl.getBoundingClientRect();
+  pop.style.left=Math.min(rect.left, window.innerWidth-140)+'px';
+  pop.style.top=(rect.bottom+4)+'px';
+  pop.classList.add('op');
+}
+function closeColorPop(){ $('color-pop').classList.remove('op'); colorPopTarget=null; }
+
+$('color-pop').addEventListener('click',e=>{
+  const dot=e.target.closest('[data-color]');
+  if(!dot||!colorPopTarget)return;
+  const color=dot.dataset.color;
+  if(colorPopTarget.type==='task'){
+    const t=tData[colorPopTarget.dataKey].find(x=>x.id===colorPopTarget.id);
+    if(t){ if(color) t.color=color; else delete t.color; saveTasks(); renderTasks(); }
+  } else if(colorPopTarget.type==='routine'){
+    const item=routineData.items.find(x=>x.id===colorPopTarget.id);
+    if(item){ if(color) item.color=color; else delete item.color; saveRoutine(); renderRoutine(); }
+  }
+  closeColorPop();
+});
+document.addEventListener('click',e=>{
+  if(!colorPopTarget)return;
+  if(e.target.closest('.color-pop')||e.target.closest('.tcolor')||e.target.closest('.rcolor'))return;
+  closeColorPop();
+});
 
 function wireTaskWidget(wid){
   const dataKey=taskDataKey(wid);
@@ -952,6 +1007,9 @@ function wireTaskWidget(wid){
   list.addEventListener('click',e=>{
     const dl=e.target.closest('[data-dl]');
     if(dl){ tData[dataKey]=tData[dataKey].filter(x=>x.id!==dl.dataset.dl); saveTasks(); renderTasks(); return; }
+
+    const colorBtn=e.target.closest('[data-color]');
+    if(colorBtn){ openColorPop({type:'task',id:colorBtn.dataset.color,dataKey}, colorBtn); return; }
 
     const ck=e.target.closest('[data-ck]');
     if(ck){
@@ -1373,7 +1431,9 @@ function renderRoutine(){
   }
   grid.innerHTML=routineData.items.map(item=>{
     const isDone=doneToday.includes(item.id);
-    return `<div class="rbox${isDone?' done':''}" data-id="${item.id}" draggable="true"><div class="rck"></div><span data-rename="${item.id}">${esc(item.name)}</span><div class="rdel" data-del="${item.id}">✕</div></div>`;
+    const col=item.color||'';
+    const style=col&&!isDone?`background:${col}2e;border-color:${col};`:'';
+    return `<div class="rbox${isDone?' done':''}" data-id="${item.id}" draggable="true" style="${style}"><div class="rck"></div><span data-rename="${item.id}">${esc(item.name)}</span><div class="rcolor" data-color="${item.id}"></div><div class="rdel" data-del="${item.id}">✕</div></div>`;
   }).join('');
 }
 function wireRoutine(){
@@ -1399,6 +1459,8 @@ function wireRoutine(){
       saveRoutine();renderRoutine();
       return;
     }
+    const colorBtn=e.target.closest('[data-color]');
+    if(colorBtn){ openColorPop({type:'routine',id:colorBtn.dataset.color}, colorBtn); return; }
     const box=e.target.closest('.rbox');
     if(!box)return;
     // Attendre un court instant pour voir si un second clic arrive (= dblclick → renommage)
