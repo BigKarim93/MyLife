@@ -790,7 +790,7 @@ function renderTasks(){
     const list=$('list-'+id);if(!list)return;
     const tasks=(tData[key]||[]).filter(t=>!t.done);
     if(!tasks.length){list.innerHTML='<div class="empty">Aucune tâche 🎉</div>';return;}
-    list.innerHTML=tasks.map(t=>`<div class="titem"><div class="tck${t.done?' on':''}" data-ck="${t.id}"></div><div class="ttxt${t.done?' sk':''}">${esc(t.text)}</div><div class="tdl" data-dl="${t.id}">✕</div></div>`).join('');
+    list.innerHTML=tasks.map(t=>`<div class="titem" data-id="${t.id}" draggable="true"><div class="tck" data-ck="${t.id}"></div><div class="ttxt" data-rename="${t.id}">${esc(t.text)}</div><div class="tdl" data-dl="${t.id}">✕</div></div>`).join('');
   });
   // titres personnalisés
   if(tData.titles){
@@ -798,24 +798,83 @@ function renderTasks(){
     if(tData.titles.t7&&$('t7-title')) $('t7-title').textContent=tData.titles.t7;
   }
 }
-WIDGETS.forEach(id=>{
-  const addBtn=$('add-'+id),inp=$('inp-'+id),list=$('list-'+id);
-  if(!addBtn||!inp||!list)return;
-  addBtn.addEventListener('click',()=>{const text=inp.value.trim();if(!text)return;tData.tasks.push({id:'t'+Date.now(),text,done:false,createdAt:new Date().toISOString()});inp.value='';saveTasks();renderTasks();});
-  inp.addEventListener('keydown',e=>{if(e.key==='Enter')addBtn.click();});
-  list.addEventListener('click',e=>{
-    const ck=e.target.closest('[data-ck]');if(ck){const t=tData.tasks.find(x=>x.id===ck.dataset.ck);if(t){t.done=!t.done;t.doneAt=t.done?new Date().toISOString():null;saveTasks();renderTasks();}return;}
-    const dl=e.target.closest('[data-dl]');if(dl){tData.tasks=tData.tasks.filter(x=>x.id!==dl.dataset.dl);saveTasks();renderTasks();}
-  });
-});
 
-/* t1 — ajout via modale (pas de formulaire inline) */
+/* Ajout, coche, suppression, renommage, glisser-déposer — un seul système par widget de tâches */
 function wireTaskWidget(wid, dataKey){
   const list=$('list-'+wid);if(!list)return;
+  let clickTimer=null;
+
   list.addEventListener('click',e=>{
-    const ck=e.target.closest('[data-ck]');if(ck){const t=tData[dataKey].find(x=>x.id===ck.dataset.ck);if(t){t.done=!t.done;t.doneAt=t.done?new Date().toISOString():null;saveTasks();renderTasks();}return;}
-    const dl=e.target.closest('[data-dl]');if(dl){tData[dataKey]=tData[dataKey].filter(x=>x.id!==dl.dataset.dl);saveTasks();renderTasks();}
+    const dl=e.target.closest('[data-dl]');
+    if(dl){ tData[dataKey]=tData[dataKey].filter(x=>x.id!==dl.dataset.dl); saveTasks(); renderTasks(); return; }
+
+    const ck=e.target.closest('[data-ck]');
+    if(ck){
+      const t=tData[dataKey].find(x=>x.id===ck.dataset.ck);
+      if(t){ t.done=!t.done; t.doneAt=t.done?new Date().toISOString():null; saveTasks(); renderTasks(); }
+      return;
+    }
+
+    // Clic sur le texte : attend un court instant pour distinguer simple clic (coche) / double-clic (renommer)
+    const txt=e.target.closest('[data-rename]');
+    if(txt){
+      if(clickTimer){ clearTimeout(clickTimer); clickTimer=null; return; }
+      clickTimer=setTimeout(()=>{
+        clickTimer=null;
+        const t=tData[dataKey].find(x=>x.id===txt.dataset.rename);
+        if(t){ t.done=!t.done; t.doneAt=t.done?new Date().toISOString():null; saveTasks(); renderTasks(); }
+      },230);
+    }
   });
+
+  list.addEventListener('dblclick',e=>{
+    const txt=e.target.closest('[data-rename]');
+    if(!txt)return;
+    if(clickTimer){ clearTimeout(clickTimer); clickTimer=null; }
+    const t=tData[dataKey].find(x=>x.id===txt.dataset.rename);
+    if(!t)return;
+    const newText=prompt('Modifier la tâche :', t.text);
+    if(newText&&newText.trim()){ t.text=newText.trim(); saveTasks(); renderTasks(); }
+  });
+
+  // Glisser-déposer pour réordonner
+  let dragSrcId=null;
+  list.addEventListener('dragstart',e=>{
+    const item=e.target.closest('.titem');
+    if(!item)return;
+    dragSrcId=item.dataset.id;
+    item.style.opacity='.4';
+  });
+  list.addEventListener('dragend',e=>{
+    const item=e.target.closest('.titem');
+    if(item) item.style.opacity='';
+  });
+  list.addEventListener('dragover',e=>{
+    e.preventDefault();
+    const item=e.target.closest('.titem');
+    if(item) item.style.borderColor='var(--accent)';
+  });
+  list.addEventListener('dragleave',e=>{
+    const item=e.target.closest('.titem');
+    if(item) item.style.borderColor='';
+  });
+  list.addEventListener('drop',e=>{
+    e.preventDefault();
+    const item=e.target.closest('.titem');
+    if(!item||!dragSrcId)return;
+    item.style.borderColor='';
+    const targetId=item.dataset.id;
+    if(targetId===dragSrcId)return;
+    const arr=tData[dataKey];
+    const srcIdx=arr.findIndex(x=>x.id===dragSrcId);
+    const tgtIdx=arr.findIndex(x=>x.id===targetId);
+    if(srcIdx<0||tgtIdx<0)return;
+    const [moved]=arr.splice(srcIdx,1);
+    arr.splice(tgtIdx,0,moved);
+    dragSrcId=null;
+    saveTasks();renderTasks();
+  });
+
   $(wid+'-open-add').addEventListener('click',()=>{
     $(wid+'-inp').value='';
     $('ov-'+wid).classList.add('op');
@@ -1041,29 +1100,34 @@ function renderRoutine(){
 }
 function wireRoutine(){
   const grid=$('routine-grid');if(!grid)return;
+  let clickTimer=null;
   grid.addEventListener('click',e=>{
     const del=e.target.closest('[data-del]');
     if(del){
       routineData.items=routineData.items.filter(i=>i.id!==del.dataset.del);
-      // nettoie aussi les références dans doneDates
       Object.keys(routineData.doneDates).forEach(k=>{routineData.doneDates[k]=routineData.doneDates[k].filter(id=>id!==del.dataset.del);});
       saveRoutine();renderRoutine();
       return;
     }
     const box=e.target.closest('.rbox');
-    if(box){
+    if(!box)return;
+    // Attendre un court instant pour voir si un second clic arrive (= dblclick → renommage)
+    if(clickTimer){ clearTimeout(clickTimer); clickTimer=null; return; }
+    clickTimer=setTimeout(()=>{
+      clickTimer=null;
       const id=box.dataset.id,tk=todayKeyR();
       if(!routineData.doneDates[tk])routineData.doneDates[tk]=[];
       const idx=routineData.doneDates[tk].indexOf(id);
       if(idx>-1) routineData.doneDates[tk].splice(idx,1);
       else routineData.doneDates[tk].push(id);
       saveRoutine();renderRoutine();
-    }
+    },230);
   });
-  // Renommage par double-clic sur le texte
+  // Renommage par double-clic sur le texte uniquement
   grid.addEventListener('dblclick',e=>{
     const span=e.target.closest('[data-rename]');
     if(!span)return;
+    if(clickTimer){ clearTimeout(clickTimer); clickTimer=null; }
     const item=routineData.items.find(i=>i.id===span.dataset.rename);
     if(!item)return;
     const newName=prompt('Nouveau nom de la routine :', item.name);
