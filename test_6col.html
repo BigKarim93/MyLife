@@ -523,6 +523,16 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
     <div class="modal-act"><button class="btn" id="task-done-close">Fermer</button></div>
   </div>
 </div>
+<div class="ov" id="ov-widget-manage">
+  <div class="modal" style="max-width:300px;">
+    <h3 id="wm-title">⧉ Gérer le widget</h3>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <button class="btn prim" id="wm-duplicate" style="justify-content:center;">⧉ Dupliquer ce widget</button>
+      <button class="btn dn" id="wm-delete" style="justify-content:center;">🗑️ Supprimer ce widget</button>
+      <button class="btn" id="wm-cancel" style="justify-content:center;">Annuler</button>
+    </div>
+  </div>
+</div>
 <div class="ov" id="ov-size">
   <div class="modal" style="max-width:300px;">
     <h3>⊞ Taille</h3>
@@ -1019,7 +1029,7 @@ function wireTaskWidget(wid){
   }
 
   const dupBtn=$(wid+'-dup');
-  if(dupBtn) dupBtn.addEventListener('click',()=>duplicateTaskWidget());
+  if(dupBtn) dupBtn.addEventListener('click',()=>openWidgetManageModal('task',wid));
 
   const doneBtn=$(wid+'-done-btn');
   if(doneBtn) doneBtn.addEventListener('click',()=>openDoneTasksModal(wid));
@@ -1053,6 +1063,37 @@ function duplicateTaskWidget(){
   applyLayout();saveLayout();
   renderTasks();
 }
+function deleteTaskWidget(wid){
+  if(wid==='task1'){ alert('Le widget Tâches principal ne peut pas être supprimé.'); return; }
+  if(!confirm('Supprimer ce widget et toutes ses tâches ?'))return;
+  document.getElementById('wc-'+wid).classList.add('hi');
+  delete wLayout[wid];
+  delete tData[taskDataKey(wid)];
+  if(tData.titles) delete tData.titles[wid];
+  saveLayout();saveTasks();
+  applyLayout();
+}
+
+// Modale "Gérer le widget" — Dupliquer ou Supprimer (Tâches et Note)
+let wmTarget=null, wmType=null;
+function openWidgetManageModal(type, wid){
+  wmType=type; wmTarget=wid;
+  $('wm-title').textContent = type==='task' ? '⧉ Gérer le widget Tâches' : '⧉ Gérer le widget Note';
+  $('wm-delete').style.display = (wid==='task1'||wid==='note1') ? 'none' : 'flex';
+  $('ov-widget-manage').classList.add('op');
+}
+function wireWidgetManageModal(){
+  $('wm-duplicate').addEventListener('click',()=>{
+    $('ov-widget-manage').classList.remove('op');
+    if(wmType==='task') duplicateTaskWidget(); else duplicateNoteWidget();
+  });
+  $('wm-delete').addEventListener('click',()=>{
+    $('ov-widget-manage').classList.remove('op');
+    if(wmType==='task') deleteTaskWidget(wmTarget); else deleteNoteWidget(wmTarget);
+  });
+  $('wm-cancel').addEventListener('click',()=>$('ov-widget-manage').classList.remove('op'));
+}
+wireWidgetManageModal();
 
 // Modale d'ajout de tâche partagée (un seul input, ciblé via data-target)
 function wireTaskAddModal(){
@@ -1104,7 +1145,7 @@ function wireNoteWidget(wid){
     });
   }
   const dupBtn=$(wid+'-dup');
-  if(dupBtn) dupBtn.addEventListener('click',()=>duplicateNoteWidget());
+  if(dupBtn) dupBtn.addEventListener('click',()=>openWidgetManageModal('note',wid));
 }
 
 function duplicateNoteWidget(){
@@ -1113,6 +1154,16 @@ function duplicateNoteWidget(){
   document.getElementById('wc-'+nextSlot).classList.remove('hi');
   if(!wLayout[nextSlot]) wLayout[nextSlot]=Object.assign({},LAYOUT_DEFAULT[nextSlot]);
   applyLayout();saveLayout();
+}
+function deleteNoteWidget(wid){
+  if(wid==='note1'){ alert('Le widget Note principal ne peut pas être supprimé.'); return; }
+  if(!confirm('Supprimer ce widget et son contenu ?'))return;
+  document.getElementById('wc-'+wid).classList.add('hi');
+  delete wLayout[wid];
+  delete noteData[noteDataKey(wid)];
+  if(noteData.titles) delete noteData.titles[wid];
+  saveLayout();saveNote();
+  applyLayout();
 }
 NOTE_SLOTS.forEach(slot=>{ wireNoteWidget(slot); });
 function wireNoteWidgets(){
