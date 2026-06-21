@@ -478,7 +478,7 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 
         <div class="wcell" id="wc-t6" style="grid-column:5/span 2;grid-row:3/span 2;">
           <div class="widget">
-            <div class="whdr"><span>🕌</span><h2>Prières</h2><span id="prayer-countdown" style="font-size:.7rem;color:var(--accent);margin-left:6px;"></span><button class="wh-move" id="wmv-t6">✥</button><button class="wh-size" id="wsz-t6">⊞</button></div>
+            <div class="whdr"><span>🕌</span><h2>Prières</h2><span id="prayer-countdown" style="font-family:'Kalam',cursive;font-size:.88rem;color:var(--accent);margin-left:6px;"></span><button class="wh-move" id="wmv-t6">✥</button><button class="wh-size" id="wsz-t6">⊞</button></div>
             <div class="wbody">
               <div id="prayer-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;"></div>
             </div>
@@ -794,7 +794,7 @@ auth.onAuthStateChanged(async user=>{
   $('page').classList.remove('hi');
   // Nettoyage intelligent : ne garde actif que les widgets Tâches/Note qui ont réellement du contenu
   // (tâches, texte, ou titre renommé par l'utilisateur) — protège tes widgets volontaires comme "Aujourd'hui"
-  if(!wLayout._cleanedDupSlots4){
+  if(!wLayout._cleanedDupSlots5){
     TASK_SLOTS.forEach(slot=>{
       if(slot==='task1')return;
       const key=taskDataKey(slot);
@@ -807,8 +807,8 @@ auth.onAuthStateChanged(async user=>{
       const hasData=(noteData[key]&&noteData[key].trim())||(noteData.titles&&noteData.titles[slot]);
       if(!hasData) delete wLayout[slot];
     });
-    wLayout._cleanedDupSlots4=true;
-    saveLayout();
+    wLayout._cleanedDupSlots5=true;
+    if(layDoc) layDoc.set(wLayout).catch(()=>{});
   }
   TASK_SLOTS.forEach(slot=>{ if(wLayout[slot]) document.getElementById('wc-'+slot).classList.remove('hi'); else document.getElementById('wc-'+slot).classList.add('hi'); });
   NOTE_SLOTS.forEach(slot=>{ if(wLayout[slot]) document.getElementById('wc-'+slot).classList.remove('hi'); else document.getElementById('wc-'+slot).classList.add('hi'); });
@@ -1163,7 +1163,9 @@ function deleteTaskWidget(wid){
   delete wLayout[wid];
   delete tData[taskDataKey(wid)];
   if(tData.titles) delete tData.titles[wid];
-  saveLayout();saveTasks();
+  // Sauvegarde immédiate (pas de debounce) pour garantir que la suppression persiste même en cas de rechargement rapide
+  clearTimeout(layT); if(layDoc) layDoc.set(wLayout).catch(()=>{});
+  clearTimeout(tT); if(tDoc) tDoc.set(tData).catch(()=>{});
   applyLayout();
 }
 
@@ -1256,7 +1258,8 @@ function deleteNoteWidget(wid){
   delete wLayout[wid];
   delete noteData[noteDataKey(wid)];
   if(noteData.titles) delete noteData.titles[wid];
-  saveLayout();saveNote();
+  clearTimeout(layT); if(layDoc) layDoc.set(wLayout).catch(()=>{});
+  clearTimeout(noteT); if(noteDoc) noteDoc.set(noteData).catch(()=>{});
   applyLayout();
 }
 NOTE_SLOTS.forEach(slot=>{ wireNoteWidget(slot); });
@@ -1639,8 +1642,7 @@ function renderPrayerCountdown(nextKey, nextMin, nowMin){
   let diff=nextMin-nowMin;
   if(diff<0)diff+=1440;
   const h=Math.floor(diff/60), m=diff%60;
-  const hStr=h>0?h+'h ':'';
-  el.textContent=`(dans ${hStr}${m}min)`;
+  el.textContent=`${h}:${String(m).padStart(2,'0')}`;
 }
 function tickPrayerCountdown(){
   if(!lastPrayerTimings)return;
