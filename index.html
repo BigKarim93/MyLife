@@ -80,13 +80,13 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 /* TASKS */
 .tadd{display:flex;gap:6px;margin-bottom:7px;}
 .tadd input{flex:1;background:var(--bg);border:1px solid var(--line);color:var(--chalk);border-radius:6px;padding:6px 9px;font-size:.8rem;}
-.tlist{display:flex;flex-direction:column;gap:4px;max-height:140px;overflow-y:auto;}
-.titem{display:flex;align-items:center;gap:7px;padding:6px 9px;background:var(--bg3);border:1px solid var(--line);border-radius:7px;}
+.tlist{display:flex;flex-direction:column;gap:3px;}
+.titem{display:flex;align-items:center;gap:6px;padding:4px 7px;background:var(--bg3);border:1px solid var(--line);border-radius:6px;}
 .titem:hover{border-color:var(--line2);}
-.tck{width:16px;height:16px;border-radius:4px;border:2px solid var(--line);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:transparent;}
+.tck{width:14px;height:14px;border-radius:4px;border:2px solid var(--line);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:transparent;}
 .tck.on{background:var(--green);border-color:var(--green);}
 .tck.on::after{content:'✓';font-size:.65rem;color:#0f1117;font-weight:700;}
-.ttxt{flex:1;font-size:.78rem;}
+.ttxt{flex:1;font-size:.75rem;}
 .ttxt.sk{text-decoration:line-through;color:var(--dim);}
 .tdl{font-size:.68rem;color:var(--dim);cursor:pointer;opacity:0;padding:2px 4px;border-radius:4px;border:1px solid transparent;}
 .titem:hover .tdl{opacity:1;}
@@ -165,11 +165,15 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 .ev-perso{background:rgba(240,169,120,.2);border-color:#f0a978;}
 
 /* ROUTINE */
-.rbox{position:relative;background:var(--bg3);border:2px solid var(--line);border-radius:8px;padding:7px 5px;text-align:center;cursor:pointer;transition:.15s;min-height:42px;display:flex;align-items:center;justify-content:center;}
-.rbox.done{background:rgba(74,222,128,.18);border-color:var(--green);}
-.rbox span{font-size:.72rem;line-height:1.25;color:var(--chalk);word-break:break-word;}
-.rbox.done span{color:var(--green);font-weight:700;}
-.rbox .rdel{position:absolute;top:-6px;right:-6px;width:16px;height:16px;border-radius:50%;background:#c0392b;color:#fff;border:2px solid var(--bg);font-size:8px;display:none;align-items:center;justify-content:center;cursor:pointer;}
+.rbox{position:relative;background:var(--bg3);border:1px solid var(--line);border-radius:7px;padding:6px 9px;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:8px;}
+.rbox:hover{border-color:var(--line2);}
+.rbox.done{background:rgba(74,222,128,.13);border-color:var(--green);}
+.rbox .rck{width:16px;height:16px;border-radius:4px;border:2px solid var(--line);flex-shrink:0;display:flex;align-items:center;justify-content:center;background:transparent;}
+.rbox.done .rck{background:var(--green);border-color:var(--green);}
+.rbox.done .rck::after{content:'✓';font-size:.65rem;color:#0f1117;font-weight:700;}
+.rbox span{font-size:.76rem;line-height:1.25;color:var(--chalk);flex:1;text-align:left;}
+.rbox.done span{color:var(--green);font-weight:600;}
+.rbox .rdel{flex-shrink:0;width:16px;height:16px;border-radius:50%;background:#c0392b;color:#fff;border:none;font-size:8px;display:none;align-items:center;justify-content:center;cursor:pointer;}
 .rbox:hover .rdel{display:flex;}
 
 /* PRAYER TIMES */
@@ -225,12 +229,110 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
       <div class="ghost-layer" id="ghost-layer"></div>
       <div class="wgrid" id="wgrid">
 
-        <div class="wcell" id="wc-t1" style="grid-column:1/span 2;grid-row:1/span 2;">
+        <div id="wc-task1" class="wcell" style="grid-column:1/span 2;grid-row:1/span 2;">
           <div class="widget">
-            <div class="whdr"><span>✅</span><h2>Tâches 1</h2><button class="wh-move" id="wmv-t1">✥</button><button class="wh-size" id="wsz-t1">⊞</button></div>
+            <div class="whdr"><span>✅</span><h2 id="task1-title" style="cursor:text;" title="Double-clic pour renommer">Tâches</h2><button class="btn sm" id="task1-open-add" style="padding:3px 8px;">➕</button><button class="btn sm" id="task1-dup" style="padding:3px 6px;" title="Dupliquer">⧉</button><button class="btn sm" id="task1-done-btn" style="padding:3px 6px;font-size:.68rem;" title="Tâches effectuées">✅</button><button class="wh-move" id="wmv-task1">✥</button><button class="wh-size" id="wsz-task1">⊞</button></div>
             <div class="wbody">
-              <div class="tadd"><input type="text" id="inp-t1" placeholder="Ajouter une tâche…"><button class="btn prim" id="add-t1">+</button></div>
-              <div class="tlist" id="list-t1"></div>
+              <div class="tlist" id="list-task1"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="wc-task2" class="wcell hi" style="grid-column:1/span 2;grid-row:1/span 2;">
+          <div class="widget">
+            <div class="whdr"><span>✅</span><h2 id="task2-title" style="cursor:text;" title="Double-clic pour renommer">Tâches 2</h2><button class="btn sm" id="task2-open-add" style="padding:3px 8px;">➕</button><button class="btn sm" id="task2-dup" style="padding:3px 6px;" title="Dupliquer">⧉</button><button class="btn sm" id="task2-done-btn" style="padding:3px 6px;font-size:.68rem;" title="Tâches effectuées">✅</button><button class="wh-move" id="wmv-task2">✥</button><button class="wh-size" id="wsz-task2">⊞</button></div>
+            <div class="wbody">
+              <div class="tlist" id="list-task2"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="wc-task3" class="wcell hi" style="grid-column:1/span 2;grid-row:1/span 2;">
+          <div class="widget">
+            <div class="whdr"><span>✅</span><h2 id="task3-title" style="cursor:text;" title="Double-clic pour renommer">Tâches 3</h2><button class="btn sm" id="task3-open-add" style="padding:3px 8px;">➕</button><button class="btn sm" id="task3-dup" style="padding:3px 6px;" title="Dupliquer">⧉</button><button class="btn sm" id="task3-done-btn" style="padding:3px 6px;font-size:.68rem;" title="Tâches effectuées">✅</button><button class="wh-move" id="wmv-task3">✥</button><button class="wh-size" id="wsz-task3">⊞</button></div>
+            <div class="wbody">
+              <div class="tlist" id="list-task3"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="wc-task4" class="wcell hi" style="grid-column:1/span 2;grid-row:1/span 2;">
+          <div class="widget">
+            <div class="whdr"><span>✅</span><h2 id="task4-title" style="cursor:text;" title="Double-clic pour renommer">Tâches 4</h2><button class="btn sm" id="task4-open-add" style="padding:3px 8px;">➕</button><button class="btn sm" id="task4-dup" style="padding:3px 6px;" title="Dupliquer">⧉</button><button class="btn sm" id="task4-done-btn" style="padding:3px 6px;font-size:.68rem;" title="Tâches effectuées">✅</button><button class="wh-move" id="wmv-task4">✥</button><button class="wh-size" id="wsz-task4">⊞</button></div>
+            <div class="wbody">
+              <div class="tlist" id="list-task4"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="wc-task5" class="wcell hi" style="grid-column:1/span 2;grid-row:1/span 2;">
+          <div class="widget">
+            <div class="whdr"><span>✅</span><h2 id="task5-title" style="cursor:text;" title="Double-clic pour renommer">Tâches 5</h2><button class="btn sm" id="task5-open-add" style="padding:3px 8px;">➕</button><button class="btn sm" id="task5-dup" style="padding:3px 6px;" title="Dupliquer">⧉</button><button class="btn sm" id="task5-done-btn" style="padding:3px 6px;font-size:.68rem;" title="Tâches effectuées">✅</button><button class="wh-move" id="wmv-task5">✥</button><button class="wh-size" id="wsz-task5">⊞</button></div>
+            <div class="wbody">
+              <div class="tlist" id="list-task5"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="wc-task6" class="wcell hi" style="grid-column:1/span 2;grid-row:1/span 2;">
+          <div class="widget">
+            <div class="whdr"><span>✅</span><h2 id="task6-title" style="cursor:text;" title="Double-clic pour renommer">Tâches 6</h2><button class="btn sm" id="task6-open-add" style="padding:3px 8px;">➕</button><button class="btn sm" id="task6-dup" style="padding:3px 6px;" title="Dupliquer">⧉</button><button class="btn sm" id="task6-done-btn" style="padding:3px 6px;font-size:.68rem;" title="Tâches effectuées">✅</button><button class="wh-move" id="wmv-task6">✥</button><button class="wh-size" id="wsz-task6">⊞</button></div>
+            <div class="wbody">
+              <div class="tlist" id="list-task6"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="wc-note1" class="wcell" style="grid-column:3/span 2;grid-row:5/span 2;">
+          <div class="widget">
+            <div class="whdr"><span>📝</span><h2 id="note1-title" style="cursor:text;" title="Double-clic pour renommer">Note</h2><button class="btn sm" id="note1-dup" style="padding:3px 6px;" title="Dupliquer">⧉</button><button class="wh-move" id="wmv-note1">✥</button><button class="wh-size" id="wsz-note1">⊞</button></div>
+            <div class="wbody" style="padding:0;display:flex;">
+              <textarea id="note1-text" placeholder="Écris ce que tu veux ici…" style="flex:1;width:100%;background:transparent;border:none;outline:none;resize:none;color:var(--chalk);font-family:inherit;font-size:.8rem;line-height:1.45;padding:8px 10px;"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div id="wc-note2" class="wcell hi" style="grid-column:3/span 2;grid-row:5/span 2;">
+          <div class="widget">
+            <div class="whdr"><span>📝</span><h2 id="note2-title" style="cursor:text;" title="Double-clic pour renommer">Note 2</h2><button class="btn sm" id="note2-dup" style="padding:3px 6px;" title="Dupliquer">⧉</button><button class="wh-move" id="wmv-note2">✥</button><button class="wh-size" id="wsz-note2">⊞</button></div>
+            <div class="wbody" style="padding:0;display:flex;">
+              <textarea id="note2-text" placeholder="Écris ce que tu veux ici…" style="flex:1;width:100%;background:transparent;border:none;outline:none;resize:none;color:var(--chalk);font-family:inherit;font-size:.8rem;line-height:1.45;padding:8px 10px;"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div id="wc-note3" class="wcell hi" style="grid-column:3/span 2;grid-row:5/span 2;">
+          <div class="widget">
+            <div class="whdr"><span>📝</span><h2 id="note3-title" style="cursor:text;" title="Double-clic pour renommer">Note 3</h2><button class="btn sm" id="note3-dup" style="padding:3px 6px;" title="Dupliquer">⧉</button><button class="wh-move" id="wmv-note3">✥</button><button class="wh-size" id="wsz-note3">⊞</button></div>
+            <div class="wbody" style="padding:0;display:flex;">
+              <textarea id="note3-text" placeholder="Écris ce que tu veux ici…" style="flex:1;width:100%;background:transparent;border:none;outline:none;resize:none;color:var(--chalk);font-family:inherit;font-size:.8rem;line-height:1.45;padding:8px 10px;"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div id="wc-note4" class="wcell hi" style="grid-column:3/span 2;grid-row:5/span 2;">
+          <div class="widget">
+            <div class="whdr"><span>📝</span><h2 id="note4-title" style="cursor:text;" title="Double-clic pour renommer">Note 4</h2><button class="btn sm" id="note4-dup" style="padding:3px 6px;" title="Dupliquer">⧉</button><button class="wh-move" id="wmv-note4">✥</button><button class="wh-size" id="wsz-note4">⊞</button></div>
+            <div class="wbody" style="padding:0;display:flex;">
+              <textarea id="note4-text" placeholder="Écris ce que tu veux ici…" style="flex:1;width:100%;background:transparent;border:none;outline:none;resize:none;color:var(--chalk);font-family:inherit;font-size:.8rem;line-height:1.45;padding:8px 10px;"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div id="wc-note5" class="wcell hi" style="grid-column:3/span 2;grid-row:5/span 2;">
+          <div class="widget">
+            <div class="whdr"><span>📝</span><h2 id="note5-title" style="cursor:text;" title="Double-clic pour renommer">Note 5</h2><button class="btn sm" id="note5-dup" style="padding:3px 6px;" title="Dupliquer">⧉</button><button class="wh-move" id="wmv-note5">✥</button><button class="wh-size" id="wsz-note5">⊞</button></div>
+            <div class="wbody" style="padding:0;display:flex;">
+              <textarea id="note5-text" placeholder="Écris ce que tu veux ici…" style="flex:1;width:100%;background:transparent;border:none;outline:none;resize:none;color:var(--chalk);font-family:inherit;font-size:.8rem;line-height:1.45;padding:8px 10px;"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div id="wc-note6" class="wcell hi" style="grid-column:3/span 2;grid-row:5/span 2;">
+          <div class="widget">
+            <div class="whdr"><span>📝</span><h2 id="note6-title" style="cursor:text;" title="Double-clic pour renommer">Note 6</h2><button class="btn sm" id="note6-dup" style="padding:3px 6px;" title="Dupliquer">⧉</button><button class="wh-move" id="wmv-note6">✥</button><button class="wh-size" id="wsz-note6">⊞</button></div>
+            <div class="wbody" style="padding:0;display:flex;">
+              <textarea id="note6-text" placeholder="Écris ce que tu veux ici…" style="flex:1;width:100%;background:transparent;border:none;outline:none;resize:none;color:var(--chalk);font-family:inherit;font-size:.8rem;line-height:1.45;padding:8px 10px;"></textarea>
             </div>
           </div>
         </div>
@@ -356,13 +458,9 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 
         <div class="wcell" id="wc-t5" style="grid-column:3/span 2;grid-row:3/span 2;">
           <div class="widget">
-            <div class="whdr"><span>🔁</span><h2>Routine du jour</h2><button class="wh-move" id="wmv-t5">✥</button><button class="wh-size" id="wsz-t5">⊞</button></div>
+            <div class="whdr"><span>🔁</span><h2>Routine du jour</h2><button class="btn sm" id="routine-open-add" style="padding:3px 8px;">➕</button><button class="wh-move" id="wmv-t5">✥</button><button class="wh-size" id="wsz-t5">⊞</button></div>
             <div class="wbody">
-              <div id="routine-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:7px;"></div>
-              <div style="display:flex;gap:6px;">
-                <input type="text" id="routine-inp" placeholder="Nouvelle routine…" style="flex:1;background:var(--bg);border:1px solid var(--line);color:var(--chalk);border-radius:6px;padding:6px 9px;font-size:.78rem;">
-                <button class="btn prim" id="routine-add">+</button>
-              </div>
+              <div id="routine-grid" style="display:flex;flex-direction:column;gap:4px;"></div>
             </div>
           </div>
         </div>
@@ -403,12 +501,36 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
     <div class="modal-act"><button class="btn" id="wcancel">Annuler</button><button class="btn prim" id="wsave">Enregistrer</button></div>
   </div>
 </div>
-<div class="ov" id="ov-weigh">
+<div class="ov" id="ov-routine">
   <div class="modal" style="max-width:300px;">
-    <h3>⚖️ Peser</h3>
-    <div class="fld"><label>Poids (kg)</label><input type="number" id="wval" step="0.1" min="40" max="200" placeholder="96.8" style="font-size:1.1rem;"></div>
-    <div class="fld"><label>Date</label><input type="date" id="wdat"></div>
-    <div class="modal-act"><button class="btn" id="wcancel">Annuler</button><button class="btn prim" id="wsave">Enregistrer</button></div>
+    <h3>🔁 Nouvelle routine</h3>
+    <div class="fld"><label>Nom</label><input type="text" id="routine-inp" placeholder="ex : Lecture, Sport, Médicaments…" maxlength="30"></div>
+    <div class="modal-act"><button class="btn" id="routine-cancel">Annuler</button><button class="btn prim" id="routine-save">Ajouter</button></div>
+  </div>
+</div>
+<div class="ov" id="ov-task">
+  <div class="modal" style="max-width:300px;">
+    <h3>✅ Nouvelle tâche</h3>
+    <div class="fld"><label>Texte</label><input type="text" id="task-inp" placeholder="ex : Acheter du pain…" maxlength="80"></div>
+    <div class="modal-act"><button class="btn" id="task-cancel">Annuler</button><button class="btn prim" id="task-save">Ajouter</button></div>
+  </div>
+</div>
+<div class="ov" id="ov-task-done">
+  <div class="modal" style="max-width:340px;">
+    <h3>✅ Tâches effectuées</h3>
+    <div style="font-size:.7rem;color:var(--dim);margin-bottom:8px;">Supprimées automatiquement après 7 jours. Clique sur une tâche pour la remettre dans ta liste.</div>
+    <div class="tlist" id="task-done-list" style="max-height:280px;overflow-y:auto;"></div>
+    <div class="modal-act"><button class="btn" id="task-done-close">Fermer</button></div>
+  </div>
+</div>
+<div class="ov" id="ov-widget-manage">
+  <div class="modal" style="max-width:300px;">
+    <h3 id="wm-title">⧉ Gérer le widget</h3>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <button class="btn prim" id="wm-duplicate" style="justify-content:center;">⧉ Dupliquer ce widget</button>
+      <button class="btn dn" id="wm-delete" style="justify-content:center;">🗑️ Supprimer ce widget</button>
+      <button class="btn" id="wm-cancel" style="justify-content:center;">Annuler</button>
+    </div>
   </div>
 </div>
 <div class="ov" id="ov-size">
@@ -586,8 +708,16 @@ function showQResults(){
 }
 function shuf(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
 
-const WIDGETS=['t1','t2','t3','t4','t5','t6'];
-const LAYOUT_DEFAULT={t1:{c:1,r:1,w:2,h:2},t2:{c:3,r:1,w:2,h:2},t3:{c:5,r:1,w:2,h:2},t4:{c:1,r:3,w:2,h:2},t5:{c:3,r:3,w:2,h:2},t6:{c:5,r:3,w:2,h:2}};
+const TASK_SLOTS=['task1','task2','task3','task4','task5','task6'];
+const NOTE_SLOTS=['note1','note2','note3','note4','note5','note6'];
+const WIDGETS=['t2','t3','t4','t5','t6',...TASK_SLOTS,...NOTE_SLOTS];
+const LAYOUT_DEFAULT={
+  t2:{c:3,r:1,w:2,h:2},t3:{c:5,r:1,w:2,h:2},t4:{c:1,r:3,w:2,h:2},t5:{c:3,r:3,w:2,h:2},t6:{c:5,r:3,w:2,h:2},
+  task1:{c:1,r:1,w:2,h:2}, task2:{c:1,r:5,w:2,h:2}, task3:{c:5,r:5,w:2,h:2}, task4:{c:1,r:7,w:2,h:2}, task5:{c:3,r:7,w:2,h:2}, task6:{c:5,r:7,w:2,h:2},
+  note1:{c:3,r:5,w:2,h:2}, note2:{c:5,r:9,w:2,h:2}, note3:{c:1,r:9,w:2,h:2}, note4:{c:3,r:9,w:2,h:2}, note5:{c:1,r:11,w:2,h:2}, note6:{c:3,r:11,w:2,h:2}
+};
+// Combien de slots de chaque type sont actifs (visibles) — sauvegardé dans wLayout._activeTasks / _activeNotes
+let activeTaskCount=2, activeNoteCount=1;
 const EMOJI_CATS={'Études':['📋','📖','📚','📝','✏️','📊','🧠','💡','🔬','🎓','💻'],'Sport':['💪','🏋️','⚽','🏀','🎾','🏊','🚴','🤸','🧘','🏃','⚖️'],'Voyage':['✈️','🌍','🗺️','🏖️','⛰️','🎵','🎮','🎬','📷','🚗','🏕️'],'Maison':['🏠','🍕','🍎','☕','🛒','💰','📱','🔑','🌱','🐶','🌸'],'Symboles':['⭐','🌟','🔥','✅','❌','⚡','🎯','🏆','💎','🎉','🔵','🟡','🟢']};
 const THEMES=[{id:'foret',n:'🌿 Forêt',bg:'#16261e',bg2:'#1f3a2c',bg3:'#274a37',ac:'#f2c14e',tl:'#2dd4bf',gr:'#4ade80',rd:'#f87171',bl:'#60a5fa',ch:'#f1efe4'},{id:'ocean',n:'🌊 Océan',bg:'#0d1f2d',bg2:'#122534',bg3:'#193040',ac:'#22d3ee',tl:'#06b6d4',gr:'#34d399',rd:'#f87171',bl:'#38bdf8',ch:'#e0f4ff'},{id:'violet',n:'🌙 Nuit violette',bg:'#1a1228',bg2:'#221535',bg3:'#2d1d48',ac:'#c084fc',tl:'#e879f9',gr:'#a78bfa',rd:'#f472b6',bl:'#818cf8',ch:'#ede9fe'},{id:'ember',n:'🔥 Ember',bg:'#1c1208',bg2:'#271a0c',bg3:'#332212',ac:'#fb923c',tl:'#fbbf24',gr:'#84cc16',rd:'#ef4444',bl:'#f97316',ch:'#fff7ed'},{id:'ardoise',n:'🤍 Ardoise',bg:'#1a1f2e',bg2:'#222840',bg3:'#2a3050',ac:'#e2e8f0',tl:'#94a3b8',gr:'#64748b',rd:'#f87171',bl:'#93c5fd',ch:'#f8fafc'},{id:'sakura',n:'🌸 Sakura',bg:'#1f1218',bg2:'#2a1a22',bg3:'#38222e',ac:'#f9a8d4',tl:'#fb7185',gr:'#86efac',rd:'#fca5a5',bl:'#f0abfc',ch:'#fdf2f8'},{id:'electro',n:'⚡ Électrique',bg:'#080808',bg2:'#111111',bg3:'#1a1a1a',ac:'#facc15',tl:'#3b82f6',gr:'#22c55e',rd:'#ef4444',bl:'#60a5fa',ch:'#f9fafb'},{id:'desert',n:'🏜️ Désert',bg:'#1e1610',bg2:'#271e14',bg3:'#332819',ac:'#d97706',tl:'#b45309',gr:'#84cc16',rd:'#ef4444',bl:'#f59e0b',ch:'#fef3c7'},{id:'autumn',n:'🍂 Automne',bg:'#1c1008',bg2:'#271608',bg3:'#361e0a',ac:'#f97316',tl:'#dc2626',gr:'#fbbf24',rd:'#ef4444',bl:'#fb923c',ch:'#fff7ed'},{id:'arctic',n:'🧊 Arctique',bg:'#0f1923',bg2:'#172433',bg3:'#1e3045',ac:'#bfdbfe',tl:'#7dd3fc',gr:'#a5f3fc',rd:'#fca5a5',bl:'#93c5fd',ch:'#f0f9ff'},{id:'tropic',n:'🌺 Tropique',bg:'#0a1f12',bg2:'#0f2918',bg3:'#173520',ac:'#f0abfc',tl:'#4ade80',gr:'#86efac',rd:'#f9a8d4',bl:'#a78bfa',ch:'#f0fdf4'},{id:'minuit',n:'🖤 Minuit',bg:'#000000',bg2:'#111111',bg3:'#1c1c1c',ac:'#ffffff',tl:'#a3a3a3',gr:'#737373',rd:'#ef4444',bl:'#6b7280',ch:'#f5f5f5'},{id:'neon',n:'🟣 Néon',bg:'#0a0010',bg2:'#10001a',bg3:'#18002a',ac:'#d946ef',tl:'#a855f7',gr:'#34d399',rd:'#f43f5e',bl:'#818cf8',ch:'#fdf4ff'},{id:'ble',n:'🌾 Blé',bg:'#1e1a10',bg2:'#272212',bg3:'#332d18',ac:'#fde68a',tl:'#d97706',gr:'#a3e635',rd:'#ef4444',bl:'#fcd34d',ch:'#fffbeb'}];
 
@@ -597,9 +727,10 @@ const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 /* STATE */
 let mods=null,modEdit=false,modEditId=null,modDragIdx=null,hubDoc=null,modT=null;
-let tData={tasks:[],cats:[]},tDoc=null,tT=null;
+let tData={tasks:[],cats:[],titles:{}},tDoc=null,tT=null;
 let spData={weights:[],goal:SPORT_GOAL,startWeight:SPORT_START_W},spDoc=null;
 let wLayout=JSON.parse(JSON.stringify(LAYOUT_DEFAULT)),layDoc=null,layT=null;
+let noteData={text:'',titles:{}},noteDoc=null,noteT=null;
 let planState=null,planDoc=null;
 let gedit=false,selW=null,sizingId=null,curTheme='foret';
 let tTab='todo',tFilt='',tPrio='🔴';
@@ -618,6 +749,7 @@ auth.onAuthStateChanged(async user=>{
   spDoc=db.collection('users').doc(user.uid).collection('modules').doc('sport');
   planDoc=db.collection('users').doc(user.uid).collection('modules').doc('planning');
   layDoc=db.collection('users').doc(user.uid).collection('modules').doc('dashboard-layout');
+  noteDoc=db.collection('users').doc(user.uid).collection('modules').doc('note');
   qcmDoc=db.collection('users').doc(user.uid).collection('modules').doc('qcm-arabe');
   routineDoc=db.collection('users').doc(user.uid).collection('modules').doc('routines');
   try{
@@ -629,8 +761,17 @@ auth.onAuthStateChanged(async user=>{
       {id:'m4',icon:'✈️',name:'PPL Aviation',desc:'Bientôt.',url:'',disabled:true}
     ];
     const sp=await spDoc.get();if(sp.exists)spData=Object.assign({weights:[],goal:SPORT_GOAL,startWeight:SPORT_START_W},sp.data());
+    const nt=await noteDoc.get();if(nt.exists)noteData=Object.assign({text:'',titles:{}},nt.data());
     const pl=await planDoc.get();if(pl.exists)planState=pl.data();
-    if(t.exists){tData=Object.assign({tasks:[],cats:[]},t.data());const n7=new Date();n7.setDate(n7.getDate()-7);tData.tasks=tData.tasks.filter(x=>!x.done||(x.doneAt&&new Date(x.doneAt)>n7));}
+    if(t.exists){
+      tData=Object.assign({tasks:[],cats:[],titles:{}},t.data());
+      const n7=new Date();n7.setDate(n7.getDate()-7);
+      Object.keys(tData).forEach(k=>{
+        if(Array.isArray(tData[k]) && k!=='cats'){
+          tData[k]=tData[k].filter(x=>!x.done||(x.doneAt&&new Date(x.doneAt)>n7));
+        }
+      });
+    }
     if(l.exists){const ld=l.data();wLayout=Object.assign(JSON.parse(JSON.stringify(LAYOUT_DEFAULT)),ld);if(ld.theme)applyTheme(ld.theme);}
     const qSnap=await qcmDoc.get();if(qSnap.exists){const qd=qSnap.data();qProg={green:qd.green||{},blue:qd.blue||{},red:qd.red||{}};}
     const rSnap=await routineDoc.get();if(rSnap.exists)routineData=Object.assign({items:[],doneDates:{}},rSnap.data());
@@ -639,6 +780,19 @@ auth.onAuthStateChanged(async user=>{
   $('ls').classList.add('hi');
   $('auth-wrap').classList.add('hi');
   $('page').classList.remove('hi');
+  // Réactive les widgets Tâches/Note dupliqués lors d'une session précédente
+  // Nettoyage ponctuel : retire les entrées de layout créées par erreur lors des tests (slots jamais vraiment dupliqués par l'utilisateur)
+  if(!wLayout._cleanedDupSlots2){
+    ['task2','task3','task4','task5','task6','note2','note3','note4','note5','note6'].forEach(slot=>{
+      delete wLayout[slot];
+    });
+    wLayout._cleanedDupSlots2=true;
+    saveLayout();
+  }
+  TASK_SLOTS.forEach(slot=>{ if(wLayout[slot]) document.getElementById('wc-'+slot).classList.remove('hi'); else document.getElementById('wc-'+slot).classList.add('hi'); });
+  NOTE_SLOTS.forEach(slot=>{ if(wLayout[slot]) document.getElementById('wc-'+slot).classList.remove('hi'); else document.getElementById('wc-'+slot).classList.add('hi'); });
+  document.getElementById('wc-task1').classList.remove('hi');
+  document.getElementById('wc-note1').classList.remove('hi');
   applyLayout();
   renderMods();
   renderTasks();
@@ -653,6 +807,7 @@ auth.onAuthStateChanged(async user=>{
   updateQStats();
   updateQInfo();
   wireHandles();
+  wireNoteWidgets();
 });
 
 /* AUTH */
@@ -761,26 +916,265 @@ function removeMod(id){if(!confirm('Supprimer ?'))return;mods=mods.filter(m=>m.i
 $('etogg').addEventListener('click',e=>{e.stopPropagation();$('epdd').classList.toggle('op');});
 document.addEventListener('click',e=>{if(!e.target.closest('.epf'))$('epdd').classList.remove('op');});
 
-/* TASKS — partagées entre les 3 widgets */
+/* TASKS — système à slots dynamiques (max 6), avec duplication */
 function saveTasks(){if(!tDoc)return;clearTimeout(tT);tT=setTimeout(()=>tDoc.set(tData).catch(()=>{}),600);}
+function taskDataKey(slot){ return slot==='task1' ? 'tasks' : 'tasks_'+slot; }
+
 function renderTasks(){
-  WIDGETS.forEach(id=>{
-    const list=$('list-'+id);if(!list)return;
-    const tasks=(tData.tasks||[]).filter(t=>!t.done);
+  TASK_SLOTS.forEach(slot=>{
+    const list=$('list-'+slot);if(!list)return;
+    const key=taskDataKey(slot);
+    const tasks=(tData[key]||[]).filter(t=>!t.done);
     if(!tasks.length){list.innerHTML='<div class="empty">Aucune tâche 🎉</div>';return;}
-    list.innerHTML=tasks.map(t=>`<div class="titem"><div class="tck${t.done?' on':''}" data-ck="${t.id}"></div><div class="ttxt${t.done?' sk':''}">${esc(t.text)}</div><div class="tdl" data-dl="${t.id}">✕</div></div>`).join('');
+    list.innerHTML=tasks.map(t=>`<div class="titem" data-id="${t.id}" draggable="true"><div class="tck" data-ck="${t.id}"></div><div class="ttxt" data-rename="${t.id}">${esc(t.text)}</div><div class="tdl" data-dl="${t.id}">✕</div></div>`).join('');
+  });
+  if(tData.titles){
+    TASK_SLOTS.forEach(slot=>{ if(tData.titles[slot]&&$(slot+'-title')) $(slot+'-title').textContent=tData.titles[slot]; });
+  }
+}
+
+function wireTaskWidget(wid){
+  const dataKey=taskDataKey(wid);
+  const list=$('list-'+wid);if(!list)return;
+  let clickTimer=null;
+
+  list.addEventListener('click',e=>{
+    const dl=e.target.closest('[data-dl]');
+    if(dl){ tData[dataKey]=tData[dataKey].filter(x=>x.id!==dl.dataset.dl); saveTasks(); renderTasks(); return; }
+
+    const ck=e.target.closest('[data-ck]');
+    if(ck){
+      const t=tData[dataKey].find(x=>x.id===ck.dataset.ck);
+      if(t){ t.done=!t.done; t.doneAt=t.done?new Date().toISOString():null; saveTasks(); renderTasks(); }
+      return;
+    }
+
+    const txt=e.target.closest('[data-rename]');
+    if(txt){
+      if(clickTimer){ clearTimeout(clickTimer); clickTimer=null; return; }
+      clickTimer=setTimeout(()=>{
+        clickTimer=null;
+        const t=tData[dataKey].find(x=>x.id===txt.dataset.rename);
+        if(t){ t.done=!t.done; t.doneAt=t.done?new Date().toISOString():null; saveTasks(); renderTasks(); }
+      },230);
+    }
+  });
+
+  list.addEventListener('dblclick',e=>{
+    const txt=e.target.closest('[data-rename]');
+    if(!txt)return;
+    if(clickTimer){ clearTimeout(clickTimer); clickTimer=null; }
+    const t=tData[dataKey].find(x=>x.id===txt.dataset.rename);
+    if(!t)return;
+    const newText=prompt('Modifier la tâche :', t.text);
+    if(newText&&newText.trim()){ t.text=newText.trim(); saveTasks(); renderTasks(); }
+  });
+
+  let dragSrcId=null;
+  list.addEventListener('dragstart',e=>{
+    const item=e.target.closest('.titem');
+    if(!item)return;
+    dragSrcId=item.dataset.id;
+    item.style.opacity='.4';
+  });
+  list.addEventListener('dragend',e=>{
+    const item=e.target.closest('.titem');
+    if(item) item.style.opacity='';
+  });
+  list.addEventListener('dragover',e=>{
+    e.preventDefault();
+    const item=e.target.closest('.titem');
+    if(item) item.style.borderColor='var(--accent)';
+  });
+  list.addEventListener('dragleave',e=>{
+    const item=e.target.closest('.titem');
+    if(item) item.style.borderColor='';
+  });
+  list.addEventListener('drop',e=>{
+    e.preventDefault();
+    const item=e.target.closest('.titem');
+    if(!item||!dragSrcId)return;
+    item.style.borderColor='';
+    const targetId=item.dataset.id;
+    if(targetId===dragSrcId)return;
+    const arr=tData[dataKey];
+    const srcIdx=arr.findIndex(x=>x.id===dragSrcId);
+    const tgtIdx=arr.findIndex(x=>x.id===targetId);
+    if(srcIdx<0||tgtIdx<0)return;
+    const [moved]=arr.splice(srcIdx,1);
+    arr.splice(tgtIdx,0,moved);
+    dragSrcId=null;
+    saveTasks();renderTasks();
+  });
+
+  $(wid+'-open-add').addEventListener('click',()=>{
+    $('task-inp').value='';
+    $('task-inp').dataset.target=wid;
+    $('ov-task').classList.add('op');
+    $('task-inp').focus();
+  });
+
+  const titleEl=$(wid+'-title');
+  if(titleEl){
+    titleEl.addEventListener('dblclick',()=>{
+      const current=titleEl.textContent;
+      const newName=prompt('Nouveau nom du widget :', current);
+      if(newName&&newName.trim()){
+        if(!tData.titles)tData.titles={};
+        tData.titles[wid]=newName.trim();
+        titleEl.textContent=newName.trim();
+        saveTasks();
+      }
+    });
+  }
+
+  const dupBtn=$(wid+'-dup');
+  if(dupBtn) dupBtn.addEventListener('click',()=>openWidgetManageModal('task',wid));
+
+  const doneBtn=$(wid+'-done-btn');
+  if(doneBtn) doneBtn.addEventListener('click',()=>openDoneTasksModal(wid));
+}
+
+function openDoneTasksModal(wid){
+  const dataKey=taskDataKey(wid);
+  const doneList=(tData[dataKey]||[]).filter(t=>t.done);
+  const list=$('task-done-list');
+  list.dataset.target=wid;
+  list.innerHTML = !doneList.length
+    ? '<div class="empty">Aucune tâche effectuée.</div>'
+    : doneList.map(t=>`<div class="titem" data-restore="${t.id}" style="cursor:pointer;"><div class="tck on"></div><div class="ttxt sk">${esc(t.text)}</div></div>`).join('');
+  $('ov-task-done').classList.add('op');
+}
+$('task-done-list').addEventListener('click',e=>{
+  const item=e.target.closest('[data-restore]');
+  if(!item)return;
+  const wid=$('task-done-list').dataset.target;
+  const dataKey=taskDataKey(wid);
+  const t=tData[dataKey].find(x=>x.id===item.dataset.restore);
+  if(t){ t.done=false; t.doneAt=null; saveTasks(); renderTasks(); openDoneTasksModal(wid); }
+});
+$('task-done-close').addEventListener('click',()=>$('ov-task-done').classList.remove('op'));
+
+function duplicateTaskWidget(){
+  const nextSlot=TASK_SLOTS.find(s=>document.getElementById('wc-'+s).classList.contains('hi'));
+  if(!nextSlot){ alert('Maximum 6 widgets Tâches atteint.'); return; }
+  document.getElementById('wc-'+nextSlot).classList.remove('hi');
+  if(!wLayout[nextSlot]) wLayout[nextSlot]=Object.assign({},LAYOUT_DEFAULT[nextSlot]);
+  applyLayout();saveLayout();
+  renderTasks();
+}
+function deleteTaskWidget(wid){
+  if(wid==='task1'){ alert('Le widget Tâches principal ne peut pas être supprimé.'); return; }
+  if(!confirm('Supprimer ce widget et toutes ses tâches ?'))return;
+  document.getElementById('wc-'+wid).classList.add('hi');
+  delete wLayout[wid];
+  delete tData[taskDataKey(wid)];
+  if(tData.titles) delete tData.titles[wid];
+  saveLayout();saveTasks();
+  applyLayout();
+}
+
+// Modale "Gérer le widget" — Dupliquer ou Supprimer (Tâches et Note)
+let wmTarget=null, wmType=null;
+function openWidgetManageModal(type, wid){
+  wmType=type; wmTarget=wid;
+  $('wm-title').textContent = type==='task' ? '⧉ Gérer le widget Tâches' : '⧉ Gérer le widget Note';
+  $('wm-delete').style.display = (wid==='task1'||wid==='note1') ? 'none' : 'flex';
+  $('ov-widget-manage').classList.add('op');
+}
+function wireWidgetManageModal(){
+  $('wm-duplicate').addEventListener('click',()=>{
+    $('ov-widget-manage').classList.remove('op');
+    if(wmType==='task') duplicateTaskWidget(); else duplicateNoteWidget();
+  });
+  $('wm-delete').addEventListener('click',()=>{
+    $('ov-widget-manage').classList.remove('op');
+    if(wmType==='task') deleteTaskWidget(wmTarget); else deleteNoteWidget(wmTarget);
+  });
+  $('wm-cancel').addEventListener('click',()=>$('ov-widget-manage').classList.remove('op'));
+}
+wireWidgetManageModal();
+
+// Modale d'ajout de tâche partagée (un seul input, ciblé via data-target)
+function wireTaskAddModal(){
+  $('task-cancel').addEventListener('click',()=>$('ov-task').classList.remove('op'));
+  function saveNewTask(){
+    const wid=$('task-inp').dataset.target;
+    const text=$('task-inp').value.trim();
+    if(!text||!wid)return;
+    const dataKey=taskDataKey(wid);
+    if(!tData[dataKey])tData[dataKey]=[];
+    tData[dataKey].push({id:'t'+Date.now(),text,done:false,createdAt:new Date().toISOString()});
+    saveTasks();renderTasks();
+    $('ov-task').classList.remove('op');
+  }
+  $('task-save').addEventListener('click',saveNewTask);
+  $('task-inp').addEventListener('keydown',e=>{if(e.key==='Enter')saveNewTask();});
+}
+wireTaskAddModal();
+TASK_SLOTS.forEach(slot=>{ wireTaskWidget(slot); });
+
+/* NOTE — système à slots dynamiques (max 6), avec duplication */
+function saveNote(){
+  if(!noteDoc)return;
+  clearTimeout(noteT);
+  noteT=setTimeout(()=>noteDoc.set(noteData).catch(()=>{}),700);
+}
+function noteDataKey(slot){ return slot==='note1' ? 'text' : 'text_'+slot; }
+
+function wireNoteWidget(wid){
+  const ta=$(wid+'-text');if(!ta)return;
+  const key=noteDataKey(wid);
+  ta.value=noteData[key]||'';
+  ta.addEventListener('input',()=>{
+    noteData[key]=ta.value;
+    saveNote();
+  });
+  const titleEl=$(wid+'-title');
+  if(titleEl){
+    if(noteData.titles&&noteData.titles[wid]) titleEl.textContent=noteData.titles[wid];
+    titleEl.addEventListener('dblclick',()=>{
+      const current=titleEl.textContent;
+      const newName=prompt('Nouveau nom du widget :', current);
+      if(newName&&newName.trim()){
+        if(!noteData.titles)noteData.titles={};
+        noteData.titles[wid]=newName.trim();
+        titleEl.textContent=newName.trim();
+        saveNote();
+      }
+    });
+  }
+  const dupBtn=$(wid+'-dup');
+  if(dupBtn) dupBtn.addEventListener('click',()=>openWidgetManageModal('note',wid));
+}
+
+function duplicateNoteWidget(){
+  const nextSlot=NOTE_SLOTS.find(s=>document.getElementById('wc-'+s).classList.contains('hi'));
+  if(!nextSlot){ alert('Maximum 6 widgets Note atteint.'); return; }
+  document.getElementById('wc-'+nextSlot).classList.remove('hi');
+  if(!wLayout[nextSlot]) wLayout[nextSlot]=Object.assign({},LAYOUT_DEFAULT[nextSlot]);
+  applyLayout();saveLayout();
+}
+function deleteNoteWidget(wid){
+  if(wid==='note1'){ alert('Le widget Note principal ne peut pas être supprimé.'); return; }
+  if(!confirm('Supprimer ce widget et son contenu ?'))return;
+  document.getElementById('wc-'+wid).classList.add('hi');
+  delete wLayout[wid];
+  delete noteData[noteDataKey(wid)];
+  if(noteData.titles) delete noteData.titles[wid];
+  saveLayout();saveNote();
+  applyLayout();
+}
+NOTE_SLOTS.forEach(slot=>{ wireNoteWidget(slot); });
+function wireNoteWidgets(){
+  // Recharge les valeurs des textarea + titres une fois noteData chargé depuis Firestore
+  NOTE_SLOTS.forEach(slot=>{
+    const ta=$(slot+'-text');if(!ta)return;
+    ta.value=noteData[noteDataKey(slot)]||'';
+    const titleEl=$(slot+'-title');
+    if(titleEl&&noteData.titles&&noteData.titles[slot]) titleEl.textContent=noteData.titles[slot];
   });
 }
-WIDGETS.forEach(id=>{
-  const addBtn=$('add-'+id),inp=$('inp-'+id),list=$('list-'+id);
-  if(!addBtn||!inp||!list)return;
-  addBtn.addEventListener('click',()=>{const text=inp.value.trim();if(!text)return;tData.tasks.push({id:'t'+Date.now(),text,done:false,createdAt:new Date().toISOString()});inp.value='';saveTasks();renderTasks();});
-  inp.addEventListener('keydown',e=>{if(e.key==='Enter')addBtn.click();});
-  list.addEventListener('click',e=>{
-    const ck=e.target.closest('[data-ck]');if(ck){const t=tData.tasks.find(x=>x.id===ck.dataset.ck);if(t){t.done=!t.done;t.doneAt=t.done?new Date().toISOString():null;saveTasks();renderTasks();}return;}
-    const dl=e.target.closest('[data-dl]');if(dl){tData.tasks=tData.tasks.filter(x=>x.id!==dl.dataset.dl);saveTasks();renderTasks();}
-  });
-});
 
 
 /* SPORT — connecté à Firestore et au vrai planning */
@@ -962,43 +1356,103 @@ function renderRoutine(){
   const tk=todayKeyR();
   const doneToday=routineData.doneDates[tk]||[];
   if(!routineData.items.length){
-    grid.innerHTML='<div class="empty" style="grid-column:1/-1;">Ajoute tes routines ci-dessous.</div>';
+    grid.innerHTML='<div class="empty">Ajoute tes routines ci-dessous.</div>';
     return;
   }
   grid.innerHTML=routineData.items.map(item=>{
     const isDone=doneToday.includes(item.id);
-    return `<div class="rbox${isDone?' done':''}" data-id="${item.id}"><span>${esc(item.name)}</span><div class="rdel" data-del="${item.id}">✕</div></div>`;
+    return `<div class="rbox${isDone?' done':''}" data-id="${item.id}" draggable="true"><div class="rck"></div><span data-rename="${item.id}">${esc(item.name)}</span><div class="rdel" data-del="${item.id}">✕</div></div>`;
   }).join('');
 }
 function wireRoutine(){
   const grid=$('routine-grid');if(!grid)return;
+  let clickTimer=null;
   grid.addEventListener('click',e=>{
     const del=e.target.closest('[data-del]');
     if(del){
       routineData.items=routineData.items.filter(i=>i.id!==del.dataset.del);
-      // nettoie aussi les références dans doneDates
       Object.keys(routineData.doneDates).forEach(k=>{routineData.doneDates[k]=routineData.doneDates[k].filter(id=>id!==del.dataset.del);});
       saveRoutine();renderRoutine();
       return;
     }
     const box=e.target.closest('.rbox');
-    if(box){
+    if(!box)return;
+    // Attendre un court instant pour voir si un second clic arrive (= dblclick → renommage)
+    if(clickTimer){ clearTimeout(clickTimer); clickTimer=null; return; }
+    clickTimer=setTimeout(()=>{
+      clickTimer=null;
       const id=box.dataset.id,tk=todayKeyR();
       if(!routineData.doneDates[tk])routineData.doneDates[tk]=[];
       const idx=routineData.doneDates[tk].indexOf(id);
       if(idx>-1) routineData.doneDates[tk].splice(idx,1);
       else routineData.doneDates[tk].push(id);
       saveRoutine();renderRoutine();
+    },230);
+  });
+  // Renommage par double-clic sur le texte uniquement
+  grid.addEventListener('dblclick',e=>{
+    const span=e.target.closest('[data-rename]');
+    if(!span)return;
+    if(clickTimer){ clearTimeout(clickTimer); clickTimer=null; }
+    const item=routineData.items.find(i=>i.id===span.dataset.rename);
+    if(!item)return;
+    const newName=prompt('Nouveau nom de la routine :', item.name);
+    if(newName&&newName.trim()){
+      item.name=newName.trim();
+      saveRoutine();renderRoutine();
     }
   });
-  $('routine-add').addEventListener('click',()=>{
+  // Glisser-déposer pour réordonner
+  let dragSrcId=null;
+  grid.addEventListener('dragstart',e=>{
+    const box=e.target.closest('.rbox');
+    if(!box)return;
+    dragSrcId=box.dataset.id;
+    box.style.opacity='.4';
+  });
+  grid.addEventListener('dragend',e=>{
+    const box=e.target.closest('.rbox');
+    if(box) box.style.opacity='';
+  });
+  grid.addEventListener('dragover',e=>{
+    e.preventDefault();
+    const box=e.target.closest('.rbox');
+    if(box) box.style.borderColor='var(--accent)';
+  });
+  grid.addEventListener('dragleave',e=>{
+    const box=e.target.closest('.rbox');
+    if(box) box.style.borderColor='';
+  });
+  grid.addEventListener('drop',e=>{
+    e.preventDefault();
+    const box=e.target.closest('.rbox');
+    if(!box||!dragSrcId)return;
+    box.style.borderColor='';
+    const targetId=box.dataset.id;
+    if(targetId===dragSrcId)return;
+    const srcIdx=routineData.items.findIndex(i=>i.id===dragSrcId);
+    const tgtIdx=routineData.items.findIndex(i=>i.id===targetId);
+    if(srcIdx<0||tgtIdx<0)return;
+    const [moved]=routineData.items.splice(srcIdx,1);
+    routineData.items.splice(tgtIdx,0,moved);
+    dragSrcId=null;
+    saveRoutine();renderRoutine();
+  });
+  $('routine-open-add').addEventListener('click',()=>{
+    $('routine-inp').value='';
+    $('ov-routine').classList.add('op');
+    $('routine-inp').focus();
+  });
+  $('routine-cancel').addEventListener('click',()=>$('ov-routine').classList.remove('op'));
+  function saveNewRoutine(){
     const inp=$('routine-inp'),name=inp.value.trim();
     if(!name)return;
     routineData.items.push({id:'r'+Date.now(),name});
-    inp.value='';
     saveRoutine();renderRoutine();
-  });
-  $('routine-inp').addEventListener('keydown',e=>{if(e.key==='Enter')$('routine-add').click();});
+    $('ov-routine').classList.remove('op');
+  }
+  $('routine-save').addEventListener('click',saveNewRoutine);
+  $('routine-inp').addEventListener('keydown',e=>{if(e.key==='Enter')saveNewRoutine();});
 
   // Nettoyage : on garde seulement les 14 derniers jours de doneDates pour ne pas alourdir le document
   const cutoff=new Date();cutoff.setDate(cutoff.getDate()-14);
