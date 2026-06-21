@@ -764,7 +764,7 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 let mods=null,modEdit=false,modEditId=null,modDragIdx=null,hubDoc=null,modT=null;
 let tData={tasks:[],cats:[],titles:{}},tDoc=null,tT=null;
 let spData={weights:[],goal:SPORT_GOAL,startWeight:SPORT_START_W},spDoc=null;
-let wLayout=JSON.parse(JSON.stringify(LAYOUT_DEFAULT)),layDoc=null,layT=null;
+let wLayout={t2:Object.assign({},LAYOUT_DEFAULT.t2),t3:Object.assign({},LAYOUT_DEFAULT.t3),t4:Object.assign({},LAYOUT_DEFAULT.t4),t5:Object.assign({},LAYOUT_DEFAULT.t5),t6:Object.assign({},LAYOUT_DEFAULT.t6),task1:Object.assign({},LAYOUT_DEFAULT.task1),note1:Object.assign({},LAYOUT_DEFAULT.note1)},layDoc=null,layT=null;
 let noteData={text:'',titles:{}},noteDoc=null,noteT=null;
 let planState=null,planDoc=null;
 let gedit=false,selW=null,sizingId=null,curTheme='foret';
@@ -808,7 +808,14 @@ auth.onAuthStateChanged(async user=>{
         }
       });
     }
-    if(l.exists){const ld=l.data();wLayout=Object.assign(JSON.parse(JSON.stringify(LAYOUT_DEFAULT)),ld);if(ld.theme)applyTheme(ld.theme);}
+    if(l.exists){
+      const ld=l.data();
+      // On ne fusionne les défauts QUE pour les widgets toujours présents (fixes + task1/note1)
+      // afin de ne jamais réintroduire un slot task2-6/note2-6 que l'utilisateur a supprimé.
+      const alwaysOnDefaults={t2:LAYOUT_DEFAULT.t2,t3:LAYOUT_DEFAULT.t3,t4:LAYOUT_DEFAULT.t4,t5:LAYOUT_DEFAULT.t5,t6:LAYOUT_DEFAULT.t6,task1:LAYOUT_DEFAULT.task1,note1:LAYOUT_DEFAULT.note1};
+      wLayout=Object.assign(JSON.parse(JSON.stringify(alwaysOnDefaults)),ld);
+      if(ld.theme)applyTheme(ld.theme);
+    }
     const qSnap=await qcmDoc.get();if(qSnap.exists){const qd=qSnap.data();qProg={green:qd.green||{},blue:qd.blue||{},red:qd.red||{}};}
     const rSnap=await routineDoc.get();if(rSnap.exists)routineData=Object.assign({items:[],doneDates:{},cols2:false},rSnap.data());
     const aSnap=await alarmDoc.get();if(aSnap.exists)alarmSettings=aSnap.data();
@@ -928,12 +935,9 @@ $('btn-clean-empty').addEventListener('click',()=>{
     }
   });
   if(removed>0){
-    if(layDoc){
-      layDoc.set(wLayout)
-        .then(()=>{ alert(removed+' widget'+(removed>1?'s vides supprimés':' vide supprimé')+' (sauvegardé ✅).'); })
-        .catch(err=>{ alert('Erreur de sauvegarde : '+err.message); });
-    }
+    if(layDoc) layDoc.set(wLayout).catch(()=>{});
     applyLayout();
+    alert(removed+' widget'+(removed>1?'s vides supprimés':' vide supprimé')+'.');
   } else {
     alert('Aucun widget vide à supprimer.');
   }
