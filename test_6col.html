@@ -1689,7 +1689,7 @@ function scRender() {
       var fav = '';
       try { fav = 'https://www.google.com/s2/favicons?domain=' + new URL(sc[i].url).hostname + '&sz=32'; } catch(e) {}
       html += '<div class="sc-item" data-sci="' + i + '" title="' + sc[i].url + '">';
-      if (fav) html += '<img src="' + fav + '" onerror="this.style.display='none'" style="width:20px;height:20px;object-fit:contain;" alt="">';
+      if (fav) html += '<img src="' + fav + '" style="width:20px;height:20px;object-fit:contain;" alt="">';
       html += '<div class="sc-lbl">' + lbl + '</div>';
       html += '<div class="sc-edit-btn" data-sce="' + i + '">✎</div>';
       html += '</div>';
