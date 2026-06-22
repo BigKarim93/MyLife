@@ -801,7 +801,7 @@ try{db.enablePersistence({synchronizeTabs:true}).catch(()=>{});}catch(e){}
 
 auth.onAuthStateChanged(async user=>{
   if(!user){$('ls').classList.add('hi');$('auth-wrap').classList.remove('hi');return;}
-  $('uem').textContent=user.displayName||user.email||'';
+  if($('uem'))$('uem').textContent=user.displayName||user.email||'';
   $('tbr').classList.remove('hi');
   hubDoc=db.collection('users').doc(user.uid).collection('modules').doc('hub');
   tDoc=db.collection('users').doc(user.uid).collection('modules').doc('tasks');
@@ -951,7 +951,7 @@ $('szdone').addEventListener('click',()=>$('ov-size').classList.remove('op'));
 document.addEventListener('click',e=>{if(!selW)return;if(e.target.closest('.wcell')||e.target.closest('#ghost-layer')||e.target.closest('.ov'))return;selW=null;hideGhosts();WIDGETS.forEach(i=>$('wc-'+i).classList.remove('picked'));});
 
 /* MODULES */
-function renderMods(){
+function renderMods(){const list=$('mlist');if(!list)return;
   const list=$('mlist');list.innerHTML='';
   mods.forEach((m,idx)=>{
     const el=document.createElement('div');el.className='mtile'+(m.disabled?' dis':'');
@@ -974,8 +974,8 @@ function renderMods(){
   });
 }
 function saveMods(){if(!hubDoc)return;clearTimeout(modT);modT=setTimeout(()=>hubDoc.set({modules:mods}).catch(()=>{}),600);}
-$('btn-medit').addEventListener('click',()=>{modEdit=!modEdit;$('btn-medit').classList.toggle('act',modEdit);renderMods();});
-$('btn-addm').addEventListener('click',()=>openMod(null));
+if($('btn-medit'))$('btn-medit').addEventListener('click',()=>{modEdit=!modEdit;$('btn-medit').classList.toggle('act',modEdit);renderMods();});
+if($('btn-addm'))$('btn-addm').addEventListener('click',()=>openMod(null));
 function openMod(m){modEditId=m?m.id:null;$('modtitle').textContent=m?'Modifier':'Ajouter';$('moji').value=m?(m.icon||''):'';$('mname').value=m?m.name:'';$('mdesc').value=m?(m.desc||''):'';$('murl').value=m?(m.url||''):'';$('mdel').style.display=m?'inline-flex':'none';$('ov-mod').classList.add('op');}
 $('mcancel').addEventListener('click',()=>$('ov-mod').classList.remove('op'));
 $('msave').addEventListener('click',()=>{const name=$('mname').value.trim();if(!name){alert('Nom requis');return;}const data={id:modEditId||'m'+Date.now(),icon:$('moji').value.trim()||'📦',name,desc:$('mdesc').value.trim(),url:$('murl').value.trim(),disabled:!$('murl').value.trim()};if(modEditId){const i=mods.findIndex(m=>m.id===modEditId);if(i>-1)mods[i]=data;}else mods.push(data);saveMods();$('ov-mod').classList.remove('op');renderMods();});
