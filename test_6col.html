@@ -952,7 +952,7 @@ document.addEventListener('click',e=>{if(!selW)return;if(e.target.closest('.wcel
 
 /* MODULES */
 function renderMods(){const list=$('mlist');if(!list)return;
-  const list=$('mlist');list.innerHTML='';
+  list.innerHTML='';
   mods.forEach((m,idx)=>{
     const el=document.createElement('div');el.className='mtile'+(m.disabled?' dis':'');
     el.innerHTML=`<button class="mdel">✕</button><div class="mico">${m.icon||'📦'}</div><div class="minfo"><h3>${esc(m.name)}</h3>${m.desc?`<p>${esc(m.desc)}</p>`:''}</div>`;
