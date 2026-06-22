@@ -185,6 +185,33 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 .pbox.next .pname{color:var(--accent);font-weight:700;}
 .pbox .ptime{font-family:'Kalam',cursive;font-size:.85rem;color:var(--chalk);}
 .pbox.next .ptime{color:var(--accent);}
+
+/* HEADER MODULES PILLS */
+.tb-mods{display:flex;align-items:center;gap:5px;flex-wrap:wrap;flex:1;}
+.tb-mpill{background:var(--bg3);border:1px solid var(--line2);color:var(--chalk);border-radius:8px;padding:5px 10px;font-size:.76rem;font-weight:600;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;text-decoration:none;}
+.tb-mpill:hover{border-color:var(--accent);color:var(--accent);}
+.tb-logo{font-family:'Kalam',cursive;font-size:1.15rem;color:var(--accent);font-weight:700;white-space:nowrap;margin-right:6px;}
+/* MÉTÉO */
+.meteo-days{display:flex;gap:5px;overflow-x:auto;padding-bottom:2px;}
+.meteo-day{flex:1;min-width:52px;background:var(--bg3);border:1px solid var(--line);border-radius:7px;padding:5px 4px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.meteo-day.today{border-color:var(--accent);}
+.meteo-dlbl{font-size:.58rem;color:var(--dim);text-transform:uppercase;font-weight:700;}
+.meteo-day.today .meteo-dlbl{color:var(--accent);}
+.meteo-ico{font-size:1.3rem;line-height:1;}
+.meteo-hi{font-size:.72rem;color:var(--chalk);font-weight:700;}
+.meteo-lo{font-size:.62rem;color:var(--dim);}
+.meteo-desc{font-size:.52rem;color:var(--dim);line-height:1.2;text-align:center;}
+.meteo-loc{font-size:.6rem;color:var(--dim);margin-bottom:4px;}
+/* RACCOURCIS */
+.sc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;}
+.sc-item{background:var(--bg3);border:1px solid var(--line);border-radius:7px;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:.15s;text-decoration:none;position:relative;min-height:52px;justify-content:center;}
+.sc-item:hover{border-color:var(--accent);}
+.sc-item.empty{border-style:dashed;color:var(--dim);font-size:.7rem;}
+.sc-ico{font-size:1.15rem;line-height:1;}
+.sc-lbl{font-size:.58rem;color:var(--chalk);font-weight:600;text-align:center;line-height:1.2;max-width:54px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.sc-edit-btn{position:absolute;top:2px;right:2px;width:13px;height:13px;border-radius:50%;background:var(--bg2);border:1px solid var(--line);font-size:.5rem;display:none;align-items:center;justify-content:center;cursor:pointer;color:var(--dim);}
+.sc-item:hover .sc-edit-btn{display:flex;}
+
 </style>
 </head>
 <body>
@@ -192,9 +219,9 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 <div class="ls" id="ls"><div class="lbox"><div class="spin"></div><p>Connexion…</p></div></div>
 
 <div class="tb">
-  <h1>🏠 MyLife</h1>
-  <div class="tb-r hi" id="tbr">
-    <span id="uem" style="font-size:.78rem;color:var(--dim);"></span>
+  <span class="tb-logo">MyLife</span>
+  <div class="tb-mods hi" id="tb-mods-row"></div>
+  <div class="tb-r hi" id="tbr" style="margin-left:0;">
     <button class="btn" id="btn-gedit">✏️ Disposition</button>
     <button class="btn" id="btn-theme">🎨 Thème</button>
     <button class="btn" id="btn-logout">Déconnexion</button>
@@ -476,6 +503,25 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
           </div>
         </div>
 
+
+        <div class="wcell hi" id="wc-meteo" style="grid-column:1/span 3;grid-row:5/span 1;">
+          <div class="widget">
+            <div class="whdr"><span>🌤️</span><h2>Météo</h2><button class="wh-move" id="wmv-meteo">✕</button><button class="wh-size" id="wsz-meteo">⊞</button></div>
+            <div class="wbody">
+              <div class="meteo-loc" id="meteo-loc">Villepinte, 93420</div>
+              <div class="meteo-days" id="meteo-days"><div class="empty">Chargement…</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="wcell hi" id="wc-shortcuts" style="grid-column:4/span 3;grid-row:5/span 1;">
+          <div class="widget">
+            <div class="whdr"><span>🔗</span><h2>Raccourcis</h2><button class="wh-move" id="wmv-shortcuts">✕</button><button class="wh-size" id="wsz-shortcuts">⊞</button></div>
+            <div class="wbody">
+              <div class="sc-grid" id="sc-grid"></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -712,11 +758,12 @@ function shuf(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()
 
 const TASK_SLOTS=['task1','task2','task3','task4','task5','task6'];
 const NOTE_SLOTS=['note1','note2','note3','note4','note5','note6'];
-const WIDGETS=['t2','t3','t4','t5','t6',...TASK_SLOTS,...NOTE_SLOTS];
+const WIDGETS=['t2','t3','t4','t5','t6','meteo','shortcuts',...TASK_SLOTS,...NOTE_SLOTS];
 const LAYOUT_DEFAULT={
   t2:{c:3,r:1,w:2,h:2},t3:{c:5,r:1,w:2,h:2},t4:{c:1,r:3,w:2,h:2},t5:{c:3,r:3,w:2,h:2},t6:{c:5,r:3,w:2,h:2},
-  task1:{c:1,r:1,w:2,h:2}, task2:{c:1,r:5,w:2,h:2}, task3:{c:5,r:5,w:2,h:2}, task4:{c:1,r:7,w:2,h:2}, task5:{c:3,r:7,w:2,h:2}, task6:{c:5,r:7,w:2,h:2},
-  note1:{c:3,r:5,w:2,h:2}, note2:{c:5,r:9,w:2,h:2}, note3:{c:1,r:9,w:2,h:2}, note4:{c:3,r:9,w:2,h:2}, note5:{c:1,r:11,w:2,h:2}, note6:{c:3,r:11,w:2,h:2}
+  meteo:{c:1,r:5,w:3,h:1},shortcuts:{c:4,r:5,w:3,h:1},
+  task1:{c:1,r:1,w:2,h:2}, task2:{c:1,r:6,w:2,h:2}, task3:{c:5,r:6,w:2,h:2}, task4:{c:1,r:8,w:2,h:2}, task5:{c:3,r:8,w:2,h:2}, task6:{c:5,r:8,w:2,h:2},
+  note1:{c:3,r:6,w:2,h:2}, note2:{c:5,r:10,w:2,h:2}, note3:{c:1,r:10,w:2,h:2}, note4:{c:3,r:10,w:2,h:2}, note5:{c:1,r:12,w:2,h:2}, note6:{c:3,r:12,w:2,h:2}
 };
 // Combien de slots de chaque type sont actifs (visibles) — sauvegardé dans wLayout._activeTasks / _activeNotes
 let activeTaskCount=2, activeNoteCount=1;
@@ -819,6 +866,7 @@ auth.onAuthStateChanged(async user=>{
   updateQInfo();
   wireHandles();
   wireNoteWidgets();
+  initNewWidgets();
 });
 
 /* AUTH */
@@ -1549,6 +1597,121 @@ function buildThemeGrid(){const g=$('tgrid');g.innerHTML='';THEMES.forEach(t=>{c
 $('btn-theme').addEventListener('click',()=>{buildThemeGrid();$('ov-theme').classList.add('op');});
 $('thclose').addEventListener('click',()=>$('ov-theme').classList.remove('op'));
 (()=>{try{const s=localStorage.getItem('mlt');if(s)applyTheme(s);}catch(e){}})();
+/* ========================== MODULES DANS LE HEADER ========================== */
+function renderHeaderMods(){
+  const row=document.getElementById('tb-mods-row');
+  if(!row||!mods)return;
+  row.innerHTML='';
+  mods.forEach(m=>{
+    if(m.disabled)return;
+    const a=document.createElement('a');
+    a.className='tb-mpill';
+    a.innerHTML=(m.icon||'📦')+' '+m.name;
+    if(m.url){
+      a.href=m.url;
+      a.target='_blank';
+      a.rel='noopener';
+    }
+    row.appendChild(a);
+  });
+  row.classList.remove('hi');
+}
+
+/* ========================== MÉTÉO ========================== */
+const METEO_LAT=48.9578,METEO_LON=2.5388; // Villepinte 93420
+const WMO_ICONS={0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'🌨️',73:'🌨️',75:'🌨️',80:'🌦️',81:'🌧️',82:'⛈️',85:'🌨️',86:'🌨️',95:'⛈️',96:'⛈️',99:'⛈️'};
+const WMO_DESC={0:'Dégagé',1:'Peu nuageux',2:'Part. nuageux',3:'Couvert',45:'Brouillard',48:'Brouillard',51:'Bruine légère',53:'Bruine',55:'Bruine forte',61:'Pluie légère',63:'Pluie',65:'Pluie forte',71:'Neige légère',73:'Neige',75:'Neige forte',80:'Averses lég.',81:'Averses',82:'F. averses',85:'Av. neige',86:'Av. neige',95:'Orage',96:'Orage',99:'Orage fort'};
+const DAY_SHORT=['דim','לun','Mar','Mer','Jeu','Ven','Sam'];
+
+async function fetchMeteo(){
+  const container=document.getElementById('meteo-days');
+  if(!container)return;
+  try{
+    const url='https://api.open-meteo.com/v1/forecast?latitude='+METEO_LAT+'&longitude='+METEO_LON+'&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=Europe%2FParis&forecast_days=7';
+    const res=await fetch(url);
+    const data=await res.json();
+    const{time,weathercode,temperature_2m_max,temperature_2m_min}=data.daily;
+    const todayStr=new Date().toISOString().slice(0,10);
+    container.innerHTML=time.map(function(d,i){
+      const isToday=d===todayStr;
+      const dt=new Date(d+'T12:00:00');
+      const dayNames=['דim','לun','Mar','Mer','Jeu','Ven','Sam'];
+      const lbl=isToday?'Auj.':dayNames[dt.getDay()];
+      const ico=WMO_ICONS[weathercode[i]]||'🌡️';
+      const desc=WMO_DESC[weathercode[i]]||'';
+      const hi=Math.round(temperature_2m_max[i]);
+      const lo=Math.round(temperature_2m_min[i]);
+      return '<div class="meteo-day'+(isToday?' today':'')+'"><div class="meteo-dlbl">'+lbl+'</div><div class="meteo-ico">'+ico+'</div><div class="meteo-hi">'+hi+'°</div><div class="meteo-lo">'+lo+'°</div><div class="meteo-desc">'+desc+'</div></div>';
+    }).join('');
+  }catch(e){
+    const c=document.getElementById('meteo-days');
+    if(c)c.innerHTML='<div class="empty">Météo indisponible</div>';
+  }
+}
+
+/* ========================== RACCOURCIS ========================== */
+const SC_KEY='mylife_shortcuts_v1';
+function loadShortcuts(){
+  try{const d=localStorage.getItem(SC_KEY);return d?JSON.parse(d):Array(8).fill(null).map(()=>({ico:'',label:'',url:''}));}
+  catch(e){return Array(8).fill(null).map(()=>({ico:'',label:'',url:''}));}
+}
+function saveShortcuts(arr){try{localStorage.setItem(SC_KEY,JSON.stringify(arr));}catch(e){}}
+
+function renderShortcuts(){
+  const grid=document.getElementById('sc-grid');
+  if(!grid)return;
+  const shortcuts=loadShortcuts();
+  grid.innerHTML=shortcuts.map(function(s,i){
+    if(!s.url){
+      return '<div class="sc-item empty" data-sc-idx="'+i+'">＋</div>';
+    }
+    let favicon='';
+    try{favicon='https://www.google.com/s2/favicons?domain='+encodeURIComponent(new URL(s.url).hostname)+'&sz=32';}catch(e){}
+    const label=s.label||(function(){try{return new URL(s.url).hostname.replace('www.','')}catch(e){return s.url}}());
+    return '<div class="sc-item" data-sc-idx="'+i+'" title="'+s.url+'"><div class="sc-edit-btn" data-sc-edit="'+i+'">✎</div>'+(favicon?'<img class="sc-ico" src="'+favicon+'" onerror="this.style.display='none'" style="width:20px;height:20px;object-fit:contain;" alt="">':'')+'<div class="sc-lbl">'+label+'</div></div>';
+  }).join('');
+
+  grid.onclick=function(e){
+    const editBtn=e.target.closest('[data-sc-edit]');
+    if(editBtn){e.stopPropagation();editShortcut(Number(editBtn.dataset.scEdit));return;}
+    const item=e.target.closest('[data-sc-idx]');
+    if(!item)return;
+    const idx=Number(item.dataset.scIdx);
+    const sc=loadShortcuts()[idx];
+    if(!sc.url){editShortcut(idx);return;}
+    window.open(sc.url,'_blank','noopener');
+  };
+}
+
+function editShortcut(idx){
+  const shortcuts=loadShortcuts();
+  const sc=shortcuts[idx];
+  const url=prompt('URL du raccourci :', sc.url||'https://');
+  if(url===null)return;
+  if(!url.trim()){shortcuts[idx]={ico:'',label:'',url:''};saveShortcuts(shortcuts);renderShortcuts();return;}
+  const label=prompt('Nom (laisser vide = auto) :', sc.label||'');
+  if(label===null)return;
+  shortcuts[idx]={ico:'',label:label.trim(),url:url.trim()};
+  saveShortcuts(shortcuts);
+  renderShortcuts();
+}
+
+/* ========================== INIT NOUVEAUX WIDGETS ========================== */
+function initNewWidgets(){
+  if(!wLayout['meteo']) wLayout['meteo']={c:1,r:5,w:3,h:1};
+  if(!wLayout['shortcuts']) wLayout['shortcuts']={c:4,r:5,w:3,h:1};
+  const wm=document.getElementById('wc-meteo');
+  const ws=document.getElementById('wc-shortcuts');
+  if(wm) wm.classList.remove('hi');
+  if(ws) ws.classList.remove('hi');
+  applyLayout();
+  wireHandles();
+  fetchMeteo();
+  renderShortcuts();
+  renderHeaderMods();
+  setInterval(fetchMeteo,30*60*1000);
+}
+
 </script>
 </body>
 </html>
