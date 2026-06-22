@@ -1621,7 +1621,7 @@ function renderHeaderMods(){
 const METEO_LAT=48.9578,METEO_LON=2.5388; // Villepinte 93420
 const WMO_ICONS={0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'🌨️',73:'🌨️',75:'🌨️',80:'🌦️',81:'🌧️',82:'⛈️',85:'🌨️',86:'🌨️',95:'⛈️',96:'⛈️',99:'⛈️'};
 const WMO_DESC={0:'Dégagé',1:'Peu nuageux',2:'Part. nuageux',3:'Couvert',45:'Brouillard',48:'Brouillard',51:'Bruine légère',53:'Bruine',55:'Bruine forte',61:'Pluie légère',63:'Pluie',65:'Pluie forte',71:'Neige légère',73:'Neige',75:'Neige forte',80:'Averses lég.',81:'Averses',82:'F. averses',85:'Av. neige',86:'Av. neige',95:'Orage',96:'Orage',99:'Orage fort'};
-const DAY_SHORT=['דim','לun','Mar','Mer','Jeu','Ven','Sam'];
+const DAY_SHORT=['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
 
 async function fetchMeteo(){
   const container=document.getElementById('meteo-days');
@@ -1635,7 +1635,7 @@ async function fetchMeteo(){
     container.innerHTML=time.map(function(d,i){
       const isToday=d===todayStr;
       const dt=new Date(d+'T12:00:00');
-      const dayNames=['דim','לun','Mar','Mer','Jeu','Ven','Sam'];
+      const dayNames=['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
       const lbl=isToday?'Auj.':dayNames[dt.getDay()];
       const ico=WMO_ICONS[weathercode[i]]||'🌡️';
       const desc=WMO_DESC[weathercode[i]]||'';
