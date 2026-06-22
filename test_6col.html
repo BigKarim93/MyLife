@@ -207,6 +207,29 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 .tb-mods{display:flex;align-items:center;gap:5px;flex-wrap:wrap;flex:1;}
 .tb-mpill{background:var(--bg3);border:1px solid var(--line2);color:var(--chalk);border-radius:8px;padding:4px 9px;font-size:.73rem;font-weight:600;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;text-decoration:none;}
 .tb-mpill:hover{border-color:var(--accent);color:var(--accent);}
+
+/* MÉTÉO */
+.meteo-days{display:flex;gap:5px;overflow-x:auto;}
+.meteo-day{flex:1;min-width:48px;background:var(--bg3);border:1px solid var(--line);border-radius:7px;padding:5px 4px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.meteo-day.today{border-color:var(--accent);}
+.meteo-dlbl{font-size:.58rem;color:var(--dim);font-weight:700;}
+.meteo-ico{font-size:1.2rem;}
+.meteo-hi{font-size:.72rem;color:var(--chalk);font-weight:700;}
+.meteo-lo{font-size:.62rem;color:var(--dim);}
+.meteo-desc{font-size:.5rem;color:var(--dim);}
+/* RACCOURCIS */
+.sc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;}
+.sc-item{background:var(--bg3);border:1px solid var(--line);border-radius:7px;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:.15s;position:relative;min-height:52px;justify-content:center;}
+.sc-item:hover{border-color:var(--accent);}
+.sc-item.empty{border-style:dashed;color:var(--dim);font-size:.8rem;}
+.sc-ico{width:20px;height:20px;object-fit:contain;}
+.sc-lbl{font-size:.58rem;color:var(--chalk);font-weight:600;text-align:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:54px;}
+.sc-edit-btn{position:absolute;top:2px;right:2px;font-size:.6rem;display:none;cursor:pointer;color:var(--dim);}
+.sc-item:hover .sc-edit-btn{display:block;}
+/* HEADER MODULES */
+.tb-mods{display:flex;align-items:center;gap:5px;flex-wrap:wrap;flex:1;}
+.tb-mpill{background:var(--bg3);border:1px solid var(--line2);color:var(--chalk);border-radius:8px;padding:4px 9px;font-size:.73rem;font-weight:600;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;text-decoration:none;}
+.tb-mpill:hover{border-color:var(--accent);color:var(--accent);}
 </style>
 </head>
 <body>
@@ -510,6 +533,24 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
           <div class="widget">
             <div class="whdr"><span>🔗</span><h2>Raccourcis</h2><button class="wh-move" id="wmv-shortcuts">✥</button><button class="wh-size" id="wsz-shortcuts">⊞</button></div>
             <div class="wbody"><div class="sc-grid" id="sc-grid"></div></div>
+          </div>
+        </div>
+
+        <div class="wcell hi" id="wc-meteo" style="grid-column:1/span 3;grid-row:5/span 1;">
+          <div class="widget">
+            <div class="whdr"><span>🌤️</span><h2>Météo — Villepinte</h2><button class="wh-move" id="wmv-meteo">✥</button><button class="wh-size" id="wsz-meteo">⊞</button></div>
+            <div class="wbody">
+              <div class="meteo-days" id="meteo-days"><div class="empty">Chargement…</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="wcell hi" id="wc-shortcuts" style="grid-column:4/span 3;grid-row:5/span 1;">
+          <div class="widget">
+            <div class="whdr"><span>🔗</span><h2>Raccourcis</h2><button class="wh-move" id="wmv-shortcuts">✥</button><button class="wh-size" id="wsz-shortcuts">⊞</button></div>
+            <div class="wbody">
+              <div class="sc-grid" id="sc-grid"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -1697,6 +1738,131 @@ function renderHeaderMods() {
 }
 
 /* Init nouveaux widgets — appelé après login */
+function initNewWidgets() {
+  var wm = document.getElementById('wc-meteo');
+  var ws = document.getElementById('wc-shortcuts');
+  if (wm) wm.classList.remove('hi');
+  if (ws) ws.classList.remove('hi');
+  if (!wLayout['meteo']) wLayout['meteo'] = {c:1, r:5, w:3, h:1};
+  if (!wLayout['shortcuts']) wLayout['shortcuts'] = {c:4, r:5, w:3, h:1};
+  applyLayout();
+  wireHandles();
+  doFetchMeteo();
+  scRender();
+  renderHeaderMods();
+  setInterval(doFetchMeteo, 30*60*1000);
+}
+
+/* === MÉTÉO === */
+var METEO_WCO = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'🌨️',73:'🌨️',75:'🌨️',80:'🌦️',81:'🌧️',82:'⛈️',95:'⛈️',96:'⛈️',99:'⛈️'};
+var METEO_WDE = {0:'Dégagé',1:'Peu nuageux',2:'Part. nuageux',3:'Couvert',45:'Brouillard',48:'Brouillard',51:'Bruine légère',53:'Bruine',55:'Bruine forte',61:'Pluie légère',63:'Pluie',65:'Pluie forte',71:'Neige légère',73:'Neige',75:'Neige forte',80:'Averses légères',81:'Averses',82:'Fortes averses',95:'Orage',96:'Orage',99:'Orage fort'};
+var METEO_DN = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+function doFetchMeteo() {
+  var c = document.getElementById('meteo-days');
+  if (!c) return;
+  var u = 'https://api.open-meteo.com/v1/forecast?latitude=48.9578&longitude=2.5388&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=Europe%2FParis&forecast_days=7';
+  fetch(u).then(function(r) { return r.json(); }).then(function(d) {
+    var today = new Date().toISOString().slice(0, 10);
+    var html = '';
+    for (var i = 0; i < d.daily.time.length; i++) {
+      var dt = d.daily.time[i];
+      var isT = (dt === today);
+      var date = new Date(dt + 'T12:00:00');
+      var lbl = isT ? 'Auj.' : METEO_DN[date.getDay()];
+      var ico = METEO_WCO[d.daily.weathercode[i]] || '';
+      var desc = METEO_WDE[d.daily.weathercode[i]] || '';
+      var hi = Math.round(d.daily.temperature_2m_max[i]);
+      var lo = Math.round(d.daily.temperature_2m_min[i]);
+      html += '<div class="meteo-day' + (isT ? ' today' : '') + '">';
+      html += '<div class="meteo-dlbl">' + lbl + '</div>';
+      html += '<div class="meteo-ico">' + ico + '</div>';
+      html += '<div class="meteo-hi">' + hi + '&#176;</div>';
+      html += '<div class="meteo-lo">' + lo + '&#176;</div>';
+      html += '<div class="meteo-desc">' + desc + '</div>';
+      html += '</div>';
+    }
+    c.innerHTML = html;
+  }).catch(function() {
+    var c2 = document.getElementById('meteo-days');
+    if (c2) c2.innerHTML = '<div class="empty">Indisponible</div>';
+  });
+}
+
+/* === RACCOURCIS === */
+var SC_KEY = 'mylife_sc_v1';
+function scLoad() {
+  try {
+    var d = localStorage.getItem(SC_KEY);
+    if (d) return JSON.parse(d);
+  } catch(e) {}
+  var arr = [];
+  for (var i = 0; i < 8; i++) arr.push({label: '', url: ''});
+  return arr;
+}
+function scSave(arr) {
+  try { localStorage.setItem(SC_KEY, JSON.stringify(arr)); } catch(e) {}
+}
+function scRender() {
+  var g = document.getElementById('sc-grid');
+  if (!g) return;
+  var sc = scLoad();
+  var html = '';
+  for (var i = 0; i < sc.length; i++) {
+    if (!sc[i].url) {
+      html += '<div class="sc-item empty" data-sci="' + i + '">&#65291;</div>';
+    } else {
+      var lbl = sc[i].label;
+      if (!lbl) { try { lbl = new URL(sc[i].url).hostname.replace('www.', ''); } catch(e2) { lbl = sc[i].url; } }
+      html += '<div class="sc-item" data-sci="' + i + '">';
+      html += '<div class="sc-lbl">' + lbl + '</div>';
+      html += '<div class="sc-edit-btn" data-sce="' + i + '">&#9998;</div>';
+      html += '</div>';
+    }
+  }
+  g.innerHTML = html;
+  g.onclick = function(e) {
+    var eb = e.target.closest('[data-sce]');
+    if (eb) { e.stopPropagation(); scEdit(parseInt(eb.dataset.sce, 10)); return; }
+    var it = e.target.closest('[data-sci]');
+    if (!it) return;
+    var idx = parseInt(it.dataset.sci, 10);
+    var s = scLoad()[idx];
+    if (!s.url) { scEdit(idx); return; }
+    window.open(s.url, '_blank', 'noopener');
+  };
+}
+function scEdit(idx) {
+  var sc = scLoad();
+  var url = prompt('URL :', sc[idx].url || 'https://');
+  if (url === null) return;
+  if (!url.trim()) { sc[idx] = {label: '', url: ''}; scSave(sc); scRender(); return; }
+  var label = prompt('Nom (vide = auto) :', sc[idx].label || '');
+  if (label === null) return;
+  sc[idx] = {label: label.trim(), url: url.trim()};
+  scSave(sc);
+  scRender();
+}
+
+/* === HEADER MODULES === */
+function renderHeaderMods() {
+  var row = document.getElementById('tb-mods-row');
+  if (!row || !mods) return;
+  row.innerHTML = '';
+  for (var i = 0; i < mods.length; i++) {
+    var m = mods[i];
+    if (m.disabled || !m.url) continue;
+    var a = document.createElement('a');
+    a.className = 'tb-mpill';
+    a.href = m.url;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.textContent = (m.icon || '') + ' ' + m.name;
+    row.appendChild(a);
+  }
+  row.classList.remove('hi');
+}
+
+/* === INIT === */
 function initNewWidgets() {
   var wm = document.getElementById('wc-meteo');
   var ws = document.getElementById('wc-shortcuts');
