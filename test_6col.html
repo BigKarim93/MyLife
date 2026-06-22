@@ -194,6 +194,7 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 .meteo-wrap{display:grid;grid-template-columns:1fr 1fr;gap:2px 18px;}
 .meteo-row{display:flex;align-items:center;gap:5px;padding:2px 0;}
 .meteo-row.today .meteo-day-lbl{color:var(--accent);font-weight:700;}
+.meteo-sep{grid-column:1/-1;height:1px;background:var(--line2);margin:3px 0;}
 .meteo-day-lbl{width:26px;font-size:.63rem;color:var(--dim);flex-shrink:0;}
 .meteo-ico{font-size:.95rem;width:20px;text-align:center;flex-shrink:0;}
 .meteo-hi{font-size:.65rem;color:var(--chalk);font-weight:700;width:26px;text-align:right;flex-shrink:0;}
@@ -203,6 +204,13 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 .sc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;}
 .sc-item{border:1px solid var(--line);border-radius:7px;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:.15s;position:relative;min-height:52px;justify-content:center;}
 .sc-item:hover{border-color:var(--accent);}
+.sc-item[data-color="1"]{border-color:rgba(242,193,78,.4);}
+.sc-item[data-color="2"]{border-color:rgba(74,222,128,.4);}
+.sc-item[data-color="3"]{border-color:rgba(96,165,250,.4);}
+.sc-item[data-color="4"]{border-color:rgba(248,113,113,.4);}
+.sc-item[data-color="5"]{border-color:rgba(192,132,252,.4);}
+.sc-item[data-color="6"]{border-color:rgba(251,146,60,.4);}
+.sc-item[data-color="7"]{border-color:rgba(45,212,191,.4);}
 .sc-item.empty{background:var(--bg3);border-style:dashed;color:var(--dim);font-size:.8rem;}
 .sc-item.dragging{opacity:.4;}
 .sc-item.drag-over{border-color:var(--accent);background:rgba(242,193,78,.1);}
@@ -1623,6 +1631,7 @@ function doFetchMeteo() {
       var ico = METEO_WCO[d.daily.weathercode[i]] || '';
       var hi = Math.round(d.daily.temperature_2m_max[i]);
       var lo = Math.round(d.daily.temperature_2m_min[i]);
+      if (i === 5) html += '<div class="meteo-sep"></div>';
       html += '<div class="meteo-row' + (isT ? ' today' : '') + '">';
       html += '<div class="meteo-day-lbl">' + lbl + '</div>';
       html += '<div class="meteo-ico">' + ico + '</div>';
@@ -1640,7 +1649,7 @@ function doFetchMeteo() {
 
 /* ======== RACCOURCIS ======== */
 var SC_KEY = 'mylife_sc_v1';
-var SC_COLORS = ['var(--bg3)','rgba(242,193,78,.15)','rgba(74,222,128,.12)','rgba(96,165,250,.15)','rgba(248,113,113,.12)','rgba(192,132,252,.12)','rgba(251,146,60,.12)','rgba(45,212,191,.12)'];
+var SC_COLORS = ['var(--bg3)','rgba(242,193,78,.22)','rgba(74,222,128,.20)','rgba(96,165,250,.22)','rgba(248,113,113,.20)','rgba(192,132,252,.20)','rgba(251,146,60,.20)','rgba(45,212,191,.20)'];
 var SC_COLOR_LABELS = ['Défaut','Jaune','Vert','Bleu','Rouge','Violet','Orange','Cyan'];
 function scLoad() {
   try { var d = localStorage.getItem(SC_KEY); if (d) return JSON.parse(d); } catch(e) {}
@@ -1657,11 +1666,11 @@ function scRender() {
   for (var i = 0; i < sc.length; i++) {
     var bg = SC_COLORS[sc[i].color || 0];
     if (!sc[i].url) {
-      html += '<div class="sc-item empty" data-sci="' + i + '" style="background:' + bg + ';" draggable="true" data-scd="' + i + '">&#65291;</div>';
+      html += '<div class="sc-item empty" data-sci="' + i + '" data-color="' + (sc[i].color||0) + '" style="background:' + bg + ';" draggable="true" data-scd="' + i + '">&#65291;</div>';
     } else {
       var lbl = sc[i].label;
       if (!lbl) { try { lbl = new URL(sc[i].url).hostname.replace('www.', ''); } catch(e2) { lbl = sc[i].url; } }
-      html += '<div class="sc-item" data-sci="' + i + '" style="background:' + bg + ';" draggable="true" data-scd="' + i + '">';
+      html += '<div class="sc-item" data-sci="' + i + '" data-color="' + (sc[i].color||0) + '" style="background:' + bg + ';" draggable="true" data-scd="' + i + '">';
       html += '<div class="sc-lbl">' + lbl + '</div>';
       html += '<div class="sc-edit-btn" data-sce="' + i + '">&#9998;</div>';
       html += '</div>';
