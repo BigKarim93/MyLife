@@ -791,7 +791,7 @@ try{db.enablePersistence({synchronizeTabs:true}).catch(()=>{});}catch(e){}
 
 auth.onAuthStateChanged(async user=>{
   if(!user){$('ls').classList.add('hi');$('auth-wrap').classList.remove('hi');return;}
-  $('uem').textContent=user.displayName||user.email||'';
+  if($('uem'))$('uem').textContent=user.displayName||user.email||'';
   $('tbr').classList.remove('hi');
   hubDoc=db.collection('users').doc(user.uid).collection('modules').doc('hub');
   tDoc=db.collection('users').doc(user.uid).collection('modules').doc('tasks');
