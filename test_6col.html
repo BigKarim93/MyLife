@@ -1846,7 +1846,6 @@ $('color-pop').addEventListener('click',e=>{
   } else if(colorPopTarget.type==='routine'){
     const item=routineData.items.find(x=>x.id===colorPopTarget.id);
     if(item){ if(color) item.color=color; else delete item.color; saveRoutine(); renderRoutine(); }
-  }
   } else if(colorPopTarget.type==='shortcut'){
     const sc2=scLoad();
     if(color) sc2[colorPopTarget.id].color=color; else delete sc2[colorPopTarget.id].color;
