@@ -92,6 +92,7 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 .titem:hover .tdl{opacity:1;}
 .tcolor{width:13px;height:13px;border-radius:50%;border:2px solid var(--line);cursor:pointer;flex-shrink:0;opacity:0;transition:.15s;}
 .titem:hover .tcolor{opacity:1;}
+.sc-item:hover .tcolor{opacity:1;}
 .color-pop{position:fixed;display:none;background:var(--bg2);border:1px solid var(--line2);border-radius:9px;padding:8px;z-index:400;box-shadow:0 8px 24px rgba(0,0,0,.45);}
 .color-pop.op{display:flex;gap:5px;flex-wrap:wrap;width:130px;}
 .color-pop .cdot{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;}
@@ -252,6 +253,7 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 
 .tcolor{width:13px;height:13px;border-radius:50%;border:2px solid var(--line);cursor:pointer;flex-shrink:0;opacity:0;transition:.15s;}
 .titem:hover .tcolor{opacity:1;}
+.sc-item:hover .tcolor{opacity:1;}
 .rcolor{width:12px;height:12px;border-radius:50%;border:2px solid var(--line);cursor:pointer;flex-shrink:0;opacity:0;transition:.15s;}
 .rbox:hover .rcolor{opacity:1;}
 .color-pop{position:fixed;display:none;background:var(--bg2);border:1px solid var(--line2);border-radius:9px;padding:8px;z-index:400;box-shadow:0 8px 24px rgba(0,0,0,.45);}
@@ -319,6 +321,7 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 
 .tcolor{width:13px;height:13px;border-radius:50%;border:2px solid var(--line);cursor:pointer;flex-shrink:0;opacity:0;transition:.15s;}
 .titem:hover .tcolor{opacity:1;}
+.sc-item:hover .tcolor{opacity:1;}
 .rcolor{width:12px;height:12px;border-radius:50%;border:2px solid var(--line);cursor:pointer;flex-shrink:0;opacity:0;transition:.15s;}
 .rbox:hover .rcolor{opacity:1;}
 .color-pop{position:fixed;display:none;background:var(--bg2);border:1px solid var(--line2);border-radius:9px;padding:8px;z-index:400;box-shadow:0 8px 24px rgba(0,0,0,.45);}
@@ -386,6 +389,7 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 
 .tcolor{width:13px;height:13px;border-radius:50%;border:2px solid var(--line);cursor:pointer;flex-shrink:0;opacity:0;transition:.15s;}
 .titem:hover .tcolor{opacity:1;}
+.sc-item:hover .tcolor{opacity:1;}
 .rcolor{width:12px;height:12px;border-radius:50%;border:2px solid var(--line);cursor:pointer;flex-shrink:0;opacity:0;transition:.15s;}
 .rbox:hover .rcolor{opacity:1;}
 .color-pop{position:fixed;display:none;background:var(--bg2);border:1px solid var(--line2);border-radius:9px;padding:8px;z-index:400;box-shadow:0 8px 24px rgba(0,0,0,.45);}
@@ -2069,7 +2073,7 @@ $('thclose').addEventListener('click',()=>$('ov-theme').classList.remove('op'));
 function doFetchMeteo() {
   var c = document.getElementById('meteo-days');
   if (!c) return;
-  var u = 'https://api.open-meteo.com/v1/forecast?latitude=48.9578&longitude=2.5388&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=Europe%2FParis&forecast_days=10';
+  var u = 'https://api.open-meteo.com/v1/forecast?latitude=48.9578&longitude=2.5388&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=Europe%2FParis&forecast_days=10';
   fetch(u).then(function(r) { return r.json(); }).then(function(d) {
     var today = new Date().toISOString().slice(0, 10);
     var html = '<div class="meteo-wrap">';
@@ -2078,7 +2082,7 @@ function doFetchMeteo() {
       var isT = (dt === today);
       var date = new Date(dt + 'T12:00:00');
       var lbl = isT ? 'Auj.' : METEO_DN[date.getDay()];
-      var ico = METEO_WCO[d.daily.weathercode[i]] || '';
+      var ico = METEO_WCO[d.daily.weather_code[i]] || '';
       var hi = Math.round(d.daily.temperature_2m_max[i]);
       var lo = Math.round(d.daily.temperature_2m_min[i]);
       html += '<div class="meteo-row' + (isT ? ' today' : '') + '">';
