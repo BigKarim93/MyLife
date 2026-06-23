@@ -1814,38 +1814,8 @@ function initNewWidgets() {
   setInterval(doFetchMeteo, 30*60*1000);
 }
 
-
-/* ======== SYSTÈME COULEUR ======== */
-
-
-
-
-
-
-$('color-pop').addEventListener('click',e=>{
-  const dot=e.target.closest('[data-color]');
-  if(!dot||!colorPopTarget)return;
-  const color=dot.dataset.color;
-  if(colorPopTarget.type==='task'){
-    const t=tData[colorPopTarget.dataKey].find(x=>x.id===colorPopTarget.id);
-    if(t){ if(color) t.color=color; else delete t.color; saveTasks(); renderTasks(); }
-  } else if(colorPopTarget.type==='routine'){
-    const item=routineData.items.find(x=>x.id===colorPopTarget.id);
-    if(item){ if(color) item.color=color; else delete item.color; saveRoutine(); renderRoutine(); }
-  } else if(colorPopTarget.type==='shortcut'){
-    const sc2=scLoad();
-    if(color) sc2[colorPopTarget.id].color=color; else delete sc2[colorPopTarget.id].color;
-    scSave(sc2); scRender();
-  }
-  closeColorPop();
-});
-
-
-
-
-
 /* === COULEURS === */
-TASK_COLORS=['#f87171','#fb923c','#fbbf24','#4ade80','#2dd4bf','#60a5fa','#a78bfa','#f472b6'];
+const TASK_COLORS=['#f87171','#fb923c','#fbbf24','#4ade80','#2dd4bf','#60a5fa','#a78bfa','#f472b6'];
 let colorPopTarget=null;
 function buildColorPop(){
   const pop=$('color-pop');
