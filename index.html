@@ -1268,12 +1268,7 @@ $('color-pop').addEventListener('click',e=>{
 });
 document.addEventListener('click',e=>{
   if(!colorPopTarget)return;
-  if(e.target.closest('.color-pop')||e.target.closest('.tcolor')||e.target.closest('.rcolor'))return;
-  } else if(colorPopTarget.type==='shortcut'){
-    const sc2=scLoad();
-    if(color) sc2[colorPopTarget.id].color=color; else delete sc2[colorPopTarget.id].color;
-    scSave(sc2); scRender();
-  }
+  if(e.target.closest('.color-pop')||e.target.closest('.tcolor')||e.target.closest('.rcolor')||e.target.closest('[data-sccolor]'))return;
   closeColorPop();
 });
 
