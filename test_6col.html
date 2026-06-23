@@ -1842,28 +1842,26 @@ $('color-pop').addEventListener('click',e=>{
 
 
 
-/* === COULEURS (copie exacte index.html) === */
-TASK_COLORS=['#f87171','#fb923c','#fbbf24','#4ade80','#2dd4bf','#60a5fa','#a78bfa','#f472b6'];
-let colorPopTarget=null; // {type:'task'|'routine', id, dataKey}
 
+
+/* === COULEURS === */
+TASK_COLORS=['#f87171','#fb923c','#fbbf24','#4ade80','#2dd4bf','#60a5fa','#a78bfa','#f472b6'];
+let colorPopTarget=null;
 function buildColorPop(){
   const pop=$('color-pop');
   let html='<div class="cdot none" data-color="">✕</div>';
   TASK_COLORS.forEach(c=>{ html+=`<div class="cdot" style="background:${c}" data-color="${c}"></div>`; });
   pop.innerHTML=html;
 }
-buildColorPop();
-
-function openColorPop(target, anchorEl){
+function openColorPop(target,anchorEl){
   colorPopTarget=target;
   const pop=$('color-pop');
   const rect=anchorEl.getBoundingClientRect();
-  pop.style.left=Math.min(rect.left, window.innerWidth-140)+'px';
+  pop.style.left=Math.min(rect.left,window.innerWidth-140)+'px';
   pop.style.top=(rect.bottom+4)+'px';
   pop.classList.add('op');
 }
 function closeColorPop(){ $('color-pop').classList.remove('op'); colorPopTarget=null; }
-
 $('color-pop').addEventListener('click',e=>{
   const dot=e.target.closest('[data-color]');
   if(!dot||!colorPopTarget)return;
@@ -1883,15 +1881,9 @@ $('color-pop').addEventListener('click',e=>{
 });
 document.addEventListener('click',e=>{
   if(!colorPopTarget)return;
-  if(e.target.closest('.color-pop')||e.target.closest('.tcolor')||e.target.closest('.rcolor'))return;
-  } else if(colorPopTarget.type==='shortcut'){
-    const sc2=scLoad();
-    if(color) sc2[colorPopTarget.id].color=color; else delete sc2[colorPopTarget.id].color;
-    scSave(sc2); scRender();
-  }
+  if(e.target.closest('.color-pop')||e.target.closest('.tcolor')||e.target.closest('.rcolor')||e.target.closest('[data-sccolor]'))return;
   closeColorPop();
 });
-
 </script>
 <div class="color-pop" id="color-pop"></div>
 </body>
