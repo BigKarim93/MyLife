@@ -225,8 +225,8 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 .tb-mpill.edit-mode{border-color:var(--accent);background:rgba(242,193,78,.1);}
 .tb-add-mod{background:transparent;border:1px dashed var(--line);color:var(--dim);border-radius:8px;padding:4px 8px;font-size:.73rem;cursor:pointer;transition:.15s;white-space:nowrap;}
 .tb-add-mod:hover{border-color:var(--accent);color:var(--accent);}
-.tcolor{width:13px;height:13px;border-radius:50%;border:2px solid var(--line);cursor:pointer;flex-shrink:0;opacity:0;transition:.15s;}
-.titem:hover .tcolor{opacity:1;}
+.tcolor,.rcolor{width:13px;height:13px;border-radius:50%;border:2px solid var(--line);cursor:pointer;flex-shrink:0;opacity:0;transition:.15s;background:transparent;}
+.titem:hover .tcolor,.rbox:hover .rcolor{opacity:1;}
 .color-pop{position:fixed;display:none;background:var(--bg2);border:1px solid var(--line2);border-radius:9px;padding:8px;z-index:400;box-shadow:0 8px 24px rgba(0,0,0,.45);}
 .color-pop.op{display:flex;gap:5px;flex-wrap:wrap;width:130px;}
 .color-pop .cdot{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;}
@@ -1848,10 +1848,12 @@ $('color-pop').addEventListener('click',e=>{
 
 document.addEventListener('click',e=>{
   if(!colorPopTarget)return;
-  if(e.target.closest('.color-pop')||e.target.closest('.tcolor')||e.target.closest('.rcolor'))return;
+  if(e.target.closest('.color-pop')) return;
+  if(e.target.closest('.tcolor')) return;
+  if(e.target.closest('.rcolor')) return;
+  if(e.target.closest('[data-sccolor]')) return;
   closeColorPop();
 });
-
 
 </script>
 <div class="color-pop" id="color-pop"></div>
