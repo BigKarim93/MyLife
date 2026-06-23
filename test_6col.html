@@ -1030,8 +1030,6 @@ function wireTaskWidget(wid){
     if(dl){ tData[dataKey]=tData[dataKey].filter(x=>x.id!==dl.dataset.dl); saveTasks(); renderTasks(); return; }
     const colorBtn=e.target.closest('[data-color]');
     if(colorBtn){ openColorPop({type:'task',id:colorBtn.dataset.color,dataKey}, colorBtn); return; }
-    const colorBtn=e.target.closest('[data-color]');
-    if(colorBtn){ openColorPop({type:'task',id:colorBtn.dataset.color,dataKey}, colorBtn); return; }
 
     const ck=e.target.closest('[data-ck]');
     if(ck){
