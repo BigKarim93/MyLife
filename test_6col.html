@@ -190,7 +190,7 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 
 
 
-/* MÉTÉO — 2 colonnes, 10 jours */
+
 .meteo-wrap{display:grid;grid-template-columns:1fr 1fr;gap:2px 0;}
 .meteo-wrap .meteo-row:nth-child(odd){padding-right:10px;border-right:1px solid var(--line2);}
 .meteo-wrap .meteo-row:nth-child(even){padding-left:10px;}
@@ -201,7 +201,7 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 .meteo-hi{font-size:.65rem;color:var(--chalk);font-weight:700;width:26px;text-align:right;flex-shrink:0;}
 .meteo-lo{font-size:.65rem;color:var(--dim);width:22px;flex-shrink:0;}
 .meteo-lo{font-size:.68rem;color:var(--dim);width:24px;}
-/* RACCOURCIS */
+
 .sc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;}
 .sc-item{border:1px solid var(--line);border-radius:7px;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:.15s;position:relative;min-height:52px;justify-content:center;}
 .sc-item:hover{border-color:var(--accent);}
@@ -218,20 +218,28 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 .sc-lbl{font-size:.58rem;color:var(--chalk);font-weight:600;text-align:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:54px;}
 .sc-edit-btn{position:absolute;top:2px;right:2px;font-size:.55rem;display:none;cursor:pointer;color:rgba(255,255,255,.6);background:rgba(0,0,0,.3);border-radius:3px;padding:1px 3px;}
 .sc-item:hover .sc-edit-btn{display:block;}
-/* HEADER MODULES */
+
 .tb-mods{display:flex;align-items:center;gap:5px;flex-wrap:wrap;flex:1;min-width:0;}
 .tb-mpill{background:var(--bg3);border:1px solid var(--line2);color:var(--chalk);border-radius:8px;padding:4px 9px;font-size:.73rem;font-weight:600;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;text-decoration:none;}
 .tb-mpill:hover{border-color:var(--accent);color:var(--accent);}
 .tb-mpill.edit-mode{border-color:var(--accent);background:rgba(242,193,78,.1);}
 .tb-add-mod{background:transparent;border:1px dashed var(--line);color:var(--dim);border-radius:8px;padding:4px 8px;font-size:.73rem;cursor:pointer;transition:.15s;white-space:nowrap;}
 .tb-add-mod:hover{border-color:var(--accent);color:var(--accent);}
-.tcolor,.rcolor{width:13px;height:13px;border-radius:50%;border:2px solid var(--line);cursor:pointer;flex-shrink:0;opacity:0;transition:.15s;background:transparent;}
-.titem:hover .tcolor,.rbox:hover .rcolor{opacity:1;}
 .color-pop{position:fixed;display:none;background:var(--bg2);border:1px solid var(--line2);border-radius:9px;padding:8px;z-index:400;box-shadow:0 8px 24px rgba(0,0,0,.45);}
 .color-pop.op{display:flex;gap:5px;flex-wrap:wrap;width:130px;}
 .color-pop .cdot{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;}
 .color-pop .cdot:hover{border-color:var(--chalk);}
 .color-pop .cdot.none{background:var(--bg3);border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:.6rem;color:var(--dim);}
+
+.tcolor{width:13px;height:13px;border-radius:50%;border:2px solid var(--line);cursor:pointer;flex-shrink:0;opacity:0;transition:.15s;}
+.titem:hover .tcolor{opacity:1;}
+.color-pop{position:fixed;display:none;background:var(--bg2);border:1px solid var(--line2);border-radius:9px;padding:8px;z-index:400;box-shadow:0 8px 24px rgba(0,0,0,.45);}
+.color-pop.op{display:flex;gap:5px;flex-wrap:wrap;width:130px;}
+.color-pop .cdot{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;}
+.color-pop .cdot:hover{border-color:var(--chalk);}
+.color-pop .cdot.none{background:var(--bg3);border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:.6rem;color:var(--dim);}
+.tdl:hover{border-color:var(--red);color:var(--red);}
+.empty{text-align:center;padding:12px;color:var(--dim);font-size:.78rem;}
 
 </style>
 </head>
@@ -1808,9 +1816,35 @@ function initNewWidgets() {
 
 
 /* ======== SYSTÈME COULEUR ======== */
-TASK_COLORS=['#f87171','#fb923c','#fbbf24','#4ade80','#2dd4bf','#60a5fa','#a78bfa','#f472b6'];
 
-let colorPopTarget=null;
+
+
+
+
+
+$('color-pop').addEventListener('click',e=>{
+  const dot=e.target.closest('[data-color]');
+  if(!dot||!colorPopTarget)return;
+  const color=dot.dataset.color;
+  if(colorPopTarget.type==='task'){
+    const t=tData[colorPopTarget.dataKey].find(x=>x.id===colorPopTarget.id);
+    if(t){ if(color) t.color=color; else delete t.color; saveTasks(); renderTasks(); }
+  } else if(colorPopTarget.type==='routine'){
+    const item=routineData.items.find(x=>x.id===colorPopTarget.id);
+    if(item){ if(color) item.color=color; else delete item.color; saveRoutine(); renderRoutine(); }
+  } else if(colorPopTarget.type==='shortcut'){
+    const sc2=scLoad();
+    if(color) sc2[colorPopTarget.id].color=color; else delete sc2[colorPopTarget.id].color;
+    scSave(sc2); scRender();
+  }
+  closeColorPop();
+});
+
+
+
+/* === COULEURS (copie exacte index.html) === */
+TASK_COLORS=['#f87171','#fb923c','#fbbf24','#4ade80','#2dd4bf','#60a5fa','#a78bfa','#f472b6'];
+let colorPopTarget=null; // {type:'task'|'routine', id, dataKey}
 
 function buildColorPop(){
   const pop=$('color-pop');
@@ -1818,6 +1852,8 @@ function buildColorPop(){
   TASK_COLORS.forEach(c=>{ html+=`<div class="cdot" style="background:${c}" data-color="${c}"></div>`; });
   pop.innerHTML=html;
 }
+buildColorPop();
+
 function openColorPop(target, anchorEl){
   colorPopTarget=target;
   const pop=$('color-pop');
@@ -1838,6 +1874,7 @@ $('color-pop').addEventListener('click',e=>{
   } else if(colorPopTarget.type==='routine'){
     const item=routineData.items.find(x=>x.id===colorPopTarget.id);
     if(item){ if(color) item.color=color; else delete item.color; saveRoutine(); renderRoutine(); }
+  }
   } else if(colorPopTarget.type==='shortcut'){
     const sc2=scLoad();
     if(color) sc2[colorPopTarget.id].color=color; else delete sc2[colorPopTarget.id].color;
@@ -1845,10 +1882,14 @@ $('color-pop').addEventListener('click',e=>{
   }
   closeColorPop();
 });
-
 document.addEventListener('click',e=>{
   if(!colorPopTarget)return;
-  if(e.target.closest('.color-pop')||e.target.closest('.tcolor')||e.target.closest('.rcolor')||e.target.closest('[data-sccolor]'))return;
+  if(e.target.closest('.color-pop')||e.target.closest('.tcolor')||e.target.closest('.rcolor'))return;
+  } else if(colorPopTarget.type==='shortcut'){
+    const sc2=scLoad();
+    if(color) sc2[colorPopTarget.id].color=color; else delete sc2[colorPopTarget.id].color;
+    scSave(sc2); scRender();
+  }
   closeColorPop();
 });
 
