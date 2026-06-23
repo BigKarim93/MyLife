@@ -404,10 +404,8 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 <div class="ls" id="ls"><div class="lbox"><div class="spin"></div><p>Connexion…</p></div></div>
 
 <div class="tb">
-  <h1>🏠 MyLife</h1>
   <div class="tb-mods hi" id="tb-mods-row"></div>
-  <div class="tb-r hi" id="tbr">
-    <span id="uem" style="font-size:.78rem;color:var(--dim);"></span>
+  <div class="tb-r hi" id="tbr" style="margin-left:0;">
     <button class="btn" id="btn-gedit">✏️ Disposition</button>
     <button class="btn" id="btn-clean-empty" style="display:none;">🧹 Nettoyer</button>
     <button class="btn" id="btn-theme">🎨 Thème</button>
@@ -433,11 +431,7 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 
 <div class="page hi" id="page">
   <!-- Modules -->
-  <div class="mod-col">
-    <div class="mod-col-hdr"><h2>Modules</h2><button class="btn sm" id="btn-medit">✏️</button></div>
-    <div id="mlist"></div>
-    <button class="add-mod" id="btn-addm">＋ Ajouter</button>
-  </div>
+  
 
   <!-- Grid — identique à test3.html -->
   <div class="grid-col">
@@ -983,7 +977,7 @@ try{db.enablePersistence({synchronizeTabs:true}).catch(()=>{});}catch(e){}
 
 auth.onAuthStateChanged(async user=>{
   if(!user){$('ls').classList.add('hi');$('auth-wrap').classList.remove('hi');return;}
-  $('uem').textContent=user.displayName||user.email||'';
+  if($('uem'))$('uem').textContent=user.displayName||user.email||'';
   $('tbr').classList.remove('hi');
   hubDoc=db.collection('users').doc(user.uid).collection('modules').doc('hub');
   tDoc=db.collection('users').doc(user.uid).collection('modules').doc('tasks');
@@ -1176,8 +1170,8 @@ $('szdone').addEventListener('click',()=>$('ov-size').classList.remove('op'));
 document.addEventListener('click',e=>{if(!selW)return;if(e.target.closest('.wcell')||e.target.closest('#ghost-layer')||e.target.closest('.ov'))return;selW=null;hideGhosts();WIDGETS.forEach(i=>$('wc-'+i).classList.remove('picked'));});
 
 /* MODULES */
-function renderMods(){
-  const list=$('mlist');list.innerHTML='';
+function renderMods(){const list=$('mlist');if(!list)return;
+  list.innerHTML='';
   mods.forEach((m,idx)=>{
     const el=document.createElement('div');el.className='mtile'+(m.disabled?' dis':'');
     el.innerHTML=`<button class="mdel">✕</button><div class="mico">${m.icon||'📦'}</div><div class="minfo"><h3>${esc(m.name)}</h3>${m.desc?`<p>${esc(m.desc)}</p>`:''}</div>`;
@@ -1199,8 +1193,8 @@ function renderMods(){
   });
 }
 function saveMods(){if(!hubDoc)return;clearTimeout(modT);modT=setTimeout(()=>hubDoc.set({modules:mods}).catch(()=>{}),600);}
-$('btn-medit').addEventListener('click',()=>{modEdit=!modEdit;$('btn-medit').classList.toggle('act',modEdit);renderMods();});
-$('btn-addm').addEventListener('click',()=>openMod(null));
+if($('btn-medit'))$('btn-medit').addEventListener('click',()=>{modEdit=!modEdit;$('btn-medit').classList.toggle('act',modEdit);renderMods();});
+if($('btn-addm'))$('btn-addm').addEventListener('click',()=>openMod(null));
 function openMod(m){modEditId=m?m.id:null;$('modtitle').textContent=m?'Modifier':'Ajouter';$('moji').value=m?(m.icon||''):'';$('mname').value=m?m.name:'';$('mdesc').value=m?(m.desc||''):'';$('murl').value=m?(m.url||''):'';$('mdel').style.display=m?'inline-flex':'none';$('ov-mod').classList.add('op');}
 $('mcancel').addEventListener('click',()=>$('ov-mod').classList.remove('op'));
 $('msave').addEventListener('click',()=>{const name=$('mname').value.trim();if(!name){alert('Nom requis');return;}const data={id:modEditId||'m'+Date.now(),icon:$('moji').value.trim()||'📦',name,desc:$('mdesc').value.trim(),url:$('murl').value.trim(),disabled:!$('murl').value.trim()};if(modEditId){const i=mods.findIndex(m=>m.id===modEditId);if(i>-1)mods[i]=data;}else mods.push(data);saveMods();$('ov-mod').classList.remove('op');renderMods();});
