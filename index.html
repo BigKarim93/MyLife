@@ -2138,9 +2138,13 @@ function scRender() {
 
 function scWireEvents(g) {
   var dragSrc = null;
+  g.addEventListener('mousedown', function(e) {
+    var cb2 = e.target.closest('[data-sccolor]');
+    if (cb2) { e.stopPropagation(); e.preventDefault(); openColorPop({type:'shortcut',id:parseInt(cb2.dataset.sccolor,10)}, cb2); return; }
+  });
   g.onclick = function(e) {
     var cb2 = e.target.closest('[data-sccolor]');
-    if (cb2) { openColorPop({type:'shortcut',id:parseInt(cb2.dataset.sccolor,10)}, cb2); return; }
+    if (cb2) { e.stopPropagation(); return; }
     var eb = e.target.closest('[data-sce]');
     if (eb) { e.stopPropagation(); scEdit(parseInt(eb.dataset.sce, 10)); return; }
     var it = e.target.closest('[data-sci]');
