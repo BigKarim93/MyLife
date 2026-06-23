@@ -1029,7 +1029,7 @@ function wireTaskWidget(wid){
     const dl=e.target.closest('[data-dl]');
     if(dl){ tData[dataKey]=tData[dataKey].filter(x=>x.id!==dl.dataset.dl); saveTasks(); renderTasks(); return; }
     const colorBtn=e.target.closest('[data-color]');
-    if(colorBtn){ openColorPop({type:'task',id:colorBtn.dataset.color,dataKey}, colorBtn); return; }
+    if(colorBtn){ openColorPop({type:'task',id:colorBtn.dataset.color,dataKey}, colorBtn, e); return; }
 
     const ck=e.target.closest('[data-ck]');
     if(ck){
@@ -1480,7 +1480,7 @@ function wireRoutine(){
       return;
     }
     const rcolorBtn=e.target.closest('[data-color]');
-    if(rcolorBtn){ openColorPop({type:'routine',id:rcolorBtn.dataset.color}, rcolorBtn); return; }
+    if(rcolorBtn){ openColorPop({type:'routine',id:rcolorBtn.dataset.color}, rcolorBtn, e); return; }
     const box=e.target.closest('.rbox');
     if(!box)return;
     // Attendre un court instant pour voir si un second clic arrive (= dblclick → renommage)
@@ -1703,7 +1703,7 @@ function scWireEvents(g) {
   var dragSrc = null;
   g.onclick = function(e) {
     var cb2 = e.target.closest('[data-sccolor]');
-    if (cb2) { e.stopPropagation(); openColorPop({type:'shortcut',id:parseInt(cb2.dataset.sccolor,10)}, cb2); return; }
+    if (cb2) { openColorPop({type:'shortcut',id:parseInt(cb2.dataset.sccolor,10)}, cb2, e); return; }
     var eb = e.target.closest('[data-sce]');
     if (eb) { e.stopPropagation(); scEdit(parseInt(eb.dataset.sce, 10)); return; }
     var it = e.target.closest('[data-sci]');
@@ -1818,7 +1818,8 @@ function buildColorPop(){
   TASK_COLORS.forEach(c=>{ html+=`<div class="cdot" style="background:${c}" data-color="${c}"></div>`; });
   pop.innerHTML=html;
 }
-function openColorPop(target, anchorEl){
+function openColorPop(target, anchorEl, evt){
+  if(evt) evt.stopPropagation();
   colorPopTarget=target;
   const pop=$('color-pop');
   const rect=anchorEl.getBoundingClientRect();
@@ -1849,9 +1850,6 @@ $('color-pop').addEventListener('click',e=>{
 document.addEventListener('click',e=>{
   if(!colorPopTarget)return;
   if(e.target.closest('.color-pop')) return;
-  if(e.target.closest('.tcolor')) return;
-  if(e.target.closest('.rcolor')) return;
-  if(e.target.closest('[data-sccolor]')) return;
   closeColorPop();
 });
 
