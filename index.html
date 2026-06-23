@@ -2090,9 +2090,11 @@ function doFetchMeteo() {
     }
     html += '</div>';
     c.innerHTML = html;
-  }).catch(function() {
+  }).catch(function(err) {
+    console.error('Météo fetch error:', err);
     var c2 = document.getElementById('meteo-days');
     if (c2) c2.innerHTML = '<div class="empty">Indisponible</div>';
+    setTimeout(doFetchMeteo, 60000);
   });
 }
 
@@ -2115,7 +2117,7 @@ function scRender() {
   for (var i = 0; i < sc.length; i++) {
     var col2=sc[i].color||''; var bg=col2?col2+'2e':'var(--bg3)'; var brd=col2?'border-color:'+col2+';':'';
     if (!sc[i].url) {
-      html += '<div class="sc-item empty" data-sci="' + i + '" style="background:' + bg + ';' + brd + '" draggable="true" data-scd="' + i + '">&#65291;</div>';
+      html += '<div class="sc-item empty" data-sci="' + i + '" style="background:' + bg + ';' + brd + '" draggable="true" data-scd="' + i + '"><div class="tcolor" data-sccolor="' + i + '"></div>&#65291;</div>';
     } else {
       var lbl = sc[i].label;
       if (!lbl) { try { lbl = new URL(sc[i].url).hostname.replace('www.', ''); } catch(e2) { lbl = sc[i].url; } }
