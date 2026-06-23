@@ -1481,8 +1481,6 @@ function wireRoutine(){
     }
     const rcolorBtn=e.target.closest('[data-color]');
     if(rcolorBtn){ openColorPop({type:'routine',id:rcolorBtn.dataset.color}, rcolorBtn); return; }
-    const rcolorBtn=e.target.closest('[data-color]');
-    if(rcolorBtn){ openColorPop({type:'routine',id:rcolorBtn.dataset.color}, rcolorBtn); return; }
     const box=e.target.closest('.rbox');
     if(!box)return;
     // Attendre un court instant pour voir si un second clic arrive (= dblclick → renommage)
@@ -1513,10 +1511,6 @@ function wireRoutine(){
   // Glisser-déposer pour réordonner
   let dragSrcId=null;
   grid.addEventListener('dragstart',e=>{
-    const rcolorBtn=e.target.closest('[data-color]');
-    if(rcolorBtn){ openColorPop({type:'routine',id:rcolorBtn.dataset.color}, rcolorBtn); return; }
-    const rcolorBtn=e.target.closest('[data-color]');
-    if(rcolorBtn){ openColorPop({type:'routine',id:rcolorBtn.dataset.color}, rcolorBtn); return; }
     const box=e.target.closest('.rbox');
     if(!box)return;
     dragSrcId=box.dataset.id;
