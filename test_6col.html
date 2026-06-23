@@ -1819,13 +1819,13 @@ function buildColorPop(){
   pop.innerHTML=html;
 }
 function openColorPop(target, anchorEl, evt){
-  if(evt) evt.stopPropagation();
-  colorPopTarget=target;
+  if(evt){ evt.stopPropagation(); evt.preventDefault(); }
   const pop=$('color-pop');
   const rect=anchorEl.getBoundingClientRect();
   pop.style.left=Math.min(rect.left, window.innerWidth-140)+'px';
   pop.style.top=(rect.bottom+4)+'px';
   pop.classList.add('op');
+  setTimeout(function(){ colorPopTarget=target; }, 10);
 }
 function closeColorPop(){ $('color-pop').classList.remove('op'); colorPopTarget=null; }
 
