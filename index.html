@@ -961,7 +961,7 @@ const SPORT_GOAL=83,SPORT_START_W=97.2,SPORT_MS=2,SPORT_TARGET=3,SPORT_FROM='202
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 /* STATE */
-let mods=null,modEdit=false,modEditId=null,modDragIdx=null,hubDoc=null,modT=null;
+let mods=null,modEdit=false,modEditId=null,modDragIdx=null,modMenuEdit=false,hubDoc=null,modT=null;
 let tData={tasks:[],cats:[],titles:{}},tDoc=null,tT=null;
 let spData={weights:[],goal:SPORT_GOAL,startWeight:SPORT_START_W},spDoc=null;
 let wLayout={t2:Object.assign({},LAYOUT_DEFAULT.t2),t3:Object.assign({},LAYOUT_DEFAULT.t3),t4:Object.assign({},LAYOUT_DEFAULT.t4),t5:Object.assign({},LAYOUT_DEFAULT.t5),t6:Object.assign({},LAYOUT_DEFAULT.t6),task1:Object.assign({},LAYOUT_DEFAULT.task1),note1:Object.assign({},LAYOUT_DEFAULT.note1)},layDoc=null,layT=null;
@@ -1170,7 +1170,7 @@ $('szdone').addEventListener('click',()=>$('ov-size').classList.remove('op'));
 document.addEventListener('click',e=>{if(!selW)return;if(e.target.closest('.wcell')||e.target.closest('#ghost-layer')||e.target.closest('.ov'))return;selW=null;hideGhosts();WIDGETS.forEach(i=>$('wc-'+i).classList.remove('picked'));});
 
 /* MODULES */
-function renderMods(){const list=$('mlist');if(!list)return;
+function renderMods(){renderHeaderMods();const list=$('mlist');if(!list)return;
   list.innerHTML='';
   mods.forEach((m,idx)=>{
     const el=document.createElement('div');el.className='mtile'+(m.disabled?' dis':'');
