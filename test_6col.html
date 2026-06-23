@@ -1030,6 +1030,8 @@ function wireTaskWidget(wid){
     if(dl){ tData[dataKey]=tData[dataKey].filter(x=>x.id!==dl.dataset.dl); saveTasks(); renderTasks(); return; }
     const colorBtn=e.target.closest('[data-color]');
     if(colorBtn){ openColorPop({type:'task',id:colorBtn.dataset.color,dataKey}, colorBtn); return; }
+    const colorBtn=e.target.closest('[data-color]');
+    if(colorBtn){ openColorPop({type:'task',id:colorBtn.dataset.color,dataKey}, colorBtn); return; }
 
     const ck=e.target.closest('[data-ck]');
     if(ck){
@@ -1481,6 +1483,8 @@ function wireRoutine(){
     }
     const rcolorBtn=e.target.closest('[data-color]');
     if(rcolorBtn){ openColorPop({type:'routine',id:rcolorBtn.dataset.color}, rcolorBtn); return; }
+    const rcolorBtn=e.target.closest('[data-color]');
+    if(rcolorBtn){ openColorPop({type:'routine',id:rcolorBtn.dataset.color}, rcolorBtn); return; }
     const box=e.target.closest('.rbox');
     if(!box)return;
     // Attendre un court instant pour voir si un second clic arrive (= dblclick → renommage)
@@ -1511,6 +1515,8 @@ function wireRoutine(){
   // Glisser-déposer pour réordonner
   let dragSrcId=null;
   grid.addEventListener('dragstart',e=>{
+    const rcolorBtn=e.target.closest('[data-color]');
+    if(rcolorBtn){ openColorPop({type:'routine',id:rcolorBtn.dataset.color}, rcolorBtn); return; }
     const rcolorBtn=e.target.closest('[data-color]');
     if(rcolorBtn){ openColorPop({type:'routine',id:rcolorBtn.dataset.color}, rcolorBtn); return; }
     const box=e.target.closest('.rbox');
@@ -1670,8 +1676,8 @@ function doFetchMeteo() {
 
 /* ======== RACCOURCIS ======== */
 var SC_KEY = 'mylife_sc_v1';
-var SC_COLORS = ['var(--bg3)','rgba(242,193,78,.22)','rgba(74,222,128,.20)','rgba(96,165,250,.22)','rgba(248,113,113,.20)','rgba(192,132,252,.20)','rgba(251,146,60,.20)','rgba(45,212,191,.20)'];
-var SC_COLOR_LABELS = ['Défaut','Jaune','Vert','Bleu','Rouge','Violet','Orange','Cyan'];
+
+
 function scLoad() {
   try { var d = localStorage.getItem(SC_KEY); if (d) return JSON.parse(d); } catch(e) {}
   var arr = [];
@@ -1685,15 +1691,16 @@ function scRender() {
   var sc = scLoad();
   var html = '';
   for (var i = 0; i < sc.length; i++) {
-    var bg = SC_COLORS[sc[i].color || 0];
+    var col2=sc[i].color||''; var bg=col2?col2+'2e':'var(--bg3)'; var brd=col2?'border-color:'+col2+';':'';
     if (!sc[i].url) {
-      html += '<div class="sc-item empty" data-sci="' + i + '" data-color="' + (sc[i].color||0) + '" style="background:' + bg + ';" draggable="true" data-scd="' + i + '">&#65291;</div>';
+      html += '<div class="sc-item empty" data-sci="' + i + '" style="background:' + bg + ';' + brd + '" draggable="true" data-scd="' + i + '">&#65291;</div>';
     } else {
       var lbl = sc[i].label;
       if (!lbl) { try { lbl = new URL(sc[i].url).hostname.replace('www.', ''); } catch(e2) { lbl = sc[i].url; } }
-      html += '<div class="sc-item" data-sci="' + i + '" data-color="' + (sc[i].color||0) + '" style="background:' + bg + ';" draggable="true" data-scd="' + i + '">';
+      html += '<div class="sc-item" data-sci="' + i + '" style="background:' + bg + ';' + brd + '" draggable="true" data-scd="' + i + '">';
       html += '<div class="sc-lbl">' + lbl + '</div>';
       html += '<div class="sc-edit-btn" data-sce="' + i + '">&#9998;</div>';
+      html += '<div class="tcolor" data-sccolor="' + i + '"></div>';
       html += '</div>';
     }
   }
@@ -1703,6 +1710,8 @@ function scRender() {
 function scWireEvents(g) {
   var dragSrc = null;
   g.onclick = function(e) {
+    var cb2 = e.target.closest('[data-sccolor]');
+    if (cb2) { e.stopPropagation(); openColorPop({type:'shortcut',id:parseInt(cb2.dataset.sccolor,10)}, cb2); return; }
     var eb = e.target.closest('[data-sce]');
     if (eb) { e.stopPropagation(); scEdit(parseInt(eb.dataset.sce, 10)); return; }
     var it = e.target.closest('[data-sci]');
@@ -1750,9 +1759,7 @@ function scEdit(idx) {
   if (!url.trim()) { sc[idx] = {label:'', url:'', color:0}; scSave(sc); scRender(); return; }
   var label = prompt('Nom (vide = auto) :', sc[idx].label || '');
   if (label === null) return;
-  var colorChoice = prompt('Couleur (0-7) :\n0=Défaut 1=Jaune 2=Vert 3=Bleu\n4=Rouge 5=Violet 6=Orange 7=Cyan', sc[idx].color || 0);
-  if (colorChoice === null) return;
-  sc[idx] = {label: label.trim(), url: url.trim(), color: Math.min(7, Math.max(0, parseInt(colorChoice, 10) || 0))};
+  sc[idx] = {label: label.trim(), url: url.trim(), color: sc[idx].color||''};
   scSave(sc); scRender();
 }
 
@@ -1806,6 +1813,54 @@ function initNewWidgets() {
   renderHeaderMods();
   setInterval(doFetchMeteo, 30*60*1000);
 }
+
+
+/* ======== SYSTÈME COULEUR ======== */
+TASK_COLORS=['#f87171','#fb923c','#fbbf24','#4ade80','#2dd4bf','#60a5fa','#a78bfa','#f472b6'];
+
+let colorPopTarget=null;
+
+function buildColorPop(){
+  const pop=$('color-pop');
+  let html='<div class="cdot none" data-color="">✕</div>';
+  TASK_COLORS.forEach(c=>{ html+=`<div class="cdot" style="background:${c}" data-color="${c}"></div>`; });
+  pop.innerHTML=html;
+}
+function openColorPop(target, anchorEl){
+  colorPopTarget=target;
+  const pop=$('color-pop');
+  const rect=anchorEl.getBoundingClientRect();
+  pop.style.left=Math.min(rect.left, window.innerWidth-140)+'px';
+  pop.style.top=(rect.bottom+4)+'px';
+  pop.classList.add('op');
+}
+function closeColorPop(){ $('color-pop').classList.remove('op'); colorPopTarget=null; }
+
+$('color-pop').addEventListener('click',e=>{
+  const dot=e.target.closest('[data-color]');
+  if(!dot||!colorPopTarget)return;
+  const color=dot.dataset.color;
+  if(colorPopTarget.type==='task'){
+    const t=tData[colorPopTarget.dataKey].find(x=>x.id===colorPopTarget.id);
+    if(t){ if(color) t.color=color; else delete t.color; saveTasks(); renderTasks(); }
+  } else if(colorPopTarget.type==='routine'){
+    const item=routineData.items.find(x=>x.id===colorPopTarget.id);
+    if(item){ if(color) item.color=color; else delete item.color; saveRoutine(); renderRoutine(); }
+  }
+  } else if(colorPopTarget.type==='shortcut'){
+    const sc2=scLoad();
+    if(color) sc2[colorPopTarget.id].color=color; else delete sc2[colorPopTarget.id].color;
+    scSave(sc2); scRender();
+  }
+  closeColorPop();
+});
+
+document.addEventListener('click',e=>{
+  if(!colorPopTarget)return;
+  if(e.target.closest('.color-pop')||e.target.closest('.tcolor')||e.target.closest('.rcolor'))return;
+  closeColorPop();
+});
+
 
 </script>
 <div class="color-pop" id="color-pop"></div>
