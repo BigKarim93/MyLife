@@ -191,10 +191,11 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 
 
 /* MÉTÉO — 2 colonnes, 10 jours */
-.meteo-wrap{display:grid;grid-template-columns:1fr 1fr;gap:2px 18px;}
+.meteo-wrap{display:grid;grid-template-columns:1fr 1fr;gap:2px 0;}
+.meteo-wrap .meteo-row:nth-child(odd){padding-right:10px;border-right:1px solid var(--line2);}
+.meteo-wrap .meteo-row:nth-child(even){padding-left:10px;}
 .meteo-row{display:flex;align-items:center;gap:5px;padding:2px 0;}
 .meteo-row.today .meteo-day-lbl{color:var(--accent);font-weight:700;}
-.meteo-sep{grid-column:1/-1;height:1px;background:var(--line2);margin:3px 0;}
 .meteo-day-lbl{width:26px;font-size:.63rem;color:var(--dim);flex-shrink:0;}
 .meteo-ico{font-size:.95rem;width:20px;text-align:center;flex-shrink:0;}
 .meteo-hi{font-size:.65rem;color:var(--chalk);font-weight:700;width:26px;text-align:right;flex-shrink:0;}
@@ -224,6 +225,14 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 .tb-mpill.edit-mode{border-color:var(--accent);background:rgba(242,193,78,.1);}
 .tb-add-mod{background:transparent;border:1px dashed var(--line);color:var(--dim);border-radius:8px;padding:4px 8px;font-size:.73rem;cursor:pointer;transition:.15s;white-space:nowrap;}
 .tb-add-mod:hover{border-color:var(--accent);color:var(--accent);}
+.tcolor{width:13px;height:13px;border-radius:50%;border:2px solid var(--line);cursor:pointer;flex-shrink:0;opacity:0;transition:.15s;}
+.titem:hover .tcolor{opacity:1;}
+.color-pop{position:fixed;display:none;background:var(--bg2);border:1px solid var(--line2);border-radius:9px;padding:8px;z-index:400;box-shadow:0 8px 24px rgba(0,0,0,.45);}
+.color-pop.op{display:flex;gap:5px;flex-wrap:wrap;width:130px;}
+.color-pop .cdot{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;}
+.color-pop .cdot:hover{border-color:var(--chalk);}
+.color-pop .cdot.none{background:var(--bg3);border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:.6rem;color:var(--dim);}
+
 </style>
 </head>
 <body>
@@ -881,6 +890,7 @@ auth.onAuthStateChanged(async user=>{
   wireHandles();
   wireNoteWidgets();
   initNewWidgets();
+  buildColorPop();
 });
 
 /* AUTH */
@@ -999,7 +1009,11 @@ function renderTasks(){
     const key=taskDataKey(slot);
     const tasks=(tData[key]||[]).filter(t=>!t.done);
     if(!tasks.length){list.innerHTML='<div class="empty">Aucune tâche 🎉</div>';return;}
-    list.innerHTML=tasks.map(t=>`<div class="titem" data-id="${t.id}" draggable="true"><div class="tck" data-ck="${t.id}"></div><div class="ttxt" data-rename="${t.id}">${esc(t.text)}</div><div class="tdl" data-dl="${t.id}">✕</div></div>`).join('');
+    list.innerHTML=tasks.map(t=>{
+      const col=t.color||'';
+      const style=col?`background:${col}2e;border-color:${col};`:'';
+      return `<div class="titem" data-id="${t.id}" draggable="true" style="${style}"><div class="tck" data-ck="${t.id}"></div><div class="ttxt" data-rename="${t.id}">${esc(t.text)}</div><div class="tcolor" data-color="${t.id}"></div><div class="tdl" data-dl="${t.id}">✕</div></div>`;
+    }).join('');
   });
   if(tData.titles){
     TASK_SLOTS.forEach(slot=>{ if(tData.titles[slot]&&$(slot+'-title')) $(slot+'-title').textContent=tData.titles[slot]; });
@@ -1014,6 +1028,8 @@ function wireTaskWidget(wid){
   list.addEventListener('click',e=>{
     const dl=e.target.closest('[data-dl]');
     if(dl){ tData[dataKey]=tData[dataKey].filter(x=>x.id!==dl.dataset.dl); saveTasks(); renderTasks(); return; }
+    const colorBtn=e.target.closest('[data-color]');
+    if(colorBtn){ openColorPop({type:'task',id:colorBtn.dataset.color,dataKey}, colorBtn); return; }
 
     const ck=e.target.closest('[data-ck]');
     if(ck){
@@ -1435,7 +1451,9 @@ function renderRoutine(){
   }
   grid.innerHTML=routineData.items.map(item=>{
     const isDone=doneToday.includes(item.id);
-    return `<div class="rbox${isDone?' done':''}" data-id="${item.id}" draggable="true"><div class="rck"></div><span data-rename="${item.id}">${esc(item.name)}</span><div class="rdel" data-del="${item.id}">✕</div></div>`;
+    const col=item.color||'';
+    const style=col&&!isDone?`background:${col}2e;border-color:${col};`:'';
+    return `<div class="rbox${isDone?' done':''}" data-id="${item.id}" draggable="true" style="${style}"><div class="rck"></div><span data-rename="${item.id}">${esc(item.name)}</span><div class="rcolor" data-color="${item.id}"></div><div class="rdel" data-del="${item.id}">✕</div></div>`;
   }).join('');
 }
 function wireRoutine(){
@@ -1461,6 +1479,8 @@ function wireRoutine(){
       saveRoutine();renderRoutine();
       return;
     }
+    const rcolorBtn=e.target.closest('[data-color]');
+    if(rcolorBtn){ openColorPop({type:'routine',id:rcolorBtn.dataset.color}, rcolorBtn); return; }
     const box=e.target.closest('.rbox');
     if(!box)return;
     // Attendre un court instant pour voir si un second clic arrive (= dblclick → renommage)
@@ -1491,6 +1511,8 @@ function wireRoutine(){
   // Glisser-déposer pour réordonner
   let dragSrcId=null;
   grid.addEventListener('dragstart',e=>{
+    const rcolorBtn=e.target.closest('[data-color]');
+    if(rcolorBtn){ openColorPop({type:'routine',id:rcolorBtn.dataset.color}, rcolorBtn); return; }
     const box=e.target.closest('.rbox');
     if(!box)return;
     dragSrcId=box.dataset.id;
@@ -1631,7 +1653,6 @@ function doFetchMeteo() {
       var ico = METEO_WCO[d.daily.weathercode[i]] || '';
       var hi = Math.round(d.daily.temperature_2m_max[i]);
       var lo = Math.round(d.daily.temperature_2m_min[i]);
-      if (i === 5) html += '<div class="meteo-sep"></div>';
       html += '<div class="meteo-row' + (isT ? ' today' : '') + '">';
       html += '<div class="meteo-day-lbl">' + lbl + '</div>';
       html += '<div class="meteo-ico">' + ico + '</div>';
@@ -1787,5 +1808,6 @@ function initNewWidgets() {
 }
 
 </script>
+<div class="color-pop" id="color-pop"></div>
 </body>
 </html>
