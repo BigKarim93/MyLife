@@ -1489,8 +1489,8 @@ function wireRoutine(){
       saveRoutine();renderRoutine();
       return;
     }
-    const rcolorBtn=e.target.closest('[data-color]');
-    if(rcolorBtn){ openColorPop({type:'routine',id:rcolorBtn.dataset.color}, rcolorBtn); return; }
+    const colorBtn=e.target.closest('[data-color]');
+    if(colorBtn){ openColorPop({type:'routine',id:colorBtn.dataset.color}, colorBtn); return; }
     const box=e.target.closest('.rbox');
     if(!box)return;
     // Attendre un court instant pour voir si un second clic arrive (= dblclick → renommage)
