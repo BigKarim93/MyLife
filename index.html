@@ -61,11 +61,11 @@ input,button,select{font-family:inherit;}
 /* GRID — copié de test3.html */
 .grid-col{flex:1;min-width:0;}
 .grid-wrap{position:relative;}
-.ghost-layer{display:none;position:absolute;top:0;left:0;right:0;bottom:0;grid-template-columns:repeat(6,1fr);grid-auto-rows:200px;gap:10px;z-index:100;pointer-events:none;}
+.ghost-layer{display:none;position:absolute;top:0;left:0;right:0;bottom:0;grid-template-columns:repeat(7,1fr);grid-auto-rows:200px;gap:10px;z-index:100;pointer-events:none;}
 .ghost-layer.active{display:grid;pointer-events:all;}
 .gcell{border-radius:var(--r);border:2px solid rgba(242,193,78,.5);background:rgba(242,193,78,.15);cursor:crosshair;transition:.1s;}
 .gcell:hover{background:rgba(242,193,78,.45);border-color:var(--accent);}
-.wgrid{display:grid;grid-template-columns:repeat(6,1fr);grid-auto-rows:200px;gap:10px;}
+.wgrid{display:grid;grid-template-columns:repeat(7,1fr);grid-auto-rows:200px;gap:10px;}
 .wcell{position:relative;z-index:1;}
 .wcell.picked{outline:3px solid var(--accent);outline-offset:3px;z-index:2;}
 .wh-move,.wh-size{display:none;background:rgba(242,193,78,.2);border:1px solid rgba(242,193,78,.5);border-radius:5px;padding:3px 7px;cursor:pointer;font-size:.7rem;color:var(--accent);font-weight:700;user-select:none;}
@@ -207,6 +207,196 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 .alarm-opts label{font-size:.68rem;color:var(--dim);}
 .alarm-opts select,.alarm-opts input{background:var(--bg);border:1px solid var(--line);color:var(--chalk);border-radius:5px;padding:4px 6px;font-size:.72rem;}
 .alarm-opts input[type=number]{width:50px;}
+
+
+
+
+
+.meteo-wrap .meteo-row:nth-child(even){padding-left:10px;}
+.meteo-row{display:flex;align-items:center;gap:5px;padding:2px 0;}
+.meteo-row.today .meteo-day-lbl{color:var(--accent);font-weight:700;}
+.meteo-day-lbl{width:26px;font-size:.63rem;color:var(--dim);flex-shrink:0;}
+.meteo-ico{font-size:.95rem;width:20px;text-align:center;flex-shrink:0;}
+.meteo-hi{font-size:.65rem;color:var(--chalk);font-weight:700;width:26px;text-align:right;flex-shrink:0;}
+.meteo-lo{font-size:.65rem;color:var(--dim);width:22px;flex-shrink:0;}
+.meteo-lo{font-size:.68rem;color:var(--dim);width:24px;}
+
+.sc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;}
+.sc-item{border:1px solid var(--line);border-radius:7px;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:.15s;position:relative;min-height:52px;justify-content:center;}
+.sc-item:hover{border-color:var(--accent);}
+.sc-item[data-color="1"]{border-color:rgba(242,193,78,.4);}
+.sc-item[data-color="2"]{border-color:rgba(74,222,128,.4);}
+.sc-item[data-color="3"]{border-color:rgba(96,165,250,.4);}
+.sc-item[data-color="4"]{border-color:rgba(248,113,113,.4);}
+.sc-item[data-color="5"]{border-color:rgba(192,132,252,.4);}
+.sc-item[data-color="6"]{border-color:rgba(251,146,60,.4);}
+.sc-item[data-color="7"]{border-color:rgba(45,212,191,.4);}
+.sc-item.empty{background:var(--bg3);border-style:dashed;color:var(--dim);font-size:.8rem;}
+.sc-item.dragging{opacity:.4;}
+.sc-item.drag-over{border-color:var(--accent);background:rgba(242,193,78,.1);}
+.sc-lbl{font-size:.58rem;color:var(--chalk);font-weight:600;text-align:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:54px;}
+.sc-edit-btn{position:absolute;top:2px;right:2px;font-size:.55rem;display:none;cursor:pointer;color:rgba(255,255,255,.6);background:rgba(0,0,0,.3);border-radius:3px;padding:1px 3px;}
+.sc-item:hover .sc-edit-btn{display:block;}
+
+.tb-mods{display:flex;align-items:center;gap:5px;flex-wrap:wrap;flex:1;min-width:0;}
+.tb-mpill{background:var(--bg3);border:1px solid var(--line2);color:var(--chalk);border-radius:8px;padding:4px 9px;font-size:.73rem;font-weight:600;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;text-decoration:none;}
+.tb-mpill:hover{border-color:var(--accent);color:var(--accent);}
+.tb-mpill.edit-mode{border-color:var(--accent);background:rgba(242,193,78,.1);}
+.tb-add-mod{background:transparent;border:1px dashed var(--line);color:var(--dim);border-radius:8px;padding:4px 8px;font-size:.73rem;cursor:pointer;transition:.15s;white-space:nowrap;}
+.tb-add-mod:hover{border-color:var(--accent);color:var(--accent);}
+.color-pop{position:fixed;display:none;background:var(--bg2);border:1px solid var(--line2);border-radius:9px;padding:8px;z-index:400;box-shadow:0 8px 24px rgba(0,0,0,.45);}
+.color-pop.op{display:flex;gap:5px;flex-wrap:wrap;width:130px;}
+.color-pop .cdot{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;}
+.color-pop .cdot:hover{border-color:var(--chalk);}
+.color-pop .cdot.none{background:var(--bg3);border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:.6rem;color:var(--dim);}
+
+.tcolor{width:13px;height:13px;border-radius:50%;border:2px solid var(--line);cursor:pointer;flex-shrink:0;opacity:0;transition:.15s;}
+.titem:hover .tcolor{opacity:1;}
+.rcolor{width:12px;height:12px;border-radius:50%;border:2px solid var(--line);cursor:pointer;flex-shrink:0;opacity:0;transition:.15s;}
+.rbox:hover .rcolor{opacity:1;}
+.color-pop{position:fixed;display:none;background:var(--bg2);border:1px solid var(--line2);border-radius:9px;padding:8px;z-index:400;box-shadow:0 8px 24px rgba(0,0,0,.45);}
+.color-pop.op{display:flex;gap:5px;flex-wrap:wrap;width:130px;}
+.color-pop .cdot{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;}
+.color-pop .cdot:hover{border-color:var(--chalk);}
+.color-pop .cdot.none{background:var(--bg3);border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:.6rem;color:var(--dim);}
+.tdl:hover{border-color:var(--red);color:var(--red);}
+.empty{text-align:center;padding:12px;color:var(--dim);font-size:.78rem;}
+
+
+
+/* PRAYER TIMES */
+.pbox{background:var(--bg3);border:1px solid var(--line);border-radius:7px;padding:6px 3px;text-align:center;}
+.pbox.next{border-color:var(--accent);background:rgba(242,193,78,.12);}
+.pbox .pname{font-size:.6rem;color:var(--dim);margin-bottom:2px;}
+.pbox.next .pname{color:var(--accent);font-weight:700;}
+.pbox .ptime{font-family:'Kalam',cursive;font-size:.85rem;color:var(--chalk);}
+.pbox.next .ptime{color:var(--accent);}
+
+
+
+
+
+
+.meteo-wrap{display:grid;grid-template-columns:1fr 1fr;gap:2px 0;}
+.meteo-wrap .meteo-row:nth-child(odd){padding-right:10px;border-right:1px solid var(--line2);}
+.meteo-wrap .meteo-row:nth-child(even){padding-left:10px;}
+.meteo-row{display:flex;align-items:center;gap:5px;padding:2px 0;}
+.meteo-row.today .meteo-day-lbl{color:var(--accent);font-weight:700;}
+.meteo-day-lbl{width:26px;font-size:.63rem;color:var(--dim);flex-shrink:0;}
+.meteo-ico{font-size:.95rem;width:20px;text-align:center;flex-shrink:0;}
+.meteo-hi{font-size:.65rem;color:var(--chalk);font-weight:700;width:26px;text-align:right;flex-shrink:0;}
+.meteo-lo{font-size:.65rem;color:var(--dim);width:22px;flex-shrink:0;}
+.meteo-lo{font-size:.68rem;color:var(--dim);width:24px;}
+
+.sc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;}
+.sc-item{border:1px solid var(--line);border-radius:7px;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:.15s;position:relative;min-height:52px;justify-content:center;}
+.sc-item:hover{border-color:var(--accent);}
+.sc-item[data-color="1"]{border-color:rgba(242,193,78,.4);}
+.sc-item[data-color="2"]{border-color:rgba(74,222,128,.4);}
+.sc-item[data-color="3"]{border-color:rgba(96,165,250,.4);}
+.sc-item[data-color="4"]{border-color:rgba(248,113,113,.4);}
+.sc-item[data-color="5"]{border-color:rgba(192,132,252,.4);}
+.sc-item[data-color="6"]{border-color:rgba(251,146,60,.4);}
+.sc-item[data-color="7"]{border-color:rgba(45,212,191,.4);}
+.sc-item.empty{background:var(--bg3);border-style:dashed;color:var(--dim);font-size:.8rem;}
+.sc-item.dragging{opacity:.4;}
+.sc-item.drag-over{border-color:var(--accent);background:rgba(242,193,78,.1);}
+.sc-lbl{font-size:.58rem;color:var(--chalk);font-weight:600;text-align:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:54px;}
+.sc-edit-btn{position:absolute;top:2px;right:2px;font-size:.55rem;display:none;cursor:pointer;color:rgba(255,255,255,.6);background:rgba(0,0,0,.3);border-radius:3px;padding:1px 3px;}
+.sc-item:hover .sc-edit-btn{display:block;}
+
+.tb-mods{display:flex;align-items:center;gap:5px;flex-wrap:wrap;flex:1;min-width:0;}
+.tb-mpill{background:var(--bg3);border:1px solid var(--line2);color:var(--chalk);border-radius:8px;padding:4px 9px;font-size:.73rem;font-weight:600;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;text-decoration:none;}
+.tb-mpill:hover{border-color:var(--accent);color:var(--accent);}
+.tb-mpill.edit-mode{border-color:var(--accent);background:rgba(242,193,78,.1);}
+.tb-add-mod{background:transparent;border:1px dashed var(--line);color:var(--dim);border-radius:8px;padding:4px 8px;font-size:.73rem;cursor:pointer;transition:.15s;white-space:nowrap;}
+.tb-add-mod:hover{border-color:var(--accent);color:var(--accent);}
+.color-pop{position:fixed;display:none;background:var(--bg2);border:1px solid var(--line2);border-radius:9px;padding:8px;z-index:400;box-shadow:0 8px 24px rgba(0,0,0,.45);}
+.color-pop.op{display:flex;gap:5px;flex-wrap:wrap;width:130px;}
+.color-pop .cdot{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;}
+.color-pop .cdot:hover{border-color:var(--chalk);}
+.color-pop .cdot.none{background:var(--bg3);border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:.6rem;color:var(--dim);}
+
+.tcolor{width:13px;height:13px;border-radius:50%;border:2px solid var(--line);cursor:pointer;flex-shrink:0;opacity:0;transition:.15s;}
+.titem:hover .tcolor{opacity:1;}
+.rcolor{width:12px;height:12px;border-radius:50%;border:2px solid var(--line);cursor:pointer;flex-shrink:0;opacity:0;transition:.15s;}
+.rbox:hover .rcolor{opacity:1;}
+.color-pop{position:fixed;display:none;background:var(--bg2);border:1px solid var(--line2);border-radius:9px;padding:8px;z-index:400;box-shadow:0 8px 24px rgba(0,0,0,.45);}
+.color-pop.op{display:flex;gap:5px;flex-wrap:wrap;width:130px;}
+.color-pop .cdot{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;}
+.color-pop .cdot:hover{border-color:var(--chalk);}
+.color-pop .cdot.none{background:var(--bg3);border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:.6rem;color:var(--dim);}
+.tdl:hover{border-color:var(--red);color:var(--red);}
+.empty{text-align:center;padding:12px;color:var(--dim);font-size:.78rem;}
+
+
+
+/* PRAYER TIMES */
+.pbox{background:var(--bg3);border:1px solid var(--line);border-radius:7px;padding:6px 3px;text-align:center;}
+.pbox.next{border-color:var(--accent);background:rgba(242,193,78,.12);}
+.pbox .pname{font-size:.6rem;color:var(--dim);margin-bottom:2px;}
+.pbox.next .pname{color:var(--accent);font-weight:700;}
+.pbox .ptime{font-family:'Kalam',cursive;font-size:.85rem;color:var(--chalk);}
+.pbox.next .ptime{color:var(--accent);}
+
+
+
+
+
+
+.meteo-wrap{display:grid;grid-template-columns:1fr 1fr;gap:2px 0;}
+.meteo-wrap .meteo-row:nth-child(odd){padding-right:10px;border-right:1px solid var(--line2);}
+.meteo-wrap .meteo-row:nth-child(even){padding-left:10px;}
+.meteo-row{display:flex;align-items:center;gap:5px;padding:2px 0;}
+.meteo-row.today .meteo-day-lbl{color:var(--accent);font-weight:700;}
+.meteo-day-lbl{width:26px;font-size:.63rem;color:var(--dim);flex-shrink:0;}
+.meteo-ico{font-size:.95rem;width:20px;text-align:center;flex-shrink:0;}
+.meteo-hi{font-size:.65rem;color:var(--chalk);font-weight:700;width:26px;text-align:right;flex-shrink:0;}
+.meteo-lo{font-size:.65rem;color:var(--dim);width:22px;flex-shrink:0;}
+.meteo-lo{font-size:.68rem;color:var(--dim);width:24px;}
+
+.sc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;}
+.sc-item{border:1px solid var(--line);border-radius:7px;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:.15s;position:relative;min-height:52px;justify-content:center;}
+.sc-item:hover{border-color:var(--accent);}
+.sc-item[data-color="1"]{border-color:rgba(242,193,78,.4);}
+.sc-item[data-color="2"]{border-color:rgba(74,222,128,.4);}
+.sc-item[data-color="3"]{border-color:rgba(96,165,250,.4);}
+.sc-item[data-color="4"]{border-color:rgba(248,113,113,.4);}
+.sc-item[data-color="5"]{border-color:rgba(192,132,252,.4);}
+.sc-item[data-color="6"]{border-color:rgba(251,146,60,.4);}
+.sc-item[data-color="7"]{border-color:rgba(45,212,191,.4);}
+.sc-item.empty{background:var(--bg3);border-style:dashed;color:var(--dim);font-size:.8rem;}
+.sc-item.dragging{opacity:.4;}
+.sc-item.drag-over{border-color:var(--accent);background:rgba(242,193,78,.1);}
+.sc-lbl{font-size:.58rem;color:var(--chalk);font-weight:600;text-align:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:54px;}
+.sc-edit-btn{position:absolute;top:2px;right:2px;font-size:.55rem;display:none;cursor:pointer;color:rgba(255,255,255,.6);background:rgba(0,0,0,.3);border-radius:3px;padding:1px 3px;}
+.sc-item:hover .sc-edit-btn{display:block;}
+
+.tb-mods{display:flex;align-items:center;gap:5px;flex-wrap:wrap;flex:1;min-width:0;}
+.tb-mpill{background:var(--bg3);border:1px solid var(--line2);color:var(--chalk);border-radius:8px;padding:4px 9px;font-size:.73rem;font-weight:600;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;text-decoration:none;}
+.tb-mpill:hover{border-color:var(--accent);color:var(--accent);}
+.tb-mpill.edit-mode{border-color:var(--accent);background:rgba(242,193,78,.1);}
+.tb-add-mod{background:transparent;border:1px dashed var(--line);color:var(--dim);border-radius:8px;padding:4px 8px;font-size:.73rem;cursor:pointer;transition:.15s;white-space:nowrap;}
+.tb-add-mod:hover{border-color:var(--accent);color:var(--accent);}
+.color-pop{position:fixed;display:none;background:var(--bg2);border:1px solid var(--line2);border-radius:9px;padding:8px;z-index:400;box-shadow:0 8px 24px rgba(0,0,0,.45);}
+.color-pop.op{display:flex;gap:5px;flex-wrap:wrap;width:130px;}
+.color-pop .cdot{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;}
+.color-pop .cdot:hover{border-color:var(--chalk);}
+.color-pop .cdot.none{background:var(--bg3);border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:.6rem;color:var(--dim);}
+
+.tcolor{width:13px;height:13px;border-radius:50%;border:2px solid var(--line);cursor:pointer;flex-shrink:0;opacity:0;transition:.15s;}
+.titem:hover .tcolor{opacity:1;}
+.rcolor{width:12px;height:12px;border-radius:50%;border:2px solid var(--line);cursor:pointer;flex-shrink:0;opacity:0;transition:.15s;}
+.rbox:hover .rcolor{opacity:1;}
+.color-pop{position:fixed;display:none;background:var(--bg2);border:1px solid var(--line2);border-radius:9px;padding:8px;z-index:400;box-shadow:0 8px 24px rgba(0,0,0,.45);}
+.color-pop.op{display:flex;gap:5px;flex-wrap:wrap;width:130px;}
+.color-pop .cdot{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;}
+.color-pop .cdot:hover{border-color:var(--chalk);}
+.color-pop .cdot.none{background:var(--bg3);border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:.6rem;color:var(--dim);}
+.tdl:hover{border-color:var(--red);color:var(--red);}
+.empty{text-align:center;padding:12px;color:var(--dim);font-size:.78rem;}
+
+
 </style>
 </head>
 <body>
@@ -215,6 +405,7 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 
 <div class="tb">
   <h1>🏠 MyLife</h1>
+  <div class="tb-mods hi" id="tb-mods-row"></div>
   <div class="tb-r hi" id="tbr">
     <span id="uem" style="font-size:.78rem;color:var(--dim);"></span>
     <button class="btn" id="btn-gedit">✏️ Disposition</button>
@@ -500,6 +691,20 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
           </div>
         </div>
 
+
+        <div class="wcell hi" id="wc-meteo" style="grid-column:1/span 2;grid-row:5/span 2;">
+          <div class="widget">
+            <div class="whdr"><span>🌤️</span><h2>Météo</h2><span style="font-size:.6rem;color:var(--dim);margin-left:4px;">Villepinte</span><button class="wh-move" id="wmv-meteo">✥</button><button class="wh-size" id="wsz-meteo">⊞</button></div>
+            <div class="wbody"><div class="meteo-wrap" id="meteo-days"><div class="empty">Chargement…</div></div></div>
+          </div>
+        </div>
+
+        <div class="wcell hi" id="wc-shortcuts" style="grid-column:3/span 2;grid-row:5/span 2;">
+          <div class="widget">
+            <div class="whdr"><span>🔗</span><h2>Raccourcis</h2><button class="wh-move" id="wmv-shortcuts">✥</button><button class="wh-size" id="wsz-shortcuts">⊞</button></div>
+            <div class="wbody"><div class="sc-grid" id="sc-grid"></div></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -572,7 +777,7 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
   <div class="modal" style="max-width:300px;">
     <h3>⊞ Taille</h3>
     <div class="clbl">Largeur</div>
-    <div class="pills" id="sw-pills"><button class="pill" data-w="1">1</button><button class="pill" data-w="2">2</button><button class="pill" data-w="3">3</button><button class="pill" data-w="4">4</button><button class="pill" data-w="5">5</button><button class="pill" data-w="6">6</button></div>
+    <div class="pills" id="sw-pills"><button class="pill" data-w="1">1</button><button class="pill" data-w="2">2</button><button class="pill" data-w="3">3</button><button class="pill" data-w="4">4</button><button class="pill" data-w="5">5</button><button class="pill" data-w="6">6</button><button class="pill" data-w="7">7</button></div>
     <div class="clbl">Hauteur</div>
     <div class="pills" id="sh-pills"><button class="pill" data-h="1">Petite</button><button class="pill" data-h="2">Moyenne</button><button class="pill" data-h="3">Grande</button><button class="pill" data-h="4">Très grande</button></div>
     <div class="modal-act"><button class="btn prim" id="szdone">Fermer</button></div>
@@ -745,8 +950,9 @@ function shuf(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()
 
 const TASK_SLOTS=['task1','task2','task3','task4','task5','task6'];
 const NOTE_SLOTS=['note1','note2','note3','note4','note5','note6'];
-const WIDGETS=['t2','t3','t4','t5','t6',...TASK_SLOTS,...NOTE_SLOTS];
+const WIDGETS=['t2','meteo','shortcuts','t3','t4','t5','t6',...TASK_SLOTS,...NOTE_SLOTS];
 const LAYOUT_DEFAULT={
+  meteo:{c:1,r:5,w:2,h:2},shortcuts:{c:3,r:5,w:2,h:2},
   t2:{c:3,r:1,w:2,h:2},t3:{c:5,r:1,w:2,h:2},t4:{c:1,r:3,w:2,h:2},t5:{c:3,r:3,w:2,h:2},t6:{c:5,r:3,w:2,h:2},
   task1:{c:1,r:1,w:2,h:2}, task2:{c:1,r:5,w:2,h:2}, task3:{c:5,r:5,w:2,h:2}, task4:{c:1,r:7,w:2,h:2}, task5:{c:3,r:7,w:2,h:2}, task6:{c:5,r:7,w:2,h:2},
   note1:{c:3,r:5,w:2,h:2}, note2:{c:5,r:9,w:2,h:2}, note3:{c:1,r:9,w:2,h:2}, note4:{c:3,r:9,w:2,h:2}, note5:{c:1,r:11,w:2,h:2}, note6:{c:3,r:11,w:2,h:2}
@@ -862,6 +1068,7 @@ auth.onAuthStateChanged(async user=>{
   updateQInfo();
   wireHandles();
   wireNoteWidgets();
+  initNewWidgets();
 });
 
 /* AUTH */
@@ -891,7 +1098,7 @@ function buildGhosts(){
   const maxR=Math.max(...WIDGETS.map(id=>wLayout[id]?wLayout[id].r+wLayout[id].h-1:4),4);
   layer.style.gridTemplateRows='repeat('+maxR+',200px)';
   layer.style.height=(maxR*200+(maxR-1)*10)+'px';
-  for(let r=1;r<=maxR;r++) for(let c=1;c<=6;c++){
+  for(let r=1;r<=maxR;r++) for(let c=1;c<=7;c++){
     const gc=document.createElement('div');gc.className='gcell';
     gc.style.gridColumn=c;gc.style.gridRow=r;
     gc.addEventListener('click',()=>{
@@ -1062,6 +1269,11 @@ $('color-pop').addEventListener('click',e=>{
 document.addEventListener('click',e=>{
   if(!colorPopTarget)return;
   if(e.target.closest('.color-pop')||e.target.closest('.tcolor')||e.target.closest('.rcolor'))return;
+  } else if(colorPopTarget.type==='shortcut'){
+    const sc2=scLoad();
+    if(color) sc2[colorPopTarget.id].color=color; else delete sc2[colorPopTarget.id].color;
+    scSave(sc2); scRender();
+  }
   closeColorPop();
 });
 
@@ -1857,6 +2069,179 @@ function buildThemeGrid(){const g=$('tgrid');g.innerHTML='';THEMES.forEach(t=>{c
 $('btn-theme').addEventListener('click',()=>{buildThemeGrid();$('ov-theme').classList.add('op');});
 $('thclose').addEventListener('click',()=>$('ov-theme').classList.remove('op'));
 (()=>{try{const s=localStorage.getItem('mlt');if(s)applyTheme(s);}catch(e){}})();
+
+/* === NOUVEAUX WIDGETS (météo, raccourcis, header) === */
+
+
+function doFetchMeteo() {
+  var c = document.getElementById('meteo-days');
+  if (!c) return;
+  var u = 'https://api.open-meteo.com/v1/forecast?latitude=48.9578&longitude=2.5388&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=Europe%2FParis&forecast_days=10';
+  fetch(u).then(function(r) { return r.json(); }).then(function(d) {
+    var today = new Date().toISOString().slice(0, 10);
+    var html = '<div class="meteo-wrap">';
+    for (var i = 0; i < d.daily.time.length; i++) {
+      var dt = d.daily.time[i];
+      var isT = (dt === today);
+      var date = new Date(dt + 'T12:00:00');
+      var lbl = isT ? 'Auj.' : METEO_DN[date.getDay()];
+      var ico = METEO_WCO[d.daily.weathercode[i]] || '';
+      var hi = Math.round(d.daily.temperature_2m_max[i]);
+      var lo = Math.round(d.daily.temperature_2m_min[i]);
+      html += '<div class="meteo-row' + (isT ? ' today' : '') + '">';
+      html += '<div class="meteo-day-lbl">' + lbl + '</div>';
+      html += '<div class="meteo-ico">' + ico + '</div>';
+      html += '<div class="meteo-lo">' + lo + '&#176;</div>';
+      html += '<div class="meteo-hi">' + hi + '&#176;</div>';
+      html += '</div>';
+    }
+    html += '</div>';
+    c.innerHTML = html;
+  }).catch(function() {
+    var c2 = document.getElementById('meteo-days');
+    if (c2) c2.innerHTML = '<div class="empty">Indisponible</div>';
+  });
+}
+
+var SC_KEY = 'mylife_sc_v1';
+
+function scLoad() {
+  try { var d = localStorage.getItem(SC_KEY); if (d) return JSON.parse(d); } catch(e) {}
+  var arr = [];
+  for (var i = 0; i < 8; i++) arr.push({label:'', url:'', color:0});
+  return arr;
+}
+
+function scSave(arr) { try { localStorage.setItem(SC_KEY, JSON.stringify(arr)); } catch(e) {} }
+
+function scRender() {
+  var g = document.getElementById('sc-grid');
+  if (!g) return;
+  var sc = scLoad();
+  var html = '';
+  for (var i = 0; i < sc.length; i++) {
+    var col2=sc[i].color||''; var bg=col2?col2+'2e':'var(--bg3)'; var brd=col2?'border-color:'+col2+';':'';
+    if (!sc[i].url) {
+      html += '<div class="sc-item empty" data-sci="' + i + '" style="background:' + bg + ';' + brd + '" draggable="true" data-scd="' + i + '">&#65291;</div>';
+    } else {
+      var lbl = sc[i].label;
+      if (!lbl) { try { lbl = new URL(sc[i].url).hostname.replace('www.', ''); } catch(e2) { lbl = sc[i].url; } }
+      html += '<div class="sc-item" data-sci="' + i + '" style="background:' + bg + ';' + brd + '" draggable="true" data-scd="' + i + '">';
+      html += '<div class="sc-lbl">' + lbl + '</div>';
+      html += '<div class="sc-edit-btn" data-sce="' + i + '">&#9998;</div>';
+      html += '<div class="tcolor" data-sccolor="' + i + '"></div>';
+      html += '</div>';
+    }
+  }
+  g.innerHTML = html;
+  scWireEvents(g);
+}
+
+function scWireEvents(g) {
+  var dragSrc = null;
+  g.onclick = function(e) {
+    var cb2 = e.target.closest('[data-sccolor]');
+    if (cb2) { openColorPop({type:'shortcut',id:parseInt(cb2.dataset.sccolor,10)}, cb2); return; }
+    var eb = e.target.closest('[data-sce]');
+    if (eb) { e.stopPropagation(); scEdit(parseInt(eb.dataset.sce, 10)); return; }
+    var it = e.target.closest('[data-sci]');
+    if (!it) return;
+    var idx = parseInt(it.dataset.sci, 10);
+    var s = scLoad()[idx];
+    if (!s.url) { scEdit(idx); return; }
+    window.open(s.url, '_blank', 'noopener');
+  };
+  g.addEventListener('dragstart', function(e) {
+    var it = e.target.closest('[data-scd]');
+    if (!it) return;
+    dragSrc = parseInt(it.dataset.scd, 10);
+    it.classList.add('dragging');
+  });
+  g.addEventListener('dragend', function(e) {
+    var it = e.target.closest('[data-scd]');
+    if (it) it.classList.remove('dragging');
+    g.querySelectorAll('.sc-item').forEach(function(el) { el.classList.remove('drag-over'); });
+  });
+  g.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    var it = e.target.closest('[data-scd]');
+    if (it) it.classList.add('drag-over');
+  });
+  g.addEventListener('dragleave', function(e) {
+    var it = e.target.closest('[data-scd]');
+    if (it) it.classList.remove('drag-over');
+  });
+  g.addEventListener('drop', function(e) {
+    e.preventDefault();
+    var it = e.target.closest('[data-scd]');
+    if (!it || dragSrc === null) return;
+    var dst = parseInt(it.dataset.scd, 10);
+    if (dst === dragSrc) return;
+    var sc = scLoad();
+    var tmp = sc[dragSrc]; sc[dragSrc] = sc[dst]; sc[dst] = tmp;
+    scSave(sc); scRender();
+  });
+}
+
+function scEdit(idx) {
+  var sc = scLoad();
+  var url = prompt('URL :', sc[idx].url || 'https://');
+  if (url === null) return;
+  if (!url.trim()) { sc[idx] = {label:'', url:'', color:0}; scSave(sc); scRender(); return; }
+  var label = prompt('Nom (vide = auto) :', sc[idx].label || '');
+  if (label === null) return;
+  sc[idx] = {label: label.trim(), url: url.trim(), color: sc[idx].color||''};
+  scSave(sc); scRender();
+}
+
+function renderHeaderMods() {
+  var row = document.getElementById('tb-mods-row');
+  if (!row || !mods) return;
+  row.innerHTML = '';
+  for (var i = 0; i < mods.length; i++) {
+    var m = mods[i];
+    var a = document.createElement('a');
+    a.className = 'tb-mpill' + (modMenuEdit ? ' edit-mode' : '') + (m.disabled ? ' dis' : '');
+    a.style.opacity = m.disabled ? '0.5' : '1';
+    if (!modMenuEdit && m.url && !m.disabled) {
+      a.href = m.url;
+      a.target = '_blank';
+      a.rel = 'noopener';
+    }
+    a.textContent = (m.icon || '') + ' ' + m.name;
+    if (modMenuEdit) {
+      a.onclick = (function(mod) { return function(e) { e.preventDefault(); openMod(mod); }; })(m);
+    }
+    row.appendChild(a);
+  }
+  var addBtn = document.createElement('button');
+  addBtn.className = 'tb-add-mod';
+  addBtn.innerHTML = modMenuEdit ? '&#10003; OK' : '&#9998;';
+  addBtn.title = modMenuEdit ? 'Terminer' : 'Gérer les modules';
+  addBtn.onclick = function() {
+    modMenuEdit = !modMenuEdit;
+    renderHeaderMods();
+    if (!modMenuEdit && typeof renderMods === 'function') renderMods();
+  };
+  row.appendChild(addBtn);
+  row.classList.remove('hi');
+}
+
+function initNewWidgets() {
+  var wm = document.getElementById('wc-meteo');
+  var ws = document.getElementById('wc-shortcuts');
+  if (wm) wm.classList.remove('hi');
+  if (ws) ws.classList.remove('hi');
+  if (!wLayout['meteo']) wLayout['meteo'] = {c:1, r:5, w:2, h:2};
+  if (!wLayout['shortcuts']) wLayout['shortcuts'] = {c:3, r:5, w:2, h:2};
+  applyLayout();
+  wireHandles();
+  doFetchMeteo();
+  scRender();
+  renderHeaderMods();
+  setInterval(doFetchMeteo, 30*60*1000);
+}
+
 </script>
 </body>
 </html>
