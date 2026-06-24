@@ -197,13 +197,18 @@ function mondayOf(date) {
   return d;
 }
 function addDays(date, n) { const d = new Date(date); d.setDate(d.getDate()+n); return d; }
-function dateKey(d) { return d.toISOString().slice(0,10); }
+function dateKey(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const dd = String(d.getDate()).padStart(2,'0');
+  return y+'-'+m+'-'+dd;
+}
 function fmtShort(d) { return d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'}); }
 
 // getDay() → index 0=Lu…6=Di
 function jsToIdx(jsDay) { return jsDay === 0 ? 6 : jsDay - 1; }
 
-function timeToMin(t) { const [h,m] = t.split(':').map(Number); return h*60+m; }
+function timeToMin(t) { if(!t) return 0; const [h,m] = (t+'').split(':').map(Number); return (h||0)*60+(m||0); }
 function minToPx(min) { return (min - START_H*60) * (HOUR_H/60); }
 
 /* ===== GRILLE ===== */
@@ -254,7 +259,7 @@ function renderGrid() {
     html += `<div class="day-col${isToday?' today-col':''}${isPast?' past-col':''}" style="height:${totalH}px">`;
 
     // Lieux ouverts ce jour
-    const open = lieux.filter(l => !hidden[l.id] && l.horaires[d] && !l.horaires[d].closed);
+    const open = lieux.filter(l => !hidden[l.id] && l.horaires && l.horaires[d] && !l.horaires[d].closed);
     const nb = open.length;
 
     open.forEach((lieu, i) => {
@@ -358,7 +363,9 @@ function getHoraires() {
   return DAY_NAMES.map((_, i) => {
     const closed = document.getElementById(`dhx-${i}`).checked;
     if (closed) return { closed: true };
-    return { closed: false, open: document.getElementById(`dho-${i}`).value||'09:00', close: document.getElementById(`dhc-${i}`).value||'18:00' };
+    const openVal = document.getElementById('dho-'+i).value.trim() || '09:00';
+    const closeVal = document.getElementById('dhc-'+i).value.trim() || '18:00';
+    return { closed: false, open: openVal, close: closeVal };
   });
 }
 
