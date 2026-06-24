@@ -2218,6 +2218,7 @@ function renderHeaderMods() {
     a.className = 'tb-mpill' + (modMenuEdit ? ' edit-mode' : '') + (m.disabled ? ' dis' : '');
     a.style.opacity = m.disabled ? '0.5' : '1';
     a.dataset.mid = m.id;
+    a.dataset.midx = i;
     if (!modMenuEdit && m.url && !m.disabled) {
       a.href = m.url;
       a.target = '_blank';
@@ -2225,28 +2226,7 @@ function renderHeaderMods() {
     }
     a.textContent = (m.icon || '') + ' ' + m.name;
     if (modMenuEdit) {
-      a.draggable = true;
       a.onclick = (function(mod) { return function(e) { e.preventDefault(); openMod(mod); }; })(m);
-      a.addEventListener('dragstart', function() {
-        modDragIdx = mods.findIndex(function(x){ return x.id===a.dataset.mid; });
-        setTimeout(function(){ a.style.opacity='.3'; }, 0);
-      });
-      a.addEventListener('dragend', function() {
-        a.style.opacity = m.disabled ? '0.5' : '1';
-        row.querySelectorAll('.tb-mpill').forEach(function(x){ x.classList.remove('drag-over-pill'); });
-      });
-      a.addEventListener('dragover', function(e) { e.preventDefault(); a.classList.add('drag-over-pill'); });
-      a.addEventListener('dragleave', function() { a.classList.remove('drag-over-pill'); });
-      a.addEventListener('drop', function(e) {
-        e.preventDefault();
-        a.classList.remove('drag-over-pill');
-        var toIdx = mods.findIndex(function(x){ return x.id===a.dataset.mid; });
-        if (modDragIdx === null || modDragIdx === toIdx) return;
-        var moved = mods.splice(modDragIdx, 1)[0];
-        mods.splice(toIdx, 0, moved);
-        modDragIdx = null;
-        saveMods(); renderHeaderMods();
-      });
     }
     row.appendChild(a);
   }
@@ -2271,6 +2251,40 @@ function renderHeaderMods() {
   };
   row.appendChild(addBtn);
   row.classList.remove('hi');
+
+  // Drag & drop géré au niveau du conteneur
+  if (modMenuEdit) {
+    var dragSrcIdx = null;
+    row.querySelectorAll('.tb-mpill[data-mid]').forEach(function(pill) {
+      pill.draggable = true;
+      pill.addEventListener('dragstart', function(e) {
+        dragSrcIdx = parseInt(pill.dataset.midx);
+        pill.style.opacity = '.3';
+        e.stopPropagation();
+      });
+      pill.addEventListener('dragend', function() {
+        pill.style.opacity = '';
+        row.querySelectorAll('.tb-mpill').forEach(function(p){ p.classList.remove('drag-over-pill'); });
+      });
+      pill.addEventListener('dragover', function(e) {
+        e.preventDefault(); e.stopPropagation();
+        pill.classList.add('drag-over-pill');
+      });
+      pill.addEventListener('dragleave', function() {
+        pill.classList.remove('drag-over-pill');
+      });
+      pill.addEventListener('drop', function(e) {
+        e.preventDefault(); e.stopPropagation();
+        pill.classList.remove('drag-over-pill');
+        var toIdx = parseInt(pill.dataset.midx);
+        if (dragSrcIdx === null || dragSrcIdx === toIdx) return;
+        var moved = mods.splice(dragSrcIdx, 1)[0];
+        mods.splice(toIdx, 0, moved);
+        dragSrcIdx = null;
+        saveMods(); renderHeaderMods();
+      });
+    });
+  }
 }
 
 function initNewWidgets() {
