@@ -41,6 +41,10 @@ input,button,select{font-family:inherit;}
 .leg-item.off{opacity:.3;}
 .leg-dot{width:11px;height:11px;border-radius:3px;flex-shrink:0;}
 .leg-edit{font-size:.6rem;color:var(--chalk-dim);margin-left:2px;opacity:.6;}
+.leg-item{cursor:grab;}
+.leg-item.dragging{opacity:.4;cursor:grabbing;}
+.leg-item.drag-over{outline:2px solid var(--accent);border-radius:20px;}
+.leg-drag-handle{font-size:.7rem;color:var(--chalk-dim);opacity:.5;margin-right:2px;cursor:grab;}
 .leg-item:hover .leg-edit{opacity:1;}
 
 /* GRILLE — même style que planning.html */
@@ -305,19 +309,47 @@ function renderLegend() {
   const bar = document.getElementById('legend-bar');
   let html = '';
   lieux.forEach(l => {
-    html += `<div class="leg-item${hidden[l.id]?' off':''}" data-id="${l.id}">
-      <div class="leg-dot" style="background:${l.color}"></div>
-      <span>${l.nom}</span>
-      <span class="leg-edit" data-edit="${l.id}">✎</span>
-    </div>`;
+    html += '<div class="leg-item'+(hidden[l.id]?' off':'')+'" data-id="'+l.id+'" draggable="true">' +
+      '<span class="leg-drag-handle">⠿</span>' +
+      '<div class="leg-dot" style="background:'+l.color+'"></div>' +
+      '<span>'+l.nom+'</span>' +
+      '<span class="leg-edit" data-edit="'+l.id+'">✎</span>' +
+    '</div>';
   });
   bar.innerHTML = html;
+  let dragSrcId = null;
   bar.querySelectorAll('.leg-item').forEach(el => {
     el.addEventListener('click', e => {
       const ed = e.target.closest('[data-edit]');
       if (ed) { openModal(ed.dataset.edit); return; }
+      if (e.target.closest('.leg-drag-handle')) return;
       const id = el.dataset.id;
       hidden[id] = !hidden[id];
+      save(); renderLegend(); renderGrid();
+    });
+    el.addEventListener('dragstart', e => {
+      dragSrcId = el.dataset.id;
+      setTimeout(() => el.classList.add('dragging'), 0);
+    });
+    el.addEventListener('dragend', () => {
+      el.classList.remove('dragging');
+      bar.querySelectorAll('.leg-item').forEach(x => x.classList.remove('drag-over'));
+    });
+    el.addEventListener('dragover', e => {
+      e.preventDefault();
+      if (el.dataset.id !== dragSrcId) el.classList.add('drag-over');
+    });
+    el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
+    el.addEventListener('drop', e => {
+      e.preventDefault();
+      el.classList.remove('drag-over');
+      if (!dragSrcId || el.dataset.id === dragSrcId) return;
+      const fromIdx = lieux.findIndex(l => l.id === dragSrcId);
+      const toIdx   = lieux.findIndex(l => l.id === el.dataset.id);
+      if (fromIdx < 0 || toIdx < 0) return;
+      const [moved] = lieux.splice(fromIdx, 1);
+      lieux.splice(toIdx, 0, moved);
+      dragSrcId = null;
       save(); renderLegend(); renderGrid();
     });
   });
