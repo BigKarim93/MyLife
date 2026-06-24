@@ -2225,6 +2225,16 @@ function renderHeaderMods() {
     }
     row.appendChild(a);
   }
+  // Bouton ➕ Ajouter visible uniquement en mode édition
+  if (modMenuEdit) {
+    var addNewBtn = document.createElement('button');
+    addNewBtn.className = 'tb-add-mod';
+    addNewBtn.innerHTML = '&#65291; Ajouter';
+    addNewBtn.title = 'Ajouter un module';
+    addNewBtn.onclick = function() { openMod(null); };
+    row.appendChild(addNewBtn);
+  }
+
   var addBtn = document.createElement('button');
   addBtn.className = 'tb-add-mod';
   addBtn.innerHTML = modMenuEdit ? '&#10003; OK' : '&#9998;';
