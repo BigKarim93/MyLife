@@ -243,6 +243,7 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 .tb-mods{display:flex;align-items:center;gap:5px;flex-wrap:wrap;flex:1;min-width:0;}
 .tb-mpill{background:var(--bg3);border:1px solid var(--line2);color:var(--chalk);border-radius:8px;padding:4px 9px;font-size:.73rem;font-weight:600;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;text-decoration:none;}
 .tb-mpill:hover{border-color:var(--accent);color:var(--accent);}
+.tb-mpill.drag-over-pill{border-color:var(--accent);background:rgba(242,193,78,.2);outline:2px dashed var(--accent);}
 .tb-mpill.edit-mode{border-color:var(--accent);background:rgba(242,193,78,.1);}
 .tb-add-mod{background:transparent;border:1px dashed var(--line);color:var(--dim);border-radius:8px;padding:4px 8px;font-size:.73rem;cursor:pointer;transition:.15s;white-space:nowrap;}
 .tb-add-mod:hover{border-color:var(--accent);color:var(--accent);}
@@ -313,6 +314,7 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 .tb-mods{display:flex;align-items:center;gap:5px;flex-wrap:wrap;flex:1;min-width:0;}
 .tb-mpill{background:var(--bg3);border:1px solid var(--line2);color:var(--chalk);border-radius:8px;padding:4px 9px;font-size:.73rem;font-weight:600;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;text-decoration:none;}
 .tb-mpill:hover{border-color:var(--accent);color:var(--accent);}
+.tb-mpill.drag-over-pill{border-color:var(--accent);background:rgba(242,193,78,.2);outline:2px dashed var(--accent);}
 .tb-mpill.edit-mode{border-color:var(--accent);background:rgba(242,193,78,.1);}
 .tb-add-mod{background:transparent;border:1px dashed var(--line);color:var(--dim);border-radius:8px;padding:4px 8px;font-size:.73rem;cursor:pointer;transition:.15s;white-space:nowrap;}
 .tb-add-mod:hover{border-color:var(--accent);color:var(--accent);}
@@ -383,6 +385,7 @@ body.gedit .wh-move, body.gedit .wh-size{display:inline-flex;align-items:center;
 .tb-mods{display:flex;align-items:center;gap:5px;flex-wrap:wrap;flex:1;min-width:0;}
 .tb-mpill{background:var(--bg3);border:1px solid var(--line2);color:var(--chalk);border-radius:8px;padding:4px 9px;font-size:.73rem;font-weight:600;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;text-decoration:none;}
 .tb-mpill:hover{border-color:var(--accent);color:var(--accent);}
+.tb-mpill.drag-over-pill{border-color:var(--accent);background:rgba(242,193,78,.2);outline:2px dashed var(--accent);}
 .tb-mpill.edit-mode{border-color:var(--accent);background:rgba(242,193,78,.1);}
 .tb-add-mod{background:transparent;border:1px dashed var(--line);color:var(--dim);border-radius:8px;padding:4px 8px;font-size:.73rem;cursor:pointer;transition:.15s;white-space:nowrap;}
 .tb-add-mod:hover{border-color:var(--accent);color:var(--accent);}
@@ -2214,6 +2217,7 @@ function renderHeaderMods() {
     var a = document.createElement('a');
     a.className = 'tb-mpill' + (modMenuEdit ? ' edit-mode' : '') + (m.disabled ? ' dis' : '');
     a.style.opacity = m.disabled ? '0.5' : '1';
+    a.dataset.mid = m.id;
     if (!modMenuEdit && m.url && !m.disabled) {
       a.href = m.url;
       a.target = '_blank';
@@ -2221,7 +2225,35 @@ function renderHeaderMods() {
     }
     a.textContent = (m.icon || '') + ' ' + m.name;
     if (modMenuEdit) {
+      a.draggable = true;
       a.onclick = (function(mod) { return function(e) { e.preventDefault(); openMod(mod); }; })(m);
+      a.addEventListener('dragstart', function(e) {
+        e.dataTransfer.setData('text/plain', a.dataset.mid);
+        setTimeout(function(){ a.style.opacity='.3'; }, 0);
+      });
+      a.addEventListener('dragend', function() {
+        a.style.opacity = m.disabled ? '0.5' : '1';
+        row.querySelectorAll('.tb-mpill').forEach(function(x){ x.classList.remove('drag-over-pill'); });
+      });
+      a.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        if (a.dataset.mid !== e.dataTransfer.getData('text/plain'))
+          a.classList.add('drag-over-pill');
+      });
+      a.addEventListener('dragleave', function() { a.classList.remove('drag-over-pill'); });
+      a.addEventListener('drop', function(e) {
+        e.preventDefault();
+        a.classList.remove('drag-over-pill');
+        var fromId = e.dataTransfer.getData('text/plain');
+        var toId = a.dataset.mid;
+        if (!fromId || fromId === toId) return;
+        var fi = mods.findIndex(function(x){ return x.id===fromId; });
+        var ti = mods.findIndex(function(x){ return x.id===toId; });
+        if (fi<0||ti<0) return;
+        var moved = mods.splice(fi,1)[0];
+        mods.splice(ti,0,moved);
+        saveMods(); renderHeaderMods();
+      });
     }
     row.appendChild(a);
   }
