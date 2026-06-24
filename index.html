@@ -1561,7 +1561,7 @@ function computeSessions(){
   const a=planState.weekAnchor||{monday:dateKeyOf(mondayOf(new Date())),letter:'A'};
   const ad=new Date(a.monday+'T00:00:00'),sd=new Date(SPORT_FROM+'T00:00:00');
   const sessions=[];
-  for(let w=-60;w<=0;w++){
+  for(let w=-60;w<=4;w++){
     const mon=mondayOf(addDays(ad,w*7));if(mon<sd)continue;
     const dw=Math.round((mon-ad)/604800000),p=((dw%2)+2)%2;
     const letter=p===0?a.letter:(a.letter==='A'?'B':'A');
@@ -2068,6 +2068,7 @@ $('thclose').addEventListener('click',()=>$('ov-theme').classList.remove('op'));
 (()=>{try{const s=localStorage.getItem('mlt');if(s)applyTheme(s);}catch(e){}})();
 
 /* === NOUVEAUX WIDGETS (météo, raccourcis, header) === */
+
 
 
 function doFetchMeteo() {
