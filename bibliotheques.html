@@ -2,123 +2,151 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Bibliothèques & Lieux de révision</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lieux de révision</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@700&family=Work+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#16261e;--bg2:#1f3a2c;--bg3:#274a37;--line:rgba(238,241,234,.09);--line2:rgba(238,241,234,.18);--chalk:#f1efe4;--dim:#aebcb1;--accent:#f2c14e;--green:#4ade80;--r:10px;}
+:root{
+  --bg:#16261e;--bg2:#1f3a2c;--bg3:#274a37;
+  --line:rgba(238,241,234,.09);--line-strong:rgba(238,241,234,.22);
+  --chalk:#f1efe4;--chalk-dim:#aebcb1;--accent:#f2c14e;
+  --radius:10px;--hour-h:48px;
+}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Work Sans',sans-serif;background:var(--bg);color:var(--chalk);min-height:100vh;}
-h1,h2,h3{font-family:'Kalam',cursive;}
-input,button,select,textarea{font-family:inherit;}
+h1,h2{font-family:'Kalam',cursive;}
+input,button,select{font-family:inherit;}
 
 /* TOPBAR */
-.tb{position:sticky;top:0;z-index:50;background:linear-gradient(var(--bg2),rgba(31,58,44,.95));border-bottom:2px solid var(--line2);padding:10px 16px;display:flex;align-items:center;gap:10px;backdrop-filter:blur(4px);}
-.tb h1{font-size:1.2rem;color:var(--accent);flex:1;}
-.btn{background:var(--bg3);border:1px solid var(--line);color:var(--chalk);padding:6px 12px;border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;}
+.tb{position:sticky;top:0;z-index:50;background:linear-gradient(var(--bg2),rgba(31,58,44,.95));
+    border-bottom:2px solid var(--line-strong);padding:10px 16px;
+    display:flex;align-items:center;gap:8px;flex-wrap:wrap;backdrop-filter:blur(4px);}
+.tb h1{font-size:1.15rem;color:var(--accent);}
+.spacer{flex:1;}
+.btn{background:var(--bg3);border:1px solid var(--line-strong);color:var(--chalk);
+     padding:6px 12px;border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer;
+     transition:.15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;text-decoration:none;}
 .btn:hover{border-color:var(--accent);}
 .btn.prim{background:var(--accent);color:#21321f;border-color:var(--accent);}
-.btn.sm{padding:4px 8px;font-size:.72rem;}
+.btn.sm{padding:4px 9px;font-size:.75rem;}
 .btn.dn{background:#5a2b2b;border-color:#7a3a3a;}
 
 /* LÉGENDE */
-.legend{display:flex;gap:8px;flex-wrap:wrap;padding:10px 16px;border-bottom:1px solid var(--line);}
-.legend-item{display:flex;align-items:center;gap:5px;font-size:.75rem;color:var(--chalk);cursor:pointer;padding:3px 8px;border-radius:6px;border:1px solid transparent;transition:.15s;}
-.legend-item:hover{border-color:var(--line2);}
-.legend-item.off{opacity:.35;}
-.legend-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
-.legend-add{background:transparent;border:1px dashed var(--line);color:var(--dim);border-radius:6px;padding:3px 10px;font-size:.75rem;cursor:pointer;transition:.15s;}
-.legend-add:hover{border-color:var(--accent);color:var(--accent);}
+.legend-bar{display:flex;gap:6px;flex-wrap:wrap;padding:8px 16px;
+            border-bottom:1px solid var(--line);align-items:center;}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:.75rem;cursor:pointer;
+          padding:3px 9px;border-radius:20px;border:1px solid transparent;transition:.15s;}
+.leg-item:hover{border-color:var(--line-strong);}
+.leg-item.off{opacity:.3;}
+.leg-dot{width:11px;height:11px;border-radius:3px;flex-shrink:0;}
+.leg-edit{font-size:.6rem;color:var(--chalk-dim);margin-left:2px;opacity:.6;}
+.leg-item:hover .leg-edit{opacity:1;}
 
-/* GRILLE */
-.grid-wrap{overflow-x:auto;padding:10px 16px 20px;}
-.edt-grid{min-width:500px;}
+/* GRILLE — même style que planning.html */
+.week-wrap{overflow-x:auto;padding:10px 16px 30px;}
+.week-grid{min-width:720px;}
 
-/* HEADER JOURS */
-.eth{display:flex;border-bottom:1px solid var(--line);background:var(--bg3);}
-.etth{width:32px;flex-shrink:0;}
-.etdh{flex:1;text-align:center;padding:4px 2px;font-family:'Kalam',cursive;font-size:.68rem;border-left:1px solid var(--line);}
-.etdh.today{color:var(--accent);}
+.grid-header{display:flex;border-bottom:1px solid var(--line-strong);
+             position:sticky;top:61px;background:var(--bg2);z-index:5;}
+.time-col-header{width:52px;flex-shrink:0;}
+.day-header{flex:1;text-align:center;padding:7px 4px;font-family:'Kalam',cursive;
+            font-weight:700;font-size:1rem;border-left:1px solid var(--line);cursor:default;}
+.day-header .day-date{display:block;font-family:'Work Sans';font-weight:600;
+                       font-size:.7rem;color:var(--chalk-dim);margin-top:2px;}
+.day-header.today{color:var(--accent);}
+.day-header.today .day-date{display:inline-block;background:var(--accent);color:#21321f;
+                              border-radius:999px;padding:1px 8px;margin-top:3px;}
+.day-header.past-hdr{opacity:.5;}
 
-/* CORPS */
-.etb{display:flex;}
-.ettc{width:32px;flex-shrink:0;position:relative;}
-.ettl{position:absolute;right:3px;font-size:.5rem;color:var(--dim);transform:translateY(-6px);}
-.etds{flex:1;display:flex;}
-
-/* COLONNE JOUR */
-.etdc{flex:1;position:relative;border-left:1px solid var(--line);background:repeating-linear-gradient(to bottom,var(--line) 0 1px,transparent 1px 14px);}
-.etdc.today{background-color:rgba(242,193,78,.04);}
+.grid-body{display:flex;padding-top:8px;}
+.time-col{width:52px;flex-shrink:0;position:relative;}
+.time-label{position:absolute;left:0;right:6px;text-align:right;font-size:10px;
+             color:var(--chalk-dim);transform:translateY(-6px);}
+.days-body{flex:1;display:flex;}
+.day-col{flex:1;position:relative;border-left:1px solid var(--line);
+         background:repeating-linear-gradient(to bottom,var(--line) 0 1px,transparent 1px var(--hour-h));
+         cursor:default;}
+.day-col.today-col{background-color:rgba(242,193,78,.04);}
+.day-col.past-col{background-color:rgba(0,0,0,.12);}
 
 /* BARRE LIEU */
-.lib-bar{position:absolute;left:1px;right:1px;border-radius:2px;opacity:.85;transition:opacity .15s;cursor:default;}
-.lib-bar:hover{opacity:1;z-index:5;}
-.lib-label{font-size:.42rem;font-weight:700;color:#fff;padding:1px 3px;line-height:1.2;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.lib-bar{position:absolute;border-radius:5px;padding:3px 5px;overflow:hidden;
+         border-left:3px solid;font-size:.68rem;line-height:1.2;z-index:3;
+         box-shadow:0 1px 4px rgba(0,0,0,.3);cursor:default;transition:opacity .15s;}
+.lib-bar:hover{opacity:.95!important;z-index:5;outline:1px solid rgba(255,255,255,.4);}
+.lib-title{font-weight:700;font-family:'Kalam',cursive;font-size:.9rem;color:#fff;}
+.lib-hours{font-size:.6rem;color:rgba(255,255,255,.8);display:block;margin-top:1px;}
 
 /* LIGNE HEURE ACTUELLE */
-.etnl{position:absolute;left:0;right:0;height:2px;background:var(--accent);z-index:3;pointer-events:none;}
-.etnl::before{content:'';position:absolute;left:-3px;top:-3px;width:8px;height:8px;border-radius:50%;background:var(--accent);}
+.time-now-line{position:absolute;left:0;right:0;height:2px;
+               background:repeating-linear-gradient(90deg,var(--accent) 0 6px,transparent 6px 10px);
+               z-index:4;pointer-events:none;}
+.time-now-line::before{content:'';position:absolute;left:-4px;top:-4px;
+                        width:10px;height:10px;border-radius:50%;background:var(--accent);}
 
 /* VIDE */
-.empty-state{text-align:center;padding:40px 20px;color:var(--dim);font-size:.88rem;}
-.empty-state h2{font-size:1.4rem;color:var(--accent);margin-bottom:8px;}
+.empty-state{text-align:center;padding:60px 20px;color:var(--chalk-dim);}
+.empty-state h2{font-size:1.6rem;color:var(--accent);margin-bottom:10px;}
 
 /* MODALS */
-.ov{position:fixed;inset:0;background:rgba(10,16,12,.75);display:none;align-items:center;justify-content:center;z-index:300;padding:14px;}
+.ov{position:fixed;inset:0;background:rgba(10,16,12,.75);display:none;
+    align-items:center;justify-content:center;z-index:300;padding:14px;}
 .ov.op{display:flex;}
-.modal{background:var(--bg2);border:1px solid var(--line2);border-radius:var(--r);padding:20px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;}
+.modal{background:var(--bg2);border:1px solid var(--line-strong);border-radius:var(--radius);
+       padding:20px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;}
 .modal h3{color:var(--accent);margin-bottom:14px;font-size:1.1rem;}
-.fld{margin-bottom:10px;display:flex;flex-direction:column;gap:4px;}
-.fld label{font-size:.75rem;color:var(--dim);font-weight:600;}
-.fld input,.fld select,.fld textarea{background:var(--bg);border:1px solid var(--line);color:var(--chalk);border-radius:6px;padding:7px 10px;font-size:.85rem;width:100%;}
-.fld input:focus,.fld select:focus{outline:none;border-color:var(--accent);}
+.fld{margin-bottom:11px;display:flex;flex-direction:column;gap:4px;}
+.fld label{font-size:.75rem;color:var(--chalk-dim);font-weight:600;text-transform:uppercase;letter-spacing:.03em;}
+.fld input{background:var(--bg);border:1px solid var(--line-strong);color:var(--chalk);
+           border-radius:7px;padding:8px 11px;font-size:.88rem;width:100%;}
+.fld input:focus{outline:none;border-color:var(--accent);}
 .modal-act{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;}
+.tip{font-size:.65rem;color:var(--chalk-dim);margin-top:2px;}
 
 /* HORAIRES PAR JOUR */
-.day-hours{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:6px;}
-.dh-col{display:flex;flex-direction:column;gap:3px;}
-.dh-lbl{font-size:.6rem;color:var(--dim);text-align:center;font-weight:700;}
-.dh-inp{background:var(--bg);border:1px solid var(--line);color:var(--chalk);border-radius:4px;padding:3px 4px;font-size:.62rem;width:100%;text-align:center;}
+.day-hours{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:6px;}
+.dh-col{display:flex;flex-direction:column;gap:3px;align-items:center;}
+.dh-lbl{font-size:.62rem;color:var(--chalk-dim);font-weight:700;text-align:center;}
+.dh-inp{background:var(--bg);border:1px solid var(--line-strong);color:var(--chalk);
+        border-radius:5px;padding:4px 3px;font-size:.65rem;width:100%;text-align:center;}
 .dh-inp:focus{outline:none;border-color:var(--accent);}
-.dh-closed{display:flex;align-items:center;justify-content:center;gap:3px;font-size:.6rem;color:var(--dim);}
-.dh-closed input[type=checkbox]{accent-color:var(--accent);}
+.dh-inp:disabled{opacity:.3;}
+.dh-closed{display:flex;align-items:center;gap:2px;margin-top:1px;}
+.dh-closed input[type=checkbox]{accent-color:var(--accent);width:12px;height:12px;}
+.dh-closed label{font-size:.58rem;color:var(--chalk-dim);cursor:pointer;}
 
 /* COULEURS */
-.color-grid{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;}
-.color-dot{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:.15s;}
+.color-grid{display:flex;gap:7px;flex-wrap:wrap;margin-top:4px;}
+.color-dot{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:.15s;}
 .color-dot:hover,.color-dot.sel{border-color:var(--chalk);transform:scale(1.15);}
-
-/* INFO TOOLTIP */
-.tip{font-size:.65rem;color:var(--dim);margin-top:3px;}
-
-@media(max-width:600px){.day-hours{grid-template-columns:repeat(4,1fr);}}
 </style>
 </head>
 <body>
 
 <div class="tb">
   <h1>📚 Lieux de révision</h1>
-  <button class="btn sm" id="btn-semaine">← Semaine</button>
-  <button class="btn sm" id="btn-auj">Auj.</button>
-  <button class="btn sm" id="btn-semaine-next">Semaine →</button>
+  <div class="spacer"></div>
+  <button class="btn sm" id="btn-prev">◀</button>
+  <button class="btn sm" id="btn-today">Aujourd'hui</button>
+  <button class="btn sm" id="btn-next">▶</button>
   <button class="btn prim" id="btn-add">＋ Lieu</button>
-  <a href="index.html" class="btn sm">🏠</a>
+  <a href="index.html" class="btn sm">🏠 Accueil</a>
 </div>
 
-<div class="legend" id="legend"></div>
+<div class="legend-bar" id="legend-bar"></div>
 
-<div class="grid-wrap">
-  <div class="edt-grid" id="edt-grid"></div>
+<div class="week-wrap">
+  <div class="week-grid" id="week-grid"></div>
 </div>
 
 <!-- MODAL LIEU -->
 <div class="ov" id="ov-lieu">
   <div class="modal">
-    <h3 id="lieu-modal-title">Nouveau lieu</h3>
+    <h3 id="lieu-title">Nouveau lieu</h3>
     <div class="fld">
       <label>Nom du lieu</label>
-      <input type="text" id="lieu-nom" placeholder="ex: BU Créteil, Médiathèque..." maxlength="40">
+      <input type="text" id="lieu-nom" placeholder="ex: BU Créteil, Médiathèque de Villepinte…" maxlength="50">
     </div>
     <div class="fld">
       <label>Couleur</label>
@@ -126,7 +154,7 @@ input,button,select,textarea{font-family:inherit;}
     </div>
     <div class="fld">
       <label>Horaires d'ouverture par jour</label>
-      <p class="tip">Laisse "Fermé" coché si le lieu est fermé ce jour-là. Format : HH:MM</p>
+      <p class="tip">Coche "F" si le lieu est fermé ce jour-là. Sinon indique l'heure d'ouverture et de fermeture (ex: 09:00 / 20:00).</p>
       <div class="day-hours" id="day-hours"></div>
     </div>
     <div class="modal-act">
@@ -138,11 +166,13 @@ input,button,select,textarea{font-family:inherit;}
 </div>
 
 <script>
-const STORAGE_KEY = 'mylife_bibliotheques_v1';
-const JOURS = ['Lu','Ma','Me','Je','Ve','Sa','Di'];
-const JOURS_FULL = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
-const COLORS = ['#f87171','#fb923c','#fbbf24','#4ade80','#2dd4bf','#60a5fa','#a78bfa','#f472b6','#34d399','#f97316','#e879f9','#38bdf8'];
-const EDT_START = 8, EDT_END = 22, PPM = 14/60; // pixels par minute
+const STORE = 'mylife_biblio_v2';
+const COLORS = ['#f87171','#fb923c','#fbbf24','#4ade80','#2dd4bf','#60a5fa','#a78bfa','#f472b6','#34d399','#e879f9','#38bdf8','#f97316'];
+const DAY_NAMES = ['Lu','Ma','Me','Je','Ve','Sa','Di'];
+const DAY_FULL  = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+const HOUR_H = 48; // px par heure — identique au planning
+const START_H = 7;
+const END_H   = 22;
 
 let lieux = [];
 let hidden = {};
@@ -150,143 +180,152 @@ let weekOffset = 0;
 let editId = null;
 let selColor = COLORS[0];
 
-// ===== STORAGE =====
-function loadData() {
-  try {
-    const d = localStorage.getItem(STORAGE_KEY);
-    if (d) { const p = JSON.parse(d); lieux = p.lieux||[]; hidden = p.hidden||{}; }
-  } catch(e) {}
+/* ===== UTILS ===== */
+function load() {
+  try { const d = localStorage.getItem(STORE); if (d) { const p = JSON.parse(d); lieux = p.lieux||[]; hidden = p.hidden||{}; } } catch(e) {}
 }
-function saveData() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({lieux, hidden})); } catch(e) {}
+function save() {
+  try { localStorage.setItem(STORE, JSON.stringify({lieux, hidden})); } catch(e) {}
 }
 
-// ===== DATE UTILS =====
+// Lundi de la semaine contenant `date`
 function mondayOf(date) {
   const d = new Date(date); d.setHours(0,0,0,0);
-  const day = d.getDay(); const diff = (day === 0) ? -6 : 1 - day;
-  d.setDate(d.getDate() + diff); return d;
+  const js = d.getDay(); // 0=dim
+  const diff = js === 0 ? -6 : 1 - js;
+  d.setDate(d.getDate() + diff);
+  return d;
 }
 function addDays(date, n) { const d = new Date(date); d.setDate(d.getDate()+n); return d; }
-function fmtDate(d) { return d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'}); }
 function dateKey(d) { return d.toISOString().slice(0,10); }
-// JS getDay(): 0=dim,1=lun...6=sam → notre index 0=lun...6=dim
-function jsDay2idx(jsDay) { return jsDay === 0 ? 6 : jsDay - 1; }
+function fmtShort(d) { return d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'}); }
 
-// ===== RENDER GRILLE =====
+// getDay() → index 0=Lu…6=Di
+function jsToIdx(jsDay) { return jsDay === 0 ? 6 : jsDay - 1; }
+
+function timeToMin(t) { const [h,m] = t.split(':').map(Number); return h*60+m; }
+function minToPx(min) { return (min - START_H*60) * (HOUR_H/60); }
+
+/* ===== GRILLE ===== */
 function renderGrid() {
-  const grid = document.getElementById('edt-grid');
+  const grid = document.getElementById('week-grid');
   const now = new Date();
-  const monday = mondayOf(addDays(now, weekOffset * 7));
-  const todayKey = dateKey(now);
-  const H = (EDT_END - EDT_START) * PPM * 60; // hauteur totale en px
+  const today = dateKey(now);
+  const monday = mondayOf(addDays(now, weekOffset*7));
+  const totalH = (END_H - START_H) * HOUR_H;
 
-  // HEADER
-  let html = '<div class="eth"><div class="etth"></div>';
+  if (!lieux.length) {
+    grid.innerHTML = '<div class="empty-state"><h2>📚</h2><p style="font-size:.9rem">Aucun lieu encore.<br>Clique sur <strong>＋ Lieu</strong> pour ajouter ta première bibliothèque !</p></div>';
+    return;
+  }
+
+  // HEADER JOURS
+  let html = '<div class="grid-header"><div class="time-col-header"></div>';
   for (let d = 0; d < 7; d++) {
     const dt = addDays(monday, d);
-    const isToday = dateKey(dt) === todayKey;
-    html += `<div class="etdh${isToday?' today':''}"><div>${JOURS[d]}</div><div style="font-size:.55rem;color:var(--dim);">${fmtDate(dt)}</div></div>`;
+    const k  = dateKey(dt);
+    const isToday = k === today;
+    const isPast  = weekOffset === 0 && k < today;
+    html += `<div class="day-header${isToday?' today':''}${isPast?' past-hdr':''}">
+      ${DAY_NAMES[d]}
+      <span class="day-date">${fmtShort(dt)}</span>
+    </div>`;
   }
   html += '</div>';
 
   // CORPS
-  html += '<div class="etb">';
+  html += '<div class="grid-body">';
 
   // Colonne heures
-  html += `<div class="ettc" style="height:${H}px">`;
-  for (let h = EDT_START; h <= EDT_END; h += 2) {
-    html += `<div class="ettl" style="top:${(h-EDT_START)*PPM*60}px">${h}h</div>`;
+  html += `<div class="time-col" style="height:${totalH}px">`;
+  for (let h = START_H; h <= END_H; h++) {
+    html += `<div class="time-label" style="top:${(h-START_H)*HOUR_H}px">${h}h</div>`;
   }
   html += '</div>';
 
   // Colonnes jours
-  html += '<div class="etds" style="flex:1;">';
+  html += '<div class="days-body">';
   for (let d = 0; d < 7; d++) {
     const dt = addDays(monday, d);
-    const isToday = dateKey(dt) === todayKey;
-    html += `<div class="etdc${isToday?' today':''}" style="height:${H}px;flex:1;">`;
+    const k  = dateKey(dt);
+    const isToday = k === today;
+    const isPast  = weekOffset === 0 && k < today;
 
-    // Barres des lieux ouverts ce jour
-    const activeLieux = lieux.filter(l => !hidden[l.id] && l.horaires && l.horaires[d] && !l.horaires[d].closed);
-    const nbActive = activeLieux.length;
+    html += `<div class="day-col${isToday?' today-col':''}${isPast?' past-col':''}" style="height:${totalH}px">`;
 
-    activeLieux.forEach((lieu, i) => {
+    // Lieux ouverts ce jour
+    const open = lieux.filter(l => !hidden[l.id] && l.horaires[d] && !l.horaires[d].closed);
+    const nb = open.length;
+
+    open.forEach((lieu, i) => {
       const h = lieu.horaires[d];
-      const [oh, om] = h.open.split(':').map(Number);
-      const [ch, cm] = h.close.split(':').map(Number);
-      const openMin = oh * 60 + om;
-      const closeMin = ch * 60 + cm;
-      const startPx = (openMin - EDT_START * 60) * PPM;
-      const heightPx = (closeMin - openMin) * PPM;
-      if (heightPx <= 0 || startPx < 0) return;
+      const topPx    = minToPx(timeToMin(h.open));
+      const bottomPx = minToPx(timeToMin(h.close));
+      const heightPx = bottomPx - topPx;
+      if (heightPx <= 0) return;
 
-      const barW = 100 / nbActive;
-      const barL = barW * i;
-      html += `<div class="lib-bar" title="${lieu.nom}: ${h.open}–${h.close}" style="top:${startPx}px;height:${heightPx}px;left:${barL+0.5}%;width:${barW-1}%;background:${lieu.color};border-left:3px solid ${lieu.color};">`;
-      if (heightPx > 18) html += `<div class="lib-label">${lieu.nom}</div>`;
+      const w = 100 / nb;
+      const l = w * i;
+      const opacity = isPast ? 0.4 : 0.88;
+      const darkened = lieu.color + '33'; // fond semi-transparent
+
+      html += `<div class="lib-bar" title="${lieu.nom}: ${h.open}–${h.close}"
+        style="top:${topPx}px;height:${heightPx}px;left:${l+0.3}%;width:${w-0.6}%;
+               background:${darkened};border-color:${lieu.color};opacity:${opacity};">`;
+      if (heightPx >= 24) {
+        html += `<div class="lib-title">${lieu.nom}</div>`;
+      }
+      if (heightPx >= 38) {
+        html += `<span class="lib-hours">${h.open}–${h.close}</span>`;
+      }
       html += '</div>';
     });
 
     // Ligne heure actuelle
     if (isToday) {
-      const nowMin = now.getHours() * 60 + now.getMinutes();
-      const nowPx = (nowMin - EDT_START * 60) * PPM;
-      if (nowPx >= 0 && nowPx < H) {
-        html += `<div class="etnl" style="top:${nowPx}px"></div>`;
+      const nowPx = minToPx(now.getHours()*60 + now.getMinutes());
+      if (nowPx >= 0 && nowPx <= totalH) {
+        html += `<div class="time-now-line" style="top:${nowPx}px"></div>`;
       }
     }
     html += '</div>';
   }
   html += '</div></div>';
-
-  // Vide ?
-  if (lieux.length === 0) {
-    grid.innerHTML = '<div class="empty-state"><h2>📚</h2><p>Aucun lieu encore.<br>Clique sur <strong>＋ Lieu</strong> pour commencer !</p></div>';
-    return;
-  }
-
   grid.innerHTML = html;
 }
 
-// ===== LÉGENDE =====
+/* ===== LÉGENDE ===== */
 function renderLegend() {
-  const leg = document.getElementById('legend');
+  const bar = document.getElementById('legend-bar');
   let html = '';
   lieux.forEach(l => {
-    html += `<div class="legend-item${hidden[l.id]?' off':''}" data-id="${l.id}">
-      <div class="legend-dot" style="background:${l.color}"></div>
+    html += `<div class="leg-item${hidden[l.id]?' off':''}" data-id="${l.id}">
+      <div class="leg-dot" style="background:${l.color}"></div>
       <span>${l.nom}</span>
-      <span style="font-size:.6rem;color:var(--dim);margin-left:2px;" data-edit="${l.id}">✎</span>
+      <span class="leg-edit" data-edit="${l.id}">✎</span>
     </div>`;
   });
-  html += '<button class="legend-add" id="leg-add">＋ Lieu</button>';
-  leg.innerHTML = html;
-
-  // Toggle visibilité
-  leg.querySelectorAll('.legend-item').forEach(el => {
+  bar.innerHTML = html;
+  bar.querySelectorAll('.leg-item').forEach(el => {
     el.addEventListener('click', e => {
-      if (e.target.closest('[data-edit]')) {
-        openModal(e.target.closest('[data-edit]').dataset.edit);
-        return;
-      }
+      const ed = e.target.closest('[data-edit]');
+      if (ed) { openModal(ed.dataset.edit); return; }
       const id = el.dataset.id;
       hidden[id] = !hidden[id];
-      saveData(); renderLegend(); renderGrid();
+      save(); renderLegend(); renderGrid();
     });
   });
-  document.getElementById('leg-add').addEventListener('click', () => openModal(null));
 }
 
-// ===== MODAL =====
-function buildColorGrid(selected) {
+/* ===== MODAL ===== */
+function buildColors(sel) {
   const g = document.getElementById('color-grid');
   g.innerHTML = COLORS.map(c =>
-    `<div class="color-dot${c===selected?' sel':''}" data-color="${c}" style="background:${c}"></div>`
+    `<div class="color-dot${c===sel?' sel':''}" data-c="${c}" style="background:${c}"></div>`
   ).join('');
   g.querySelectorAll('.color-dot').forEach(dot => {
     dot.addEventListener('click', () => {
-      selColor = dot.dataset.color;
+      selColor = dot.dataset.c;
       g.querySelectorAll('.color-dot').forEach(d => d.classList.toggle('sel', d===dot));
     });
   });
@@ -294,91 +333,80 @@ function buildColorGrid(selected) {
 
 function buildDayHours(horaires) {
   const c = document.getElementById('day-hours');
-  c.innerHTML = JOURS.map((j, i) => {
+  c.innerHTML = DAY_NAMES.map((j, i) => {
     const h = horaires && horaires[i];
     const closed = !h || h.closed;
     return `<div class="dh-col">
       <div class="dh-lbl">${j}</div>
-      <input class="dh-inp" type="text" id="dh-open-${i}" placeholder="09:00" value="${closed?'':h.open}" ${closed?'disabled':''}>
-      <input class="dh-inp" type="text" id="dh-close-${i}" placeholder="20:00" value="${closed?'':h.close}" ${closed?'disabled':''}>
+      <input class="dh-inp" id="dho-${i}" type="text" placeholder="09:00" value="${!closed?h.open:''}" ${closed?'disabled':''}>
+      <input class="dh-inp" id="dhc-${i}" type="text" placeholder="20:00" value="${!closed?h.close:''}" ${closed?'disabled':''}>
       <div class="dh-closed">
-        <input type="checkbox" id="dh-closed-${i}" ${closed?'checked':''}>
-        <label for="dh-closed-${i}" style="font-size:.58rem;color:var(--dim);cursor:pointer;">Fermé</label>
+        <input type="checkbox" id="dhx-${i}" ${closed?'checked':''}>
+        <label for="dhx-${i}">F</label>
       </div>
     </div>`;
   }).join('');
-
-  // Toggle disable sur checkbox
-  JOURS.forEach((_, i) => {
-    const cb = document.getElementById(`dh-closed-${i}`);
-    cb.addEventListener('change', () => {
-      document.getElementById(`dh-open-${i}`).disabled = cb.checked;
-      document.getElementById(`dh-close-${i}`).disabled = cb.checked;
+  DAY_NAMES.forEach((_, i) => {
+    document.getElementById(`dhx-${i}`).addEventListener('change', function() {
+      document.getElementById(`dho-${i}`).disabled = this.checked;
+      document.getElementById(`dhc-${i}`).disabled = this.checked;
     });
+  });
+}
+
+function getHoraires() {
+  return DAY_NAMES.map((_, i) => {
+    const closed = document.getElementById(`dhx-${i}`).checked;
+    if (closed) return { closed: true };
+    return { closed: false, open: document.getElementById(`dho-${i}`).value||'09:00', close: document.getElementById(`dhc-${i}`).value||'18:00' };
   });
 }
 
 function openModal(id) {
   editId = id;
   const lieu = id ? lieux.find(l => l.id === id) : null;
-  document.getElementById('lieu-modal-title').textContent = lieu ? '✏️ Modifier le lieu' : '📍 Nouveau lieu';
+  document.getElementById('lieu-title').textContent = lieu ? '✏️ Modifier' : '📍 Nouveau lieu';
   document.getElementById('lieu-nom').value = lieu ? lieu.nom : '';
   document.getElementById('lieu-del').style.display = lieu ? 'inline-flex' : 'none';
   selColor = lieu ? lieu.color : COLORS[lieux.length % COLORS.length];
-  buildColorGrid(selColor);
+  buildColors(selColor);
   buildDayHours(lieu ? lieu.horaires : null);
   document.getElementById('ov-lieu').classList.add('op');
-  document.getElementById('lieu-nom').focus();
+  setTimeout(() => document.getElementById('lieu-nom').focus(), 50);
 }
 
-function closeModal() {
-  document.getElementById('ov-lieu').classList.remove('op');
-  editId = null;
-}
-
-function getHorairesFromForm() {
-  return JOURS.map((_, i) => {
-    const closed = document.getElementById(`dh-closed-${i}`).checked;
-    if (closed) return { closed: true };
-    const open = document.getElementById(`dh-open-${i}`).value.trim() || '09:00';
-    const close = document.getElementById(`dh-close-${i}`).value.trim() || '18:00';
-    return { closed: false, open, close };
-  });
-}
+function closeModal() { document.getElementById('ov-lieu').classList.remove('op'); editId = null; }
 
 document.getElementById('lieu-save').addEventListener('click', () => {
   const nom = document.getElementById('lieu-nom').value.trim();
   if (!nom) { document.getElementById('lieu-nom').focus(); return; }
-  const horaires = getHorairesFromForm();
+  const horaires = getHoraires();
   if (editId) {
-    const idx = lieux.findIndex(l => l.id === editId);
-    if (idx >= 0) lieux[idx] = { ...lieux[idx], nom, color: selColor, horaires };
+    const i = lieux.findIndex(l => l.id === editId);
+    if (i >= 0) lieux[i] = { ...lieux[i], nom, color: selColor, horaires };
   } else {
-    lieux.push({ id: 'lib_' + Date.now(), nom, color: selColor, horaires });
+    lieux.push({ id: 'lib_'+Date.now(), nom, color: selColor, horaires });
   }
-  saveData(); closeModal(); renderLegend(); renderGrid();
+  save(); closeModal(); renderLegend(); renderGrid();
 });
 
 document.getElementById('lieu-del').addEventListener('click', () => {
   if (!editId || !confirm('Supprimer ce lieu ?')) return;
   lieux = lieux.filter(l => l.id !== editId);
   delete hidden[editId];
-  saveData(); closeModal(); renderLegend(); renderGrid();
+  save(); closeModal(); renderLegend(); renderGrid();
 });
 
 document.getElementById('lieu-cancel').addEventListener('click', closeModal);
 document.getElementById('btn-add').addEventListener('click', () => openModal(null));
 document.getElementById('ov-lieu').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
 
-// Navigation semaine
-document.getElementById('btn-semaine').addEventListener('click', () => { weekOffset--; renderGrid(); });
-document.getElementById('btn-semaine-next').addEventListener('click', () => { weekOffset++; renderGrid(); });
-document.getElementById('btn-auj').addEventListener('click', () => { weekOffset = 0; renderGrid(); });
+document.getElementById('btn-prev').addEventListener('click', () => { weekOffset--; renderGrid(); });
+document.getElementById('btn-next').addEventListener('click', () => { weekOffset++; renderGrid(); });
+document.getElementById('btn-today').addEventListener('click', () => { weekOffset = 0; renderGrid(); });
 
 // Init
-loadData(); renderLegend(); renderGrid();
-
-// Refresh heure actuelle toutes les minutes
+load(); renderLegend(); renderGrid();
 setInterval(() => renderGrid(), 60000);
 </script>
 </body>
