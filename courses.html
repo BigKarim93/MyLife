@@ -36,23 +36,22 @@ input,button{font-family:inherit;}
 .search-bar input::placeholder{color:var(--dim);}
 
 /* RAYONS */
-.rayons{padding:12px 16px 80px;display:flex;flex-direction:column;gap:14px;}
-.rayon{}
-.rayon-header{display:flex;align-items:center;gap:6px;padding:5px 8px;background:var(--bg2);border-radius:8px;margin-bottom:6px;cursor:pointer;user-select:none;border:1px solid var(--line2);}
+.rayons{padding:12px 16px 80px;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;align-items:start;}
+.rayon{background:var(--bg2);border:1px solid var(--line2);border-radius:10px;overflow:hidden;}
+.rayon-header{display:flex;align-items:center;gap:6px;padding:7px 10px;background:var(--bg3);border-bottom:1px solid var(--line2);cursor:default;}
 .rayon-ico{font-size:1rem;}
-.rayon-nom{font-family:'Kalam',cursive;font-size:.9rem;flex:1;}
-.rayon-count{font-size:.68rem;color:var(--dim);background:var(--bg3);padding:1px 6px;border-radius:10px;}
+.rayon-nom{font-family:'Kalam',cursive;font-size:.85rem;flex:1;}
+.rayon-count{font-size:.65rem;color:var(--dim);background:var(--bg);padding:1px 6px;border-radius:10px;}
 .rayon-count.has-items{background:rgba(242,193,78,.2);color:var(--accent);}
-.rayon-chevron{font-size:.65rem;color:var(--dim);transition:.2s;}
-.rayon.collapsed .rayon-chevron{transform:rotate(-90deg);}
-.rayon.collapsed .items-list{display:none;}
+.rayon-chevron{display:none;}
 
-/* ITEMS — grille compacte */
-.items-list{display:flex;flex-wrap:wrap;gap:5px;}
-.item{display:flex;align-items:center;gap:6px;padding:5px 9px;background:var(--bg2);border:1px solid var(--line);border-radius:20px;cursor:pointer;transition:.15s;user-select:none;white-space:nowrap;}
-.item:hover{border-color:var(--line2);}
-.item.in-list{background:rgba(74,222,128,.15);border-color:rgba(74,222,128,.5);}
-.item-check{width:14px;height:14px;border-radius:50%;border:2px solid var(--line2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:.15s;}
+/* ITEMS — liste verticale dans chaque colonne */
+.items-list{display:flex;flex-direction:column;}
+.item{display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid var(--line);cursor:pointer;transition:.15s;user-select:none;}
+.item:last-child{border-bottom:none;}
+.item:hover{background:var(--bg3);}
+.item.in-list{background:rgba(74,222,128,.08);}
+.item-check{width:15px;height:15px;border-radius:4px;border:2px solid var(--line2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:.15s;}
 .item.in-list .item-check{background:var(--green);border-color:var(--green);}
 .item.in-list .item-check::after{content:'✓';font-size:.55rem;color:#0f1117;font-weight:700;}
 .item-name{font-size:.78rem;}
@@ -287,10 +286,8 @@ function render() {
     const its = byRayon[rayon] || [];
     if (!its.length) return;
     const inListCount = its.filter(it => liste.has(it.id)).length;
-    const isCollapsed = collapsed[rayon] && !searchQ;
-
-    html += `<div class="rayon${isCollapsed?' collapsed':''}" data-rayon="${rayon}">`;
-    html += `<div class="rayon-header" data-toggle="${rayon}">
+    html += `<div class="rayon" data-rayon="${rayon}">`;
+    html += `<div class="rayon-header">
       <span class="rayon-ico">${RAYON_ICONS[rayon]||'📦'}</span>
       <span class="rayon-nom">${rayon}</span>
       <span class="rayon-count${inListCount>0?' has-items':''}">${inListCount>0?inListCount+'/':''}${its.length}</span>
@@ -310,14 +307,7 @@ function render() {
   container.innerHTML = html;
   updateStats();
 
-  // Events rayons
-  container.querySelectorAll('[data-toggle]').forEach(el => {
-    el.addEventListener('click', () => {
-      const r = el.dataset.toggle;
-      collapsed[r] = !collapsed[r];
-      render();
-    });
-  });
+
 
   // Events items
   container.querySelectorAll('.item').forEach(el => {
