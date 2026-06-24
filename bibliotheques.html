@@ -106,6 +106,7 @@ input,button,select{font-family:inherit;}
 
 /* HORAIRES PAR JOUR */
 .day-hours{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:6px;}
+.dh-sep{font-size:.55rem;color:var(--chalk-dim);text-align:center;margin:1px 0;}
 .dh-col{display:flex;flex-direction:column;gap:3px;align-items:center;}
 .dh-lbl{font-size:.62rem;color:var(--chalk-dim);font-weight:700;text-align:center;}
 .dh-inp{background:var(--bg);border:1px solid var(--line-strong);color:var(--chalk);
@@ -264,26 +265,26 @@ function renderGrid() {
 
     open.forEach((lieu, i) => {
       const h = lieu.horaires[d];
-      const topPx    = minToPx(timeToMin(h.open));
-      const bottomPx = minToPx(timeToMin(h.close));
-      const heightPx = bottomPx - topPx;
-      if (heightPx <= 0) return;
-
       const w = 100 / nb;
       const l = w * i;
       const opacity = isPast ? 0.4 : 0.88;
-      const darkened = lieu.color + '33'; // fond semi-transparent
+      const darkened = lieu.color + '33';
 
-      html += `<div class="lib-bar" title="${lieu.nom}: ${h.open}–${h.close}"
-        style="top:${topPx}px;height:${heightPx}px;left:${l+0.3}%;width:${w-0.6}%;
-               background:${darkened};border-color:${lieu.color};opacity:${opacity};">`;
-      if (heightPx >= 24) {
-        html += `<div class="lib-title">${lieu.nom}</div>`;
+      // Fonction pour dessiner un créneau
+      function drawBar(openT, closeT, isSecond) {
+        const topPx    = minToPx(timeToMin(openT));
+        const heightPx = minToPx(timeToMin(closeT)) - topPx;
+        if (heightPx <= 0) return;
+        html += '<div class="lib-bar" title="'+lieu.nom+': '+openT+'–'+closeT+(isSecond?' (2)':'')+'"' +
+          ' style="top:'+topPx+'px;height:'+heightPx+'px;left:'+(l+0.3)+'%;width:'+(w-0.6)+'%;' +
+          'background:'+darkened+';border-color:'+lieu.color+';opacity:'+opacity+';">';
+        if (heightPx >= 24) html += '<div class="lib-title">'+lieu.nom+'</div>';
+        if (heightPx >= 38) html += '<span class="lib-hours">'+openT+'–'+closeT+'</span>';
+        html += '</div>';
       }
-      if (heightPx >= 38) {
-        html += `<span class="lib-hours">${h.open}–${h.close}</span>`;
-      }
-      html += '</div>';
+
+      drawBar(h.open, h.close, false);
+      if (h.open2 && h.close2) drawBar(h.open2, h.close2, true);
     });
 
     // Ligne heure actuelle
@@ -341,31 +342,43 @@ function buildDayHours(horaires) {
   c.innerHTML = DAY_NAMES.map((j, i) => {
     const h = horaires && horaires[i];
     const closed = !h || h.closed;
-    return `<div class="dh-col">
-      <div class="dh-lbl">${j}</div>
-      <input class="dh-inp" id="dho-${i}" type="text" placeholder="09:00" value="${!closed?h.open:''}" ${closed?'disabled':''}>
-      <input class="dh-inp" id="dhc-${i}" type="text" placeholder="20:00" value="${!closed?h.close:''}" ${closed?'disabled':''}>
-      <div class="dh-closed">
-        <input type="checkbox" id="dhx-${i}" ${closed?'checked':''}>
-        <label for="dhx-${i}">F</label>
-      </div>
-    </div>`;
+    const s2 = h && h.open2; // 2e créneau
+    return '<div class="dh-col">' +
+      '<div class="dh-lbl">'+j+'</div>' +
+      '<input class="dh-inp" id="dho-'+i+'" type="text" placeholder="09:00" value="'+((!closed&&h.open)?h.open:'')+'" '+(closed?'disabled':'')+' title="Ouverture 1">' +
+      '<input class="dh-inp" id="dhc-'+i+'" type="text" placeholder="12:00" value="'+((!closed&&h.close)?h.close:'')+'" '+(closed?'disabled':'')+' title="Fermeture 1">' +
+      '<div class="dh-sep">–2–</div>' +
+      '<input class="dh-inp" id="dho2-'+i+'" type="text" placeholder="14:00" value="'+((s2&&h.open2)?h.open2:'')+'" '+(closed?'disabled':'')+' title="Ouverture 2 (optionnel)" style="opacity:'+(closed?'.3':'.7')+'">' +
+      '<input class="dh-inp" id="dhc2-'+i+'" type="text" placeholder="20:00" value="'+((s2&&h.close2)?h.close2:'')+'" '+(closed?'disabled':'')+' title="Fermeture 2 (optionnel)" style="opacity:'+(closed?'.3':'.7')+'">' +
+      '<div class="dh-closed">' +
+        '<input type="checkbox" id="dhx-'+i+'" '+(closed?'checked':'')+'>'+
+        '<label for="dhx-'+i+'">F</label>' +
+      '</div>' +
+    '</div>';
   }).join('');
   DAY_NAMES.forEach((_, i) => {
-    document.getElementById(`dhx-${i}`).addEventListener('change', function() {
-      document.getElementById(`dho-${i}`).disabled = this.checked;
-      document.getElementById(`dhc-${i}`).disabled = this.checked;
+    document.getElementById('dhx-'+i).addEventListener('change', function() {
+      const dis = this.checked;
+      ['dho-','dhc-','dho2-','dhc2-'].forEach(p => {
+        const el = document.getElementById(p+i);
+        el.disabled = dis;
+        el.style.opacity = dis ? '.3' : (p.includes('2') ? '.7' : '1');
+      });
     });
   });
 }
 
 function getHoraires() {
   return DAY_NAMES.map((_, i) => {
-    const closed = document.getElementById(`dhx-${i}`).checked;
+    const closed = document.getElementById('dhx-'+i).checked;
     if (closed) return { closed: true };
-    const openVal = document.getElementById('dho-'+i).value.trim() || '09:00';
-    const closeVal = document.getElementById('dhc-'+i).value.trim() || '18:00';
-    return { closed: false, open: openVal, close: closeVal };
+    const open  = document.getElementById('dho-'+i).value.trim()  || '09:00';
+    const close = document.getElementById('dhc-'+i).value.trim()  || '18:00';
+    const open2  = document.getElementById('dho2-'+i).value.trim();
+    const close2 = document.getElementById('dhc2-'+i).value.trim();
+    const result = { closed: false, open, close };
+    if (open2 && close2) { result.open2 = open2; result.close2 = close2; }
+    return result;
   });
 }
 
