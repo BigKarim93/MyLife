@@ -96,6 +96,27 @@ body.edit-mode .item-actions{display:flex;}
 .fld input,.fld select{background:var(--bg);border:1px solid var(--line2);color:var(--chalk);border-radius:7px;padding:8px 10px;font-size:.85rem;width:100%;}
 .fld input:focus,.fld select:focus{outline:none;border-color:var(--accent);}
 .modal-act{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;}
+
+/* MODE COURSES MOBILE */
+.mode-courses{display:none;position:fixed;inset:0;background:var(--bg);z-index:500;overflow-y:auto;}
+.mode-courses.active{display:block;}
+.mc-header{background:var(--bg2);border-bottom:2px solid var(--line2);padding:12px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10;}
+.mc-header h2{font-family:'Kalam',cursive;font-size:1.3rem;color:var(--accent);flex:1;}
+.mc-body{padding:10px 12px 40px;}
+.mc-rayon{margin-bottom:20px;}
+.mc-rayon-title{font-family:'Kalam',cursive;font-size:1rem;color:var(--accent);padding:6px 4px;border-bottom:1px solid var(--line2);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+.mc-item{display:flex;align-items:center;gap:12px;padding:12px 10px;border-bottom:1px solid var(--line);cursor:pointer;transition:.15s;-webkit-tap-highlight-color:transparent;}
+.mc-item:active{background:var(--bg3);}
+.mc-item.done{opacity:.45;}
+.mc-check{width:26px;height:26px;border-radius:7px;border:2px solid var(--line2);flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.mc-item.done .mc-check{background:var(--green);border-color:var(--green);}
+.mc-item.done .mc-check::after{content:'✓';font-size:.85rem;color:#0f1117;font-weight:700;}
+.mc-name{font-size:1.05rem;font-weight:600;flex:1;}
+.mc-item.done .mc-name{text-decoration:line-through;color:var(--dim);}
+.mc-empty{text-align:center;padding:60px 20px;color:var(--dim);}
+.mc-empty p{font-size:.9rem;margin-top:8px;}
+.mc-progress{font-size:.78rem;color:var(--dim);}
+.mc-progress strong{color:var(--green);}
 </style>
 </head>
 <body>
@@ -106,6 +127,7 @@ body.edit-mode .item-actions{display:flex;}
   <button class="btn sm" id="btn-edit-mode">✏️ Modifier</button>
   <button class="btn sm" id="btn-tout-cocher">✅ Tout décocher</button>
   <button class="btn sm" id="btn-add-item">＋ Article</button>
+  <button class="btn prim" id="btn-mode-courses">🛒 Faire mes courses</button>
   <a href="index.html" class="btn sm">🏠</a>
 </div>
 
@@ -537,8 +559,87 @@ document.getElementById('btn-edit-mode').addEventListener('click', () => {
   document.getElementById('btn-edit-mode').textContent = editMode ? '✓ Terminer' : '✏️ Modifier';
 });
 
+// ===== MODE COURSES =====
+let mcDone = new Set(); // articles rayés pendant les courses
+
+function renderModeCourses() {
+  const body = document.getElementById('mc-body');
+  const prog = document.getElementById('mc-progress');
+
+  if (!liste.size) {
+    body.innerHTML = '<div class="mc-empty"><div style="font-size:3rem">🛒</div><p>Ta liste est vide !<br>Ajoute des articles depuis la vue principale.</p></div>';
+    prog.innerHTML = '';
+    return;
+  }
+
+  // Grouper par rayon dans l'ordre du circuit
+  const byRayon = {};
+  [...liste].forEach(id => {
+    const it = items.find(x => x.id === id);
+    if (!it) return;
+    if (!byRayon[it.rayon]) byRayon[it.rayon] = [];
+    byRayon[it.rayon].push(it);
+  });
+
+  const total = liste.size;
+  const done = mcDone.size;
+  prog.innerHTML = '<strong>' + done + '</strong>/' + total;
+
+  let html = '';
+  RAYON_ORDER.forEach(rayon => {
+    if (!byRayon[rayon]?.length) return;
+    html += '<div class="mc-rayon">';
+    html += '<div class="mc-rayon-title">' + (RAYON_ICONS[rayon]||'📦') + ' ' + rayon + '</div>';
+    byRayon[rayon].forEach(it => {
+      const done = mcDone.has(it.id);
+      html += '<div class="mc-item' + (done?' done':'') + '" data-mc="' + it.id + '">' +
+        '<div class="mc-check"></div>' +
+        '<span class="mc-name">' + it.nom + '</span>' +
+        '</div>';
+    });
+    html += '</div>';
+  });
+  body.innerHTML = html;
+
+  body.querySelectorAll('[data-mc]').forEach(el => {
+    el.addEventListener('click', () => {
+      const id = el.dataset.mc;
+      if (mcDone.has(id)) mcDone.delete(id); else mcDone.add(id);
+      renderModeCourses();
+    });
+  });
+}
+
+document.getElementById('btn-mode-courses').addEventListener('click', () => {
+  mcDone.clear();
+  renderModeCourses();
+  document.getElementById('mode-courses').classList.add('active');
+  // Empêcher le scroll du body
+  document.body.style.overflow = 'hidden';
+});
+
+document.getElementById('mc-close').addEventListener('click', () => {
+  document.getElementById('mode-courses').classList.remove('active');
+  document.body.style.overflow = '';
+});
+
+document.getElementById('mc-reset').addEventListener('click', () => {
+  if (confirm('Recommencer depuis le début ?')) { mcDone.clear(); renderModeCourses(); }
+});
+
 // Init
 load(); render();
 </script>
+
+<!-- MODE COURSES MOBILE -->
+<div class="mode-courses" id="mode-courses">
+  <div class="mc-header">
+    <h2>🛒 Mes courses</h2>
+    <span class="mc-progress" id="mc-progress"></span>
+    <button class="btn sm" id="mc-reset">↺</button>
+    <button class="btn sm" id="mc-close">✕ Quitter</button>
+  </div>
+  <div class="mc-body" id="mc-body"></div>
+</div>
 </body>
 </html>
