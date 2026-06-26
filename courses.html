@@ -98,11 +98,11 @@ body.edit-mode .item-actions{display:flex;}
 .modal-act{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;}
 
 /* MODE COURSES MOBILE */
-.mode-courses{position:fixed;inset:0;background:var(--bg);z-index:500;overflow-y:auto;visibility:hidden;pointer-events:none;}
+.mode-courses{position:fixed;inset:0;background:var(--bg);z-index:500;visibility:hidden;pointer-events:none;display:flex;flex-direction:column;}
 .mode-courses.active{visibility:visible;pointer-events:all;}
-.mc-header{background:var(--bg2);border-bottom:2px solid var(--line2);padding:12px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10;} .mc-header .btn{position:relative;z-index:20;pointer-events:all;}
+.mc-header{background:var(--bg2);border-bottom:2px solid var(--line2);padding:14px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;z-index:10;}
 .mc-header h2{font-family:'Kalam',cursive;font-size:1.3rem;color:var(--accent);flex:1;}
-.mc-body{padding:10px 12px 40px;}
+.mc-body{padding:10px 12px 40px;overflow-y:auto;flex:1;}
 .mc-rayon{margin-bottom:20px;}
 .mc-rayon-title{font-family:'Kalam',cursive;font-size:1rem;color:var(--accent);padding:6px 4px;border-bottom:1px solid var(--line2);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
 .mc-item{display:flex;align-items:center;gap:12px;padding:12px 10px;border-bottom:1px solid var(--line);cursor:pointer;transition:.15s;-webkit-tap-highlight-color:transparent;}
@@ -666,13 +666,18 @@ function renderModeCourses() {
     el.addEventListener('click', () => {
       const id = el.dataset.mc;
       if (mcDone.has(id)) mcDone.delete(id); else mcDone.add(id);
+      try { localStorage.setItem('mylife_courses_done', JSON.stringify([...mcDone])); } catch(e) {}
       renderModeCourses();
     });
   });
 }
 
 document.getElementById('btn-mode-courses').addEventListener('click', () => {
-  mcDone.clear();
+  // Charger mcDone depuis localStorage pour persistance
+  try {
+    const saved = localStorage.getItem('mylife_courses_done');
+    mcDone = saved ? new Set(JSON.parse(saved)) : new Set();
+  } catch(e) { mcDone = new Set(); }
   renderModeCourses();
   document.getElementById('mode-courses').classList.add('active');
   document.body.style.overflow = 'hidden';
@@ -684,7 +689,11 @@ document.getElementById('mc-close').addEventListener('click', () => {
 });
 
 document.getElementById('mc-reset').addEventListener('click', () => {
-  if (confirm('Recommencer depuis le début ?')) { mcDone.clear(); renderModeCourses(); }
+  if (confirm('Recommencer depuis le début ?')) {
+    mcDone.clear();
+    try { localStorage.removeItem('mylife_courses_done'); } catch(e) {}
+    renderModeCourses();
+  }
 });
 
 // Init
