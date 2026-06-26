@@ -100,7 +100,7 @@ body.edit-mode .item-actions{display:flex;}
 /* MODE COURSES MOBILE */
 .mode-courses{display:none;position:fixed;inset:0;background:var(--bg);z-index:500;overflow-y:auto;}
 .mode-courses.active{display:block;}
-.mc-header{background:var(--bg2);border-bottom:2px solid var(--line2);padding:12px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10;}
+.mc-header{background:var(--bg2);border-bottom:2px solid var(--line2);padding:12px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10;} .mc-header .btn{position:relative;z-index:20;pointer-events:all;}
 .mc-header h2{font-family:'Kalam',cursive;font-size:1.3rem;color:var(--accent);flex:1;}
 .mc-body{padding:10px 12px 40px;}
 .mc-rayon{margin-bottom:20px;}
@@ -296,7 +296,13 @@ let searchQ = '';
 function load() {
   try {
     const d = localStorage.getItem(STORE);
-    items = d ? JSON.parse(d) : [...BASE_ITEMS];
+    if (d !== null) {
+      items = JSON.parse(d);
+    } else {
+      // Premier lancement — charger la base
+      items = [...BASE_ITEMS];
+      localStorage.setItem(STORE, JSON.stringify(items));
+    }
   } catch(e) { items = [...BASE_ITEMS]; }
   try {
     const l = localStorage.getItem(LIST_STORE);
@@ -618,8 +624,12 @@ document.getElementById('btn-mode-courses').addEventListener('click', () => {
   document.body.style.overflow = 'hidden';
 });
 
-document.getElementById('mc-close').addEventListener('click', () => {
-  document.getElementById('mode-courses').classList.remove('active');
+document.getElementById('mc-close').addEventListener('click', (e) => {
+  e.stopPropagation();
+  const mc = document.getElementById('mode-courses');
+  mc.classList.remove('active');
+  mc.style.display = 'none';
+  setTimeout(() => { mc.style.display = ''; }, 50);
   document.body.style.overflow = '';
 });
 
@@ -637,7 +647,7 @@ load(); render();
     <h2>🛒 Mes courses</h2>
     <span class="mc-progress" id="mc-progress"></span>
     <button class="btn sm" id="mc-reset">↺</button>
-    <button class="btn sm" id="mc-close">✕ Quitter</button>
+    <button class="btn sm" id="mc-close" style="background:#5a2b2b;border-color:#7a3a3a;position:relative;z-index:100;">✕ Quitter</button>
   </div>
   <div class="mc-body" id="mc-body"></div>
 </div>
