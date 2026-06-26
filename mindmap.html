@@ -231,22 +231,7 @@ function renderCanvas() {
   }
   emptyMsg.style.display = 'none';
 
-  // Dessiner les lignes d'abord
-  domain.nodes.forEach(node => {
-    if (!node.parentId) return;
-    const parent = domain.nodes.find(n => n.id === node.parentId);
-    if (!parent) return;
-    const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    const x1 = panX + (parent.x + 80) * scale, y1 = panY + (parent.y + 20) * scale;
-    const x2 = panX + node.x * scale, y2 = panY + (node.y + 20) * scale;
-    const mx = (x1 + x2) / 2;
-    line.setAttribute('d', `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`);
-    line.setAttribute('class', 'connection');
-    line.setAttribute('stroke', node.color || '#60a5fa');
-    svg.appendChild(line);
-  });
-
-  // Dessiner les nœuds
+  // Dessiner les nœuds d'abord
   domain.nodes.forEach(node => {
     const el = document.createElement('div');
     el.className = 'node' + (node.parentId ? '' : ' root') + (selNodeId === node.id ? ' selected' : '') + (node.done ? ' done' : '');
@@ -342,6 +327,36 @@ function renderCanvas() {
     });
 
     canvas.appendChild(el);
+  });
+
+  // Dessiner les lignes après que les nœuds sont dans le DOM (tailles réelles)
+  requestAnimationFrame(() => {
+    svg.innerHTML = '';
+    domain.nodes.forEach(node => {
+      if (!node.parentId) return;
+      const parent = domain.nodes.find(n => n.id === node.parentId);
+      if (!parent) return;
+      const parentEl = canvas.querySelector('[data-id="'+parent.id+'"]');
+      const nodeEl = canvas.querySelector('[data-id="'+node.id+'"]');
+      if (!parentEl || !nodeEl) return;
+      // Lire les vraies dimensions
+      const pw = parentEl.offsetWidth * scale;
+      const ph = parentEl.offsetHeight * scale;
+      const nw = nodeEl.offsetWidth * scale;
+      const nh = nodeEl.offsetHeight * scale;
+      // Point de départ : bord droit du parent, milieu vertical
+      const x1 = panX + parent.x * scale + pw;
+      const y1 = panY + parent.y * scale + ph / 2;
+      // Point d'arrivée : bord gauche du nœud, milieu vertical
+      const x2 = panX + node.x * scale;
+      const y2 = panY + node.y * scale + nh / 2;
+      const mx = (x1 + x2) / 2;
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      line.setAttribute('d', 'M'+x1+','+y1+' C'+mx+','+y1+' '+mx+','+y2+' '+x2+','+y2);
+      line.setAttribute('class', 'connection');
+      line.setAttribute('stroke', node.color || '#60a5fa');
+      svg.appendChild(line);
+    });
   });
 }
 
