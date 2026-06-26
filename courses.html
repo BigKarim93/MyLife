@@ -118,6 +118,10 @@ body.edit-mode .item-actions{display:flex;}
 .mc-progress{font-size:.78rem;color:var(--dim);}
 .mc-progress strong{color:var(--green);}
 </style>
+<script src="firebase-config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
@@ -197,8 +201,58 @@ body.edit-mode .item-actions{display:flex;}
 </div>
 
 <script>
-const STORE = 'mylife_courses_v1';
-const LIST_STORE = 'mylife_courses_list_v1';
+const STORE = 'mylife_courses_v3';
+const LIST_STORE = 'mylife_courses_list_v3';
+
+// Firebase
+firebase.initializeApp(window.FIREBASE_CONFIG);
+const auth = firebase.auth();
+const db = firebase.firestore();
+let coursesDoc = null;
+let currentUser = null;
+
+// Auth
+auth.onAuthStateChanged(user => {
+  if (user) {
+    currentUser = user;
+    coursesDoc = db.collection('users').doc(user.uid).collection('modules').doc('courses');
+    loadFromFirestore();
+  } else {
+    // Pas connecté — utiliser localStorage
+    load(); render();
+  }
+});
+
+async function loadFromFirestore() {
+  try {
+    const snap = await coursesDoc.get();
+    if (snap.exists) {
+      const data = snap.data();
+      items = (data.items && data.items.length > 0) ? data.items : BASE_ITEMS.map(x => Object.assign({}, x));
+      liste = new Set(data.liste || []);
+    } else {
+      items = BASE_ITEMS.map(x => Object.assign({}, x));
+      liste = new Set();
+      await coursesDoc.set({ items, liste: [] });
+    }
+  } catch(e) {
+    load(); // fallback localStorage
+  }
+  render();
+}
+
+let saveTimer = null;
+function save() {
+  // localStorage backup
+  try { localStorage.setItem(STORE, JSON.stringify(items)); } catch(e) {}
+  try { localStorage.setItem(LIST_STORE, JSON.stringify([...liste])); } catch(e) {}
+  // Firestore
+  if (!coursesDoc) return;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    coursesDoc.set({ items, liste: [...liste] }).catch(() => {});
+  }, 800);
+}
 
 // ===== BASE DE DONNÉES INITIALE =====
 const BASE_ITEMS = [
@@ -296,14 +350,15 @@ let searchQ = '';
 function load() {
   try {
     const d = localStorage.getItem(STORE);
-    if (d !== null) {
-      items = JSON.parse(d);
+    const parsed = d ? JSON.parse(d) : null;
+    if (parsed && parsed.length > 0) {
+      items = parsed;
     } else {
-      // Premier lancement — charger la base
-      items = [...BASE_ITEMS];
+      // Pas de données ou vide — charger la base
+      items = BASE_ITEMS.map(x => Object.assign({}, x));
       localStorage.setItem(STORE, JSON.stringify(items));
     }
-  } catch(e) { items = [...BASE_ITEMS]; }
+  } catch(e) { items = BASE_ITEMS.map(x => Object.assign({}, x)); }
   try {
     const l = localStorage.getItem(LIST_STORE);
     liste = l ? new Set(JSON.parse(l)) : new Set();
