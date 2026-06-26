@@ -231,6 +231,10 @@ async function loadFromFirestore() {
       const data = snap.data();
       items = (data.items && data.items.length > 0) ? data.items : BASE_ITEMS.map(x => Object.assign({}, x));
       liste = new Set(data.liste || []);
+      // Charger aussi les articles rayés en mode courses
+      if (data.done) {
+        try { localStorage.setItem('mylife_courses_done', JSON.stringify(data.done)); } catch(e) {}
+      }
     } else {
       // Première fois — récupérer ce qui est dans localStorage
       load();
@@ -252,7 +256,9 @@ function save() {
   if (!coursesDoc) return;
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
-    coursesDoc.set({ items, liste: [...liste] }).catch(() => {});
+    const done = [];
+    try { const d = localStorage.getItem('mylife_courses_done'); if(d) done.push(...JSON.parse(d)); } catch(e) {}
+    coursesDoc.set({ items, liste: [...liste], done }).catch(() => {});
   }, 800);
 }
 
@@ -646,7 +652,7 @@ function renderModeCourses() {
 
   const total = liste.size;
   const done = mcDone.size;
-  prog.innerHTML = '<strong>' + done + '</strong>/' + total;
+  prog.innerHTML = '<strong>' + done + '</strong> / ' + total + ' articles';
 
   let html = '';
   RAYON_ORDER.forEach(rayon => {
@@ -668,7 +674,7 @@ function renderModeCourses() {
     el.addEventListener('click', () => {
       const id = el.dataset.mc;
       if (mcDone.has(id)) mcDone.delete(id); else mcDone.add(id);
-      try { localStorage.setItem('mylife_courses_done', JSON.stringify([...mcDone])); } catch(e) {}
+      saveMcDone();
       renderModeCourses();
     });
   });
@@ -684,6 +690,12 @@ function openModeCourses() {
   document.getElementById('btn-exit-courses').style.display = 'block';
   document.body.style.overflow = 'hidden';
 }
+function saveMcDone() {
+  try { localStorage.setItem('mylife_courses_done', JSON.stringify([...mcDone])); } catch(e) {}
+  if (coursesDoc) {
+    coursesDoc.set({ items, liste: [...liste], done: [...mcDone] }).catch(() => {});
+  }
+}
 function closeModeCourses() {
   document.getElementById('mode-courses').style.display = 'none';
   document.getElementById('btn-exit-courses').style.display = 'none';
@@ -692,7 +704,6 @@ function closeModeCourses() {
 document.getElementById('btn-mode-courses').addEventListener('click', openModeCourses);
 document.getElementById('btn-exit-courses').addEventListener('click', closeModeCourses);
 
-document.getElementById('mc-close').addEventListener('click', closeModeCourses);
 
 document.getElementById('mc-reset').addEventListener('click', () => {
   if (confirm('Recommencer depuis le début ?')) {
@@ -711,8 +722,7 @@ load(); render();
   <div class="mc-header">
     <h2>🛒 Mes courses</h2>
     <span class="mc-progress" id="mc-progress"></span>
-    <button class="btn sm" id="mc-reset">↺</button>
-    <button class="btn sm" id="mc-close" style="background:#5a2b2b;border-color:#7a3a3a;">✕</button>
+    <button class="btn sm" id="mc-reset" title="Recommencer">↺</button>
   </div>
   <div class="mc-body" id="mc-body"></div>
 </div>
