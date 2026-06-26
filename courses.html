@@ -98,8 +98,8 @@ body.edit-mode .item-actions{display:flex;}
 .modal-act{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;}
 
 /* MODE COURSES MOBILE */
-.mode-courses{position:fixed;inset:0;background:var(--bg);z-index:500;visibility:hidden;pointer-events:none;display:flex;flex-direction:column;}
-.mode-courses.active{visibility:visible;pointer-events:all;}
+.mode-courses{position:fixed;inset:0;background:var(--bg);z-index:500;display:none;flex-direction:column;}
+.mode-courses.active{display:flex;}
 .mc-header{background:var(--bg2);border-bottom:2px solid var(--line2);padding:14px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;z-index:10;}
 .mc-header h2{font-family:'Kalam',cursive;font-size:1.3rem;color:var(--accent);flex:1;}
 .mc-body{padding:10px 12px 40px;overflow-y:auto;flex:1;}
@@ -673,18 +673,18 @@ function renderModeCourses() {
 }
 
 document.getElementById('btn-mode-courses').addEventListener('click', () => {
-  // Charger mcDone depuis localStorage pour persistance
   try {
     const saved = localStorage.getItem('mylife_courses_done');
     mcDone = saved ? new Set(JSON.parse(saved)) : new Set();
   } catch(e) { mcDone = new Set(); }
   renderModeCourses();
-  document.getElementById('mode-courses').classList.add('active');
+  const mc = document.getElementById('mode-courses');
+  mc.style.display = 'flex';
   document.body.style.overflow = 'hidden';
 });
 
-document.getElementById('mc-close').addEventListener('click', () => {
-  document.getElementById('mode-courses').classList.remove('active');
+document.getElementById('mc-close').addEventListener('click', function() {
+  document.getElementById('mode-courses').style.display = 'none';
   document.body.style.overflow = '';
 });
 
@@ -706,7 +706,7 @@ load(); render();
     <h2>🛒 Mes courses</h2>
     <span class="mc-progress" id="mc-progress"></span>
     <button class="btn sm" id="mc-reset">↺</button>
-    <button class="btn sm" id="mc-close" style="background:#5a2b2b;border-color:#7a3a3a;position:relative;z-index:100;">✕ Quitter</button>
+    <button class="btn sm" id="mc-close" style="background:#5a2b2b;border-color:#7a3a3a;">✕ Quitter</button>
   </div>
   <div class="mc-body" id="mc-body"></div>
 </div>
