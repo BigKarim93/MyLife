@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Arbre de connaissances</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@700&family=Work+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#16261e;--bg2:#1f3a2c;--bg3:#274a37;--line:rgba(238,241,234,.09);--line2:rgba(238,241,234,.22);--chalk:#f1efe4;--dim:#aebcb1;--accent:#f2c14e;--green:#4ade80;--red:#f87171;--r:10px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Work Sans',sans-serif;background:var(--bg);color:var(--chalk);height:100vh;overflow:hidden;display:flex;flex-direction:column;}
+h1,h2{font-family:'Kalam',cursive;}
+input,button,select{font-family:inherit;}
+.btn{background:var(--bg3);border:1px solid var(--line2);color:var(--chalk);padding:6px 12px;border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;text-decoration:none;}
+.btn:hover{border-color:var(--accent);}
+.btn.prim{background:var(--accent);color:#21321f;border-color:var(--accent);}
+.btn.sm{padding:4px 9px;font-size:.75rem;}
+.btn.dn{background:#5a2b2b;border-color:#7a3a3a;}
+.btn.act{background:var(--accent);color:#21321f;}
+
+/* TOPBAR */
+.tb{background:linear-gradient(var(--bg2),rgba(31,58,44,.95));border-bottom:2px solid var(--line2);padding:10px 16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex-shrink:0;backdrop-filter:blur(4px);}
+.tb h1{font-size:1.15rem;color:var(--accent);}
+.spacer{flex:1;}
+
+/* ONGLETS */
+.tabs{display:flex;gap:4px;padding:8px 16px 0;background:var(--bg2);border-bottom:1px solid var(--line2);flex-shrink:0;overflow-x:auto;flex-wrap:nowrap;}
+.tab{padding:6px 14px;border-radius:8px 8px 0 0;font-size:.8rem;font-weight:600;cursor:pointer;border:1px solid transparent;border-bottom:none;color:var(--dim);transition:.15s;white-space:nowrap;background:transparent;}
+.tab:hover{color:var(--chalk);}
+.tab.active{background:var(--bg);color:var(--chalk);border-color:var(--line2);}
+.tab-add{padding:6px 10px;color:var(--dim);cursor:pointer;font-size:1rem;border-radius:8px 8px 0 0;transition:.15s;}
+.tab-add:hover{color:var(--accent);}
+
+/* CANVAS */
+.canvas-wrap{flex:1;position:relative;overflow:hidden;cursor:grab;}
+.canvas-wrap.grabbing{cursor:grabbing;}
+.canvas{position:absolute;top:0;left:0;width:100%;height:100%;}
+svg.lines{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible;}
+
+/* NŒUDS */
+.node{position:absolute;border-radius:10px;padding:8px 12px;cursor:pointer;user-select:none;min-width:80px;max-width:180px;border:2px solid transparent;transition:box-shadow .15s,border-color .15s;display:flex;align-items:center;gap:6px;}
+.node:hover{box-shadow:0 0 0 2px var(--accent);}
+.node.selected{box-shadow:0 0 0 2px var(--accent),0 0 16px rgba(242,193,78,.3);}
+.node.done .node-label{text-decoration:line-through;opacity:.5;}
+.node-check{width:16px;height:16px;border-radius:4px;border:2px solid rgba(255,255,255,.4);flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.node.done .node-check{background:rgba(255,255,255,.6);border-color:transparent;}
+.node.done .node-check::after{content:'✓';font-size:.6rem;color:#1a1a1a;font-weight:700;}
+.node-label{font-size:.82rem;font-weight:600;line-height:1.3;word-break:break-word;}
+.node.root{font-family:'Kalam',cursive;font-size:1rem;padding:10px 16px;min-width:100px;}
+
+/* LIGNE DE CONNEXION */
+.connection{stroke-width:2;fill:none;opacity:.6;}
+
+/* VIDE */
+.empty-canvas{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;color:var(--dim);pointer-events:none;}
+.empty-canvas h2{font-size:1.5rem;color:var(--accent);margin-bottom:8px;}
+
+/* MODALS */
+.ov{position:fixed;inset:0;background:rgba(10,16,12,.75);display:none;align-items:center;justify-content:center;z-index:300;padding:14px;}
+.ov.op{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--line2);border-radius:var(--r);padding:20px;width:100%;max-width:360px;}
+.modal h3{color:var(--accent);margin-bottom:12px;}
+.fld{margin-bottom:10px;display:flex;flex-direction:column;gap:4px;}
+.fld label{font-size:.75rem;color:var(--dim);font-weight:600;}
+.fld input,.fld select{background:var(--bg);border:1px solid var(--line2);color:var(--chalk);border-radius:7px;padding:8px 10px;font-size:.85rem;width:100%;}
+.fld input:focus{outline:none;border-color:var(--accent);}
+.modal-act{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;}
+.color-grid{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;}
+.color-dot{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:.15s;}
+.color-dot.sel{border-color:#fff;transform:scale(1.15);}
+.tip{font-size:.65rem;color:var(--dim);margin-top:3px;}
+
+/* ACTIONS NŒUD */
+.node-actions{position:fixed;background:var(--bg2);border:1px solid var(--line2);border-radius:10px;padding:8px;display:none;z-index:200;gap:6px;flex-direction:column;box-shadow:0 8px 24px rgba(0,0,0,.4);}
+.node-actions.open{display:flex;}
+</style>
+</head>
+<body>
+
+<div class="tb">
+  <h1>🌳 Connaissances</h1>
+  <div class="spacer"></div>
+  <button class="btn sm" id="btn-add-node" title="Ajouter un nœud enfant au nœud sélectionné">➕ Nœud</button>
+  <button class="btn sm" id="btn-edit-node" title="Modifier le nœud sélectionné">✎ Modifier</button>
+  <a href="index.html" class="btn sm">🏠</a>
+</div>
+
+<div class="tabs" id="tabs">
+  <div class="tab-add" id="tab-add" title="Nouveau domaine">＋</div>
+</div>
+
+<div class="canvas-wrap" id="canvas-wrap">
+  <svg class="lines" id="svg-lines"></svg>
+  <div class="canvas" id="canvas">
+    <div class="empty-canvas" id="empty-msg">
+      <h2>🌱</h2>
+      <p>Crée un domaine<br>avec le bouton ＋</p>
+    </div>
+  </div>
+</div>
+
+<!-- Menu contextuel nœud -->
+<div class="node-actions" id="node-actions">
+  <button class="btn sm" id="na-add">➕ Ajouter une branche</button>
+  <button class="btn sm" id="na-edit">✎ Modifier</button>
+  <button class="btn sm" id="na-toggle">☐ Cocher / Décocher</button>
+  <button class="btn sm dn" id="na-del">🗑️ Supprimer</button>
+</div>
+
+<!-- Modal domaine -->
+<div class="ov" id="ov-domain">
+  <div class="modal">
+    <h3 id="domain-title">Nouveau domaine</h3>
+    <div class="fld"><label>Nom</label><input type="text" id="domain-nom" maxlength="30" placeholder="ex: Arabe, PPL, Maths…"></div>
+    <div class="modal-act">
+      <button class="btn dn" id="domain-del" style="display:none;margin-right:auto;">🗑️ Supprimer</button>
+      <button class="btn" id="domain-cancel">Annuler</button>
+      <button class="btn prim" id="domain-save">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal nœud -->
+<div class="ov" id="ov-node">
+  <div class="modal">
+    <h3 id="node-title">Nouveau nœud</h3>
+    <div class="fld"><label>Nom</label><input type="text" id="node-nom" maxlength="50"></div>
+    <div class="fld"><label>Couleur</label><div class="color-grid" id="node-colors"></div></div>
+    <div class="modal-act">
+      <button class="btn" id="node-cancel">Annuler</button>
+      <button class="btn prim" id="node-save">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<script src="firebase-config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+const COLORS = ['#f87171','#fb923c','#fbbf24','#4ade80','#2dd4bf','#60a5fa','#a78bfa','#f472b6','#34d399','#e879f9','#f1efe4'];
+const STORE = 'mylife_mindmap_v1';
+
+firebase.initializeApp(window.FIREBASE_CONFIG);
+const auth = firebase.auth();
+const db = firebase.firestore();
+let mmDoc = null;
+
+// ===== STATE =====
+let domains = []; // [{id, nom, nodes:[{id,label,color,done,x,y,parentId}]}]
+let curDomainIdx = 0;
+let selNodeId = null;
+let saveTimer = null;
+let editingDomainId = null;
+let editingNodeId = null;
+let addingChildOfId = null;
+let nodeSelColor = COLORS[5];
+
+// ===== FIREBASE =====
+auth.onAuthStateChanged(user => {
+  if (user) {
+    mmDoc = db.collection('users').doc(user.uid).collection('modules').doc('mindmap');
+    mmDoc.get().then(snap => {
+      if (snap.exists && snap.data().domains) {
+        domains = snap.data().domains;
+      } else {
+        load();
+        if (!domains.length) domains = [];
+      }
+      renderTabs(); renderCanvas();
+    }).catch(() => { load(); renderTabs(); renderCanvas(); });
+  } else {
+    load(); renderTabs(); renderCanvas();
+  }
+});
+
+function save() {
+  try { localStorage.setItem(STORE, JSON.stringify(domains)); } catch(e) {}
+  if (!mmDoc) return;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => mmDoc.set({ domains }).catch(() => {}), 800);
+}
+function load() {
+  try { const d = localStorage.getItem(STORE); if (d) domains = JSON.parse(d); } catch(e) {}
+}
+
+// ===== ONGLETS =====
+function renderTabs() {
+  const tabs = document.getElementById('tabs');
+  tabs.innerHTML = '';
+  domains.forEach((d, i) => {
+    const el = document.createElement('div');
+    el.className = 'tab' + (i === curDomainIdx ? ' active' : '');
+    el.textContent = d.nom;
+    el.addEventListener('click', () => { curDomainIdx = i; selNodeId = null; renderTabs(); renderCanvas(); });
+    el.addEventListener('dblclick', e => { e.stopPropagation(); openDomainModal(d.id); });
+    tabs.appendChild(el);
+  });
+  const addBtn = document.createElement('div');
+  addBtn.className = 'tab-add';
+  addBtn.id = 'tab-add';
+  addBtn.title = 'Nouveau domaine';
+  addBtn.textContent = '＋';
+  addBtn.addEventListener('click', () => openDomainModal(null));
+  tabs.appendChild(addBtn);
+}
+
+// ===== CANVAS =====
+let panX = 0, panY = 0, isPanning = false, panStart = null;
+
+function renderCanvas() {
+  const canvas = document.getElementById('canvas');
+  const svg = document.getElementById('svg-lines');
+  const emptyMsg = document.getElementById('empty-msg');
+  canvas.querySelectorAll('.node').forEach(n => n.remove());
+  svg.innerHTML = '';
+
+  const domain = domains[curDomainIdx];
+  if (!domain || !domain.nodes || !domain.nodes.length) {
+    emptyMsg.style.display = 'block';
+    return;
+  }
+  emptyMsg.style.display = 'none';
+
+  // Dessiner les lignes d'abord
+  domain.nodes.forEach(node => {
+    if (!node.parentId) return;
+    const parent = domain.nodes.find(n => n.id === node.parentId);
+    if (!parent) return;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    const x1 = panX + parent.x + 80, y1 = panY + parent.y + 20;
+    const x2 = panX + node.x, y2 = panY + node.y + 20;
+    const mx = (x1 + x2) / 2;
+    line.setAttribute('d', `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`);
+    line.setAttribute('class', 'connection');
+    line.setAttribute('stroke', node.color || '#60a5fa');
+    svg.appendChild(line);
+  });
+
+  // Dessiner les nœuds
+  domain.nodes.forEach(node => {
+    const el = document.createElement('div');
+    el.className = 'node' + (node.parentId ? '' : ' root') + (selNodeId === node.id ? ' selected' : '') + (node.done ? ' done' : '');
+    el.dataset.id = node.id;
+    el.style.left = (panX + node.x) + 'px';
+    el.style.top = (panY + node.y) + 'px';
+    el.style.background = (node.color || '#60a5fa') + '33';
+    el.style.borderColor = node.color || '#60a5fa';
+
+    el.innerHTML = '<div class="node-check"></div><span class="node-label">' + node.label + '</span>';
+
+    // Drag nœud
+    let dragNode = false, dragStartX, dragStartY, nodeStartX, nodeStartY;
+    el.addEventListener('mousedown', e => {
+      if (e.button !== 0) return;
+      e.stopPropagation();
+      dragNode = false;
+      dragStartX = e.clientX; dragStartY = e.clientY;
+      nodeStartX = node.x; nodeStartY = node.y;
+      function onMove(e2) {
+        const dx = e2.clientX - dragStartX, dy = e2.clientY - dragStartY;
+        if (Math.abs(dx) > 3 || Math.abs(dy) > 3) dragNode = true;
+        if (dragNode) { node.x = nodeStartX + dx; node.y = nodeStartY + dy; renderCanvas(); }
+      }
+      function onUp() {
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+        if (dragNode) { save(); }
+      }
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    });
+
+    // Touch drag
+    el.addEventListener('touchstart', e => {
+      e.stopPropagation();
+      const t = e.touches[0];
+      dragNode = false;
+      dragStartX = t.clientX; dragStartY = t.clientY;
+      nodeStartX = node.x; nodeStartY = node.y;
+      function onMove(e2) {
+        const t2 = e2.touches[0];
+        const dx = t2.clientX - dragStartX, dy = t2.clientY - dragStartY;
+        if (Math.abs(dx) > 5 || Math.abs(dy) > 5) dragNode = true;
+        if (dragNode) { e2.preventDefault(); node.x = nodeStartX + dx; node.y = nodeStartY + dy; renderCanvas(); }
+      }
+      function onEnd() {
+        el.removeEventListener('touchmove', onMove);
+        el.removeEventListener('touchend', onEnd);
+        if (dragNode) save();
+      }
+      el.addEventListener('touchmove', onMove, { passive: false });
+      el.addEventListener('touchend', onEnd);
+    }, { passive: true });
+
+    // Clic simple = sélection + menu contextuel
+    el.addEventListener('click', e => {
+      if (dragNode) return;
+      e.stopPropagation();
+      selNodeId = node.id;
+      renderCanvas();
+      showNodeActions(e.clientX, e.clientY, node);
+    });
+
+    canvas.appendChild(el);
+  });
+}
+
+// ===== PAN CANVAS =====
+const canvasWrap = document.getElementById('canvas-wrap');
+canvasWrap.addEventListener('mousedown', e => {
+  if (e.target !== canvasWrap && e.target !== document.getElementById('canvas') && e.target !== document.getElementById('svg-lines')) return;
+  isPanning = true;
+  panStart = { x: e.clientX - panX, y: e.clientY - panY };
+  canvasWrap.classList.add('grabbing');
+  selNodeId = null;
+  hideNodeActions();
+});
+document.addEventListener('mousemove', e => {
+  if (!isPanning) return;
+  panX = e.clientX - panStart.x;
+  panY = e.clientY - panStart.y;
+  renderCanvas();
+});
+document.addEventListener('mouseup', () => { isPanning = false; canvasWrap.classList.remove('grabbing'); });
+
+// Touch pan
+canvasWrap.addEventListener('touchstart', e => {
+  if (e.target !== canvasWrap && e.target !== document.getElementById('canvas')) return;
+  isPanning = true;
+  const t = e.touches[0];
+  panStart = { x: t.clientX - panX, y: t.clientY - panY };
+  selNodeId = null; hideNodeActions();
+}, { passive: true });
+canvasWrap.addEventListener('touchmove', e => {
+  if (!isPanning) return;
+  const t = e.touches[0];
+  panX = t.clientX - panStart.x;
+  panY = t.clientY - panStart.y;
+  renderCanvas();
+}, { passive: true });
+canvasWrap.addEventListener('touchend', () => { isPanning = false; });
+
+// ===== MENU CONTEXTUEL =====
+function showNodeActions(x, y, node) {
+  const menu = document.getElementById('node-actions');
+  menu.classList.add('open');
+  const rect = document.body.getBoundingClientRect();
+  menu.style.left = Math.min(x, rect.width - 180) + 'px';
+  menu.style.top = Math.min(y + 10, rect.height - 200) + 'px';
+}
+function hideNodeActions() {
+  document.getElementById('node-actions').classList.remove('open');
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('#node-actions') && !e.target.closest('.node')) hideNodeActions();
+});
+
+document.getElementById('na-add').addEventListener('click', () => {
+  hideNodeActions();
+  addingChildOfId = selNodeId;
+  openNodeModal(null);
+});
+document.getElementById('na-edit').addEventListener('click', () => {
+  hideNodeActions();
+  const domain = domains[curDomainIdx];
+  const node = domain.nodes.find(n => n.id === selNodeId);
+  if (node) openNodeModal(node.id);
+});
+document.getElementById('na-toggle').addEventListener('click', () => {
+  hideNodeActions();
+  const domain = domains[curDomainIdx];
+  const node = domain.nodes.find(n => n.id === selNodeId);
+  if (node) { node.done = !node.done; save(); renderCanvas(); }
+});
+document.getElementById('na-del').addEventListener('click', () => {
+  hideNodeActions();
+  if (!confirm('Supprimer ce nœud et toutes ses branches ?')) return;
+  const domain = domains[curDomainIdx];
+  function getDescendants(id) {
+    const children = domain.nodes.filter(n => n.parentId === id);
+    return [id, ...children.flatMap(c => getDescendants(c.id))];
+  }
+  const toDelete = getDescendants(selNodeId);
+  domain.nodes = domain.nodes.filter(n => !toDelete.includes(n.id));
+  selNodeId = null; save(); renderCanvas();
+});
+
+// Boutons topbar
+document.getElementById('btn-add-node').addEventListener('click', () => {
+  addingChildOfId = selNodeId;
+  openNodeModal(null);
+});
+document.getElementById('btn-edit-node').addEventListener('click', () => {
+  if (!selNodeId) return;
+  const domain = domains[curDomainIdx];
+  const node = domain.nodes.find(n => n.id === selNodeId);
+  if (node) openNodeModal(node.id);
+});
+
+// ===== MODAL DOMAINE =====
+function openDomainModal(id) {
+  editingDomainId = id;
+  const d = id ? domains.find(x => x.id === id) : null;
+  document.getElementById('domain-title').textContent = d ? 'Modifier le domaine' : 'Nouveau domaine';
+  document.getElementById('domain-nom').value = d ? d.nom : '';
+  document.getElementById('domain-del').style.display = d ? 'inline-flex' : 'none';
+  document.getElementById('ov-domain').classList.add('op');
+  setTimeout(() => document.getElementById('domain-nom').focus(), 50);
+}
+document.getElementById('domain-cancel').addEventListener('click', () => document.getElementById('ov-domain').classList.remove('op'));
+document.getElementById('domain-save').addEventListener('click', () => {
+  const nom = document.getElementById('domain-nom').value.trim();
+  if (!nom) return;
+  if (editingDomainId) {
+    const d = domains.find(x => x.id === editingDomainId);
+    if (d) d.nom = nom;
+  } else {
+    const newD = { id: 'dom_'+Date.now(), nom, nodes: [] };
+    domains.push(newD);
+    curDomainIdx = domains.length - 1;
+  }
+  save(); renderTabs(); renderCanvas();
+  document.getElementById('ov-domain').classList.remove('op');
+});
+document.getElementById('domain-del').addEventListener('click', () => {
+  if (!confirm('Supprimer ce domaine et tous ses nœuds ?')) return;
+  domains = domains.filter(d => d.id !== editingDomainId);
+  curDomainIdx = Math.max(0, curDomainIdx - 1);
+  save(); renderTabs(); renderCanvas();
+  document.getElementById('ov-domain').classList.remove('op');
+});
+document.getElementById('domain-nom').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('domain-save').click(); });
+
+// ===== MODAL NŒUD =====
+function buildNodeColors(sel) {
+  const g = document.getElementById('node-colors');
+  g.innerHTML = COLORS.map(c =>
+    '<div class="color-dot'+(c===sel?' sel':'')+'" data-c="'+c+'" style="background:'+c+'"></div>'
+  ).join('');
+  g.querySelectorAll('.color-dot').forEach(dot => {
+    dot.addEventListener('click', () => {
+      nodeSelColor = dot.dataset.c;
+      g.querySelectorAll('.color-dot').forEach(d => d.classList.toggle('sel', d===dot));
+    });
+  });
+}
+function openNodeModal(id) {
+  editingNodeId = id;
+  const domain = domains[curDomainIdx];
+  const node = id ? domain.nodes.find(n => n.id === id) : null;
+  document.getElementById('node-title').textContent = node ? 'Modifier le nœud' : 'Nouveau nœud';
+  document.getElementById('node-nom').value = node ? node.label : '';
+  nodeSelColor = node ? (node.color || COLORS[5]) : COLORS[Math.floor(Math.random()*COLORS.length)];
+  buildNodeColors(nodeSelColor);
+  document.getElementById('ov-node').classList.add('op');
+  setTimeout(() => document.getElementById('node-nom').focus(), 50);
+}
+document.getElementById('node-cancel').addEventListener('click', () => document.getElementById('ov-node').classList.remove('op'));
+document.getElementById('node-save').addEventListener('click', () => {
+  const label = document.getElementById('node-nom').value.trim();
+  if (!label) return;
+  const domain = domains[curDomainIdx];
+  if (editingNodeId) {
+    const node = domain.nodes.find(n => n.id === editingNodeId);
+    if (node) { node.label = label; node.color = nodeSelColor; }
+  } else {
+    const wrap = document.getElementById('canvas-wrap');
+    const cx = wrap.clientWidth / 2 - panX;
+    const cy = wrap.clientHeight / 2 - panY;
+    // Décaler légèrement si parent
+    const parent = addingChildOfId ? domain.nodes.find(n => n.id === addingChildOfId) : null;
+    const x = parent ? parent.x + 200 : cx - 60;
+    const y = parent ? parent.y + (Math.random()-0.5)*120 : cy - 20;
+    const newNode = {
+      id: 'n_'+Date.now(),
+      label, color: nodeSelColor, done: false,
+      x: Math.round(x), y: Math.round(y),
+      parentId: addingChildOfId || null
+    };
+    if (!domain.nodes) domain.nodes = [];
+    domain.nodes.push(newNode);
+    selNodeId = newNode.id;
+    addingChildOfId = null;
+  }
+  save(); renderCanvas();
+  document.getElementById('ov-node').classList.remove('op');
+});
+document.getElementById('node-nom').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('node-save').click(); });
+document.getElementById('ov-node').addEventListener('click', e => { if (e.target === e.currentTarget) document.getElementById('ov-node').classList.remove('op'); });
+document.getElementById('ov-domain').addEventListener('click', e => { if (e.target === e.currentTarget) document.getElementById('ov-domain').classList.remove('op'); });
+</script>
+</body>
+</html>
