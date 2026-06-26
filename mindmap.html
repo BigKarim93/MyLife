@@ -222,10 +222,7 @@ function renderCanvas() {
   const emptyMsg = document.getElementById('empty-msg');
   canvas.querySelectorAll('.node').forEach(n => n.remove());
   svg.innerHTML = '';
-  canvas.style.transformOrigin = '0 0';
-  canvas.style.transform = 'scale('+scale+')';
-  svg.style.transformOrigin = '0 0';
-  svg.style.transform = 'scale('+scale+')';
+
 
   const domain = domains[curDomainIdx];
   if (!domain || !domain.nodes || !domain.nodes.length) {
@@ -240,8 +237,8 @@ function renderCanvas() {
     const parent = domain.nodes.find(n => n.id === node.parentId);
     if (!parent) return;
     const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    const x1 = panX + parent.x + 80, y1 = panY + parent.y + 20;
-    const x2 = panX + node.x, y2 = panY + node.y + 20;
+    const x1 = panX + (parent.x + 80) * scale, y1 = panY + (parent.y + 20) * scale;
+    const x2 = panX + node.x * scale, y2 = panY + (node.y + 20) * scale;
     const mx = (x1 + x2) / 2;
     line.setAttribute('d', `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`);
     line.setAttribute('class', 'connection');
@@ -254,12 +251,14 @@ function renderCanvas() {
     const el = document.createElement('div');
     el.className = 'node' + (node.parentId ? '' : ' root') + (selNodeId === node.id ? ' selected' : '') + (node.done ? ' done' : '');
     el.dataset.id = node.id;
-    el.style.left = (panX + node.x) + 'px';
-    el.style.top = (panY + node.y) + 'px';
+    el.style.left = (panX + node.x * scale) + 'px';
+    el.style.top = (panY + node.y * scale) + 'px';
+    el.style.transform = 'scale('+scale+')';
+    el.style.transformOrigin = 'top left';
     el.style.background = (node.color || '#60a5fa') + '33';
     el.style.borderColor = node.color || '#60a5fa';
 
-    el.innerHTML = '<div class="node-check"></div><span class="node-label">' + node.label + '</span>' + (node.locked ? '<span class="node-lock">🔒</span>' : '');
+    el.innerHTML = '<div class="node-check"></div><span class="node-label">' + node.label + '</span>' + (!node.parentId && node.locked ? '<span class="node-lock">🔒</span>' : '');
 
     // Drag nœud
     let dragNode = false, dragStartX, dragStartY, nodeStartX, nodeStartY;
@@ -532,8 +531,8 @@ document.getElementById('node-save').addEventListener('click', () => {
     if (node) { node.label = label; node.color = nodeSelColor; }
   } else {
     const wrap = document.getElementById('canvas-wrap');
-    const cx = wrap.clientWidth / 2 - panX;
-    const cy = wrap.clientHeight / 2 - panY;
+    const cx = (wrap.clientWidth / 2 - panX) / scale;
+    const cy = (wrap.clientHeight / 2 - panY) / scale;
     // Décaler légèrement si parent
     const parent = addingChildOfId ? domain.nodes.find(n => n.id === addingChildOfId) : null;
     const x = parent ? parent.x + 200 : cx - 60;
