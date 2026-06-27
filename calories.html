@@ -49,42 +49,20 @@ input,button,select,textarea{font-family:inherit;}
 /* LAYOUT 2 COLONNES */
 .main-layout{display:flex;gap:14px;padding:10px 16px 30px;align-items:flex-start;}
 .col-meals{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px;}
-.col-foods{display:flex;gap:10px;flex-shrink:0;position:sticky;top:120px;align-items:flex-start;}
-/* PANEL ALIMENTS FREQUENTS */
-.foods-panel{flex:1;min-width:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;}
-.foods-panel-header{padding:8px 10px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;gap:5px;}
-.foods-panel-title{font-family:'Kalam',cursive;font-size:.85rem;flex:1;}
-.foods-panel-search{padding:6px;border-bottom:1px solid var(--border);}
-.foods-panel-search input{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 7px;font-size:.75rem;}
-.foods-panel-search input:focus{outline:none;border-color:var(--teal);}
-.foods-panel-body{display:grid;grid-template-columns:repeat(6,1fr);gap:0;}
-.food-chip{padding:6px 5px;cursor:pointer;transition:.15s;border-bottom:1px solid var(--border);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;gap:3px;}
-.food-chip:nth-child(6n){border-right:none;}
-.food-chip-del-edit{position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;border-radius:50%;width:14px;height:14px;font-size:.55rem;display:none;align-items:center;justify-content:center;cursor:pointer;font-weight:700;}
-.edit-foods-mode .food-chip{position:relative;}
-.edit-foods-mode .food-chip-del-edit{display:flex;}
+.col-foods{width:340px;flex-shrink:0;position:sticky;top:120px;}
+.col-foods-inner{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;}
+.col-foods-header{padding:10px 12px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;gap:6px;}
+.col-foods-title{font-family:'Kalam',cursive;font-size:.9rem;flex:1;}
+.foods-search{padding:8px;border-bottom:1px solid var(--border);}
+.foods-search input{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:5px 8px;font-size:.78rem;}
+.foods-search input:focus{outline:none;border-color:var(--teal);}
+.foods-list{display:grid;grid-template-columns:repeat(6,1fr);gap:0;}
+.food-chip{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 4px;cursor:pointer;transition:.15s;border-bottom:1px solid var(--border);border-right:1px solid var(--border);text-align:center;}
 .food-chip:hover{background:var(--surface2);}
 .food-chip.dragging{opacity:.3;}
-.food-chip-star{font-size:.8rem;cursor:pointer;opacity:.5;transition:.15s;line-height:1;}
-.food-chip-star:hover,.food-chip-star.active{opacity:1;}
-.food-chip-star.active{color:var(--amber);}
-.food-chip-info{text-align:center;min-width:0;width:100%;}
-.food-chip-name{font-size:.62rem;font-weight:600;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%;text-align:center;}
+.food-chip:nth-child(6n){border-right:none;}
+.food-chip-name{font-size:.65rem;font-weight:600;line-height:1.2;}
 .food-chip-kcal{font-size:.58rem;color:var(--text3);}
-/* FAV COLS */
-.fav-col{width:150px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;max-height:calc(100vh - 160px);}
-.fav-col-header{padding:7px 10px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;gap:4px;}
-.fav-col-title{font-size:.78rem;font-weight:700;flex:1;color:var(--teal);cursor:pointer;}
-.fav-col-title:hover{text-decoration:underline;}
-.fav-col-body{overflow-y:auto;flex:1;}
-.fav-chip{padding:7px 9px;cursor:pointer;transition:.15s;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:5px;}
-.fav-chip:hover{background:var(--surface2);}
-.fav-chip-name{font-size:.75rem;font-weight:600;line-height:1.3;flex:1;}
-.fav-chip-del{font-size:.65rem;color:var(--text3);cursor:pointer;opacity:0;padding:1px 4px;border-radius:3px;}
-.fav-chip:hover .fav-chip-del{opacity:1;}
-.fav-chip-del:hover{color:var(--red);}
-.fav-add-btn{width:100%;background:transparent;border:none;border-top:1px dashed var(--border2);padding:7px;color:var(--text3);font-size:.75rem;cursor:pointer;transition:.15s;}
-.fav-add-btn:hover{color:var(--teal);}
 /* QTY EDITABLE */
 .food-qty-wrap{display:flex;align-items:center;gap:4px;}
 .food-qty-input{width:44px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);border-radius:4px;padding:2px 4px;font-size:.72rem;text-align:center;}
@@ -191,25 +169,7 @@ input,button,select,textarea{font-family:inherit;}
 
 <div class="tdee-banner" id="tdee-banner"></div>
 
-<div class="main-layout"><div class="col-meals" id="meals"></div><div class="col-foods"><div class="foods-panel"><div class="foods-panel-header"><span>🍽️</span><div class="foods-panel-title">Aliments</div><button class="col-btn" id="btn-add-custom-food" title="Ajouter un aliment">＋</button><button class="col-btn" id="btn-edit-foods" title="Masquer/Restaurer">✎</button></div><div class="foods-panel-body" id="foods-list"></div></div><div id="col-favs" style="display:flex;gap:10px;"></div></div></div>
-
-<!-- MODAL AJOUTER ALIMENT CUSTOM -->
-<div class="ov" id="ov-custom-food">
-  <div class="modal" style="border-radius:20px 20px 0 0">
-    <h3>➕ Ajouter un aliment</h3>
-    <div class="fld"><label>Nom</label><input type="text" id="cf-name" placeholder="ex: Mon plat maison" maxlength="40"></div>
-    <div class="macros-grid">
-      <div class="fld"><label>🔥 Calories (kcal/100g)</label><input type="number" id="cf-kcal" min="0" value="0"></div>
-      <div class="fld"><label>💪 Protéines (g)</label><input type="number" id="cf-prot" min="0" step="0.1" value="0"></div>
-      <div class="fld"><label>🍞 Glucides (g)</label><input type="number" id="cf-gluc" min="0" step="0.1" value="0"></div>
-      <div class="fld"><label>🥑 Lipides (g)</label><input type="number" id="cf-lip" min="0" step="0.1" value="0"></div>
-    </div>
-    <div class="modal-act">
-      <button class="btn" onclick="closeOv('ov-custom-food')">Annuler</button>
-      <button class="btn prim" id="cf-ok">Ajouter à la base</button>
-    </div>
-  </div>
-</div>
+<div class="main-layout"><div class="col-meals" id="meals"></div><div class="col-foods"><div class="col-foods-inner"><div class="col-foods-header"><span>🍽️</span><div class="col-foods-title">Aliments</div><button class="btn sm" id="btn-add-food-custom" title="Ajouter un aliment">＋</button></div><div class="foods-list" id="foods-list"></div></div></div></div>
 
 <!-- MODAL AJOUTER ALIMENT -->
 <div class="ov" id="ov-food">
@@ -302,36 +262,19 @@ input,button,select,textarea{font-family:inherit;}
   </div>
 </div>
 
-<!-- MODAL RENOMMER REPAS -->
-<div class="ov" id="ov-meal-rename" style="position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:flex-end;justify-content:center;z-index:400;padding:0">
+<div class="ov" id="ov-add-food-custom">
   <div class="modal" style="border-radius:20px 20px 0 0">
-    <h3>✏️ Renommer le repas</h3>
-    <div class="fld"><label>Nom</label><input type="text" id="meal-rename-inp" maxlength="30"></div>
-    <div class="modal-act">
-      <button class="btn" onclick="document.getElementById('ov-meal-rename').style.display='none'">Annuler</button>
-      <button class="btn prim" id="meal-rename-ok">Renommer</button>
+    <h3>➕ Ajouter un aliment</h3>
+    <div class="fld"><label>Nom</label><input type="text" id="afc-name" placeholder="ex: Taboulé maison" maxlength="40"></div>
+    <div class="macros-grid">
+      <div class="fld"><label>🔥 Calories /100g</label><input type="number" id="afc-k" value="0" min="0"></div>
+      <div class="fld"><label>💪 Protéines (g)</label><input type="number" id="afc-p" value="0" min="0" step="0.1"></div>
+      <div class="fld"><label>🍞 Glucides (g)</label><input type="number" id="afc-g" value="0" min="0" step="0.1"></div>
+      <div class="fld"><label>🥑 Lipides (g)</label><input type="number" id="afc-l" value="0" min="0" step="0.1"></div>
     </div>
-  </div>
-</div>
-<!-- MODAL AJOUTER FAVORI -->
-<div class="ov" id="ov-fav-add" style="position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:flex-end;justify-content:center;z-index:400;padding:0">
-  <div class="modal" style="border-radius:20px 20px 0 0">
-    <h3>⭐ Ajouter un favori</h3>
-    <div class="fld"><label>Rechercher un aliment</label><input type="text" id="fav-search-inp" placeholder="ex: riz, poulet..."></div>
-    <div class="search-results" id="fav-search-results" style="max-height:180px;overflow-y:auto;margin-top:4px"></div>
     <div class="modal-act">
-      <button class="btn" onclick="document.getElementById('ov-fav-add').style.display='none'">Annuler</button>
-    </div>
-  </div>
-</div>
-<!-- MODAL RENOMMER CAT FAVORI -->
-<div class="ov" id="ov-fav-rename" style="position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:flex-end;justify-content:center;z-index:400;padding:0">
-  <div class="modal" style="border-radius:20px 20px 0 0">
-    <h3>✏️ Renommer la catégorie</h3>
-    <div class="fld"><label>Nom</label><input type="text" id="fav-rename-inp" maxlength="20"></div>
-    <div class="modal-act">
-      <button class="btn" onclick="document.getElementById('ov-fav-rename').style.display='none'">Annuler</button>
-      <button class="btn prim" id="fav-rename-ok">Renommer</button>
+      <button class="btn" onclick="closeOv('ov-add-food-custom')">Annuler</button>
+      <button class="btn prim" id="afc-ok">Ajouter à la base</button>
     </div>
   </div>
 </div>
@@ -374,19 +317,17 @@ var FOODS_DB = [
   {n:'Eau',k:0,p:0,g:0,l:0},
 ];
 
-var MEAL_NAMES_DEFAULT = ['🌅 Matin','☀️ Midi','🌤️ Après-midi','🌙 Soir'];
+var MEAL_NAMES = ['🌅 Matin','☀️ Midi','🌤️ Après-midi','🌙 Soir'];
 
 // ===== STATE =====
 var dayOffset=0, currentMealIdx=1;
-var settings={taille:178,age:35,activite:1.375,objectif:-500,mealNames:null};
-var MEAL_NAMES=['🌅 Matin','☀️ Midi','🌤️ Après-midi','🌙 Soir'];
+var settings={taille:178,age:35,activite:1.375,objectif:-500};
 var targets={kcal:2232,prot:175,gluc:250,lip:74};
 var poids=97.5;
 // journal = {dateKey: {meals:[[{n,k,p,g,l,qty}],[],[],[]]}}
 var journal={};
-var savedMeals=[];
-var customFoods=[];
-var favCats=[{name:'Matin',foods:[]},{name:'Midi & Soir',foods:[]}];
+var savedMeals=[]; // [{name,mealIdx,foods:[]}]
+var customFoods=[]; // aliments perso
 var saveTimer=null;
 
 function dateKey(offset){
@@ -440,9 +381,7 @@ auth.onAuthStateChanged(function(user){
         if(d.settings)settings=d.settings;
         if(d.savedMeals)savedMeals=d.savedMeals;
         if(d.customFoods)customFoods=d.customFoods;
-        if(d.favCats)favCats=d.favCats;
         if(d.targets)targets=d.targets;
-      if(d.settings&&d.settings.mealNames)MEAL_NAMES=d.settings.mealNames;
       }else{computeTargets();}
       loadSettings();render();
     }).catch(function(){loadSettings();render();});
@@ -452,8 +391,7 @@ auth.onAuthStateChanged(function(user){
 function saveAll(){
   clearTimeout(saveTimer);
   saveTimer=setTimeout(function(){
-    settings.mealNames=MEAL_NAMES;
-    if(calDoc)calDoc.set({journal:journal,settings:settings,savedMeals:savedMeals,customFoods:customFoods,targets:targets,favCats:favCats}).catch(function(){});
+    if(calDoc)calDoc.set({journal:journal,settings:settings,savedMeals:savedMeals,customFoods:customFoods,targets:targets}).catch(function(){});
   },800);
 }
 
@@ -766,12 +704,9 @@ document.getElementById('btn-next-day').disabled=dayOffset>=0;
 var dragFood=null;
 
 function renderFoodsPanel(filter){
-  var allFoods=FOODS_DB.concat(customFoods);
-  var q=(filter||'').toLowerCase().trim();
-  var list=q?allFoods.filter(function(f){return f.n.toLowerCase().includes(q);}):allFoods;
+  var list=FOODS_DB.concat(customFoods);
   var container=document.getElementById('foods-list');
   container.innerHTML='';
-  if(editFoodsMode)container.classList.add('edit-foods-mode');else container.classList.remove('edit-foods-mode');
   list.forEach(function(food){
     var el=document.createElement('div');
     el.className='food-chip';
@@ -808,31 +743,23 @@ function renderFoodsPanel(filter){
 
 }
 
-
-// Init panneau + mettre à jour après chaque render
-var origRender=render;
-render=function(){origRender();renderFavCols();renderFoodsPanel('');};
-
 // Bouton + ajouter aliment custom
-document.getElementById('btn-add-custom-food').addEventListener('click',function(){
-  document.getElementById('cf-name').value='';
-  ['cf-kcal','cf-prot','cf-gluc','cf-lip'].forEach(function(id){document.getElementById(id).value='0';});
-  document.getElementById('ov-custom-food').classList.add('op');
-  setTimeout(function(){document.getElementById('cf-name').focus();},100);
+document.getElementById('btn-add-food-custom').addEventListener('click',function(){
+  ['afc-name','afc-k','afc-p','afc-g','afc-l'].forEach(function(id){document.getElementById(id).value=id==='afc-name'?'':'0';});
+  document.getElementById('ov-add-food-custom').classList.add('op');
+  setTimeout(function(){document.getElementById('afc-name').focus();},100);
 });
-document.getElementById('cf-ok').addEventListener('click',function(){
-  var name=document.getElementById('cf-name').value.trim();if(!name)return;
-  customFoods.push({n:name,k:parseFloat(document.getElementById('cf-kcal').value)||0,p:parseFloat(document.getElementById('cf-prot').value)||0,g:parseFloat(document.getElementById('cf-gluc').value)||0,l:parseFloat(document.getElementById('cf-lip').value)||0});
-  saveAll();closeOv('ov-custom-food');renderFoodsPanel('');
+document.getElementById('afc-ok').addEventListener('click',function(){
+  var name=document.getElementById('afc-name').value.trim();if(!name)return;
+  customFoods.push({n:name,k:parseFloat(document.getElementById('afc-k').value)||0,p:parseFloat(document.getElementById('afc-p').value)||0,g:parseFloat(document.getElementById('afc-g').value)||0,l:parseFloat(document.getElementById('afc-l').value)||0});
+  saveAll();closeOv('ov-add-food-custom');renderFoodsPanel();
 });
-document.getElementById('cf-name').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('cf-ok').click();});
-document.getElementById('ov-custom-food').addEventListener('click',function(e){if(e.target===e.currentTarget)closeOv('ov-custom-food');});
-document.getElementById('btn-edit-foods').addEventListener('click',function(){
-  editFoodsMode=!editFoodsMode;
-  this.classList.toggle('prim',editFoodsMode);
-  this.textContent=editFoodsMode?'✓ OK':'✎';
-  renderFoodsPanel('');
-});renderFoodsPanel(document.getElementById('quick-search')?document.getElementById('quick-search').value:'');};
+document.getElementById('afc-name').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('afc-ok').click();});
+document.getElementById('ov-add-food-custom').addEventListener('click',function(e){if(e.target===e.currentTarget)closeOv('ov-add-food-custom');});
+
+// Init panneau
+var origRender=render;
+render=function(){origRender();renderFoodsPanel();};
 </script>
 </body>
 </html>
