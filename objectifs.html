@@ -39,6 +39,18 @@ input,button,select{font-family:inherit;}
 .add-serie-btn:hover{border-color:var(--teal);color:var(--teal);}
 .add-col-btn{background:var(--surface);border:1px dashed var(--border2);border-radius:var(--radius);width:260px;flex-shrink:0;padding:30px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;transition:.15s;color:var(--text3);font-size:.88rem;}
 .add-col-btn:hover{border-color:var(--teal);color:var(--teal);}
+/* DOSSIERS */
+.obj-folder{margin-bottom:8px;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.obj-folder-header{display:flex;align-items:center;gap:6px;padding:7px 10px;}
+.obj-folder-title{font-size:.85rem;font-weight:700;flex:1;text-align:center;}
+.obj-folder-chevron{font-size:.7rem;cursor:pointer;padding:2px 6px;border-radius:4px;color:var(--text3);}
+.obj-folder-chevron:hover{background:rgba(255,255,255,.1);color:var(--text);}
+.obj-folder-body{padding:4px 6px 6px;}
+.obj-folder-body.collapsed{display:none;}
+/* DRAG */
+.dragging{opacity:.3 !important;}
+.drag-over-top{border-top:2px solid var(--teal) !important;}
+.drag-over-folder{outline:2px dashed var(--teal);outline-offset:2px;}
 .add-col-btn span{font-size:2rem;}
 
 /* SÉRIES */
@@ -105,6 +117,7 @@ input,button,select{font-family:inherit;}
     <h3 id="serie-modal-title">Nouvelle série</h3>
     <div class="fld"><label>Titre</label><input type="text" id="serie-inp-title" maxlength="60" placeholder="ex: T1 Grammaire, Météo..."></div>
     <div class="fld"><label>Nombre de cases</label><input type="number" id="serie-inp-count" min="1" max="300" value="26"></div>
+    <div class="fld"><label>Dossier</label><select id="serie-inp-folder" style="background:var(--bg);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:8px 10px;font-size:.88rem;width:100%;"><option value="">— Aucun —</option></select></div>
     <div class="modal-act">
       <button class="btn del" id="serie-del-btn" style="display:none;">🗑️ Supprimer</button>
       <button class="btn" onclick="closeModal('ov-serie')">Annuler</button>
@@ -116,7 +129,7 @@ input,button,select{font-family:inherit;}
 <div class="ov" id="ov-folder">
   <div class="modal">
     <h3 id="folder-modal-title" style="color:var(--teal)">Nouveau dossier</h3>
-    <div class="fld"><label>Nom</label><input type="text" id="folder-inp-title" maxlength="40" placeholder="ex: Médine Tome 1, Phase 1..."></div>
+    <div class="fld"><label>Nom</label><input type="text" id="folder-inp-title" maxlength="40" placeholder="ex: Médine Tome 1..."></div>
     <div class="modal-act">
       <button class="btn del" id="folder-del-btn" style="display:none;">🗑️</button>
       <button class="btn" onclick="closeModal('ov-folder')">Annuler</button>
@@ -197,55 +210,7 @@ function render() {
 
     // Séries
     var body = document.getElementById('body-' + col.id);
-    var colColor = col.color || 'var(--teal)';
-    var colsPerRow2 = col.cols || 5;
-
-    function appendSerie(serie, container) {
-      var done2 = serie.done ? serie.done.length : 0;
-      var pct2 = serie.count ? Math.round(done2/serie.count*100) : 0;
-      var dots2 = '';
-      for (var j = 1; j <= serie.count; j++) {
-        var ok2 = serie.done && serie.done.indexOf(j) >= 0;
-        var dotStyle = ok2 ? 'background:'+colColor+'22;border-color:'+colColor+';color:'+colColor+';' : '';
-        dots2 += '<div class="obj-dot'+(ok2?' done':'')+'" data-cid="'+col.id+'" data-sid="'+serie.id+'" data-n="'+j+'" style="'+dotStyle+'">'+(ok2?'✓':j)+'</div>';
-      }
-      var sEl = document.createElement('div');
-      sEl.className = 'obj-serie'; sEl.draggable = true;
-      sEl.dataset.dragserie = col.id+'|'+serie.id+(serie.folderId?'|'+serie.folderId:'');
-      sEl.innerHTML =
-        '<div class="obj-serie-header">'+
-          '<div class="obj-chevron" data-chevron="'+col.id+'|'+serie.id+'">'+(serie.collapsed?'▶':'▼')+'</div>'+
-          '<div class="obj-serie-title">'+serie.title+'</div>'+
-          '<div class="obj-serie-prog"><strong>'+done2+'</strong>/'+serie.count+' '+pct2+'%</div>'+
-          '<div class="obj-pbar"><div class="obj-pfill" style="width:'+pct2+'%;background:'+colColor+'"></div></div>'+
-          '<button class="col-btn" data-editserie="'+col.id+'|'+serie.id+'" title="Modifier">✎</button>'+
-        '</div>'+
-        '<div class="obj-dots'+(serie.collapsed?' collapsed':'')+'" style="grid-template-columns:repeat('+colsPerRow2+',36px);">'+dots2+'</div>';
-      container.appendChild(sEl);
-    }
-
-    // Dossiers
-    (col.folders || []).forEach(function(folder) {
-      var fEl = document.createElement('div');
-      fEl.className = 'obj-folder'; fEl.draggable = true;
-      fEl.dataset.dragfolder = col.id+'|'+folder.id;
-      fEl.innerHTML =
-        '<div class="obj-folder-header" style="background:'+colColor+'18;">'+
-          '<span style="font-size:.9rem">📁</span>'+
-          '<div class="obj-folder-title">'+folder.title+'</div>'+
-          '<div class="obj-folder-chevron" data-foldertoggle="'+col.id+'|'+folder.id+'">'+(folder.collapsed?'▶':'▼')+'</div>'+
-          '<button class="col-btn" data-editfolder="'+col.id+'|'+folder.id+'" title="Modifier">✎</button>'+
-        '</div>'+
-        '<div class="obj-folder-body'+(folder.collapsed?' collapsed':'')+'" id="fbody-'+folder.id+'"></div>';
-      body.appendChild(fEl);
-      var fb = fEl.querySelector('#fbody-'+folder.id);
-      if (!folder.collapsed) {
-        (col.series||[]).filter(function(s){return s.folderId===folder.id;}).forEach(function(s){appendSerie(s,fb);});
-      }
-    });
-
-    // Séries sans dossier
-    (col.series || []).filter(function(s){return !s.folderId;}).forEach(function(serie) {
+    (col.series || []).forEach(function(serie) {
       var done = serie.done ? serie.done.length : 0;
       var pct = serie.count ? Math.round(done / serie.count * 100) : 0;
       var dots = '';
@@ -268,19 +233,16 @@ dots += '<div class="obj-dot' + (ok ? ' done' : '') + '" data-cid="' + col.id + 
       body.appendChild(serieEl);
     });
 
-    // Init drag sur ce body
-    initColDrag(body, col.id);
-
     // Bouton ajouter série
     var addSerieBtn = document.createElement('button');
     addSerieBtn.className = 'add-serie-btn';
     addSerieBtn.textContent = '＋ Ajouter une série';
     addSerieBtn.dataset.addseriecol = col.id;
     body.appendChild(addSerieBtn);
-    var addFolderBtn = document.createElement('button');
-    addFolderBtn.className = 'add-serie-btn';
-    addFolderBtn.textContent = '📁 Ajouter un dossier';
-    addFolderBtn.dataset.addfoldercol = col.id;
+    var addFolderBtn=document.createElement('button');
+    addFolderBtn.className='add-serie-btn';
+    addFolderBtn.textContent='📁 Nouveau dossier';
+    addFolderBtn.dataset.addfoldercol=col.id;
     body.appendChild(addFolderBtn);
   });
 
@@ -324,16 +286,66 @@ dots += '<div class="obj-dot' + (ok ? ' done' : '') + '" data-cid="' + col.id + 
   });
   page.querySelectorAll('[data-foldertoggle]').forEach(function(btn) {
     btn.addEventListener('click', function() {
-      var p = btn.dataset.foldertoggle.split('|');
-      var c2 = cols.find(function(x){return x.id===p[0];});
-      var f = c2&&(c2.folders||[]).find(function(x){return x.id===p[1];});
+      var p=btn.dataset.foldertoggle.split('|');
+      var c2=cols.find(function(x){return x.id===p[0];});
+      var f=c2&&(c2.folders||[]).find(function(x){return x.id===p[1];});
       if(f){f.collapsed=!f.collapsed;saveData();render();}
     });
   });
   page.querySelectorAll('[data-editfolder]').forEach(function(btn) {
     btn.addEventListener('click', function() {
-      var p = btn.dataset.editfolder.split('|');
+      var p=btn.dataset.editfolder.split('|');
       openFolderModal(p[0],p[1]);
+    });
+  });
+
+  // DRAG & DROP
+  var dragId=null,dragType=null;
+  page.querySelectorAll('.obj-serie[draggable]').forEach(function(el) {
+    el.addEventListener('dragstart',function(e){
+      dragId=el.dataset.sid; dragType='serie';
+      setTimeout(function(){el.classList.add('dragging');},0);
+      e.stopPropagation();
+    });
+    el.addEventListener('dragend',function(){
+      el.classList.remove('dragging');
+      page.querySelectorAll('.drag-over-top,.drag-over-folder').forEach(function(x){x.classList.remove('drag-over-top');x.classList.remove('drag-over-folder');});
+    });
+    el.addEventListener('dragover',function(e){e.preventDefault();e.stopPropagation();el.classList.add('drag-over-top');});
+    el.addEventListener('dragleave',function(){el.classList.remove('drag-over-top');});
+    el.addEventListener('drop',function(e){
+      e.preventDefault();e.stopPropagation();
+      el.classList.remove('drag-over-top');
+      if(!dragId||dragType!=='serie'||el.dataset.sid===dragId)return;
+      var colId=el.dataset.colid;
+      var c2=cols.find(function(x){return x.id===colId;});
+      if(!c2)return;
+      var src2=c2.series.find(function(s){return s.id===dragId;});
+      var tgt=c2.series.find(function(s){return s.id===el.dataset.sid;});
+      if(!src2||!tgt)return;
+      src2.folderId=tgt.folderId||null;
+      var si=c2.series.indexOf(src2),ti=c2.series.indexOf(tgt);
+      c2.series.splice(si,1); c2.series.splice(ti,0,src2);
+      saveData();render();
+    });
+  });
+  page.querySelectorAll('.obj-folder[draggable]').forEach(function(el) {
+    el.addEventListener('dragover',function(e){
+      e.preventDefault();e.stopPropagation();
+      if(dragType==='serie') el.classList.add('drag-over-folder');
+    });
+    el.addEventListener('dragleave',function(){el.classList.remove('drag-over-folder');});
+    el.addEventListener('drop',function(e){
+      e.preventDefault();e.stopPropagation();
+      el.classList.remove('drag-over-folder');
+      if(!dragId)return;
+      var colId=el.dataset.colid; var fid=el.dataset.fid;
+      var c2=cols.find(function(x){return x.id===colId;});
+      if(!c2)return;
+      if(dragType==='serie'){
+        var s=c2.series.find(function(x){return x.id===dragId;});
+        if(s){s.folderId=fid;saveData();render();}
+      }
     });
   });
 }
@@ -387,7 +399,7 @@ function openSerieModal(colId, serieId) {
   document.getElementById('serie-del-btn').style.display=serie?'inline-flex':'none';
   var c2=cols.find(function(x){return x.id===colId;});
   var sel=document.getElementById('serie-inp-folder');
-  sel.innerHTML='<option value="">— Aucun dossier —</option>';
+  sel.innerHTML='<option value="">— Aucun —</option>';
   (c2&&c2.folders||[]).forEach(function(f){sel.innerHTML+='<option value="'+f.id+'"'+(serie&&serie.folderId===f.id?' selected':'')+'>📁 '+f.title+'</option>';});
   openModal('ov-serie');
   setTimeout(function() { document.getElementById('serie-inp-title').focus(); }, 50);
@@ -403,7 +415,9 @@ document.getElementById('serie-save-btn').addEventListener('click', function() {
   if(editSerieId){
     var s2=col.series.find(function(x){return x.id===editSerieId;});
     if(s2){s2.title=title;if(count<s2.count&&s2.done)s2.done=s2.done.filter(function(n){return n<=count;});s2.count=count;s2.folderId=fid;}
-  }else{col.series.push({id:'ser_'+Date.now(),title:title,count:count,done:[],collapsed:false,folderId:fid});}
+  }else{
+    col.series.push({id:'ser_'+Date.now(),title:title,count:count,done:[],collapsed:false,folderId:fid});
+  }
   saveData(); closeModal('ov-serie'); render();
 });
 document.getElementById('serie-del-btn').addEventListener('click', function() {
@@ -414,135 +428,24 @@ document.getElementById('serie-del-btn').addEventListener('click', function() {
 });
 document.getElementById('serie-inp-title').addEventListener('keydown', function(e) { if (e.key === 'Enter') document.getElementById('serie-save-btn').click(); });
 
-// DRAG & DROP — géré au niveau colonne (event delegation)
-var dragSrc=null; // {colId, serieId} ou {colId, folderId}
-
-function initColDrag(body, colId) {
-  // Dragstart sur les éléments draggables dans ce body
-  body.addEventListener('dragstart', function(e) {
-    var serie = e.target.closest('[data-dragserie]');
-    var folder = e.target.closest('[data-dragfolder]');
-    if (serie) {
-      dragSrc = {type:'serie', colId:colId, serieId:serie.dataset.dragserie};
-      serie.style.opacity = '.35';
-    } else if (folder) {
-      dragSrc = {type:'folder', colId:colId, folderId:folder.dataset.dragfolder};
-      folder.style.opacity = '.35';
-    }
-  });
-
-  body.addEventListener('dragend', function(e) {
-    body.querySelectorAll('[data-dragserie],[data-dragfolder]').forEach(function(el){
-      el.style.opacity = '';
-    });
-    body.querySelectorAll('.drag-over').forEach(function(el){
-      el.classList.remove('drag-over');
-      el.style.outline = '';
-    });
-    dragSrc = null;
-  });
-
-  body.addEventListener('dragover', function(e) {
-    e.preventDefault();
-    var serie = e.target.closest('[data-dragserie]');
-    var folder = e.target.closest('[data-dragfolder]');
-    var fbody = e.target.closest('.obj-folder-body');
-    // Nettoyer les anciens highlights
-    body.querySelectorAll('.drag-over').forEach(function(el){ el.classList.remove('drag-over'); el.style.outline=''; });
-    if (serie && dragSrc && dragSrc.type==='serie' && serie.dataset.dragserie !== dragSrc.serieId) {
-      serie.classList.add('drag-over');
-    } else if (folder && dragSrc && dragSrc.type==='serie') {
-      folder.style.outline = '2px dashed var(--teal)';
-      folder.classList.add('drag-over');
-    } else if (fbody && dragSrc && dragSrc.type==='serie') {
-      fbody.style.outline = '2px dashed var(--teal)';
-    } else if (folder && dragSrc && dragSrc.type==='folder' && folder.dataset.dragfolder !== dragSrc.folderId) {
-      folder.classList.add('drag-over');
-    }
-  });
-
-  body.addEventListener('dragleave', function(e) {
-    if (!body.contains(e.relatedTarget)) {
-      body.querySelectorAll('.drag-over').forEach(function(el){ el.classList.remove('drag-over'); el.style.outline=''; });
-    }
-  });
-
-  body.addEventListener('drop', function(e) {
-    e.preventDefault();
-    if (!dragSrc || dragSrc.colId !== colId) return;
-
-    var col = cols.find(function(c){ return c.id===colId; });
-    if (!col) return;
-
-    var targetSerie = e.target.closest('[data-dragserie]');
-    var targetFolder = e.target.closest('[data-dragfolder]');
-    var targetFbody = e.target.closest('.obj-folder-body');
-
-    // Nettoyer
-    body.querySelectorAll('.drag-over').forEach(function(el){ el.classList.remove('drag-over'); el.style.outline=''; });
-
-    if (dragSrc.type === 'serie') {
-      var serie = col.series.find(function(s){ return s.id===dragSrc.serieId; });
-      if (!serie) return;
-
-      if (targetFolder && targetFolder.dataset.dragfolder !== dragSrc.serieId) {
-        // Drop sur un dossier → mettre la série dedans
-        serie.folderId = targetFolder.dataset.dragfolder;
-        saveData(); render();
-
-      } else if (targetFbody && !targetFolder) {
-        // Drop dans le body d'un dossier → mettre dedans
-        var fid = targetFbody.id.replace('fbody-','');
-        serie.folderId = fid;
-        saveData(); render();
-
-      } else if (targetSerie && targetSerie.dataset.dragserie !== dragSrc.serieId) {
-        // Drop sur une autre série → réordonner + hériter du folderId
-        var targetS = col.series.find(function(s){ return s.id===targetSerie.dataset.dragserie; });
-        serie.folderId = targetS ? targetS.folderId : null;
-        var si = col.series.findIndex(function(s){ return s.id===dragSrc.serieId; });
-        var ti = col.series.findIndex(function(s){ return s.id===targetSerie.dataset.dragserie; });
-        if (si>=0 && ti>=0) {
-          var m = col.series.splice(si,1)[0];
-          col.series.splice(ti,0,m);
-          saveData(); render();
-        }
-      }
-
-    } else if (dragSrc.type === 'folder' && targetFolder) {
-      // Réordonner les dossiers
-      if (!col.folders) return;
-      var si = col.folders.findIndex(function(f){ return f.id===dragSrc.folderId; });
-      var ti = col.folders.findIndex(function(f){ return f.id===targetFolder.dataset.dragfolder; });
-      if (si>=0 && ti>=0 && si!==ti) {
-        var m = col.folders.splice(si,1)[0];
-        col.folders.splice(ti,0,m);
-        saveData(); render();
-      }
-    }
-    dragSrc = null;
-  });
-}
-
-// MODAL DOSSIER
-var editFolderColId=null,editFolderId=null;
-function openFolderModal(colId,folderId){
-  editFolderColId=colId;editFolderId=folderId||null;
-  var c2=cols.find(function(x){return x.id===colId;});
-  var f=folderId&&c2?(c2.folders||[]).find(function(x){return x.id===folderId;}):null;
-  document.getElementById('folder-modal-title').textContent=f?'Modifier le dossier':'Nouveau dossier';
-  document.getElementById('folder-inp-title').value=f?f.title:'';
-  document.getElementById('folder-del-btn').style.display=f?'inline-flex':'none';
-  openModal('ov-folder');
-  setTimeout(function(){document.getElementById('folder-inp-title').focus();},50);
-}
-
 // Fermer modals sur clic extérieur
 ['ov-col','ov-serie','ov-folder'].forEach(function(id) {
   document.getElementById(id).addEventListener('click', function(e) {
     if (e.target === e.currentTarget) closeModal(id);
   });
 });
+
+var editFolderColId=null,editFolderId=null;
+function openFolderModal(colId,fid){
+  editFolderColId=colId;editFolderId=fid||null;
+  var c2=cols.find(function(x){return x.id===colId;});
+  var f=fid&&c2?(c2.folders||[]).find(function(x){return x.id===fid;}):null;
+  document.getElementById('folder-modal-title').textContent=f?'Modifier':'Nouveau dossier';
+  document.getElementById('folder-inp-title').value=f?f.title:'';
+  document.getElementById('folder-del-btn').style.display=f?'inline-flex':'none';
+  openModal('ov-folder');
+  setTimeout(function(){document.getElementById('folder-inp-title').focus();},50);
+}
 document.getElementById('folder-save-btn').addEventListener('click',function(){
   var title=document.getElementById('folder-inp-title').value.trim();if(!title)return;
   var c2=cols.find(function(x){return x.id===editFolderColId;});if(!c2)return;
@@ -554,7 +457,10 @@ document.getElementById('folder-save-btn').addEventListener('click',function(){
 document.getElementById('folder-del-btn').addEventListener('click',function(){
   if(!confirm('Supprimer ce dossier ?'))return;
   var c2=cols.find(function(x){return x.id===editFolderColId;});
-  if(c2){(c2.series||[]).forEach(function(s){if(s.folderId===editFolderId)delete s.folderId;});c2.folders=(c2.folders||[]).filter(function(f){return f.id!==editFolderId;});}
+  if(c2){
+    (c2.series||[]).forEach(function(s){if(s.folderId===editFolderId)delete s.folderId;});
+    c2.folders=(c2.folders||[]).filter(function(x){return x.id!==editFolderId;});
+  }
   saveData();closeModal('ov-folder');render();
 });
 document.getElementById('folder-inp-title').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('folder-save-btn').click();});
