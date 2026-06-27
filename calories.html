@@ -356,12 +356,12 @@ var FOODS_DB = [
   {n:'Eau',k:0,p:0,g:0,l:0},
 ];
 
-var MEAL_NAMES_DEFAULT = ['🌅 Petit dej','☀️ Déjeuner','🌤️ Après-midi','🌙 Dîner','🍎 Collation'];
+var MEAL_NAMES_DEFAULT = ['🌅 Matin','☀️ Midi','🌤️ Après-midi','🌙 Soir'];
 
 // ===== STATE =====
 var dayOffset=0, currentMealIdx=1;
 var settings={taille:178,age:35,activite:1.375,objectif:-500,mealNames:null};
-var MEAL_NAMES=['🌅 Petit dej','☀️ Déjeuner','🌤️ Après-midi','🌙 Dîner','🍎 Collation'];
+var MEAL_NAMES=['🌅 Matin','☀️ Midi','🌤️ Après-midi','🌙 Soir'];
 var targets={kcal:2232,prot:175,gluc:250,lip:74};
 var poids=97.5;
 // journal = {dateKey: {meals:[[{n,k,p,g,l,qty}],[],[],[]]}}
@@ -369,6 +369,7 @@ var journal={};
 var savedMeals=[];
 var customFoods=[];
 var favCats=[{name:'Matin',foods:[]},{name:'Midi & Soir',foods:[]}];
+var hiddenFoods=[]; // noms d'aliments masqués
 var saveTimer=null;
 
 function dateKey(offset){
@@ -384,8 +385,8 @@ function fmtDay(offset){
 }
 function getDayData(offset){
   var k=dateKey(offset);
-  if(!journal[k])journal[k]={meals:[[],[],[],[],[]]};
-  if(journal[k].meals.length<5)journal[k].meals.push([]);
+  if(!journal[k])journal[k]={meals:[[],[],[],[]]};
+  while(journal[k].meals.length<4)journal[k].meals.push([]);
   return journal[k];
 }
 function totalDay(offset){
@@ -423,6 +424,7 @@ auth.onAuthStateChanged(function(user){
         if(d.savedMeals)savedMeals=d.savedMeals;
         if(d.customFoods)customFoods=d.customFoods;
         if(d.favCats)favCats=d.favCats;
+        if(d.hiddenFoods)hiddenFoods=d.hiddenFoods;
         if(d.targets)targets=d.targets;
       if(d.settings&&d.settings.mealNames)MEAL_NAMES=d.settings.mealNames;
       }else{computeTargets();}
@@ -435,7 +437,7 @@ function saveAll(){
   clearTimeout(saveTimer);
   saveTimer=setTimeout(function(){
     settings.mealNames=MEAL_NAMES;
-    if(calDoc)calDoc.set({journal:journal,settings:settings,savedMeals:savedMeals,customFoods:customFoods,targets:targets,favCats:favCats}).catch(function(){});
+    if(calDoc)calDoc.set({journal:journal,settings:settings,savedMeals:savedMeals,customFoods:customFoods,targets:targets,favCats:favCats,hiddenFoods:hiddenFoods}).catch(function(){});
   },800);
 }
 
@@ -748,7 +750,7 @@ document.getElementById('btn-next-day').disabled=dayOffset>=0;
 var dragFood=null;
 
 function renderFoodsPanel(filter){
-  var allFoods=FOODS_DB.concat(customFoods);
+  var allFoods=editFoodsMode?FOODS_DB.concat(customFoods):FOODS_DB.concat(customFoods).filter(function(f){return hiddenFoods.indexOf(f.n)<0;});
   var q=(filter||'').toLowerCase().trim();
   var list=q?allFoods.filter(function(f){return f.n.toLowerCase().includes(q);}):allFoods;
   var container=document.getElementById('foods-list');
