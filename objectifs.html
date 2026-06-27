@@ -240,8 +240,9 @@ function render() {
         '<div class="obj-folder-body'+(folder.collapsed?' collapsed':'')+'" id="fbody-'+folder.id+'"></div>';
       body.appendChild(fEl);
       wireDrag(fEl);
+      var fb = fEl.querySelector('#fbody-'+folder.id);
+      wireFolderBody(fb, col.id, folder.id);
       if (!folder.collapsed) {
-        var fb = fEl.querySelector('#fbody-'+folder.id);
         (col.series||[]).filter(function(s){return s.folderId===folder.id;}).forEach(function(s){appendSerie(s,fb);});
       }
     });
@@ -416,30 +417,89 @@ document.getElementById('serie-inp-title').addEventListener('keydown', function(
 // DRAG & DROP
 var dragSrc=null;
 function wireDrag(el){
-  el.addEventListener('dragstart',function(e){dragSrc=el;setTimeout(function(){el.classList.add('dragging');},0);e.stopPropagation();});
-  el.addEventListener('dragend',function(){el.classList.remove('dragging');document.querySelectorAll('.drag-over').forEach(function(x){x.classList.remove('drag-over');});});
-  el.addEventListener('dragover',function(e){e.preventDefault();e.stopPropagation();if(el!==dragSrc)el.classList.add('drag-over');});
-  el.addEventListener('dragleave',function(){el.classList.remove('drag-over');});
+  el.addEventListener('dragstart',function(e){
+    dragSrc=el;
+    setTimeout(function(){el.classList.add('dragging');},0);
+    e.stopPropagation();
+  });
+  el.addEventListener('dragend',function(){
+    el.classList.remove('dragging');
+    document.querySelectorAll('.drag-over').forEach(function(x){x.classList.remove('drag-over');});
+  });
+  el.addEventListener('dragover',function(e){
+    e.preventDefault();e.stopPropagation();
+    if(el!==dragSrc)el.classList.add('drag-over');
+  });
+  el.addEventListener('dragleave',function(e){
+    if(!el.contains(e.relatedTarget))el.classList.remove('drag-over');
+  });
   el.addEventListener('drop',function(e){
-    e.preventDefault();e.stopPropagation();el.classList.remove('drag-over');
+    e.preventDefault();e.stopPropagation();
+    el.classList.remove('drag-over');
     if(!dragSrc||dragSrc===el)return;
-    if(dragSrc.dataset.dragserie&&el.dataset.dragserie){
-      var sp=dragSrc.dataset.dragserie.split('|'),tp=el.dataset.dragserie.split('|');
+
+    // CAS 1 : Série droppée sur un dossier → mettre la série dans ce dossier
+    if(dragSrc.dataset.dragserie && el.dataset.dragfolder){
+      var sp=dragSrc.dataset.dragserie.split('|');
+      var tp=el.dataset.dragfolder.split('|');
       var c2=cols.find(function(x){return x.id===sp[0];});
       if(!c2||sp[0]!==tp[0])return;
-      var si=c2.series.findIndex(function(s){return s.id===sp[1];}),ti=c2.series.findIndex(function(s){return s.id===tp[1];});
-      if(si<0||ti<0)return;
-      var m=c2.series.splice(si,1)[0];c2.series.splice(ti,0,m);saveData();render();
+      var serie=c2.series.find(function(s){return s.id===sp[1];});
+      if(serie){serie.folderId=tp[1];}
+      saveData();render();
+      return;
     }
-    if(dragSrc.dataset.dragfolder&&el.dataset.dragfolder){
-      var sp2=dragSrc.dataset.dragfolder.split('|'),tp2=el.dataset.dragfolder.split('|');
+
+    // CAS 2 : Série droppée sur une autre série → réordonner
+    if(dragSrc.dataset.dragserie && el.dataset.dragserie){
+      var sp=dragSrc.dataset.dragserie.split('|');
+      var tp=el.dataset.dragserie.split('|');
+      var c2=cols.find(function(x){return x.id===sp[0];});
+      if(!c2||sp[0]!==tp[0])return;
+      var si=c2.series.findIndex(function(s){return s.id===sp[1];});
+      var ti=c2.series.findIndex(function(s){return s.id===tp[1];});
+      if(si<0||ti<0)return;
+      // Aussi mettre à jour le folderId selon la cible
+      var targetSerie=c2.series[ti];
+      c2.series[si].folderId=targetSerie?targetSerie.folderId:null;
+      var m=c2.series.splice(si,1)[0];
+      c2.series.splice(ti,0,m);
+      saveData();render();
+      return;
+    }
+
+    // CAS 3 : Dossier droppé sur un autre dossier → réordonner les dossiers
+    if(dragSrc.dataset.dragfolder && el.dataset.dragfolder){
+      var sp2=dragSrc.dataset.dragfolder.split('|');
+      var tp2=el.dataset.dragfolder.split('|');
       var c3=cols.find(function(x){return x.id===sp2[0];});
       if(!c3||sp2[0]!==tp2[0])return;
-      var si2=c3.folders.findIndex(function(f){return f.id===sp2[1];}),ti2=c3.folders.findIndex(function(f){return f.id===tp2[1];});
+      var si2=c3.folders.findIndex(function(f){return f.id===sp2[1];});
+      var ti2=c3.folders.findIndex(function(f){return f.id===tp2[1];});
       if(si2<0||ti2<0)return;
-      var m2=c3.folders.splice(si2,1)[0];c3.folders.splice(ti2,0,m2);saveData();render();
+      var m2=c3.folders.splice(si2,1)[0];
+      c3.folders.splice(ti2,0,m2);
+      saveData();render();
+      return;
     }
+
     dragSrc=null;
+  });
+}
+// Rendre les dossiers body aussi des zones de drop (pour sortir une série d'un dossier)
+function wireFolderBody(fbody, colId, folderId){
+  fbody.addEventListener('dragover',function(e){e.preventDefault();e.stopPropagation();fbody.style.outline='2px dashed var(--teal)';});
+  fbody.addEventListener('dragleave',function(){fbody.style.outline='';});
+  fbody.addEventListener('drop',function(e){
+    e.preventDefault();e.stopPropagation();
+    fbody.style.outline='';
+    if(!dragSrc||!dragSrc.dataset.dragserie)return;
+    var sp=dragSrc.dataset.dragserie.split('|');
+    var c2=cols.find(function(x){return x.id===sp[0];});
+    if(!c2||sp[0]!==colId)return;
+    var serie=c2.series.find(function(s){return s.id===sp[1];});
+    if(serie){serie.folderId=folderId;}
+    saveData();render();
   });
 }
 // MODAL DOSSIER
