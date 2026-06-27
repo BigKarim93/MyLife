@@ -51,15 +51,18 @@ input,button,select,textarea{font-family:inherit;}
 .col-meals{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px;}
 .col-foods{display:flex;gap:10px;flex-shrink:0;position:sticky;top:120px;align-items:flex-start;}
 /* PANEL ALIMENTS FREQUENTS */
-.foods-panel{width:400px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;max-height:calc(100vh - 160px);}
+.foods-panel{flex:1;min-width:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;}
 .foods-panel-header{padding:8px 10px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;gap:5px;}
 .foods-panel-title{font-family:'Kalam',cursive;font-size:.85rem;flex:1;}
 .foods-panel-search{padding:6px;border-bottom:1px solid var(--border);}
 .foods-panel-search input{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 7px;font-size:.75rem;}
 .foods-panel-search input:focus{outline:none;border-color:var(--teal);}
-.foods-panel-body{overflow-y:auto;flex:1;display:grid;grid-template-columns:repeat(6,1fr);gap:0;}
+.foods-panel-body{display:grid;grid-template-columns:repeat(6,1fr);gap:0;}
 .food-chip{padding:6px 5px;cursor:pointer;transition:.15s;border-bottom:1px solid var(--border);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;gap:3px;}
 .food-chip:nth-child(6n){border-right:none;}
+.food-chip-del-edit{position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;border-radius:50%;width:14px;height:14px;font-size:.55rem;display:none;align-items:center;justify-content:center;cursor:pointer;font-weight:700;}
+.edit-foods-mode .food-chip{position:relative;}
+.edit-foods-mode .food-chip-del-edit{display:flex;}
 .food-chip:hover{background:var(--surface2);}
 .food-chip.dragging{opacity:.3;}
 .food-chip-star{font-size:.8rem;cursor:pointer;opacity:.5;transition:.15s;line-height:1;}
@@ -188,7 +191,7 @@ input,button,select,textarea{font-family:inherit;}
 
 <div class="tdee-banner" id="tdee-banner"></div>
 
-<div class="main-layout"><div class="col-meals" id="meals"></div><div class="col-foods"><div class="foods-panel"><div class="foods-panel-header"><span>🍽️</span><div class="foods-panel-title">Aliments</div></div><div class="foods-panel-search"><input type="text" id="quick-search" placeholder="🔍..."></div><div class="foods-panel-body" id="foods-list"></div></div><div id="col-favs" style="display:flex;gap:10px;"></div></div></div>
+<div class="main-layout"><div class="col-meals" id="meals"></div><div class="col-foods"><div class="foods-panel"><div class="foods-panel-header"><span>🍽️</span><div class="foods-panel-title">Aliments</div><button class="col-btn" id="btn-edit-foods" title="Mode édition">✎</button></div><div class="foods-panel-search"><input type="text" id="quick-search" placeholder="🔍..."></div><div class="foods-panel-body" id="foods-list"></div></div><div id="col-favs" style="display:flex;gap:10px;"></div></div></div>
 
 <!-- MODAL AJOUTER ALIMENT -->
 <div class="ov" id="ov-food">
@@ -750,6 +753,7 @@ function renderFoodsPanel(filter){
   var list=q?allFoods.filter(function(f){return f.n.toLowerCase().includes(q);}):allFoods;
   var container=document.getElementById('foods-list');
   container.innerHTML='';
+  container.classList.toggle('edit-foods-mode',editFoodsMode);
   list.forEach(function(food){
     var el=document.createElement('div');
     el.className='food-chip';
