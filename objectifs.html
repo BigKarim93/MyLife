@@ -301,7 +301,7 @@ dots += '<div class="obj-dot' + (ok ? ' done' : '') + '" data-cid="' + col.id + 
 
   // DRAG & DROP
   var dragId=null,dragType=null;
-  page.querySelectorAll('.obj-serie[draggable]').forEach(function(el) {
+  page.querySelectorAll('.obj-serie').forEach(function(el) {
     el.addEventListener('dragstart',function(e){
       dragId=el.dataset.sid; dragType='serie';
       setTimeout(function(){el.classList.add('dragging');},0);
@@ -329,7 +329,7 @@ dots += '<div class="obj-dot' + (ok ? ' done' : '') + '" data-cid="' + col.id + 
       saveData();render();
     });
   });
-  page.querySelectorAll('.obj-folder[draggable]').forEach(function(el) {
+  page.querySelectorAll('.obj-folder').forEach(function(el) {
     el.addEventListener('dragover',function(e){
       e.preventDefault();e.stopPropagation();
       if(dragType==='serie') el.classList.add('drag-over-folder');
