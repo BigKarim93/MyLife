@@ -222,7 +222,6 @@ function render() {
         '</div>'+
         '<div class="obj-dots'+(serie.collapsed?' collapsed':'')+'" style="grid-template-columns:repeat('+colsPerRow2+',36px);">'+dots2+'</div>';
       container.appendChild(sEl);
-      wireDrag(sEl);
     }
 
     // Dossiers
@@ -239,9 +238,7 @@ function render() {
         '</div>'+
         '<div class="obj-folder-body'+(folder.collapsed?' collapsed':'')+'" id="fbody-'+folder.id+'"></div>';
       body.appendChild(fEl);
-      wireDrag(fEl);
       var fb = fEl.querySelector('#fbody-'+folder.id);
-      wireFolderBody(fb, col.id, folder.id);
       if (!folder.collapsed) {
         (col.series||[]).filter(function(s){return s.folderId===folder.id;}).forEach(function(s){appendSerie(s,fb);});
       }
@@ -270,6 +267,9 @@ dots += '<div class="obj-dot' + (ok ? ' done' : '') + '" data-cid="' + col.id + 
         '<div class="obj-dots' + (serie.collapsed ? ' collapsed' : '') + '" style="grid-template-columns:repeat('+(col.cols||5)+',36px);">' + dots + '</div>';
       body.appendChild(serieEl);
     });
+
+    // Init drag sur ce body
+    initColDrag(body, col.id);
 
     // Bouton ajouter série
     var addSerieBtn = document.createElement('button');
@@ -414,94 +414,116 @@ document.getElementById('serie-del-btn').addEventListener('click', function() {
 });
 document.getElementById('serie-inp-title').addEventListener('keydown', function(e) { if (e.key === 'Enter') document.getElementById('serie-save-btn').click(); });
 
-// DRAG & DROP
-var dragSrc=null;
-function wireDrag(el){
-  el.addEventListener('dragstart',function(e){
-    dragSrc=el;
-    setTimeout(function(){el.classList.add('dragging');},0);
-    e.stopPropagation();
-  });
-  el.addEventListener('dragend',function(){
-    el.classList.remove('dragging');
-    document.querySelectorAll('.drag-over').forEach(function(x){x.classList.remove('drag-over');});
-  });
-  el.addEventListener('dragover',function(e){
-    e.preventDefault();e.stopPropagation();
-    if(el!==dragSrc)el.classList.add('drag-over');
-  });
-  el.addEventListener('dragleave',function(e){
-    if(!el.contains(e.relatedTarget))el.classList.remove('drag-over');
-  });
-  el.addEventListener('drop',function(e){
-    e.preventDefault();e.stopPropagation();
-    el.classList.remove('drag-over');
-    if(!dragSrc||dragSrc===el)return;
+// DRAG & DROP — géré au niveau colonne (event delegation)
+var dragSrc=null; // {colId, serieId} ou {colId, folderId}
 
-    // CAS 1 : Série droppée sur un dossier → mettre la série dans ce dossier
-    if(dragSrc.dataset.dragserie && el.dataset.dragfolder){
-      var sp=dragSrc.dataset.dragserie.split('|');
-      var tp=el.dataset.dragfolder.split('|');
-      var c2=cols.find(function(x){return x.id===sp[0];});
-      if(!c2||sp[0]!==tp[0])return;
-      var serie=c2.series.find(function(s){return s.id===sp[1];});
-      if(serie){serie.folderId=tp[1];}
-      saveData();render();
-      return;
+function initColDrag(body, colId) {
+  // Dragstart sur les éléments draggables dans ce body
+  body.addEventListener('dragstart', function(e) {
+    var serie = e.target.closest('[data-dragserie]');
+    var folder = e.target.closest('[data-dragfolder]');
+    if (serie) {
+      dragSrc = {type:'serie', colId:colId, serieId:serie.dataset.dragserie};
+      serie.style.opacity = '.35';
+    } else if (folder) {
+      dragSrc = {type:'folder', colId:colId, folderId:folder.dataset.dragfolder};
+      folder.style.opacity = '.35';
     }
+  });
 
-    // CAS 2 : Série droppée sur une autre série → réordonner
-    if(dragSrc.dataset.dragserie && el.dataset.dragserie){
-      var sp=dragSrc.dataset.dragserie.split('|');
-      var tp=el.dataset.dragserie.split('|');
-      var c2=cols.find(function(x){return x.id===sp[0];});
-      if(!c2||sp[0]!==tp[0])return;
-      var si=c2.series.findIndex(function(s){return s.id===sp[1];});
-      var ti=c2.series.findIndex(function(s){return s.id===tp[1];});
-      if(si<0||ti<0)return;
-      // Aussi mettre à jour le folderId selon la cible
-      var targetSerie=c2.series[ti];
-      c2.series[si].folderId=targetSerie?targetSerie.folderId:null;
-      var m=c2.series.splice(si,1)[0];
-      c2.series.splice(ti,0,m);
-      saveData();render();
-      return;
+  body.addEventListener('dragend', function(e) {
+    body.querySelectorAll('[data-dragserie],[data-dragfolder]').forEach(function(el){
+      el.style.opacity = '';
+    });
+    body.querySelectorAll('.drag-over').forEach(function(el){
+      el.classList.remove('drag-over');
+      el.style.outline = '';
+    });
+    dragSrc = null;
+  });
+
+  body.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    var serie = e.target.closest('[data-dragserie]');
+    var folder = e.target.closest('[data-dragfolder]');
+    var fbody = e.target.closest('.obj-folder-body');
+    // Nettoyer les anciens highlights
+    body.querySelectorAll('.drag-over').forEach(function(el){ el.classList.remove('drag-over'); el.style.outline=''; });
+    if (serie && dragSrc && dragSrc.type==='serie' && serie.dataset.dragserie !== dragSrc.serieId) {
+      serie.classList.add('drag-over');
+    } else if (folder && dragSrc && dragSrc.type==='serie') {
+      folder.style.outline = '2px dashed var(--teal)';
+      folder.classList.add('drag-over');
+    } else if (fbody && dragSrc && dragSrc.type==='serie') {
+      fbody.style.outline = '2px dashed var(--teal)';
+    } else if (folder && dragSrc && dragSrc.type==='folder' && folder.dataset.dragfolder !== dragSrc.folderId) {
+      folder.classList.add('drag-over');
     }
+  });
 
-    // CAS 3 : Dossier droppé sur un autre dossier → réordonner les dossiers
-    if(dragSrc.dataset.dragfolder && el.dataset.dragfolder){
-      var sp2=dragSrc.dataset.dragfolder.split('|');
-      var tp2=el.dataset.dragfolder.split('|');
-      var c3=cols.find(function(x){return x.id===sp2[0];});
-      if(!c3||sp2[0]!==tp2[0])return;
-      var si2=c3.folders.findIndex(function(f){return f.id===sp2[1];});
-      var ti2=c3.folders.findIndex(function(f){return f.id===tp2[1];});
-      if(si2<0||ti2<0)return;
-      var m2=c3.folders.splice(si2,1)[0];
-      c3.folders.splice(ti2,0,m2);
-      saveData();render();
-      return;
+  body.addEventListener('dragleave', function(e) {
+    if (!body.contains(e.relatedTarget)) {
+      body.querySelectorAll('.drag-over').forEach(function(el){ el.classList.remove('drag-over'); el.style.outline=''; });
     }
+  });
 
-    dragSrc=null;
+  body.addEventListener('drop', function(e) {
+    e.preventDefault();
+    if (!dragSrc || dragSrc.colId !== colId) return;
+
+    var col = cols.find(function(c){ return c.id===colId; });
+    if (!col) return;
+
+    var targetSerie = e.target.closest('[data-dragserie]');
+    var targetFolder = e.target.closest('[data-dragfolder]');
+    var targetFbody = e.target.closest('.obj-folder-body');
+
+    // Nettoyer
+    body.querySelectorAll('.drag-over').forEach(function(el){ el.classList.remove('drag-over'); el.style.outline=''; });
+
+    if (dragSrc.type === 'serie') {
+      var serie = col.series.find(function(s){ return s.id===dragSrc.serieId; });
+      if (!serie) return;
+
+      if (targetFolder && targetFolder.dataset.dragfolder !== dragSrc.serieId) {
+        // Drop sur un dossier → mettre la série dedans
+        serie.folderId = targetFolder.dataset.dragfolder;
+        saveData(); render();
+
+      } else if (targetFbody && !targetFolder) {
+        // Drop dans le body d'un dossier → mettre dedans
+        var fid = targetFbody.id.replace('fbody-','');
+        serie.folderId = fid;
+        saveData(); render();
+
+      } else if (targetSerie && targetSerie.dataset.dragserie !== dragSrc.serieId) {
+        // Drop sur une autre série → réordonner + hériter du folderId
+        var targetS = col.series.find(function(s){ return s.id===targetSerie.dataset.dragserie; });
+        serie.folderId = targetS ? targetS.folderId : null;
+        var si = col.series.findIndex(function(s){ return s.id===dragSrc.serieId; });
+        var ti = col.series.findIndex(function(s){ return s.id===targetSerie.dataset.dragserie; });
+        if (si>=0 && ti>=0) {
+          var m = col.series.splice(si,1)[0];
+          col.series.splice(ti,0,m);
+          saveData(); render();
+        }
+      }
+
+    } else if (dragSrc.type === 'folder' && targetFolder) {
+      // Réordonner les dossiers
+      if (!col.folders) return;
+      var si = col.folders.findIndex(function(f){ return f.id===dragSrc.folderId; });
+      var ti = col.folders.findIndex(function(f){ return f.id===targetFolder.dataset.dragfolder; });
+      if (si>=0 && ti>=0 && si!==ti) {
+        var m = col.folders.splice(si,1)[0];
+        col.folders.splice(ti,0,m);
+        saveData(); render();
+      }
+    }
+    dragSrc = null;
   });
 }
-// Rendre les dossiers body aussi des zones de drop (pour sortir une série d'un dossier)
-function wireFolderBody(fbody, colId, folderId){
-  fbody.addEventListener('dragover',function(e){e.preventDefault();e.stopPropagation();fbody.style.outline='2px dashed var(--teal)';});
-  fbody.addEventListener('dragleave',function(){fbody.style.outline='';});
-  fbody.addEventListener('drop',function(e){
-    e.preventDefault();e.stopPropagation();
-    fbody.style.outline='';
-    if(!dragSrc||!dragSrc.dataset.dragserie)return;
-    var sp=dragSrc.dataset.dragserie.split('|');
-    var c2=cols.find(function(x){return x.id===sp[0];});
-    if(!c2||sp[0]!==colId)return;
-    var serie=c2.series.find(function(s){return s.id===sp[1];});
-    if(serie){serie.folderId=folderId;}
-    saveData();render();
-  });
-}
+
 // MODAL DOSSIER
 var editFolderColId=null,editFolderId=null;
 function openFolderModal(colId,folderId){
