@@ -19,7 +19,16 @@ input,button,select{font-family:inherit;}
 .btn.prim{background:linear-gradient(135deg,var(--teal),#0ea5e9);border:none;color:#0f1117;font-weight:700;}
 .btn.del{background:var(--red-l);border-color:var(--red);color:var(--red);}
 /* PAGE */
-.page{padding:16px;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;}
+.page-wrap{display:flex;gap:0;height:calc(100vh - 53px);}
+.page{padding:16px;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;flex:1;overflow-y:auto;}
+/* NOTE COLONNE */
+.note-col{width:280px;flex-shrink:0;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;}
+.note-col-header{padding:12px 14px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;gap:8px;}
+.note-col-header h2{font-family:'Kalam',cursive;font-size:.95rem;color:var(--teal);flex:1;}
+.note-textarea{flex:1;background:transparent;border:none;color:var(--text);font-size:.85rem;line-height:1.6;padding:14px;resize:none;font-family:'Work Sans',sans-serif;outline:none;}
+.note-textarea::placeholder{color:var(--text3);}
+.note-footer{padding:8px 14px;border-top:1px solid var(--border);font-size:.7rem;color:var(--text3);display:flex;justify-content:space-between;}
+@media(max-width:800px){.note-col{display:none;}}
 /* COLONNE */
 .obj-col{border:1px solid var(--border);border-radius:var(--radius);width:300px;flex-shrink:0;overflow:hidden;transition:opacity .15s;}
 .obj-col.dragging{opacity:.3;}
@@ -83,9 +92,7 @@ input,button,select{font-family:inherit;}
   <h1>🎯 Objectifs</h1>
   <a href="index.html" class="btn">🏠 Accueil</a>
 </div>
-<div class="page" id="page">
-  <div class="add-col-card" id="add-col-card"><span style="font-size:2rem">＋</span>Nouvelle colonne</div>
-</div>
+<div class="page-wrap"><div class="page" id="page"><div class="add-col-card" id="add-col-card"><span style="font-size:2rem">＋</span>Nouvelle colonne</div></div><div class="note-col"><div class="note-col-header"><h2>📝 Notes</h2><span id="note-saved" style="font-size:.7rem;color:var(--text3)"></span></div><textarea class="note-textarea" id="note-area" placeholder="Tes notes libres ici...&#10;&#10;Objectifs, rappels, idées, plannings..."></textarea><div class="note-footer"><span id="note-chars">0 caractères</span><span>Sauvegarde auto</span></div></div></div>
 
 <!-- Modals AVANT les scripts -->
 <div class="ov" id="ov-col">
@@ -155,6 +162,7 @@ auth.onAuthStateChanged(function(user){
     objDoc=db.collection('users').doc(user.uid).collection('modules').doc('objectifs');
     objDoc.get().then(function(s){
       if(s.exists&&s.data().cols)cols=s.data().cols;
+      if(s.exists&&s.data().note)document.getElementById('note-area').value=s.data().note;
       else{try{var d=localStorage.getItem('mylife_obj_v1');if(d)cols=JSON.parse(d);}catch(e){}}
       render();
     }).catch(function(){try{var d=localStorage.getItem('mylife_obj_v1');if(d)cols=JSON.parse(d);}catch(e){}render();});
@@ -422,6 +430,20 @@ document.getElementById('col-del').addEventListener('click',function(){
 });
 document.getElementById('col-title').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('col-ok').click();});
 document.getElementById('add-col-card').addEventListener('click',function(){openColModal(null);});
+
+// NOTE
+var noteTimer=null;
+document.getElementById('note-area').addEventListener('input',function(){
+  var len=this.value.length;
+  document.getElementById('note-chars').textContent=len+' caractère'+(len>1?'s':'');
+  document.getElementById('note-saved').textContent='';
+  clearTimeout(noteTimer);
+  noteTimer=setTimeout(function(){
+    if(objDoc)objDoc.set({cols:cols,note:document.getElementById('note-area').value}).catch(function(){});
+    document.getElementById('note-saved').textContent='✓ Sauvegardé';
+    setTimeout(function(){document.getElementById('note-saved').textContent='';},2000);
+  },1000);
+});
 document.getElementById('ov-col').addEventListener('click',function(e){if(e.target===e.currentTarget)close_('ov-col');});
 
 // ===== MODALS DOSSIER =====
