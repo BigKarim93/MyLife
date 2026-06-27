@@ -336,144 +336,90 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 }
 
 /* IBN AJROUM CHANNEL */
-let iacSeries = []; // [{id, title, count, done:[]}]
-let iacSaveTimer = null;
-let iacEditId = null;
+var iacSeries = [];
+var iacTimer = null;
 
-function iacLoad() {
-  try {
-    const d = localStorage.getItem('mylife_iac_v2');
-    if (d) iacSeries = JSON.parse(d);
-  } catch(e) {}
-}
 function iacSaveData() {
   try { localStorage.setItem('mylife_iac_v2', JSON.stringify(iacSeries)); } catch(e) {}
-  clearTimeout(iacSaveTimer);
-  iacSaveTimer = setTimeout(() => {
+  clearTimeout(iacTimer);
+  iacTimer = setTimeout(function() {
     if (typeof db !== 'undefined' && typeof currentUser !== 'undefined' && currentUser) {
       db.collection('users').doc(currentUser.uid).collection('modules').doc('iac-v2')
-        .set({ series: iacSeries }).catch(() => {});
+        .set({ series: iacSeries }).catch(function(){});
     }
   }, 800);
 }
+
 function iacRender() {
-  const container = document.getElementById('iac-sections');
-  const empty = document.getElementById('iac-empty');
-  if (!container) return;
-  if (!iacSeries.length) { container.innerHTML=''; empty.style.display='block'; return; }
+  var cont = document.getElementById('iac-sections');
+  var empty = document.getElementById('iac-empty');
+  if (!cont) return;
+  if (!iacSeries.length) { cont.innerHTML = ''; empty.style.display = 'block'; return; }
   empty.style.display = 'none';
-  container.innerHTML = iacSeries.map(function(serie) {
-    const done = serie.done ? serie.done.length : 0;
-    const pct = serie.count ? Math.round(done / serie.count * 100) : 0;
-    let dots = '';
-    for (var i = 1; i <= serie.count; i++) {
-      const isDone = serie.done && serie.done.includes(i);
-      dots += '<div class="iac-dot' + (isDone ? ' done' : '') + '" data-sid="' + serie.id + '" data-num="' + i + '" title="Cours ' + i + '">' + (isDone ? '' : i) + '</div>';
+  cont.innerHTML = iacSeries.map(function(s) {
+    var done = s.done ? s.done.length : 0;
+    var pct = s.count ? Math.round(done / s.count * 100) : 0;
+    var dots = '';
+    for (var i = 1; i <= s.count; i++) {
+      var ok = s.done && s.done.indexOf(i) >= 0;
+      dots += '<div class="iac-dot' + (ok ? ' done' : '') + '" data-sid="' + s.id + '" data-n="' + i + '">' + (ok ? '✓' : i) + '</div>';
     }
     return '<div class="iac-section">' +
       '<div class="iac-sec-header">' +
-        '<div class="iac-sec-title">' + serie.title + '</div>' +
-        '<div class="iac-sec-prog"><strong>' + done + '</strong> / ' + serie.count + ' &nbsp; ' + pct + '%</div>' +
+        '<div class="iac-sec-title">' + s.title + '</div>' +
+        '<div class="iac-sec-prog"><strong>' + done + '</strong> / ' + s.count + ' — ' + pct + '%</div>' +
         '<div class="iac-pbar"><div class="iac-pfill" style="width:' + pct + '%"></div></div>' +
-        '<button class="iac-sec-del" data-del="' + serie.id + '" title="Supprimer">🗑️</button>' +
+        '<button class="iac-sec-del" data-del="' + s.id + '">🗑️</button>' +
       '</div>' +
       '<div class="iac-dots">' + dots + '</div>' +
     '</div>';
   }).join('');
-  // Events dots
-  container.querySelectorAll('.iac-dot').forEach(function(dot) {
-    dot.addEventListener('click', function() {
-      var sid = dot.dataset.sid;
-      var num = parseInt(dot.dataset.num);
-      var serie = iacSeries.find(function(s) { return s.id === sid; });
-      if (!serie) return;
-      if (!serie.done) serie.done = [];
-      var idx = serie.done.indexOf(num);
-      if (idx >= 0) serie.done.splice(idx, 1); else serie.done.push(num);
+
+  cont.querySelectorAll('.iac-dot').forEach(function(d) {
+    d.addEventListener('click', function() {
+      var s = iacSeries.find(function(x) { return x.id === d.dataset.sid; });
+      if (!s) return;
+      if (!s.done) s.done = [];
+      var n = parseInt(d.dataset.n);
+      var idx = s.done.indexOf(n);
+      if (idx >= 0) s.done.splice(idx, 1); else s.done.push(n);
       iacSaveData(); iacRender();
     });
   });
-  // Events delete
-  container.querySelectorAll('[data-del]').forEach(function(btn) {
+  cont.querySelectorAll('[data-del]').forEach(function(btn) {
     btn.addEventListener('click', function() {
       if (!confirm('Supprimer cette série ?')) return;
-      iacSeries = iacSeries.filter(function(s) { return s.id !== btn.dataset.del; });
+      iacSeries = iacSeries.filter(function(x) { return x.id !== btn.dataset.del; });
       iacSaveData(); iacRender();
     });
   });
 }
-function iacOpenAddModal() {
-  iacEditId = null;
-  document.getElementById('iac-modal-title').textContent = 'Nouvelle série';
+
+function iacOpenModal() {
   document.getElementById('iac-inp-title').value = '';
   document.getElementById('iac-inp-count').value = '26';
   document.getElementById('iac-modal').style.display = 'flex';
   setTimeout(function() { document.getElementById('iac-inp-title').focus(); }, 50);
-}
-function iacCloseModal() {
-  document.getElementById('iac-modal').style.display = 'none';
 }
 function iacSaveModal() {
   var title = document.getElementById('iac-inp-title').value.trim();
   var count = parseInt(document.getElementById('iac-inp-count').value) || 0;
   if (!title || count < 1) return;
   iacSeries.push({ id: 'iac_' + Date.now(), title: title, count: count, done: [] });
-  iacSaveData(); iacCloseModal(); iacRender();
+  document.getElementById('iac-modal').style.display = 'none';
+  iacSaveData(); iacRender();
 }
-document.getElementById('iac-inp-title') && document.getElementById('iac-inp-title').addEventListener('keydown', function(e) { if (e.key === 'Enter') iacSaveModal(); });
+document.getElementById('iac-inp-title').addEventListener('keydown', function(e) { if (e.key === 'Enter') iacSaveModal(); });
+
 // Init
-iacLoad();
-/* IBN AJROUM CHANNEL */
-let iacProgress = new Set();
-let iacSaveTimer = null;
-
-function iacLoad() {
-  try {
-    const d = localStorage.getItem('mylife_iac_v1');
-    if (d) iacProgress = new Set(JSON.parse(d));
-  } catch(e) {}
-  // Firestore si dispo
-  if (typeof db !== 'undefined' && typeof currentUser !== 'undefined' && currentUser) {
-    db.collection('users').doc(currentUser.uid).collection('modules').doc('iac-progress').get().then(snap => {
-      if (snap.exists && snap.data().done) { iacProgress = new Set(snap.data().done); iacRender(); }
-    }).catch(() => {});
-  }
-}
-
-function iacSave() {
-  try { localStorage.setItem('mylife_iac_v1', JSON.stringify([...iacProgress])); } catch(e) {}
-  clearTimeout(iacSaveTimer);
-  iacSaveTimer = setTimeout(() => {
-    if (typeof db !== 'undefined' && typeof currentUser !== 'undefined' && currentUser) {
-      db.collection('users').doc(currentUser.uid).collection('modules').doc('iac-progress')
-        .set({ done: [...iacProgress] }).catch(() => {});
-    }
-  }, 800);
-}
-
-function iacRender() {
-  const total = document.querySelectorAll('[data-iac]').length;
-  const done = iacProgress.size;
-  const pct = total ? Math.round(done / total * 100) : 0;
-  document.querySelectorAll('[data-iac]').forEach(el => {
-    const i = parseInt(el.dataset.iac);
-    el.classList.toggle('done', iacProgress.has(i));
+try { var d = localStorage.getItem('mylife_iac_v2'); if (d) iacSeries = JSON.parse(d); } catch(e) {}
+if (typeof db !== 'undefined') {
+  document.addEventListener('iac-user-ready', function() {
+    db.collection('users').doc(currentUser.uid).collection('modules').doc('iac-v2').get().then(function(snap) {
+      if (snap.exists && snap.data().series) { iacSeries = snap.data().series; iacRender(); }
+    }).catch(function(){});
   });
-  const fill = document.getElementById('iac-fill');
-  const doneEl = document.getElementById('iac-done');
-  const pctEl = document.getElementById('iac-pct');
-  if (fill) fill.style.width = pct + '%';
-  if (doneEl) doneEl.textContent = done;
-  if (pctEl) pctEl.textContent = pct + '%';
 }
-
-function iacToggle(i) {
-  if (iacProgress.has(i)) iacProgress.delete(i); else iacProgress.add(i);
-  iacSave(); iacRender();
-}
-
-// Init au chargement
-iacLoad();
 
 </script>
 
@@ -481,36 +427,29 @@ iacLoad();
 <div class="screen" id="screen-iac">
   <div class="iac-wrap">
     <div class="iac-header">
-      <div>
-        <h2>▶ Ibn Ajroum Channel</h2>
-        <p>Suis ta progression par série de cours</p>
-      </div>
-      <button class="iac-btn prim" onclick="iacOpenAddModal()">＋ Nouvelle série</button>
+      <div><h2>▶ Ibn Ajroum Channel</h2></div>
+      <button class="iac-btn prim" onclick="iacOpenModal()">＋ Nouvelle série</button>
     </div>
     <div id="iac-sections"></div>
-    <div class="iac-empty" id="iac-empty" style="display:none">
-      Aucune série encore.<br>Clique sur <strong>＋ Nouvelle série</strong> pour commencer !
+    <div id="iac-empty" style="text-align:center;padding:3rem;color:var(--text3);display:none">
+      Aucune série.<br>Clique sur <strong>＋ Nouvelle série</strong> pour commencer !
     </div>
   </div>
 </div>
-
-<!-- MODAL IAC -->
 <div id="iac-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:600;align-items:center;justify-content:center;padding:14px">
   <div style="background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:20px;width:100%;max-width:360px">
-    <h3 style="margin-bottom:14px;font-size:1rem" id="iac-modal-title">Nouvelle série</h3>
+    <h3 style="margin-bottom:14px;font-size:1rem">Nouvelle série</h3>
     <div style="margin-bottom:10px">
       <label style="font-size:.75rem;color:var(--text2);font-weight:600;display:block;margin-bottom:4px">Titre</label>
-      <input id="iac-inp-title" type="text" maxlength="50" placeholder="ex: Grammaire Médine Tome 1" style="width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:8px 10px;font-size:.9rem">
+      <input id="iac-inp-title" type="text" maxlength="60" placeholder="ex: Grammaire Médine Tome 1" style="width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:8px 10px;font-size:.9rem;font-family:inherit">
     </div>
     <div style="margin-bottom:16px">
       <label style="font-size:.75rem;color:var(--text2);font-weight:600;display:block;margin-bottom:4px">Nombre de cours</label>
-      <input id="iac-inp-count" type="number" min="1" max="200" value="26" style="width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:8px 10px;font-size:.9rem">
+      <input id="iac-inp-count" type="number" min="1" max="300" value="26" style="width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:8px 10px;font-size:.9rem;font-family:inherit">
     </div>
     <div style="display:flex;justify-content:flex-end;gap:8px">
-      <button class="iac-btn" onclick="iacCloseModal()">Annuler</button>
+      <button class="iac-btn" onclick="document.getElementById('iac-modal').style.display='none'">Annuler</button>
       <button class="iac-btn prim" onclick="iacSaveModal()">Enregistrer</button>
     </div>
   </div>
 </div>
-</body>
-</html>
