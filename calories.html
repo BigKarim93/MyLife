@@ -48,7 +48,7 @@ input,button,select,textarea{font-family:inherit;}
 
 /* LAYOUT 2 COLONNES */
 .main-layout{display:flex;gap:14px;padding:10px 16px 30px;align-items:flex-start;}
-.col-meals{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px;}
+.col-meals{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;}
 .col-foods{width:340px;flex-shrink:0;position:sticky;top:120px;}
 .col-foods-inner{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;}
 .col-foods-header{padding:10px 12px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;gap:6px;}
@@ -77,20 +77,20 @@ input,button,select,textarea{font-family:inherit;}
 .meal-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:.15s;}
 .meal-section.drag-over{outline:2px solid var(--teal);outline-offset:2px;}
 .meal-section.active-meal>.meal-header{border-left:3px solid var(--teal);}
-.meal-header{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--surface2);}
-.meal-ico{font-size:1.1rem;}
-.meal-name{font-family:'Kalam',cursive;font-size:.95rem;flex:1;}
+.meal-header{display:flex;align-items:center;gap:6px;padding:5px 10px;border-bottom:1px solid var(--border);background:var(--surface2);}
+.meal-ico{font-size:.85rem;}
+.meal-name{font-family:'Kalam',cursive;font-size:.82rem;flex:1;}
 .meal-kcal{font-size:.78rem;color:var(--text2);}
-.meal-items{padding:6px 8px;}
-.food-row{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;transition:.15s;}
+.meal-items{padding:4px 8px;}
+.food-row{display:flex;align-items:center;gap:6px;padding:3px 8px;border-radius:6px;transition:.15s;}
 .food-row:hover{background:var(--surface2);}
-.food-name{flex:1;font-size:.83rem;}
+.food-name{flex:1;font-size:.75rem;}
 .food-macros{display:flex;gap:8px;font-size:.72rem;color:var(--text2);}
 .food-macro{display:flex;align-items:center;gap:2px;}
 .food-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:.75rem;padding:2px 5px;border-radius:4px;opacity:0;}
 .food-row:hover .food-del{opacity:1;}
 .food-del:hover{color:var(--red);}
-.add-food-btn{width:100%;background:transparent;border:1px dashed var(--border2);border-radius:8px;padding:7px;color:var(--text3);font-size:.8rem;cursor:pointer;margin-top:6px;margin-bottom:4px;transition:.15s;}
+.add-food-btn{width:100%;background:transparent;border:1px dashed var(--border2);border-radius:6px;padding:4px;color:var(--text3);font-size:.72rem;cursor:pointer;margin-top:3px;transition:.15s;}
 .add-food-btn:hover{border-color:var(--teal);color:var(--teal);}
 
 /* INFOS TDEE */
@@ -169,7 +169,7 @@ input,button,select,textarea{font-family:inherit;}
 
 <div class="tdee-banner" id="tdee-banner"></div>
 
-<div class="main-layout"><div class="col-meals" id="meals"></div><div class="col-foods"><div class="col-foods-inner"><div class="col-foods-header"><span>🍽️</span><div class="col-foods-title">Aliments</div><button class="btn sm" id="btn-add-food-custom" title="Ajouter un aliment">＋</button></div><div class="foods-list" id="foods-list"></div></div></div></div>
+<div class="main-layout"><div class="col-meals" id="meals"></div><div class="col-foods"><div class="col-foods-inner"><div class="col-foods-header"><span>🍽️</span><div class="col-foods-title">Aliments</div><button class="btn sm" id="btn-add-food-custom" title="Ajouter un aliment">＋</button></div><div id="food-trash" style="display:none;padding:6px 10px;background:rgba(248,113,113,.15);border-bottom:1px solid var(--red);text-align:center;font-size:.75rem;color:var(--red);">🗑️ Glisser ici pour supprimer</div><div class="foods-list" id="foods-list"></div></div></div></div>
 
 <!-- MODAL AJOUTER ALIMENT -->
 <div class="ov" id="ov-food">
@@ -265,7 +265,12 @@ input,button,select,textarea{font-family:inherit;}
 <div class="ov" id="ov-add-food-custom">
   <div class="modal" style="border-radius:20px 20px 0 0">
     <h3>➕ Ajouter un aliment</h3>
-    <div class="fld"><label>Nom</label><input type="text" id="afc-name" placeholder="ex: Taboulé maison" maxlength="40"></div>
+    <div class="fld"><label>Nom</label><input type="text" id="afc-name" placeholder="ex: Barre de céréales" maxlength="40"></div>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <div class="fld" style="flex:1;margin:0"><label>Quantité de référence</label><input type="number" id="afc-qty" value="100" min="0.1" step="0.1"></div>
+      <div class="fld" style="width:90px;margin:0"><label>Unité</label><select id="afc-unit" style="background:var(--bg);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:8px 6px;width:100%;font-size:.85rem;font-family:inherit"><option value="g">g</option><option value="ml">ml</option><option value="pièce">pièce</option><option value="portion">portion</option></select></div>
+    </div>
+    <p style="font-size:.7rem;color:var(--text3);margin-bottom:8px;">Macros pour cette quantité :</p>
     <div class="macros-grid">
       <div class="fld"><label>🔥 Calories /100g</label><input type="number" id="afc-k" value="0" min="0"></div>
       <div class="fld"><label>💪 Protéines (g)</label><input type="number" id="afc-p" value="0" min="0" step="0.1"></div>
@@ -751,12 +756,33 @@ document.getElementById('btn-add-food-custom').addEventListener('click',function
 });
 document.getElementById('afc-ok').addEventListener('click',function(){
   var name=document.getElementById('afc-name').value.trim();if(!name)return;
-  customFoods.push({n:name,k:parseFloat(document.getElementById('afc-k').value)||0,p:parseFloat(document.getElementById('afc-p').value)||0,g:parseFloat(document.getElementById('afc-g').value)||0,l:parseFloat(document.getElementById('afc-l').value)||0});
+  var refQty=parseFloat(document.getElementById('afc-qty').value)||100;
+  var refUnit=document.getElementById('afc-unit').value;
+  var k=parseFloat(document.getElementById('afc-k').value)||0;
+  var p=parseFloat(document.getElementById('afc-p').value)||0;
+  var g=parseFloat(document.getElementById('afc-g').value)||0;
+  var l=parseFloat(document.getElementById('afc-l').value)||0;
+  // Convertir en valeur pour 100g (base commune)
+  var f=100/refQty;
+  customFoods.push({n:name,k:Math.round(k*f*10)/10,p:Math.round(p*f*10)/10,g:Math.round(g*f*10)/10,l:Math.round(l*f*10)/10,refQty:refQty,refUnit:refUnit});
   saveAll();closeOv('ov-add-food-custom');renderFoodsPanel();
 });
 document.getElementById('afc-name').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('afc-ok').click();});
 document.getElementById('ov-add-food-custom').addEventListener('click',function(e){if(e.target===e.currentTarget)closeOv('ov-add-food-custom');});
 
+// Zone poubelle
+var trash=document.getElementById('food-trash');
+if(trash){
+  trash.addEventListener('dragover',function(e){e.preventDefault();trash.style.opacity='.7';});
+  trash.addEventListener('dragleave',function(){trash.style.opacity='1';});
+  trash.addEventListener('drop',function(e){
+    e.preventDefault();trash.style.display='none';trash.style.opacity='1';
+    if(!dragFood)return;
+    var ci=customFoods.findIndex(function(x){return x.n===dragFood.n;});
+    if(ci>=0){customFoods.splice(ci,1);saveAll();renderFoodsPanel();}
+    dragFood=null;
+  });
+}
 // Init panneau
 var origRender=render;
 render=function(){origRender();renderFoodsPanel();};
