@@ -811,7 +811,28 @@ function renderFoodsPanel(filter){
 
 // Init panneau + mettre à jour après chaque render
 var origRender=render;
-render=function(){origRender();renderFoodsPanel(document.getElementById('quick-search')?document.getElementById('quick-search').value:'');};
+render=function(){origRender();renderFavCols();renderFoodsPanel('');};
+
+// Bouton + ajouter aliment custom
+document.getElementById('btn-add-custom-food').addEventListener('click',function(){
+  document.getElementById('cf-name').value='';
+  ['cf-kcal','cf-prot','cf-gluc','cf-lip'].forEach(function(id){document.getElementById(id).value='0';});
+  document.getElementById('ov-custom-food').classList.add('op');
+  setTimeout(function(){document.getElementById('cf-name').focus();},100);
+});
+document.getElementById('cf-ok').addEventListener('click',function(){
+  var name=document.getElementById('cf-name').value.trim();if(!name)return;
+  customFoods.push({n:name,k:parseFloat(document.getElementById('cf-kcal').value)||0,p:parseFloat(document.getElementById('cf-prot').value)||0,g:parseFloat(document.getElementById('cf-gluc').value)||0,l:parseFloat(document.getElementById('cf-lip').value)||0});
+  saveAll();closeOv('ov-custom-food');renderFoodsPanel('');
+});
+document.getElementById('cf-name').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('cf-ok').click();});
+document.getElementById('ov-custom-food').addEventListener('click',function(e){if(e.target===e.currentTarget)closeOv('ov-custom-food');});
+document.getElementById('btn-edit-foods').addEventListener('click',function(){
+  editFoodsMode=!editFoodsMode;
+  this.classList.toggle('prim',editFoodsMode);
+  this.textContent=editFoodsMode?'✓ OK':'✎';
+  renderFoodsPanel('');
+});renderFoodsPanel(document.getElementById('quick-search')?document.getElementById('quick-search').value:'');};
 </script>
 </body>
 </html>
