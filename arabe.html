@@ -334,6 +334,30 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
   .lesson-wrap,.ch-wrap,.home-wrap{padding:1rem}
   .guided-opts{gap:6px}
 }
+
+/* IBN AJROUM CHANNEL */
+.iac-wrap{max-width:700px;margin:0 auto;padding:1.5rem}
+.iac-hero{text-align:center;margin-bottom:2rem}
+.iac-hero h2{font-size:1.5rem;font-weight:700;margin-bottom:.5rem}
+.iac-hero p{color:var(--text2);font-size:.9rem}
+.iac-progress-bar{background:var(--border);border-radius:999px;height:10px;margin:1rem 0;overflow:hidden}
+.iac-progress-fill{height:100%;background:linear-gradient(90deg,var(--teal),#0ea5e9);border-radius:999px;transition:.4s}
+.iac-progress-txt{display:flex;justify-content:space-between;font-size:.8rem;color:var(--text2);margin-bottom:1.5rem}
+.iac-progress-txt strong{color:var(--teal)}
+.iac-section{margin-bottom:1.5rem}
+.iac-section-title{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+.iac-grid{display:flex;flex-direction:column;gap:6px}
+.iac-lesson{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;cursor:pointer;transition:.15s}
+.iac-lesson:hover{border-color:var(--teal);background:var(--surface2)}
+.iac-lesson.done{background:rgba(45,212,191,.08);border-color:rgba(45,212,191,.35)}
+.iac-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:.15s}
+.iac-lesson.done .iac-check{background:var(--teal);border-color:var(--teal)}
+.iac-lesson.done .iac-check::after{content:'✓';font-size:.75rem;color:#0f1117;font-weight:700}
+.iac-num{font-size:.75rem;color:var(--text3);width:24px;flex-shrink:0;text-align:center;font-weight:600}
+.iac-name{flex:1;font-size:.88rem;font-weight:600}
+.iac-lesson.done .iac-name{color:var(--teal)}
+.iac-yt{font-size:.75rem;color:var(--text3);flex-shrink:0}
+.iac-lesson:hover .iac-yt{color:#ff4444}
 </style>
 </head>
 <body>
@@ -2402,6 +2426,7 @@ function getAllVocab() {
     });
   });
   return all;
+  if (id === 'iac') { iacLoad(); setTimeout(iacRender, 100); }
 }
 
 function getVocabFiltered() {
@@ -3506,6 +3531,232 @@ function gPick(sel,mode){
   const nb=document.getElementById('g-next-btn'); if(nb) nb.style.display='block';
   const eb=document.getElementById('g-exam-btn'); if(eb) eb.style.display='block';
 }
+
+/* IBN AJROUM CHANNEL */
+let iacProgress = new Set();
+let iacSaveTimer = null;
+
+function iacLoad() {
+  try {
+    const d = localStorage.getItem('mylife_iac_v1');
+    if (d) iacProgress = new Set(JSON.parse(d));
+  } catch(e) {}
+  // Firestore si dispo
+  if (typeof db !== 'undefined' && typeof currentUser !== 'undefined' && currentUser) {
+    db.collection('users').doc(currentUser.uid).collection('modules').doc('iac-progress').get().then(snap => {
+      if (snap.exists && snap.data().done) { iacProgress = new Set(snap.data().done); iacRender(); }
+    }).catch(() => {});
+  }
+}
+
+function iacSave() {
+  try { localStorage.setItem('mylife_iac_v1', JSON.stringify([...iacProgress])); } catch(e) {}
+  clearTimeout(iacSaveTimer);
+  iacSaveTimer = setTimeout(() => {
+    if (typeof db !== 'undefined' && typeof currentUser !== 'undefined' && currentUser) {
+      db.collection('users').doc(currentUser.uid).collection('modules').doc('iac-progress')
+        .set({ done: [...iacProgress] }).catch(() => {});
+    }
+  }, 800);
+}
+
+function iacRender() {
+  const total = document.querySelectorAll('[data-iac]').length;
+  const done = iacProgress.size;
+  const pct = total ? Math.round(done / total * 100) : 0;
+  document.querySelectorAll('[data-iac]').forEach(el => {
+    const i = parseInt(el.dataset.iac);
+    el.classList.toggle('done', iacProgress.has(i));
+  });
+  const fill = document.getElementById('iac-fill');
+  const doneEl = document.getElementById('iac-done');
+  const pctEl = document.getElementById('iac-pct');
+  if (fill) fill.style.width = pct + '%';
+  if (doneEl) doneEl.textContent = done;
+  if (pctEl) pctEl.textContent = pct + '%';
+}
+
+function iacToggle(i) {
+  if (iacProgress.has(i)) iacProgress.delete(i); else iacProgress.add(i);
+  iacSave(); iacRender();
+}
+
+// Init au chargement
+iacLoad();
+
 </script>
+
+<!-- IBN AJROUM CHANNEL -->
+<div class="screen" id="screen-iac">
+  <div class="iac-wrap">
+    <div class="iac-hero">
+      <h2>▶ Ibn Ajroum Channel</h2>
+      <p>Médine Tome 1 — Suis ta progression leçon par leçon</p>
+      <div class="iac-progress-bar"><div class="iac-progress-fill" id="iac-fill" style="width:0%"></div></div>
+      <div class="iac-progress-txt">
+        <span><strong id="iac-done">0</strong> / 26 leçons complétées</span>
+        <span id="iac-pct">0%</span>
+      </div>
+    </div>
+    <div class="iac-grid">
+        <div class="iac-lesson" data-iac="0" onclick="iacToggle(0)">
+          <div class="iac-check"></div>
+          <div class="iac-num">1</div>
+          <div class="iac-name">Introduction & Alphabet</div>
+          <div class="iac-yt" onclick="event.stopPropagation();window.open('https://www.youtube.com/@ibnadjroum','_blank')">▶ YouTube</div>
+        </div>
+        <div class="iac-lesson" data-iac="1" onclick="iacToggle(1)">
+          <div class="iac-check"></div>
+          <div class="iac-num">2</div>
+          <div class="iac-name">Les pronoms personnels (Leçon 1)</div>
+          <div class="iac-yt" onclick="event.stopPropagation();window.open('https://www.youtube.com/@ibnadjroum','_blank')">▶ YouTube</div>
+        </div>
+        <div class="iac-lesson" data-iac="2" onclick="iacToggle(2)">
+          <div class="iac-check"></div>
+          <div class="iac-num">3</div>
+          <div class="iac-name">L'article défini Al (Leçon 2)</div>
+          <div class="iac-yt" onclick="event.stopPropagation();window.open('https://www.youtube.com/@ibnadjroum','_blank')">▶ YouTube</div>
+        </div>
+        <div class="iac-lesson" data-iac="3" onclick="iacToggle(3)">
+          <div class="iac-check"></div>
+          <div class="iac-num">4</div>
+          <div class="iac-name">Le genre et l'accord (Leçon 3)</div>
+          <div class="iac-yt" onclick="event.stopPropagation();window.open('https://www.youtube.com/@ibnadjroum','_blank')">▶ YouTube</div>
+        </div>
+        <div class="iac-lesson" data-iac="4" onclick="iacToggle(4)">
+          <div class="iac-check"></div>
+          <div class="iac-num">5</div>
+          <div class="iac-name">La racine trilitère (Leçon 4)</div>
+          <div class="iac-yt" onclick="event.stopPropagation();window.open('https://www.youtube.com/@ibnadjroum','_blank')">▶ YouTube</div>
+        </div>
+        <div class="iac-lesson" data-iac="5" onclick="iacToggle(5)">
+          <div class="iac-check"></div>
+          <div class="iac-num">6</div>
+          <div class="iac-name">La famille (Leçon 5)</div>
+          <div class="iac-yt" onclick="event.stopPropagation();window.open('https://www.youtube.com/@ibnadjroum','_blank')">▶ YouTube</div>
+        </div>
+        <div class="iac-lesson" data-iac="6" onclick="iacToggle(6)">
+          <div class="iac-check"></div>
+          <div class="iac-num">7</div>
+          <div class="iac-name">Les adjectifs (Leçon 6)</div>
+          <div class="iac-yt" onclick="event.stopPropagation();window.open('https://www.youtube.com/@ibnadjroum','_blank')">▶ YouTube</div>
+        </div>
+        <div class="iac-lesson" data-iac="7" onclick="iacToggle(7)">
+          <div class="iac-check"></div>
+          <div class="iac-num">8</div>
+          <div class="iac-name">Le pluriel (Leçon 7)</div>
+          <div class="iac-yt" onclick="event.stopPropagation();window.open('https://www.youtube.com/@ibnadjroum','_blank')">▶ YouTube</div>
+        </div>
+        <div class="iac-lesson" data-iac="8" onclick="iacToggle(8)">
+          <div class="iac-check"></div>
+          <div class="iac-num">9</div>
+          <div class="iac-name">Les démonstratifs (Leçon 8)</div>
+          <div class="iac-yt" onclick="event.stopPropagation();window.open('https://www.youtube.com/@ibnadjroum','_blank')">▶ YouTube</div>
+        </div>
+        <div class="iac-lesson" data-iac="9" onclick="iacToggle(9)">
+          <div class="iac-check"></div>
+          <div class="iac-num">10</div>
+          <div class="iac-name">Les interrogatifs (Leçon 9)</div>
+          <div class="iac-yt" onclick="event.stopPropagation();window.open('https://www.youtube.com/@ibnadjroum','_blank')">▶ YouTube</div>
+        </div>
+        <div class="iac-lesson" data-iac="10" onclick="iacToggle(10)">
+          <div class="iac-check"></div>
+          <div class="iac-num">11</div>
+          <div class="iac-name">Les nombres 1-10 (Leçon 10)</div>
+          <div class="iac-yt" onclick="event.stopPropagation();window.open('https://www.youtube.com/@ibnadjroum','_blank')">▶ YouTube</div>
+        </div>
+        <div class="iac-lesson" data-iac="11" onclick="iacToggle(11)">
+          <div class="iac-check"></div>
+          <div class="iac-num">12</div>
+          <div class="iac-name">Les couleurs (Leçon 11)</div>
+          <div class="iac-yt" onclick="event.stopPropagation();window.open('https://www.youtube.com/@ibnadjroum','_blank')">▶ YouTube</div>
+        </div>
+        <div class="iac-lesson" data-iac="12" onclick="iacToggle(12)">
+          <div class="iac-check"></div>
+          <div class="iac-num">13</div>
+          <div class="iac-name">Le présent (Leçon 12)</div>
+          <div class="iac-yt" onclick="event.stopPropagation();window.open('https://www.youtube.com/@ibnadjroum','_blank')">▶ YouTube</div>
+        </div>
+        <div class="iac-lesson" data-iac="13" onclick="iacToggle(13)">
+          <div class="iac-check"></div>
+          <div class="iac-num">14</div>
+          <div class="iac-name">La négation (Leçon 13)</div>
+          <div class="iac-yt" onclick="event.stopPropagation();window.open('https://www.youtube.com/@ibnadjroum','_blank')">▶ YouTube</div>
+        </div>
+        <div class="iac-lesson" data-iac="14" onclick="iacToggle(14)">
+          <div class="iac-check"></div>
+          <div class="iac-num">15</div>
+          <div class="iac-name">Les adverbes de temps (Leçon 14)</div>
+          <div class="iac-yt" onclick="event.stopPropagation();window.open('https://www.youtube.com/@ibnadjroum','_blank')">▶ YouTube</div>
+        </div>
+        <div class="iac-lesson" data-iac="15" onclick="iacToggle(15)">
+          <div class="iac-check"></div>
+          <div class="iac-num">16</div>
+          <div class="iac-name">Les conjonctions (Leçon 15)</div>
+          <div class="iac-yt" onclick="event.stopPropagation();window.open('https://www.youtube.com/@ibnadjroum','_blank')">▶ YouTube</div>
+        </div>
+        <div class="iac-lesson" data-iac="16" onclick="iacToggle(16)">
+          <div class="iac-check"></div>
+          <div class="iac-num">17</div>
+          <div class="iac-name">Le duel (Leçon 16)</div>
+          <div class="iac-yt" onclick="event.stopPropagation();window.open('https://www.youtube.com/@ibnadjroum','_blank')">▶ YouTube</div>
+        </div>
+        <div class="iac-lesson" data-iac="17" onclick="iacToggle(17)">
+          <div class="iac-check"></div>
+          <div class="iac-num">18</div>
+          <div class="iac-name">L'impératif (Leçon 17)</div>
+          <div class="iac-yt" onclick="event.stopPropagation();window.open('https://www.youtube.com/@ibnadjroum','_blank')">▶ YouTube</div>
+        </div>
+        <div class="iac-lesson" data-iac="18" onclick="iacToggle(18)">
+          <div class="iac-check"></div>
+          <div class="iac-num">19</div>
+          <div class="iac-name">Le masdar (Leçon 18)</div>
+          <div class="iac-yt" onclick="event.stopPropagation();window.open('https://www.youtube.com/@ibnadjroum','_blank')">▶ YouTube</div>
+        </div>
+        <div class="iac-lesson" data-iac="19" onclick="iacToggle(19)">
+          <div class="iac-check"></div>
+          <div class="iac-num">20</div>
+          <div class="iac-name">Le participe actif (Leçon 19)</div>
+          <div class="iac-yt" onclick="event.stopPropagation();window.open('https://www.youtube.com/@ibnadjroum','_blank')">▶ YouTube</div>
+        </div>
+        <div class="iac-lesson" data-iac="20" onclick="iacToggle(20)">
+          <div class="iac-check"></div>
+          <div class="iac-num">21</div>
+          <div class="iac-name">Les jours & saisons (Leçon 20)</div>
+          <div class="iac-yt" onclick="event.stopPropagation();window.open('https://www.youtube.com/@ibnadjroum','_blank')">▶ YouTube</div>
+        </div>
+        <div class="iac-lesson" data-iac="21" onclick="iacToggle(21)">
+          <div class="iac-check"></div>
+          <div class="iac-num">22</div>
+          <div class="iac-name">Formules religieuses (Leçon 21)</div>
+          <div class="iac-yt" onclick="event.stopPropagation();window.open('https://www.youtube.com/@ibnadjroum','_blank')">▶ YouTube</div>
+        </div>
+        <div class="iac-lesson" data-iac="22" onclick="iacToggle(22)">
+          <div class="iac-check"></div>
+          <div class="iac-num">23</div>
+          <div class="iac-name">Les connecteurs (Leçon 22)</div>
+          <div class="iac-yt" onclick="event.stopPropagation();window.open('https://www.youtube.com/@ibnadjroum','_blank')">▶ YouTube</div>
+        </div>
+        <div class="iac-lesson" data-iac="23" onclick="iacToggle(23)">
+          <div class="iac-check"></div>
+          <div class="iac-num">24</div>
+          <div class="iac-name">Révision générale (Leçon 23)</div>
+          <div class="iac-yt" onclick="event.stopPropagation();window.open('https://www.youtube.com/@ibnadjroum','_blank')">▶ YouTube</div>
+        </div>
+        <div class="iac-lesson" data-iac="24" onclick="iacToggle(24)">
+          <div class="iac-check"></div>
+          <div class="iac-num">25</div>
+          <div class="iac-name">Examen blanc partie 1</div>
+          <div class="iac-yt" onclick="event.stopPropagation();window.open('https://www.youtube.com/@ibnadjroum','_blank')">▶ YouTube</div>
+        </div>
+        <div class="iac-lesson" data-iac="25" onclick="iacToggle(25)">
+          <div class="iac-check"></div>
+          <div class="iac-num">26</div>
+          <div class="iac-name">Examen blanc partie 2</div>
+          <div class="iac-yt" onclick="event.stopPropagation();window.open('https://www.youtube.com/@ibnadjroum','_blank')">▶ YouTube</div>
+        </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
