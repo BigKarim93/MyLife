@@ -51,22 +51,23 @@ input,button,select,textarea{font-family:inherit;}
 .col-meals{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px;}
 .col-foods{display:flex;gap:10px;flex-shrink:0;position:sticky;top:120px;align-items:flex-start;}
 /* PANEL ALIMENTS FREQUENTS */
-.foods-panel{width:160px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;max-height:calc(100vh - 160px);}
+.foods-panel{width:400px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;max-height:calc(100vh - 160px);}
 .foods-panel-header{padding:8px 10px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;gap:5px;}
 .foods-panel-title{font-family:'Kalam',cursive;font-size:.85rem;flex:1;}
 .foods-panel-search{padding:6px;border-bottom:1px solid var(--border);}
 .foods-panel-search input{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 7px;font-size:.75rem;}
 .foods-panel-search input:focus{outline:none;border-color:var(--teal);}
-.foods-panel-body{overflow-y:auto;flex:1;}
-.food-chip{padding:6px 9px;cursor:pointer;transition:.15s;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:5px;}
+.foods-panel-body{overflow-y:auto;flex:1;display:grid;grid-template-columns:repeat(6,1fr);gap:0;}
+.food-chip{padding:6px 5px;cursor:pointer;transition:.15s;border-bottom:1px solid var(--border);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;gap:3px;}
+.food-chip:nth-child(6n){border-right:none;}
 .food-chip:hover{background:var(--surface2);}
 .food-chip.dragging{opacity:.3;}
-.food-chip-star{font-size:.7rem;cursor:pointer;opacity:.4;flex-shrink:0;transition:.15s;}
+.food-chip-star{font-size:.8rem;cursor:pointer;opacity:.5;transition:.15s;line-height:1;}
 .food-chip-star:hover,.food-chip-star.active{opacity:1;}
 .food-chip-star.active{color:var(--amber);}
-.food-chip-info{flex:1;min-width:0;}
-.food-chip-name{font-size:.73rem;font-weight:600;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.food-chip-kcal{font-size:.62rem;color:var(--text3);}
+.food-chip-info{text-align:center;min-width:0;width:100%;}
+.food-chip-name{font-size:.62rem;font-weight:600;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%;text-align:center;}
+.food-chip-kcal{font-size:.58rem;color:var(--text3);}
 /* FAV COLS */
 .fav-col{width:150px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;max-height:calc(100vh - 160px);}
 .fav-col-header{padding:7px 10px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;gap:4px;}
