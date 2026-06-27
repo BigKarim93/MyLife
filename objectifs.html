@@ -21,7 +21,9 @@ input,button,select{font-family:inherit;}
 /* PAGE */
 .page{padding:16px;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;}
 /* COLONNE */
-.obj-col{border:1px solid var(--border);border-radius:var(--radius);width:300px;flex-shrink:0;overflow:hidden;}
+.obj-col{border:1px solid var(--border);border-radius:var(--radius);width:300px;flex-shrink:0;overflow:hidden;transition:opacity .15s;}
+.obj-col.dragging{opacity:.3;}
+.obj-col.drag-over-col{outline:2px solid var(--teal);outline-offset:3px;border-radius:var(--radius);}
 .obj-col-header{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--border);}
 .obj-col-title{font-family:'Kalam',cursive;font-size:1.05rem;flex:1;text-align:center;}
 .col-btn{background:none;border:1px solid transparent;border-radius:6px;color:var(--text3);cursor:pointer;font-size:.78rem;padding:3px 7px;transition:.15s;}
@@ -184,6 +186,8 @@ function render(){
 
     var colEl=document.createElement('div');
     colEl.className='obj-col';
+    colEl.setAttribute('draggable','true');
+    colEl.dataset.colid=col.id;
     colEl.style.background=bg;
     colEl.innerHTML=
       '<div class="obj-col-header" style="background:'+headerBg+';border-bottom:2px solid '+clr+';">'+
@@ -305,6 +309,35 @@ function wireEvents(){
   // Ajouts
   page.querySelectorAll('[data-addserie]').forEach(function(b){b.addEventListener('click',function(){openSerieModal(b.dataset.addserie,null);});});
   page.querySelectorAll('[data-addfolder]').forEach(function(b){b.addEventListener('click',function(){openFolderModal(b.dataset.addfolder,null);});});
+
+  // DRAG colonnes
+  page.querySelectorAll('.obj-col').forEach(function(el){
+    el.addEventListener('dragstart',function(e){
+      if(e.target.closest('.obj-serie,.obj-folder,.col-btn,.add-btn,.obj-dot,.serie-chevron,.folder-chevron')){return;}
+      dragSrc={type:'col',cid:el.dataset.colid};
+      setTimeout(function(){el.classList.add('dragging');},0);
+    });
+    el.addEventListener('dragend',function(){
+      el.classList.remove('dragging');
+      page.querySelectorAll('.drag-over-col').forEach(function(x){x.classList.remove('drag-over-col');});
+    });
+    el.addEventListener('dragover',function(e){
+      if(!dragSrc||dragSrc.type!=='col')return;
+      e.preventDefault();e.stopPropagation();
+      if(el.dataset.colid!==dragSrc.cid)el.classList.add('drag-over-col');
+    });
+    el.addEventListener('dragleave',function(){el.classList.remove('drag-over-col');});
+    el.addEventListener('drop',function(e){
+      e.preventDefault();e.stopPropagation();
+      el.classList.remove('drag-over-col');
+      if(!dragSrc||dragSrc.type!=='col'||el.dataset.colid===dragSrc.cid)return;
+      var si=cols.findIndex(function(c){return c.id===dragSrc.cid;});
+      var ti=cols.findIndex(function(c){return c.id===el.dataset.colid;});
+      if(si<0||ti<0)return;
+      var m=cols.splice(si,1)[0];cols.splice(ti,0,m);
+      save();render();
+    });
+  });
 
   // DRAG & DROP
   page.querySelectorAll('.obj-serie').forEach(function(el){
