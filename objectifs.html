@@ -113,6 +113,17 @@ input,button,select{font-family:inherit;}
   </div>
 </div>
 
+<div class="ov" id="ov-folder">
+  <div class="modal">
+    <h3 id="folder-modal-title" style="color:var(--teal)">Nouveau dossier</h3>
+    <div class="fld"><label>Nom</label><input type="text" id="folder-inp-title" maxlength="40" placeholder="ex: Médine Tome 1, Phase 1..."></div>
+    <div class="modal-act">
+      <button class="btn del" id="folder-del-btn" style="display:none;">🗑️</button>
+      <button class="btn" onclick="closeModal('ov-folder')">Annuler</button>
+      <button class="btn prim" id="folder-save-btn">Enregistrer</button>
+    </div>
+  </div>
+</div>
 <script src="firebase-config.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -466,16 +477,5 @@ document.getElementById('folder-del-btn').addEventListener('click',function(){
 });
 document.getElementById('folder-inp-title').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('folder-save-btn').click();});
 </script>
-<div class="ov" id="ov-folder">
-  <div class="modal">
-    <h3 id="folder-modal-title" style="color:var(--teal)">Nouveau dossier</h3>
-    <div class="fld"><label>Nom</label><input type="text" id="folder-inp-title" maxlength="40" placeholder="ex: Médine Tome 1, Phase 1..."></div>
-    <div class="modal-act">
-      <button class="btn del" id="folder-del-btn" style="display:none;">🗑️</button>
-      <button class="btn" onclick="closeModal('ov-folder')">Annuler</button>
-      <button class="btn prim" id="folder-save-btn">Enregistrer</button>
-    </div>
-  </div>
-</div>
 </body>
 </html>
