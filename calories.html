@@ -49,7 +49,7 @@ input,button,select,textarea{font-family:inherit;}
 /* LAYOUT 2 COLONNES */
 .main-layout{display:flex;gap:14px;padding:10px 16px 30px;align-items:flex-start;}
 .col-meals{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;}
-.col-foods{width:340px;flex-shrink:0;position:sticky;top:120px;}
+.col-foods{flex:1;min-width:0;position:sticky;top:120px;}
 .col-foods-inner{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;}
 .col-foods-header{padding:10px 12px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;gap:6px;}
 .col-foods-title{font-family:'Kalam',cursive;font-size:.9rem;flex:1;}
@@ -734,11 +734,17 @@ function renderFoodsPanel(filter){
     // Drag depuis le panneau
     el.addEventListener('dragstart',function(e){
       dragFood=food;
-      setTimeout(function(){el.classList.add('dragging');},0);
+      setTimeout(function(){
+        el.classList.add('dragging');
+        var t=document.getElementById('food-trash');
+        if(t)t.style.display='block';
+      },0);
     });
     el.addEventListener('dragend',function(){
       el.classList.remove('dragging');
       dragFood=null;
+      var t=document.getElementById('food-trash');
+      if(t)t.style.display='none';
       document.querySelectorAll('.meal-section.drag-over').forEach(function(x){x.classList.remove('drag-over');});
     });
 
