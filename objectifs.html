@@ -28,20 +28,8 @@ input,button,select{font-family:inherit;}
 
 /* LAYOUT — colonnes côte à côte */
 .page{padding:16px;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;}
-.obj-col{border:1px solid var(--border);border-radius:var(--radius);width:320px;flex-shrink:0;overflow:hidden;}
-.obj-col-header{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--border);}
-/* DOSSIERS */
-.obj-folder{margin-bottom:10px;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;}
-.obj-folder-header{display:flex;align-items:center;gap:6px;padding:7px 10px;cursor:default;user-select:none;}
-.obj-folder-icon{font-size:.85rem;flex-shrink:0;}
-.obj-folder-title{font-size:.85rem;font-weight:700;flex:1;text-align:center;}
-.obj-folder-chevron{font-size:.7rem;color:var(--text3);cursor:pointer;padding:2px 6px;border-radius:4px;transition:.15s;}
-.obj-folder-chevron:hover{background:rgba(255,255,255,.1);}
-.obj-folder-body{padding:6px;}
-.obj-folder-body.collapsed{display:none;}
-/* DRAG */
-.obj-serie.dragging,.obj-folder.dragging{opacity:.4;}
-.obj-serie.drag-over,.obj-folder.drag-over{outline:2px solid var(--teal);outline-offset:2px;border-radius:var(--radius-sm);}
+.obj-col{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);width:320px;flex-shrink:0;overflow:hidden;}
+.obj-col-header{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--border);background:var(--surface2);}
 .obj-col-title{font-family:'Kalam',cursive;font-size:1.05rem;flex:1;color:var(--text);text-align:center;}
 .col-btn{background:none;border:1px solid transparent;border-radius:6px;color:var(--text3);cursor:pointer;font-size:.78rem;padding:3px 7px;transition:.15s;}
 .col-btn:hover{border-color:var(--border2);color:var(--text);}
@@ -117,7 +105,6 @@ input,button,select{font-family:inherit;}
     <h3 id="serie-modal-title">Nouvelle série</h3>
     <div class="fld"><label>Titre</label><input type="text" id="serie-inp-title" maxlength="60" placeholder="ex: T1 Grammaire, Météo..."></div>
     <div class="fld"><label>Nombre de cases</label><input type="number" id="serie-inp-count" min="1" max="300" value="26"></div>
-    <div class="fld"><label>Dossier (optionnel)</label><select id="serie-inp-folder"><option value="">— Aucun dossier —</option></select></div>
     <div class="modal-act">
       <button class="btn del" id="serie-del-btn" style="display:none;">🗑️ Supprimer</button>
       <button class="btn" onclick="closeModal('ov-serie')">Annuler</button>
@@ -190,8 +177,7 @@ function render() {
     var colEl = document.createElement('div');
     colEl.className = 'obj-col';
     colEl.innerHTML =
-      colEl.style.background = col.color ? col.color + '12' : 'var(--surface)';
-      '<div class="obj-col-header" style="border-bottom:2px solid '+(col.color||'var(--teal)')+';background:'+(col.color?col.color+'22':'var(--surface2)')+';">' +
+      '<div class="obj-col-header" style="border-bottom:2px solid '+(col.color||'var(--teal)')+';">' +
         '<div class="obj-col-title" style="color:'+(col.color||'var(--teal)')+';">' + col.title + '</div>' +
         '<button class="col-btn" data-editcol="' + col.id + '" title="Modifier">✎</button>' +
       '</div>' +
@@ -200,7 +186,57 @@ function render() {
 
     // Séries
     var body = document.getElementById('body-' + col.id);
-    (col.series || []).forEach(function(serie) {
+    var colColor = col.color || 'var(--teal)';
+    var colsPerRow2 = col.cols || 5;
+
+    function appendSerie(serie, container) {
+      var done2 = serie.done ? serie.done.length : 0;
+      var pct2 = serie.count ? Math.round(done2/serie.count*100) : 0;
+      var dots2 = '';
+      for (var j = 1; j <= serie.count; j++) {
+        var ok2 = serie.done && serie.done.indexOf(j) >= 0;
+        var dotStyle = ok2 ? 'background:'+colColor+'22;border-color:'+colColor+';color:'+colColor+';' : '';
+        dots2 += '<div class="obj-dot'+(ok2?' done':'')+'" data-cid="'+col.id+'" data-sid="'+serie.id+'" data-n="'+j+'" style="'+dotStyle+'">'+(ok2?'✓':j)+'</div>';
+      }
+      var sEl = document.createElement('div');
+      sEl.className = 'obj-serie'; sEl.draggable = true;
+      sEl.dataset.dragserie = col.id+'|'+serie.id+(serie.folderId?'|'+serie.folderId:'');
+      sEl.innerHTML =
+        '<div class="obj-serie-header">'+
+          '<div class="obj-chevron" data-chevron="'+col.id+'|'+serie.id+'">'+(serie.collapsed?'▶':'▼')+'</div>'+
+          '<div class="obj-serie-title">'+serie.title+'</div>'+
+          '<div class="obj-serie-prog"><strong>'+done2+'</strong>/'+serie.count+' '+pct2+'%</div>'+
+          '<div class="obj-pbar"><div class="obj-pfill" style="width:'+pct2+'%;background:'+colColor+'"></div></div>'+
+          '<button class="col-btn" data-editserie="'+col.id+'|'+serie.id+'" title="Modifier">✎</button>'+
+        '</div>'+
+        '<div class="obj-dots'+(serie.collapsed?' collapsed':'')+'" style="grid-template-columns:repeat('+colsPerRow2+',36px);">'+dots2+'</div>';
+      container.appendChild(sEl);
+      wireDrag(sEl);
+    }
+
+    // Dossiers
+    (col.folders || []).forEach(function(folder) {
+      var fEl = document.createElement('div');
+      fEl.className = 'obj-folder'; fEl.draggable = true;
+      fEl.dataset.dragfolder = col.id+'|'+folder.id;
+      fEl.innerHTML =
+        '<div class="obj-folder-header" style="background:'+colColor+'18;">'+
+          '<span style="font-size:.9rem">📁</span>'+
+          '<div class="obj-folder-title">'+folder.title+'</div>'+
+          '<div class="obj-folder-chevron" data-foldertoggle="'+col.id+'|'+folder.id+'">'+(folder.collapsed?'▶':'▼')+'</div>'+
+          '<button class="col-btn" data-editfolder="'+col.id+'|'+folder.id+'" title="Modifier">✎</button>'+
+        '</div>'+
+        '<div class="obj-folder-body'+(folder.collapsed?' collapsed':'')+'" id="fbody-'+folder.id+'"></div>';
+      body.appendChild(fEl);
+      wireDrag(fEl);
+      if (!folder.collapsed) {
+        var fb = fEl.querySelector('#fbody-'+folder.id);
+        (col.series||[]).filter(function(s){return s.folderId===folder.id;}).forEach(function(s){appendSerie(s,fb);});
+      }
+    });
+
+    // Séries sans dossier
+    (col.series || []).filter(function(s){return !s.folderId;}).forEach(function(serie) {
       var done = serie.done ? serie.done.length : 0;
       var pct = serie.count ? Math.round(done / serie.count * 100) : 0;
       var dots = '';
@@ -224,16 +260,16 @@ dots += '<div class="obj-dot' + (ok ? ' done' : '') + '" data-cid="' + col.id + 
     });
 
     // Bouton ajouter série
-    var addFolderBtn = document.createElement('button');
-    addFolderBtn.className = 'add-serie-btn';
-    addFolderBtn.textContent = '📁 Ajouter un dossier';
-    addFolderBtn.dataset.addfoldercol = col.id;
-    body.appendChild(addFolderBtn);
     var addSerieBtn = document.createElement('button');
     addSerieBtn.className = 'add-serie-btn';
     addSerieBtn.textContent = '＋ Ajouter une série';
     addSerieBtn.dataset.addseriecol = col.id;
     body.appendChild(addSerieBtn);
+    var addFolderBtn = document.createElement('button');
+    addFolderBtn.className = 'add-serie-btn';
+    addFolderBtn.textContent = '📁 Ajouter un dossier';
+    addFolderBtn.dataset.addfoldercol = col.id;
+    body.appendChild(addFolderBtn);
   });
 
   // Events
@@ -276,16 +312,16 @@ dots += '<div class="obj-dot' + (ok ? ' done' : '') + '" data-cid="' + col.id + 
   });
   page.querySelectorAll('[data-foldertoggle]').forEach(function(btn) {
     btn.addEventListener('click', function() {
-      var parts = btn.dataset.foldertoggle.split('|');
-      var col2 = cols.find(function(c){return c.id===parts[0];});
-      var folder = col2 && (col2.folders||[]).find(function(f){return f.id===parts[1];});
-      if (folder) { folder.collapsed=!folder.collapsed; saveData(); render(); }
+      var p = btn.dataset.foldertoggle.split('|');
+      var c2 = cols.find(function(x){return x.id===p[0];});
+      var f = c2&&(c2.folders||[]).find(function(x){return x.id===p[1];});
+      if(f){f.collapsed=!f.collapsed;saveData();render();}
     });
   });
   page.querySelectorAll('[data-editfolder]').forEach(function(btn) {
     btn.addEventListener('click', function() {
-      var parts = btn.dataset.editfolder.split('|');
-      openFolderModal(parts[0], parts[1]);
+      var p = btn.dataset.editfolder.split('|');
+      openFolderModal(p[0],p[1]);
     });
   });
 }
@@ -334,15 +370,13 @@ function openSerieModal(colId, serieId) {
   var col = cols.find(function(c) { return c.id === colId; });
   var serie = serieId && col ? (col.series || []).find(function(s) { return s.id === serieId; }) : null;
   document.getElementById('serie-modal-title').textContent = serie ? 'Modifier la série' : 'Nouvelle série';
-  document.getElementById('serie-inp-title').value = serie ? serie.title : '';
-  document.getElementById('serie-inp-count').value = serie ? serie.count : 26;
-  document.getElementById('serie-del-btn').style.display = serie ? 'inline-flex' : 'none';
-  var col2 = cols.find(function(c){return c.id===colId;});
-  var sel = document.getElementById('serie-inp-folder');
-  sel.innerHTML = '<option value="">— Aucun dossier —</option>';
-  (col2&&col2.folders||[]).forEach(function(f){
-    sel.innerHTML+='<option value="'+f.id+'"'+(serie&&serie.folderId===f.id?' selected':'')+'>📁 '+f.title+'</option>';
-  });
+  document.getElementById('serie-inp-title').value=serie?serie.title:'';
+  document.getElementById('serie-inp-count').value=serie?serie.count:26;
+  document.getElementById('serie-del-btn').style.display=serie?'inline-flex':'none';
+  var c2=cols.find(function(x){return x.id===colId;});
+  var sel=document.getElementById('serie-inp-folder');
+  sel.innerHTML='<option value="">— Aucun dossier —</option>';
+  (c2&&c2.folders||[]).forEach(function(f){sel.innerHTML+='<option value="'+f.id+'"'+(serie&&serie.folderId===f.id?' selected':'')+'>📁 '+f.title+'</option>';});
   openModal('ov-serie');
   setTimeout(function() { document.getElementById('serie-inp-title').focus(); }, 50);
 }
@@ -353,18 +387,11 @@ document.getElementById('serie-save-btn').addEventListener('click', function() {
   var col = cols.find(function(c) { return c.id === editSerieColId; });
   if (!col) return;
   if (!col.series) col.series = [];
-  var folderId = document.getElementById('serie-inp-folder').value||null;
-  if (editSerieId) {
-    var serie = col.series.find(function(s) { return s.id === editSerieId; });
-    if (serie) {
-      serie.title = title;
-      if (count < serie.count && serie.done) serie.done = serie.done.filter(function(n) { return n <= count; });
-      serie.count = count;
-      serie.folderId = folderId;
-    }
-  } else {
-    col.series.push({ id: 'ser_' + Date.now(), title: title, count: count, done: [], collapsed: false, folderId: folderId });
-  }
+  var fid=document.getElementById('serie-inp-folder').value||null;
+  if(editSerieId){
+    var s2=col.series.find(function(x){return x.id===editSerieId;});
+    if(s2){s2.title=title;if(count<s2.count&&s2.done)s2.done=s2.done.filter(function(n){return n<=count;});s2.count=count;s2.folderId=fid;}
+  }else{col.series.push({id:'ser_'+Date.now(),title:title,count:count,done:[],collapsed:false,folderId:fid});}
   saveData(); closeModal('ov-serie'); render();
 });
 document.getElementById('serie-del-btn').addEventListener('click', function() {
@@ -376,67 +403,43 @@ document.getElementById('serie-del-btn').addEventListener('click', function() {
 document.getElementById('serie-inp-title').addEventListener('keydown', function(e) { if (e.key === 'Enter') document.getElementById('serie-save-btn').click(); });
 
 // DRAG & DROP
-var dragSrc = null;
-function wireDrag(el) {
-  el.addEventListener('dragstart', function(e) {
-    dragSrc = el;
-    setTimeout(function(){el.classList.add('dragging');},0);
-    e.stopPropagation();
-  });
-  el.addEventListener('dragend', function() {
-    el.classList.remove('dragging');
-    document.querySelectorAll('.drag-over').forEach(function(x){x.classList.remove('drag-over');});
-  });
-  el.addEventListener('dragover', function(e) {
-    e.preventDefault(); e.stopPropagation();
-    if (el !== dragSrc) el.classList.add('drag-over');
-  });
-  el.addEventListener('dragleave', function() { el.classList.remove('drag-over'); });
-  el.addEventListener('drop', function(e) {
-    e.preventDefault(); e.stopPropagation();
-    el.classList.remove('drag-over');
-    if (!dragSrc || dragSrc === el) return;
-    // Drag série
-    if (dragSrc.dataset.dragserie && el.dataset.dragserie) {
-      var sp = dragSrc.dataset.dragserie.split('|');
-      var tp = el.dataset.dragserie.split('|');
-      var col2 = cols.find(function(c){return c.id===sp[0];});
-      if (!col2 || sp[0]!==tp[0]) return;
-      var arr = col2.series;
-      var si = arr.findIndex(function(s){return s.id===sp[1];});
-      var ti = arr.findIndex(function(s){return s.id===tp[1];});
-      if (si<0||ti<0) return;
-      var moved = arr.splice(si,1)[0];
-      arr.splice(ti,0,moved);
-      saveData(); render();
+var dragSrc=null;
+function wireDrag(el){
+  el.addEventListener('dragstart',function(e){dragSrc=el;setTimeout(function(){el.classList.add('dragging');},0);e.stopPropagation();});
+  el.addEventListener('dragend',function(){el.classList.remove('dragging');document.querySelectorAll('.drag-over').forEach(function(x){x.classList.remove('drag-over');});});
+  el.addEventListener('dragover',function(e){e.preventDefault();e.stopPropagation();if(el!==dragSrc)el.classList.add('drag-over');});
+  el.addEventListener('dragleave',function(){el.classList.remove('drag-over');});
+  el.addEventListener('drop',function(e){
+    e.preventDefault();e.stopPropagation();el.classList.remove('drag-over');
+    if(!dragSrc||dragSrc===el)return;
+    if(dragSrc.dataset.dragserie&&el.dataset.dragserie){
+      var sp=dragSrc.dataset.dragserie.split('|'),tp=el.dataset.dragserie.split('|');
+      var c2=cols.find(function(x){return x.id===sp[0];});
+      if(!c2||sp[0]!==tp[0])return;
+      var si=c2.series.findIndex(function(s){return s.id===sp[1];}),ti=c2.series.findIndex(function(s){return s.id===tp[1];});
+      if(si<0||ti<0)return;
+      var m=c2.series.splice(si,1)[0];c2.series.splice(ti,0,m);saveData();render();
     }
-    // Drag dossier
-    if (dragSrc.dataset.dragfolder && el.dataset.dragfolder) {
-      var sp2 = dragSrc.dataset.dragfolder.split('|');
-      var tp2 = el.dataset.dragfolder.split('|');
-      var col3 = cols.find(function(c){return c.id===sp2[0];});
-      if (!col3||sp2[0]!==tp2[0]) return;
-      var arr2 = col3.folders;
-      var si2 = arr2.findIndex(function(f){return f.id===sp2[1];});
-      var ti2 = arr2.findIndex(function(f){return f.id===tp2[1];});
-      if (si2<0||ti2<0) return;
-      var moved2 = arr2.splice(si2,1)[0];
-      arr2.splice(ti2,0,moved2);
-      saveData(); render();
+    if(dragSrc.dataset.dragfolder&&el.dataset.dragfolder){
+      var sp2=dragSrc.dataset.dragfolder.split('|'),tp2=el.dataset.dragfolder.split('|');
+      var c3=cols.find(function(x){return x.id===sp2[0];});
+      if(!c3||sp2[0]!==tp2[0])return;
+      var si2=c3.folders.findIndex(function(f){return f.id===sp2[1];}),ti2=c3.folders.findIndex(function(f){return f.id===tp2[1];});
+      if(si2<0||ti2<0)return;
+      var m2=c3.folders.splice(si2,1)[0];c3.folders.splice(ti2,0,m2);saveData();render();
     }
-    dragSrc = null;
+    dragSrc=null;
   });
 }
-
 // MODAL DOSSIER
-var editFolderColId = null, editFolderId = null;
-function openFolderModal(colId, folderId) {
-  editFolderColId = colId; editFolderId = folderId||null;
-  var col2 = cols.find(function(c){return c.id===colId;});
-  var folder = folderId&&col2?(col2.folders||[]).find(function(f){return f.id===folderId;}):null;
-  document.getElementById('folder-modal-title').textContent = folder?'Modifier le dossier':'Nouveau dossier';
-  document.getElementById('folder-inp-title').value = folder?folder.title:'';
-  document.getElementById('folder-del-btn').style.display = folder?'inline-flex':'none';
+var editFolderColId=null,editFolderId=null;
+function openFolderModal(colId,folderId){
+  editFolderColId=colId;editFolderId=folderId||null;
+  var c2=cols.find(function(x){return x.id===colId;});
+  var f=folderId&&c2?(c2.folders||[]).find(function(x){return x.id===folderId;}):null;
+  document.getElementById('folder-modal-title').textContent=f?'Modifier le dossier':'Nouveau dossier';
+  document.getElementById('folder-inp-title').value=f?f.title:'';
+  document.getElementById('folder-del-btn').style.display=f?'inline-flex':'none';
   openModal('ov-folder');
   setTimeout(function(){document.getElementById('folder-inp-title').focus();},50);
 }
@@ -447,35 +450,26 @@ function openFolderModal(colId, folderId) {
     if (e.target === e.currentTarget) closeModal(id);
   });
 });
-document.getElementById('folder-save-btn').addEventListener('click', function() {
-  var title = document.getElementById('folder-inp-title').value.trim();
-  if (!title) return;
-  var col2 = cols.find(function(c){return c.id===editFolderColId;});
-  if (!col2) return;
-  if (!col2.folders) col2.folders=[];
-  if (editFolderId) {
-    var f = col2.folders.find(function(x){return x.id===editFolderId;});
-    if (f) f.title=title;
-  } else {
-    col2.folders.push({id:'fld_'+Date.now(),title:title,collapsed:false});
-  }
-  saveData(); closeModal('ov-folder'); render();
+document.getElementById('folder-save-btn').addEventListener('click',function(){
+  var title=document.getElementById('folder-inp-title').value.trim();if(!title)return;
+  var c2=cols.find(function(x){return x.id===editFolderColId;});if(!c2)return;
+  if(!c2.folders)c2.folders=[];
+  if(editFolderId){var f=c2.folders.find(function(x){return x.id===editFolderId;});if(f)f.title=title;}
+  else c2.folders.push({id:'fld_'+Date.now(),title:title,collapsed:false});
+  saveData();closeModal('ov-folder');render();
 });
-document.getElementById('folder-del-btn').addEventListener('click', function() {
-  if (!confirm('Supprimer ce dossier ? Les séries seront déplacées hors du dossier.')) return;
-  var col2 = cols.find(function(c){return c.id===editFolderColId;});
-  if (col2) {
-    (col2.series||[]).forEach(function(s){if(s.folderId===editFolderId)delete s.folderId;});
-    col2.folders=(col2.folders||[]).filter(function(f){return f.id!==editFolderId;});
-  }
-  saveData(); closeModal('ov-folder'); render();
+document.getElementById('folder-del-btn').addEventListener('click',function(){
+  if(!confirm('Supprimer ce dossier ?'))return;
+  var c2=cols.find(function(x){return x.id===editFolderColId;});
+  if(c2){(c2.series||[]).forEach(function(s){if(s.folderId===editFolderId)delete s.folderId;});c2.folders=(c2.folders||[]).filter(function(f){return f.id!==editFolderId;});}
+  saveData();closeModal('ov-folder');render();
 });
 document.getElementById('folder-inp-title').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('folder-save-btn').click();});
 </script>
 <div class="ov" id="ov-folder">
   <div class="modal">
     <h3 id="folder-modal-title" style="color:var(--teal)">Nouveau dossier</h3>
-    <div class="fld"><label>Nom du dossier</label><input type="text" id="folder-inp-title" maxlength="40" placeholder="ex: Médine Tome 1, Phase 1..."></div>
+    <div class="fld"><label>Nom</label><input type="text" id="folder-inp-title" maxlength="40" placeholder="ex: Médine Tome 1, Phase 1..."></div>
     <div class="modal-act">
       <button class="btn del" id="folder-del-btn" style="display:none;">🗑️</button>
       <button class="btn" onclick="closeModal('ov-folder')">Annuler</button>
