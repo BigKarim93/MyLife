@@ -387,7 +387,6 @@ var journal={};
 var savedMeals=[];
 var customFoods=[];
 var favCats=[{name:'Matin',foods:[]},{name:'Midi & Soir',foods:[]}];
-var hiddenFoods=[]; // noms d'aliments masqués
 var saveTimer=null;
 
 function dateKey(offset){
@@ -442,7 +441,6 @@ auth.onAuthStateChanged(function(user){
         if(d.savedMeals)savedMeals=d.savedMeals;
         if(d.customFoods)customFoods=d.customFoods;
         if(d.favCats)favCats=d.favCats;
-        // hiddenFoods volontairement non chargé pour éviter aliments disparus
         if(d.targets)targets=d.targets;
       if(d.settings&&d.settings.mealNames)MEAL_NAMES=d.settings.mealNames;
       }else{computeTargets();}
@@ -455,7 +453,7 @@ function saveAll(){
   clearTimeout(saveTimer);
   saveTimer=setTimeout(function(){
     settings.mealNames=MEAL_NAMES;
-    if(calDoc)calDoc.set({journal:journal,settings:settings,savedMeals:savedMeals,customFoods:customFoods,targets:targets,favCats:favCats,hiddenFoods:hiddenFoods}).catch(function(){});
+    if(calDoc)calDoc.set({journal:journal,settings:settings,savedMeals:savedMeals,customFoods:customFoods,targets:targets,favCats:favCats}).catch(function(){});
   },800);
 }
 
@@ -768,7 +766,7 @@ document.getElementById('btn-next-day').disabled=dayOffset>=0;
 var dragFood=null;
 
 function renderFoodsPanel(filter){
-  var allFoods=editFoodsMode?FOODS_DB.concat(customFoods):FOODS_DB.concat(customFoods).filter(function(f){return hiddenFoods.indexOf(f.n)<0;});
+  var allFoods=FOODS_DB.concat(customFoods);
   var q=(filter||'').toLowerCase().trim();
   var list=q?allFoods.filter(function(f){return f.n.toLowerCase().includes(q);}):allFoods;
   var container=document.getElementById('foods-list');
