@@ -49,22 +49,34 @@ input,button,select,textarea{font-family:inherit;}
 /* LAYOUT 2 COLONNES */
 .main-layout{display:flex;gap:14px;padding:10px 16px 30px;align-items:flex-start;}
 .col-meals{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px;}
-.col-foods{width:220px;flex-shrink:0;position:sticky;top:120px;}
+.col-foods{width:340px;flex-shrink:0;position:sticky;top:120px;}
 .col-foods-inner{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;max-height:calc(100vh - 160px);display:flex;flex-direction:column;}
 .col-foods-header{padding:10px 12px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;gap:6px;}
 .col-foods-title{font-family:'Kalam',cursive;font-size:.9rem;flex:1;}
 .foods-search{padding:8px;border-bottom:1px solid var(--border);}
 .foods-search input{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:5px 8px;font-size:.78rem;}
 .foods-search input:focus{outline:none;border-color:var(--teal);}
-.foods-list{overflow-y:auto;flex:1;}
-.food-chip{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;cursor:pointer;transition:.15s;border-bottom:1px solid var(--border);}
+.foods-list{overflow-y:auto;flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:0;}
+.food-chip{display:flex;flex-direction:column;gap:2px;padding:7px 8px;cursor:pointer;transition:.15s;border-bottom:1px solid var(--border);border-right:1px solid var(--border);}
 .food-chip:hover{background:var(--surface2);}
 .food-chip.dragging{opacity:.3;}
-.food-chip-name{font-size:.78rem;font-weight:600;}
-.food-chip-kcal{font-size:.68rem;color:var(--text3);}
+.food-chip:nth-child(3n){border-right:none;}
+.food-chip-name{font-size:.72rem;font-weight:600;line-height:1.2;}
+.food-chip-kcal{font-size:.62rem;color:var(--text3);}
+/* QTY EDITABLE */
+.food-qty-wrap{display:flex;align-items:center;gap:4px;}
+.food-qty-input{width:44px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);border-radius:4px;padding:2px 4px;font-size:.72rem;text-align:center;}
+.food-qty-input:focus{outline:none;border-color:var(--teal);}
+.food-qty-unit{font-size:.68rem;color:var(--text3);}
+/* DRAG FOOD ROW */
+.food-row{cursor:grab;}
+.food-row:active{cursor:grabbing;}
+.food-row.dragging{opacity:.3;}
+.food-row.drag-over{border-top:2px solid var(--teal);}
 /* REPAS */
 .meal-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:.15s;}
 .meal-section.drag-over{outline:2px solid var(--teal);outline-offset:2px;}
+.meal-section.active-meal>.meal-header{border-left:3px solid var(--teal);}
 .meal-header{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--surface2);}
 .meal-ico{font-size:1.1rem;}
 .meal-name{font-family:'Kalam',cursive;font-size:.95rem;flex:1;}
@@ -289,7 +301,7 @@ var FOODS_DB = [
   {n:'Eau',k:0,p:0,g:0,l:0},
 ];
 
-var MEAL_NAMES = ['🌅 Petit déjeuner','☀️ Déjeuner','🌙 Dîner','🍎 Collation'];
+var MEAL_NAMES = ['🌅 Petit dej','☀️ Déjeuner','🌙 Dîner','🍎 Collation'];
 
 // ===== STATE =====
 var dayOffset=0, currentMealIdx=1;
@@ -426,10 +438,14 @@ function render(){
   MEAL_NAMES.forEach(function(name,i){
     var foods=day.meals[i]||[];
     var mt=mealTotal(foods);
-    var sec=document.createElement('div');sec.className='meal-section';sec.dataset.mealidx=i;
+    var sec=document.createElement('div');sec.className='meal-section'+(i===currentMealIdx?' active-meal':'');sec.dataset.mealidx=i;
     var foodRows=foods.map(function(f,fi){
-      return '<div class="food-row">'+
-        '<span class="food-name">'+f.n+' <span style="color:var(--text3);font-size:.75rem">'+f.qty+'g</span></span>'+
+      return '<div class="food-row" draggable="true" data-meal="'+i+'" data-fi="'+fi+'">'+
+        '<span class="food-name">'+f.n+'</span>'+
+        '<div class="food-qty-wrap">'+
+          '<input class="food-qty-input" type="number" min="1" value="'+f.qty+'" data-qmeal="'+i+'" data-qfi="'+fi+'">'+
+          '<span class="food-qty-unit">g</span>'+
+        '</div>'+
         '<div class="food-macros">'+
           '<span class="food-macro" style="color:var(--amber)">🔥'+Math.round(f.k*f.qty/100)+'</span>'+
           '<span class="food-macro" style="color:var(--teal)">P'+Math.round(f.p*f.qty/100)+'g</span>'+
@@ -459,6 +475,71 @@ function render(){
     b.addEventListener('click',function(){
       var mi=parseInt(b.dataset.meal),fi=parseInt(b.dataset.fi);
       day.meals[mi].splice(fi,1);saveAll();render();
+    });
+  });
+
+  // Qty editable
+  meals.querySelectorAll('.food-qty-input').forEach(function(inp){
+    inp.addEventListener('change',function(){
+      var mi=parseInt(inp.dataset.qmeal),fi=parseInt(inp.dataset.qfi);
+      var qty=parseInt(inp.value)||100;
+      if(qty<1)qty=1;
+      day.meals[mi][fi].qty=qty;
+      saveAll();render();
+    });
+    inp.addEventListener('click',function(e){e.stopPropagation();});
+  });
+
+  // Drag food-row entre repas
+  var dragRow=null;
+  meals.querySelectorAll('.food-row').forEach(function(el){
+    el.addEventListener('dragstart',function(e){
+      dragRow={mi:parseInt(el.dataset.meal),fi:parseInt(el.dataset.fi)};
+      setTimeout(function(){el.classList.add('dragging');},0);
+      e.stopPropagation();
+    });
+    el.addEventListener('dragend',function(){
+      el.classList.remove('dragging');
+      meals.querySelectorAll('.food-row.drag-over,.meal-section.drag-over').forEach(function(x){x.classList.remove('drag-over');});
+    });
+    el.addEventListener('dragover',function(e){e.preventDefault();e.stopPropagation();el.classList.add('drag-over');});
+    el.addEventListener('dragleave',function(){el.classList.remove('drag-over');});
+    el.addEventListener('drop',function(e){
+      e.preventDefault();e.stopPropagation();
+      el.classList.remove('drag-over');
+      if(!dragRow)return;
+      var tmi=parseInt(el.dataset.meal),tfi=parseInt(el.dataset.fi);
+      if(dragRow.mi===tmi&&dragRow.fi===tfi)return;
+      var food=day.meals[dragRow.mi].splice(dragRow.fi,1)[0];
+      day.meals[tmi].splice(tfi,0,food);
+      saveAll();render();dragRow=null;
+    });
+  });
+
+  // Drop sur meal-section (changer de catégorie)
+  meals.querySelectorAll('.meal-section').forEach(function(sec){
+    sec.addEventListener('dragover',function(e){
+      if(!dragRow&&!dragFood)return;
+      e.preventDefault();
+      sec.classList.add('drag-over');
+    });
+    sec.addEventListener('dragleave',function(e){
+      if(!sec.contains(e.relatedTarget))sec.classList.remove('drag-over');
+    });
+    sec.addEventListener('drop',function(e){
+      e.preventDefault();
+      sec.classList.remove('drag-over');
+      var tmi=parseInt(sec.dataset.mealidx);
+      if(dragRow){
+        if(dragRow.mi===tmi)return;
+        var food=day.meals[dragRow.mi].splice(dragRow.fi,1)[0];
+        day.meals[tmi].push(food);
+        saveAll();render();dragRow=null;
+      } else if(dragFood){
+        day.meals[tmi].push({n:dragFood.n,k:dragFood.k,p:dragFood.p,g:dragFood.g,l:dragFood.l,qty:100});
+        saveAll();render();renderFoodsPanel(document.getElementById('quick-search').value);
+        dragFood=null;
+      }
     });
   });
 }
@@ -644,26 +725,7 @@ function renderFoodsPanel(filter){
     container.appendChild(el);
   });
 
-  // Drop zones sur les repas
-  document.querySelectorAll('.meal-section').forEach(function(sec){
-    sec.addEventListener('dragover',function(e){
-      if(!dragFood)return;
-      e.preventDefault();
-      sec.classList.add('drag-over');
-    });
-    sec.addEventListener('dragleave',function(){sec.classList.remove('drag-over');});
-    sec.addEventListener('drop',function(e){
-      e.preventDefault();
-      sec.classList.remove('drag-over');
-      if(!dragFood)return;
-      var mi=parseInt(sec.dataset.mealidx);
-      if(isNaN(mi))return;
-      var day=getDayData(dayOffset);
-      day.meals[mi].push({n:dragFood.n,k:dragFood.k,p:dragFood.p,g:dragFood.g,l:dragFood.l,qty:100});
-      saveAll();render();renderFoodsPanel(document.getElementById('quick-search').value);
-      dragFood=null;
-    });
-  });
+
 }
 
 // Recherche dans le panneau
