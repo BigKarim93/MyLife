@@ -191,7 +191,25 @@ input,button,select,textarea{font-family:inherit;}
 
 <div class="tdee-banner" id="tdee-banner"></div>
 
-<div class="main-layout"><div class="col-meals" id="meals"></div><div class="col-foods"><div class="foods-panel"><div class="foods-panel-header"><span>🍽️</span><div class="foods-panel-title">Aliments</div><button class="col-btn" id="btn-edit-foods" title="Mode édition">✎</button></div><div class="foods-panel-search"><input type="text" id="quick-search" placeholder="🔍..."></div><div class="foods-panel-body" id="foods-list"></div></div><div id="col-favs" style="display:flex;gap:10px;"></div></div></div>
+<div class="main-layout"><div class="col-meals" id="meals"></div><div class="col-foods"><div class="foods-panel"><div class="foods-panel-header"><span>🍽️</span><div class="foods-panel-title">Aliments</div><button class="col-btn" id="btn-add-custom-food" title="Ajouter un aliment">＋</button><button class="col-btn" id="btn-edit-foods" title="Masquer/Restaurer">✎</button></div><div class="foods-panel-body" id="foods-list"></div></div><div id="col-favs" style="display:flex;gap:10px;"></div></div></div>
+
+<!-- MODAL AJOUTER ALIMENT CUSTOM -->
+<div class="ov" id="ov-custom-food">
+  <div class="modal" style="border-radius:20px 20px 0 0">
+    <h3>➕ Ajouter un aliment</h3>
+    <div class="fld"><label>Nom</label><input type="text" id="cf-name" placeholder="ex: Mon plat maison" maxlength="40"></div>
+    <div class="macros-grid">
+      <div class="fld"><label>🔥 Calories (kcal/100g)</label><input type="number" id="cf-kcal" min="0" value="0"></div>
+      <div class="fld"><label>💪 Protéines (g)</label><input type="number" id="cf-prot" min="0" step="0.1" value="0"></div>
+      <div class="fld"><label>🍞 Glucides (g)</label><input type="number" id="cf-gluc" min="0" step="0.1" value="0"></div>
+      <div class="fld"><label>🥑 Lipides (g)</label><input type="number" id="cf-lip" min="0" step="0.1" value="0"></div>
+    </div>
+    <div class="modal-act">
+      <button class="btn" onclick="closeOv('ov-custom-food')">Annuler</button>
+      <button class="btn prim" id="cf-ok">Ajouter à la base</button>
+    </div>
+  </div>
+</div>
 
 <!-- MODAL AJOUTER ALIMENT -->
 <div class="ov" id="ov-food">
@@ -424,7 +442,7 @@ auth.onAuthStateChanged(function(user){
         if(d.savedMeals)savedMeals=d.savedMeals;
         if(d.customFoods)customFoods=d.customFoods;
         if(d.favCats)favCats=d.favCats;
-        if(d.hiddenFoods)hiddenFoods=d.hiddenFoods;
+        // hiddenFoods volontairement non chargé pour éviter aliments disparus
         if(d.targets)targets=d.targets;
       if(d.settings&&d.settings.mealNames)MEAL_NAMES=d.settings.mealNames;
       }else{computeTargets();}
@@ -755,7 +773,7 @@ function renderFoodsPanel(filter){
   var list=q?allFoods.filter(function(f){return f.n.toLowerCase().includes(q);}):allFoods;
   var container=document.getElementById('foods-list');
   container.innerHTML='';
-  container.classList.toggle('edit-foods-mode',editFoodsMode);
+  if(editFoodsMode)container.classList.add('edit-foods-mode');else container.classList.remove('edit-foods-mode');
   list.forEach(function(food){
     var el=document.createElement('div');
     el.className='food-chip';
