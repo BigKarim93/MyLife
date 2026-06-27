@@ -46,9 +46,25 @@ input,button,select,textarea{font-family:inherit;}
 .target-card.lip .target-pfill{background:var(--orange);}
 .over{color:var(--red) !important;}
 
+/* LAYOUT 2 COLONNES */
+.main-layout{display:flex;gap:14px;padding:10px 16px 30px;align-items:flex-start;}
+.col-meals{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px;}
+.col-foods{width:220px;flex-shrink:0;position:sticky;top:120px;}
+.col-foods-inner{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;max-height:calc(100vh - 160px);display:flex;flex-direction:column;}
+.col-foods-header{padding:10px 12px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;gap:6px;}
+.col-foods-title{font-family:'Kalam',cursive;font-size:.9rem;flex:1;}
+.foods-search{padding:8px;border-bottom:1px solid var(--border);}
+.foods-search input{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:5px 8px;font-size:.78rem;}
+.foods-search input:focus{outline:none;border-color:var(--teal);}
+.foods-list{overflow-y:auto;flex:1;}
+.food-chip{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;cursor:pointer;transition:.15s;border-bottom:1px solid var(--border);}
+.food-chip:hover{background:var(--surface2);}
+.food-chip.dragging{opacity:.3;}
+.food-chip-name{font-size:.78rem;font-weight:600;}
+.food-chip-kcal{font-size:.68rem;color:var(--text3);}
 /* REPAS */
-.meals{padding:0 16px 100px;}
-.meal-section{margin-bottom:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.meal-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:.15s;}
+.meal-section.drag-over{outline:2px solid var(--teal);outline-offset:2px;}
 .meal-header{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--surface2);}
 .meal-ico{font-size:1.1rem;}
 .meal-name{font-family:'Kalam',cursive;font-size:.95rem;flex:1;}
@@ -99,6 +115,7 @@ input,button,select,textarea{font-family:inherit;}
 .tab-bar{display:flex;gap:4px;margin-bottom:12px;}
 .tab{padding:6px 12px;border-radius:20px;font-size:.78rem;font-weight:600;cursor:pointer;border:1px solid var(--border2);color:var(--text2);background:transparent;transition:.15s;}
 .tab.active{background:var(--teal);border-color:var(--teal);color:#0f1117;}
+@media(max-width:700px){.main-layout{flex-direction:column;}.col-foods{width:100%;position:static;}.col-foods-inner{max-height:200px;}.col-foods{order:-1;}}
 </style>
 </head>
 <body>
@@ -140,7 +157,7 @@ input,button,select,textarea{font-family:inherit;}
 
 <div class="tdee-banner" id="tdee-banner"></div>
 
-<div class="meals" id="meals"></div>
+<div class="main-layout"><div class="col-meals" id="meals"></div><div class="col-foods"><div class="col-foods-inner"><div class="col-foods-header"><span>⚡</span><div class="col-foods-title">Aliments fréquents</div></div><div class="foods-search"><input type="text" id="quick-search" placeholder="🔍 Filtrer..."></div><div class="foods-list" id="foods-list"></div></div></div></div>
 
 <!-- MODAL AJOUTER ALIMENT -->
 <div class="ov" id="ov-food">
@@ -275,7 +292,7 @@ var FOODS_DB = [
 var MEAL_NAMES = ['🌅 Petit déjeuner','☀️ Déjeuner','🌙 Dîner','🍎 Collation'];
 
 // ===== STATE =====
-var dayOffset=0, currentMealIdx=0;
+var dayOffset=0, currentMealIdx=1;
 var settings={taille:178,age:35,activite:1.375,objectif:-500};
 var targets={kcal:2232,prot:175,gluc:250,lip:74};
 var poids=97.5;
@@ -409,7 +426,7 @@ function render(){
   MEAL_NAMES.forEach(function(name,i){
     var foods=day.meals[i]||[];
     var mt=mealTotal(foods);
-    var sec=document.createElement('div');sec.className='meal-section';
+    var sec=document.createElement('div');sec.className='meal-section';sec.dataset.mealidx=i;
     var foodRows=foods.map(function(f,fi){
       return '<div class="food-row">'+
         '<span class="food-name">'+f.n+' <span style="color:var(--text3);font-size:.75rem">'+f.qty+'g</span></span>'+
@@ -584,6 +601,80 @@ document.getElementById('btn-next-day').disabled=dayOffset>=0;
 ['ov-food','ov-repas','ov-settings'].forEach(function(id){
   document.getElementById(id).addEventListener('click',function(e){if(e.target===e.currentTarget)closeOv(id);});
 });
+
+// ===== PANNEAU ALIMENTS FRÉQUENTS =====
+var dragFood=null;
+
+function renderFoodsPanel(filter){
+  var allFoods=FOODS_DB.concat(customFoods);
+  var q=(filter||'').toLowerCase().trim();
+  var list=q?allFoods.filter(function(f){return f.n.toLowerCase().includes(q);}):allFoods;
+  var container=document.getElementById('foods-list');
+  container.innerHTML='';
+  list.forEach(function(food){
+    var el=document.createElement('div');
+    el.className='food-chip';
+    el.setAttribute('draggable','true');
+    el.innerHTML=
+      '<div><div class="food-chip-name">'+food.n+'</div>'+
+      '<div class="food-chip-kcal">'+food.k+' kcal · P'+food.p+'g</div></div>'+
+      '<span style="font-size:.7rem;color:var(--text3)">+</span>';
+
+    // Clic → ajoute au repas actif (déjeuner par défaut)
+    el.addEventListener('click',function(){
+      var day=getDayData(dayOffset);
+      day.meals[currentMealIdx].push({n:food.n,k:food.k,p:food.p,g:food.g,l:food.l,qty:100});
+      saveAll();render();renderFoodsPanel(document.getElementById('quick-search').value);
+      // Flash feedback
+      el.style.background='rgba(45,212,191,.2)';
+      setTimeout(function(){el.style.background='';},400);
+    });
+
+    // Drag depuis le panneau
+    el.addEventListener('dragstart',function(e){
+      dragFood=food;
+      setTimeout(function(){el.classList.add('dragging');},0);
+    });
+    el.addEventListener('dragend',function(){
+      el.classList.remove('dragging');
+      dragFood=null;
+      document.querySelectorAll('.meal-section.drag-over').forEach(function(x){x.classList.remove('drag-over');});
+    });
+
+    container.appendChild(el);
+  });
+
+  // Drop zones sur les repas
+  document.querySelectorAll('.meal-section').forEach(function(sec){
+    sec.addEventListener('dragover',function(e){
+      if(!dragFood)return;
+      e.preventDefault();
+      sec.classList.add('drag-over');
+    });
+    sec.addEventListener('dragleave',function(){sec.classList.remove('drag-over');});
+    sec.addEventListener('drop',function(e){
+      e.preventDefault();
+      sec.classList.remove('drag-over');
+      if(!dragFood)return;
+      var mi=parseInt(sec.dataset.mealidx);
+      if(isNaN(mi))return;
+      var day=getDayData(dayOffset);
+      day.meals[mi].push({n:dragFood.n,k:dragFood.k,p:dragFood.p,g:dragFood.g,l:dragFood.l,qty:100});
+      saveAll();render();renderFoodsPanel(document.getElementById('quick-search').value);
+      dragFood=null;
+    });
+  });
+}
+
+// Recherche dans le panneau
+document.getElementById('quick-search').addEventListener('input',function(){
+  renderFoodsPanel(this.value);
+  currentMealIdx=0; // reset
+});
+
+// Init panneau + mettre à jour après chaque render
+var origRender=render;
+render=function(){origRender();renderFoodsPanel(document.getElementById('quick-search')?document.getElementById('quick-search').value:'');};
 </script>
 </body>
 </html>
