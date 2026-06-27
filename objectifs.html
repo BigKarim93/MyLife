@@ -85,6 +85,8 @@ input,button,select{font-family:inherit;}
 .fld input,.fld select{background:var(--bg);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:8px 10px;font-size:.88rem;width:100%;}
 .fld input:focus,.fld select:focus{outline:none;border-color:var(--teal);}
 .modal-act{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;}
+* { scrollbar-width: none; }
+*::-webkit-scrollbar { display: none; }
 </style>
 </head>
 <body>
@@ -200,6 +202,8 @@ function render(){
     colEl.innerHTML=
       '<div class="obj-col-header" style="background:'+headerBg+';border-bottom:2px solid '+clr+';">'+
         '<div class="obj-col-title" style="color:'+clr+'">'+col.title+'</div>'+
+        '<button class="col-btn" data-addserie="'+col.id+'" title="Nouvelle série">＋</button>'+
+        '<button class="col-btn" data-addfolder="'+col.id+'" title="Nouveau dossier">📁</button>'+
         '<button class="col-btn" data-editcol="'+col.id+'">✎</button>'+
       '</div>'+
       '<div class="obj-col-body" id="body-'+col.id+'"></div>';
@@ -262,8 +266,7 @@ function render(){
     (col.series||[]).filter(function(s){return !s.folderId;}).forEach(function(s){makeSerie(s,body);});
 
     // Boutons
-    var bf=document.createElement('button');bf.className='add-btn';bf.textContent='📁 Nouveau dossier';bf.dataset.addfolder=col.id;body.appendChild(bf);
-    var bs=document.createElement('button');bs.className='add-btn';bs.textContent='＋ Nouvelle série';bs.dataset.addserie=col.id;body.appendChild(bs);
+
   });
 
   wireEvents();
