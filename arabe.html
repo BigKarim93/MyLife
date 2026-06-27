@@ -355,6 +355,11 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .iac-dot{width:44px;height:44px;border-radius:10px;border:2px solid var(--border2);background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;color:var(--text3);cursor:pointer;transition:.15s;user-select:none}
 .iac-dot:hover{border-color:var(--teal);color:var(--teal)}
 .iac-dot.done{background:rgba(45,212,191,.15);border-color:var(--teal);color:var(--teal);font-size:1.1rem}
+.iac-dots.collapsed{display:none}
+.iac-chevron{font-size:.75rem;color:var(--text3);cursor:pointer;padding:3px 7px;border-radius:6px;border:1px solid transparent;transition:.15s;user-select:none;flex-shrink:0}
+.iac-chevron:hover{border-color:var(--border2);color:var(--text)}
+.iac-sec-edit{background:none;border:1px solid transparent;border-radius:6px;color:var(--text3);cursor:pointer;font-size:.8rem;padding:3px 7px;transition:.15s}
+.iac-sec-edit:hover{border-color:var(--border2);color:var(--text)}
 </style>
 </head>
 <body>
@@ -3535,11 +3540,109 @@ function gPick(sel,mode){
 }
 
 /* IBN AJROUM CHANNEL */
-var iacSeries=[];var iacTimer=null;
-function iacSaveData(){try{localStorage.setItem('mylife_iac_v2',JSON.stringify(iacSeries));}catch(e){}clearTimeout(iacTimer);iacTimer=setTimeout(function(){if(typeof db!=='undefined'&&typeof currentUser!=='undefined'&&currentUser){db.collection('users').doc(currentUser.uid).collection('modules').doc('iac-v2').set({series:iacSeries}).catch(function(){});}},800);}
-function iacRender(){var cont=document.getElementById('iac-sections');var empty=document.getElementById('iac-empty');if(!cont)return;if(!iacSeries.length){cont.innerHTML='';empty.style.display='block';return;}empty.style.display='none';cont.innerHTML=iacSeries.map(function(s){var done=s.done?s.done.length:0;var pct=s.count?Math.round(done/s.count*100):0;var dots='';for(var i=1;i<=s.count;i++){var ok=s.done&&s.done.indexOf(i)>=0;dots+='<div class="iac-dot'+(ok?' done':'')+'" data-sid="'+s.id+'" data-n="'+i+'">'+(ok?'✓':i)+'</div>';}return'<div class="iac-section"><div class="iac-sec-header"><div class="iac-sec-title">'+s.title+'</div><div class="iac-sec-prog"><strong>'+done+'</strong> / '+s.count+' — '+pct+'%</div><div class="iac-pbar"><div class="iac-pfill" style="width:'+pct+'%"></div></div><button class="iac-sec-del" data-del="'+s.id+'">🗑️</button></div><div class="iac-dots">'+dots+'</div></div>';}).join('');cont.querySelectorAll('.iac-dot').forEach(function(d){d.addEventListener('click',function(){var s=iacSeries.find(function(x){return x.id===d.dataset.sid;});if(!s)return;if(!s.done)s.done=[];var n=parseInt(d.dataset.n);var idx=s.done.indexOf(n);if(idx>=0)s.done.splice(idx,1);else s.done.push(n);iacSaveData();iacRender();});});cont.querySelectorAll('[data-del]').forEach(function(btn){btn.addEventListener('click',function(){if(!confirm('Supprimer cette série ?'))return;iacSeries=iacSeries.filter(function(x){return x.id!==btn.dataset.del;});iacSaveData();iacRender();});});}
-function iacOpenModal(){document.getElementById('iac-inp-title').value='';document.getElementById('iac-inp-count').value='26';document.getElementById('iac-modal').style.display='flex';setTimeout(function(){document.getElementById('iac-inp-title').focus();},50);}
-function iacSaveModal(){var title=document.getElementById('iac-inp-title').value.trim();var count=parseInt(document.getElementById('iac-inp-count').value)||0;if(!title||count<1)return;iacSeries.push({id:'iac_'+Date.now(),title:title,count:count,done:[]});document.getElementById('iac-modal').style.display='none';iacSaveData();iacRender();}
+var iacSeries=[];var iacTimer=null;var iacEditId=null;
+
+function iacSaveData(){
+  try{localStorage.setItem('mylife_iac_v2',JSON.stringify(iacSeries));}catch(e){}
+  clearTimeout(iacTimer);
+  iacTimer=setTimeout(function(){
+    if(typeof db!=='undefined'&&typeof currentUser!=='undefined'&&currentUser){
+      db.collection('users').doc(currentUser.uid).collection('modules').doc('iac-v2').set({series:iacSeries}).catch(function(){});
+    }
+  },800);
+}
+
+function iacRender(){
+  var cont=document.getElementById('iac-sections');
+  var empty=document.getElementById('iac-empty');
+  if(!cont)return;
+  if(!iacSeries.length){cont.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  cont.innerHTML=iacSeries.map(function(s){
+    var done=s.done?s.done.length:0;
+    var pct=s.count?Math.round(done/s.count*100):0;
+    var collapsed=s.collapsed?'collapsed':'';
+    var chevron=s.collapsed?'▶':'▼';
+    var dots='';
+    for(var i=1;i<=s.count;i++){
+      var ok=s.done&&s.done.indexOf(i)>=0;
+      dots+='<div class="iac-dot'+(ok?' done':'')+'" data-sid="'+s.id+'" data-n="'+i+'">'+(ok?'✓':i)+'</div>';
+    }
+    return '<div class="iac-section" data-secid="'+s.id+'">'+
+      '<div class="iac-sec-header">'+
+        '<div class="iac-chevron" data-toggle="'+s.id+'">'+chevron+'</div>'+
+        '<div class="iac-sec-title">'+s.title+'</div>'+
+        '<div class="iac-sec-prog"><strong>'+done+'</strong>/'+s.count+' &nbsp;'+pct+'%</div>'+
+        '<div class="iac-pbar"><div class="iac-pfill" style="width:'+pct+'%"></div></div>'+
+        '<button class="iac-sec-edit" data-edit="'+s.id+'" title="Modifier">✎</button>'+
+        '<button class="iac-sec-del" data-del="'+s.id+'" title="Supprimer">🗑️</button>'+
+      '</div>'+
+      '<div class="iac-dots '+collapsed+'">'+dots+'</div>'+
+    '</div>';
+  }).join('');
+
+  // Toggle collapse
+  cont.querySelectorAll('[data-toggle]').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var s=iacSeries.find(function(x){return x.id===btn.dataset.toggle;});
+      if(s){s.collapsed=!s.collapsed;iacSaveData();iacRender();}
+    });
+  });
+  // Dots
+  cont.querySelectorAll('.iac-dot').forEach(function(d){
+    d.addEventListener('click',function(){
+      var s=iacSeries.find(function(x){return x.id===d.dataset.sid;});
+      if(!s)return;
+      if(!s.done)s.done=[];
+      var n=parseInt(d.dataset.n);
+      var idx=s.done.indexOf(n);
+      if(idx>=0)s.done.splice(idx,1);else s.done.push(n);
+      iacSaveData();iacRender();
+    });
+  });
+  // Modifier
+  cont.querySelectorAll('[data-edit]').forEach(function(btn){
+    btn.addEventListener('click',function(){iacOpenModal(btn.dataset.edit);});
+  });
+  // Supprimer
+  cont.querySelectorAll('[data-del]').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      if(!confirm('Supprimer cette série ?'))return;
+      iacSeries=iacSeries.filter(function(x){return x.id!==btn.dataset.del;});
+      iacSaveData();iacRender();
+    });
+  });
+}
+
+function iacOpenModal(editId){
+  iacEditId=editId||null;
+  var s=editId?iacSeries.find(function(x){return x.id===editId;}):null;
+  document.getElementById('iac-modal-h').textContent=s?'Modifier la série':'Nouvelle série';
+  document.getElementById('iac-inp-title').value=s?s.title:'';
+  document.getElementById('iac-inp-count').value=s?s.count:26;
+  document.getElementById('iac-modal').style.display='flex';
+  setTimeout(function(){document.getElementById('iac-inp-title').focus();},50);
+}
+
+function iacSaveModal(){
+  var title=document.getElementById('iac-inp-title').value.trim();
+  var count=parseInt(document.getElementById('iac-inp-count').value)||0;
+  if(!title||count<1)return;
+  if(iacEditId){
+    var s=iacSeries.find(function(x){return x.id===iacEditId;});
+    if(s){
+      s.title=title;
+      // Si on réduit le count, supprimer les done > count
+      if(count<s.count&&s.done)s.done=s.done.filter(function(n){return n<=count;});
+      s.count=count;
+    }
+  } else {
+    iacSeries.push({id:'iac_'+Date.now(),title:title,count:count,done:[],collapsed:false});
+  }
+  document.getElementById('iac-modal').style.display='none';
+  iacSaveData();iacRender();
+}
+
 document.getElementById('iac-inp-title').addEventListener('keydown',function(e){if(e.key==='Enter')iacSaveModal();});
 try{var _d=localStorage.getItem('mylife_iac_v2');if(_d)iacSeries=JSON.parse(_d);}catch(e){}
 
@@ -3560,7 +3663,7 @@ try{var _d=localStorage.getItem('mylife_iac_v2');if(_d)iacSeries=JSON.parse(_d);
 </div>
 <div id="iac-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:600;align-items:center;justify-content:center;padding:14px">
   <div style="background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:20px;width:100%;max-width:360px">
-    <h3 style="margin-bottom:14px;font-size:1rem">Nouvelle série</h3>
+    <h3 style="margin-bottom:14px;font-size:1rem" id="iac-modal-h">Nouvelle série</h3>
     <div style="margin-bottom:10px">
       <label style="font-size:.75rem;color:var(--text2);font-weight:600;display:block;margin-bottom:4px">Titre</label>
       <input id="iac-inp-title" type="text" maxlength="60" placeholder="ex: Grammaire Médine Tome 1" style="width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:8px 10px;font-size:.9rem;font-family:inherit">
