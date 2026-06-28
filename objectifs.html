@@ -165,9 +165,14 @@ auth.onAuthStateChanged(function(user){
           render();
         }
       }
-      if(s.exists&&s.data().note){
+      // Note : prendre la plus longue entre localStorage et Firestore
+      var lsNote='';try{lsNote=localStorage.getItem('mylife_obj_note')||'';}catch(e){}
+      var fsNote=(s.exists&&s.data().note)||'';
+      var bestNote=fsNote.length>=lsNote.length?fsNote:lsNote;
+      if(bestNote){
         var na=document.getElementById('note-area');
-        if(na&&!na.value){na.value=s.data().note;try{localStorage.setItem('mylife_obj_note',s.data().note);}catch(e){}}
+        if(na)na.value=bestNote;
+        try{localStorage.setItem('mylife_obj_note',bestNote);}catch(e){}
       }
     }).catch(function(){});
   }else{
@@ -180,7 +185,13 @@ function save(){
   try{var na=document.getElementById('note-area');if(na)localStorage.setItem('mylife_obj_note',na.value);}catch(e){}
   if(!objDoc)return;
   clearTimeout(saveTimer);
-  saveTimer=setTimeout(function(){if(cols.length>0){var na=document.getElementById('note-area');objDoc.set({cols:cols,note:na?na.value:''}).catch(function(){});}},800);
+  saveTimer=setTimeout(function(){
+    var na=document.getElementById('note-area');
+    var noteVal=na?na.value:'';
+    var data={note:noteVal};
+    if(cols.length>0)data.cols=cols;
+    objDoc.set(data,{merge:true}).catch(function(){});
+  },800);
 }
 
 // ===== UTILS =====
@@ -438,9 +449,12 @@ function forceLoadFirestore(){
 var noteTimer=null;
 var noteEl=document.getElementById('note-area');
 if(noteEl){noteEl.addEventListener('input',function(){
+  // Sauvegarder dans localStorage immédiatement
+  try{localStorage.setItem('mylife_obj_note',noteEl.value);}catch(e){}
   clearTimeout(noteTimer);
   noteTimer=setTimeout(function(){
-    save();
+    // Sauvegarder dans Firestore
+    if(objDoc){objDoc.set({note:noteEl.value},{merge:true}).catch(function(){});}
     var sv=document.getElementById('note-saved');
     if(sv){sv.textContent='✓';setTimeout(function(){sv.textContent='';},1500);}
   },1000);
