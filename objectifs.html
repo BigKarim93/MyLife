@@ -219,13 +219,18 @@ function render(){
 
     // Construire une série
     function makeSerie(serie,container){
-      var done=serie.done?serie.done.length:0;
-      var pct=serie.count?Math.round(done/serie.count*100):0;
+      var dl=serie.done||[];
+      var fullCount=dl.filter(function(x){return x%1===0;}).length;
+      var halfCount=dl.filter(function(x){return x%1!==0;}).length;
+      var pts=fullCount+halfCount*0.5;
+      var pct=serie.count?Math.round(pts/serie.count*100):0;
       var dots='';
       for(var i=1;i<=serie.count;i++){
-        var ok=serie.done&&serie.done.indexOf(i)>=0;
-        var ds=ok?'background:'+clr+'22;border-color:'+clr+';color:'+clr+';':'';
-        dots+='<div class="obj-dot'+(ok?' done':'')+'" data-cid="'+col.id+'" data-sid="'+serie.id+'" data-n="'+i+'" style="'+ds+'">'+(ok?'✓':i)+'</div>';
+        var iF=dl.indexOf(i)>=0;
+        var iH=serie.half&&dl.indexOf(i+0.5)>=0;
+        var cls='obj-dot'+(iF?' done':iH?' half':'');
+        var ds=iF?'background:'+clr+'22;border-color:'+clr+';color:'+clr+';':iH?'border-color:'+clr+';color:'+clr+';':'';
+        dots+='<div class="'+cls+'" data-cid="'+col.id+'" data-sid="'+serie.id+'" data-n="'+i+'" style="'+ds+'">'+(iF?'✓':iH?'½':i)+'</div>';
       }
       var el=document.createElement('div');
       el.className='obj-serie';
