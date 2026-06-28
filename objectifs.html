@@ -498,6 +498,7 @@ document.getElementById('serie-ok').addEventListener('click',function(){
   var count=parseInt(document.getElementById('serie-count').value)||0;
   if(!title||count<1)return;
   var fid=document.getElementById('serie-folder').value||null;
+  var isHalf=document.getElementById('serie-half').value==='1';
   var col=cols.find(function(c){return c.id===editSerieColId;});if(!col)return;
   if(!col.series)col.series=[];
   if(editSerieId){
