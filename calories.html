@@ -203,7 +203,7 @@ input,button,select,textarea{font-family:inherit;}
 
 <div class="tdee-banner" id="tdee-banner"></div>
 
-<div class="main-layout"><div class="col-meals" id="meals"></div><div class="col-foods"><div class="col-foods-inner"><div class="col-foods-header"><span>🍽️</span><div class="col-foods-title">Aliments</div><button class="btn sm" id="btn-add-food-custom" title="Ajouter un aliment">＋</button></div><div class="foods-list" id="foods-list"></div></div></div></div>
+<div class="main-layout"><div class="col-meals" id="meals"></div><div class="col-foods"><div class="col-foods-inner"><div class="col-foods-header"><span>🍽️</span><div class="col-foods-title">Aliments</div><button class="btn sm" id="btn-add-food-custom" title="Ajouter un aliment">＋</button></div><div id="food-trash" style="display:none;padding:5px 10px;background:rgba(248,113,113,.15);border-bottom:1px solid var(--red);text-align:center;font-size:.72rem;color:var(--red);">🗑️ Déposer ici pour supprimer</div><div class="foods-list" id="foods-list"></div></div></div></div>
 
 <!-- MODAL AJOUTER ALIMENT -->
 <div class="ov" id="ov-food">
@@ -861,8 +861,11 @@ function renderFoodsPanel(){
 
 // Bouton + ajouter aliment custom
 document.getElementById('btn-add-food-custom').addEventListener('click',function(){
-  ['afc-name','afc-k','afc-p','afc-g','afc-l'].forEach(function(id){document.getElementById(id).value=id==='afc-name'?'':'0';});
-  document.getElementById('ov-add-food-custom').classList.add('op');
+  document.getElementById('afc-name').value='';
+  document.getElementById('afc-qty').value='100';
+  document.getElementById('afc-unit').value='g';
+  ['afc-k','afc-p','afc-g','afc-l'].forEach(function(id){document.getElementById(id).value='0';});
+  document.getElementById('ov-afc').classList.add('op');
   setTimeout(function(){document.getElementById('afc-name').focus();},100);
 });
 document.getElementById('afc-ok').addEventListener('click',function(){
@@ -874,6 +877,21 @@ document.getElementById('afc-name').addEventListener('keydown',function(e){if(e.
 document.getElementById('ov-add-food-custom').addEventListener('click',function(e){if(e.target===e.currentTarget)closeOv('ov-add-food-custom');});
 
 // Init panneau
+// Poubelle
+var trash=document.getElementById('food-trash');
+if(trash){
+  trash.addEventListener('dragover',function(e){e.preventDefault();trash.style.background='rgba(248,113,113,.3)';});
+  trash.addEventListener('dragleave',function(){trash.style.background='rgba(248,113,113,.15)';});
+  trash.addEventListener('drop',function(e){
+    e.preventDefault();trash.style.display='none';trash.style.background='rgba(248,113,113,.15)';
+    if(!dragFood)return;
+    var ci=customFoods.findIndex(function(x){return x.n===dragFood.n;});
+    if(ci>=0){customFoods.splice(ci,1);saveAll();}
+    else{try{var rf=JSON.parse(localStorage.getItem('mylife_rf')||'[]');if(rf.indexOf(dragFood.n)<0){rf.push(dragFood.n);localStorage.setItem('mylife_rf',JSON.stringify(rf));}}catch(ex){}}
+    dragFood=null;renderFoodsPanel();
+  });
+}
+
 var origRender=render;
 render=function(){origRender();renderFoodsPanel();};
 </script>
