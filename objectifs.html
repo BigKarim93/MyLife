@@ -164,18 +164,19 @@ var cols=[], saveTimer=null;
 auth.onAuthStateChanged(function(user){
   if(user){
     objDoc=db.collection('users').doc(user.uid).collection('modules').doc('objectifs');
+    // Charger localStorage d'abord
+    try{var _ls=localStorage.getItem('mylife_obj_v1');if(_ls){var _lsd=JSON.parse(_ls);if(_lsd&&_lsd.length>0)cols=_lsd;}}catch(e){}
     objDoc.get().then(function(s){
       if(s.exists&&s.data().cols&&s.data().cols.length>0){
-        cols=s.data().cols;
-      }else{
-        try{var d=localStorage.getItem('mylife_obj_v1');if(d)cols=JSON.parse(d);}catch(e){}
+        // Firestore a plus de colonnes → utiliser Firestore
+        if(s.data().cols.length>=cols.length)cols=s.data().cols;
       }
       if(s.exists&&s.data().note){
         var na=document.getElementById('note-area');
         if(na)na.value=s.data().note;
       }
       render();
-    }).catch(function(){try{var d=localStorage.getItem('mylife_obj_v1');if(d)cols=JSON.parse(d);}catch(e){}render();});
+    }).catch(function(){render();});
   }else{try{var d=localStorage.getItem('mylife_obj_v1');if(d)cols=JSON.parse(d);}catch(e){}render();}
 });
 function save(){
