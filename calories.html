@@ -77,20 +77,20 @@ input,button,select,textarea{font-family:inherit;}
 .meal-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:.15s;}
 .meal-section.drag-over{outline:2px solid var(--teal);outline-offset:2px;}
 .meal-section.active-meal>.meal-header{border-left:3px solid var(--teal);}
-.meal-header{display:flex;align-items:center;gap:6px;padding:5px 10px;border-bottom:1px solid var(--border);background:var(--surface2);cursor:pointer;}
-.meal-ico{font-size:.85rem;}
-.meal-name{font-family:'Kalam',cursive;font-size:.82rem;flex:1;}
+.meal-header{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--surface2);}
+.meal-ico{font-size:1.1rem;}
+.meal-name{font-family:'Kalam',cursive;font-size:.95rem;flex:1;}
 .meal-kcal{font-size:.78rem;color:var(--text2);}
 .meal-items{padding:6px 8px;}
-.food-row{display:flex;align-items:center;gap:6px;padding:3px 8px;border-radius:6px;transition:.15s;}
+.food-row{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;transition:.15s;}
 .food-row:hover{background:var(--surface2);}
-.food-name{flex:1;font-size:.75rem;}
+.food-name{flex:1;font-size:.83rem;}
 .food-macros{display:flex;gap:8px;font-size:.72rem;color:var(--text2);}
 .food-macro{display:flex;align-items:center;gap:2px;}
 .food-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:.75rem;padding:2px 5px;border-radius:4px;opacity:0;}
 .food-row:hover .food-del{opacity:1;}
 .food-del:hover{color:var(--red);}
-.add-food-btn{width:100%;background:transparent;border:1px dashed var(--border2);border-radius:6px;padding:4px;color:var(--text3);font-size:.72rem;cursor:pointer;margin-top:3px;transition:.15s;}
+.add-food-btn{width:100%;background:transparent;border:1px dashed var(--border2);border-radius:8px;padding:7px;color:var(--text3);font-size:.8rem;cursor:pointer;margin-top:6px;margin-bottom:4px;transition:.15s;}
 .add-food-btn:hover{border-color:var(--teal);color:var(--teal);}
 
 /* INFOS TDEE */
@@ -128,13 +128,40 @@ input,button,select,textarea{font-family:inherit;}
 .tab{padding:6px 12px;border-radius:20px;font-size:.78rem;font-weight:600;cursor:pointer;border:1px solid var(--border2);color:var(--text2);background:transparent;transition:.15s;}
 .tab.active{background:var(--teal);border-color:var(--teal);color:#0f1117;}
 @media(max-width:700px){.main-layout{flex-direction:column;}.col-foods{width:100%;position:static;}.col-foods-inner{max-height:200px;}.col-foods{order:-1;}}
+</style>
+<style>
+/* 50/50 layout */
+.col-meals{flex:1;min-width:0;}
+.col-foods{flex:1;min-width:0;position:sticky;top:110px;}
+.col-foods-inner{max-height:calc(100vh - 140px);}
+/* 6 colonnes aliments sans scroll */
+.foods-list{display:grid !important;grid-template-columns:repeat(6,1fr) !important;overflow:hidden !important;}
+/* Chips compacts */
+.food-chip{flex-direction:column;align-items:center;padding:5px 3px;text-align:center;}
+.food-chip-name{font-size:.62rem;font-weight:600;line-height:1.2;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%;}
+.food-chip-kcal{font-size:.56rem;color:var(--text3);text-align:center;}
+/* Repas compacts */
+.meal-section{border-radius:var(--radius-sm);}
+.meal-header{padding:5px 10px !important;cursor:pointer;}
+.meal-name{font-size:.82rem !important;}
+.meal-ico{font-size:.85rem !important;}
+.meal-items{padding:3px 8px !important;}
+.food-row{padding:3px 6px !important;cursor:grab;}
+.food-row:active{cursor:grabbing;}
+.food-name{font-size:.75rem !important;}
+.add-food-btn{padding:4px !important;font-size:.72rem !important;margin-top:3px !important;}
+/* Qty input */
 .food-qty-wrap{display:flex;align-items:center;gap:3px;flex-shrink:0;}
-.food-qty-input{width:42px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);border-radius:4px;padding:2px 4px;font-size:.7rem;text-align:center;}
+.food-qty-input{width:42px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);border-radius:4px;padding:2px 4px;font-size:.7rem;text-align:center;font-family:inherit;}
 .food-qty-input:focus{outline:none;border-color:var(--teal);}
 .food-qty-unit{font-size:.65rem;color:var(--text3);}
-.food-row{cursor:grab;}.food-row.dragging{opacity:.3;}.food-row.drag-over{border-top:2px solid var(--teal);}
-.meal-section.active-meal>.meal-header{border-left:3px solid var(--teal);}
+/* Drag states */
+.food-row.dragging,.food-chip.dragging{opacity:.3;}
+.food-row.drag-over{border-top:2px solid var(--teal);}
 .meal-section.drag-over{outline:2px solid var(--teal);outline-offset:2px;}
+.meal-section.active-meal>.meal-header{border-left:3px solid var(--teal);}
+/* Poubelle */
+#food-trash{display:none;padding:5px 10px;background:rgba(248,113,113,.15);border-bottom:1px solid var(--red);text-align:center;font-size:.72rem;color:var(--red);cursor:pointer;}
 </style>
 </head>
 <body>
@@ -291,7 +318,12 @@ input,button,select,textarea{font-family:inherit;}
     <div class="fld"><label>Nom</label><input type="text" id="afc-name" placeholder="ex: Barre de céréales" maxlength="40"></div>
     <div style="display:flex;gap:8px;margin-bottom:8px">
       <div class="fld" style="flex:1;margin:0"><label>Quantité de référence</label><input type="number" id="afc-qty" value="100" min="0.1" step="0.1"></div>
-      <div class="fld" style="width:100px;margin:0"><label>Unité</label><select id="afc-unit" style="background:var(--bg);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:8px 6px;width:100%;font-family:inherit"><option value="g">g</option><option value="ml">ml</option><option value="pièce">pièce</option><option value="portion">portion</option></select></div>
+      <div class="fld" style="width:100px;margin:0"><label>Unité</label>
+        <select id="afc-unit" style="background:var(--bg);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:8px 6px;width:100%;font-family:inherit">
+          <option value="g">g</option><option value="ml">ml</option>
+          <option value="pièce">pièce</option><option value="portion">portion</option>
+        </select>
+      </div>
     </div>
     <p style="font-size:.7rem;color:var(--text3);margin-bottom:8px">Macros pour cette quantité :</p>
     <div class="macros-grid">
@@ -527,22 +559,29 @@ function render(){
     inp.addEventListener('click',function(e){e.stopPropagation();});
     inp.addEventListener('change',function(){
       var mi=parseInt(inp.dataset.qmeal),fi=parseInt(inp.dataset.qfi);
-      var qty=parseInt(inp.value)||1;
-      day.meals[mi][fi].qty=qty;saveAll();render();
+      day.meals[mi][fi].qty=Math.max(1,parseInt(inp.value)||1);
+      saveAll();render();
     });
   });
-  // Repas actif au clic header
+  // Clic header = sélectionner repas
   meals.querySelectorAll('.meal-header').forEach(function(h){
     h.addEventListener('click',function(){
       currentMealIdx=parseInt(h.closest('.meal-section').dataset.mealidx);
       render();
     });
   });
-  // Drag food-row entre repas
+  // Drag food-row
   var dragRow=null;
   meals.querySelectorAll('.food-row').forEach(function(el){
-    el.addEventListener('dragstart',function(e){dragRow={mi:parseInt(el.dataset.meal),fi:parseInt(el.dataset.fi)};setTimeout(function(){el.classList.add('dragging');},0);e.stopPropagation();});
-    el.addEventListener('dragend',function(){el.classList.remove('dragging');meals.querySelectorAll('.drag-over,.food-row.drag-over').forEach(function(x){x.classList.remove('drag-over');});});
+    el.addEventListener('dragstart',function(e){
+      dragRow={mi:parseInt(el.dataset.meal),fi:parseInt(el.dataset.fi)};
+      e.stopPropagation();
+      setTimeout(function(){el.classList.add('dragging');},0);
+    });
+    el.addEventListener('dragend',function(){
+      el.classList.remove('dragging');
+      meals.querySelectorAll('.drag-over').forEach(function(x){x.classList.remove('drag-over');});
+    });
     el.addEventListener('dragover',function(e){e.preventDefault();e.stopPropagation();el.classList.add('drag-over');});
     el.addEventListener('dragleave',function(){el.classList.remove('drag-over');});
     el.addEventListener('drop',function(e){
@@ -550,23 +589,26 @@ function render(){
       if(!dragRow)return;
       var tmi=parseInt(el.dataset.meal),tfi=parseInt(el.dataset.fi);
       if(dragRow.mi===tmi&&dragRow.fi===tfi)return;
-      var food=day.meals[dragRow.mi].splice(dragRow.fi,1)[0];
-      day.meals[tmi].splice(tfi,0,food);
-      saveAll();render();dragRow=null;
+      var moved=day.meals[dragRow.mi].splice(dragRow.fi,1)[0];
+      moved.folderId=undefined;
+      day.meals[tmi].splice(tfi,0,moved);
+      dragRow=null;saveAll();render();
     });
   });
-  // Drop sur meal-section pour changer de repas
+  // Drop sur meal-section (changer repas)
   meals.querySelectorAll('.meal-section').forEach(function(sec){
     sec.addEventListener('dragover',function(e){if(!dragRow&&!dragFood)return;e.preventDefault();sec.classList.add('drag-over');});
     sec.addEventListener('dragleave',function(e){if(!sec.contains(e.relatedTarget))sec.classList.remove('drag-over');});
     sec.addEventListener('drop',function(e){
       e.preventDefault();sec.classList.remove('drag-over');
       var tmi=parseInt(sec.dataset.mealidx);
-      if(dragRow&&dragRow.mi!==tmi){var f=day.meals[dragRow.mi].splice(dragRow.fi,1)[0];day.meals[tmi].push(f);saveAll();render();dragRow=null;}
-      else if(dragFood){
+      if(dragRow&&dragRow.mi!==tmi){
+        var moved=day.meals[dragRow.mi].splice(dragRow.fi,1)[0];
+        day.meals[tmi].push(moved);dragRow=null;saveAll();render();
+      }else if(dragFood){
         var dq=(dragFood.refUnit&&dragFood.refUnit!=='g'&&dragFood.refUnit!=='ml')?(dragFood.refQty||1):100;
         day.meals[tmi].push({n:dragFood.n,k:dragFood.k,p:dragFood.p,g:dragFood.g,l:dragFood.l,qty:dq});
-        saveAll();render();renderFoodsPanel();dragFood=null;
+        dragFood=null;saveAll();render();renderFoodsPanel();
       }
     });
   });
@@ -804,10 +846,10 @@ function renderFoodsPanel(){
 
     el.addEventListener('dragstart',function(e){
       dragFood=food;
-      setTimeout(function(){el.classList.add('dragging');_trash.style.display='block';},0);
+      setTimeout(function(){el.classList.add('dragging');trash.style.display='block';},0);
     });
     el.addEventListener('dragend',function(){
-      el.classList.remove('dragging');dragFood=null;_trash.style.display='none';
+      el.classList.remove('dragging');dragFood=null;trash.style.display='none';
       document.querySelectorAll('.meal-section.drag-over').forEach(function(x){x.classList.remove('drag-over');});
     });
 
