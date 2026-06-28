@@ -870,8 +870,15 @@ document.getElementById('btn-add-food-custom').addEventListener('click',function
 });
 document.getElementById('afc-ok').addEventListener('click',function(){
   var name=document.getElementById('afc-name').value.trim();if(!name)return;
-  customFoods.push({n:name,k:parseFloat(document.getElementById('afc-k').value)||0,p:parseFloat(document.getElementById('afc-p').value)||0,g:parseFloat(document.getElementById('afc-g').value)||0,l:parseFloat(document.getElementById('afc-l').value)||0});
-  saveAll();closeOv('ov-add-food-custom');renderFoodsPanel();
+  var refQty=parseFloat(document.getElementById('afc-qty').value)||100;
+  var refUnit=document.getElementById('afc-unit').value;
+  var k=parseFloat(document.getElementById('afc-k').value)||0;
+  var p=parseFloat(document.getElementById('afc-p').value)||0;
+  var g2=parseFloat(document.getElementById('afc-g').value)||0;
+  var l=parseFloat(document.getElementById('afc-l').value)||0;
+  var f=100/refQty;
+  customFoods.push({n:name,k:Math.round(k*f*10)/10,p:Math.round(p*f*10)/10,g:Math.round(g2*f*10)/10,l:Math.round(l*f*10)/10,refQty:refQty,refUnit:refUnit});
+  saveAll();closeOv('ov-afc');renderFoodsPanel();
 });
 document.getElementById('afc-name').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('afc-ok').click();});
 document.getElementById('ov-add-food-custom').addEventListener('click',function(e){if(e.target===e.currentTarget)closeOv('ov-add-food-custom');});
