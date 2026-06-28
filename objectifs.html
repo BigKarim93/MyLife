@@ -83,7 +83,7 @@ input,button,select{font-family:inherit;}
   <h1>🎯 Objectifs</h1>
   <a href="index.html" class="btn">🏠 Accueil</a>
 </div>
-<div class="page-wrap" style="display:flex;height:calc(100vh - 53px);"><div class="page" id="page" style="flex:1;overflow-y:auto;padding:16px;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;"><div class="add-col-card" id="add-col-card"><span style="font-size:2rem">＋</span>Nouvelle colonne</div></div><div style="width:260px;flex-shrink:0;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;"><div style="padding:10px 14px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;gap:8px;"><span style="font-family:'Kalam',cursive;font-size:.95rem;color:var(--teal);flex:1;">📝 Notes</span><span id="note-saved" style="font-size:.7rem;color:var(--text3)"></span></div><textarea id="note-area" style="flex:1;background:transparent;border:none;color:var(--text);font-size:.85rem;line-height:1.6;padding:14px;resize:none;font-family:inherit;outline:none;" placeholder="Notes libres..."></textarea><div style="padding:6px 14px;border-top:1px solid var(--border);font-size:.7rem;color:var(--text3)">Sauvegarde auto</div></div></div>
+<div class="page-wrap" style="display:flex;height:calc(100vh - 53px);"><div class="page" id="page" style="flex:1;overflow-y:auto;padding:16px;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;"><div class="add-col-card" id="add-col-card"><span style="font-size:2rem">＋</span>Nouvelle colonne</div><div id="empty-msg" style="display:none;padding:20px;color:var(--text3);font-size:.85rem;text-align:center;width:100%;"><p>Aucune colonne trouvée.<br>Clique sur ＋ pour en créer une,<br>ou <button onclick="forceLoadFirestore()" class="btn sm" style="margin-top:8px">🔄 Récupérer depuis le cloud</button></p></div></div><div style="width:260px;flex-shrink:0;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;"><div style="padding:10px 14px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;gap:8px;"><span style="font-family:'Kalam',cursive;font-size:.95rem;color:var(--teal);flex:1;">📝 Notes</span><span id="note-saved" style="font-size:.7rem;color:var(--text3)"></span></div><textarea id="note-area" style="flex:1;background:transparent;border:none;color:var(--text);font-size:.85rem;line-height:1.6;padding:14px;resize:none;font-family:inherit;outline:none;" placeholder="Notes libres..."></textarea><div style="padding:6px 14px;border-top:1px solid var(--border);font-size:.7rem;color:var(--text3)">Sauvegarde auto</div></div></div>
 
 <!-- Modals AVANT les scripts -->
 <div class="ov" id="ov-col">
@@ -152,20 +152,27 @@ var cols=[], saveTimer=null;
 auth.onAuthStateChanged(function(user){
   if(user){
     objDoc=db.collection('users').doc(user.uid).collection('modules').doc('objectifs');
-  }
-  // localStorage toujours en priorité
-  try{var d=localStorage.getItem('mylife_obj_v1');if(d){var p=JSON.parse(d);if(p&&p.length>0)cols=p;}}catch(e){}
-  try{var nt=localStorage.getItem('mylife_obj_note');if(nt){var na=document.getElementById('note-area');if(na)na.value=nt;}}catch(e){}
-  render();
-  // Firestore en arrière-plan seulement si localStorage vide
-  if(objDoc&&cols.length===0){
+    // Lire localStorage
+    try{var d=localStorage.getItem('mylife_obj_v1');if(d){var p=JSON.parse(d);if(p&&p.length>0)cols=p;}}catch(e){}
+    try{var nt=localStorage.getItem('mylife_obj_note');if(nt){var na=document.getElementById('note-area');if(na)na.value=nt;}}catch(e){}
+    render();
+    // Lire Firestore SANS CONDITION et prendre si plus riche
     objDoc.get().then(function(s){
       if(s.exists&&s.data().cols&&s.data().cols.length>0){
-        cols=s.data().cols;
-        try{localStorage.setItem('mylife_obj_v1',JSON.stringify(cols));}catch(e){}
-        render();
+        if(s.data().cols.length>cols.length){
+          cols=s.data().cols;
+          try{localStorage.setItem('mylife_obj_v1',JSON.stringify(cols));}catch(e){}
+          render();
+        }
+      }
+      if(s.exists&&s.data().note){
+        var na=document.getElementById('note-area');
+        if(na&&!na.value){na.value=s.data().note;try{localStorage.setItem('mylife_obj_note',s.data().note);}catch(e){}}
       }
     }).catch(function(){});
+  }else{
+    try{var d=localStorage.getItem('mylife_obj_v1');if(d){var p=JSON.parse(d);if(p&&p.length>0)cols=p;}}catch(e){}
+    render();
   }
 });
 function save(){
@@ -185,7 +192,9 @@ function hex2rgba(hex,a){var r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(
 function render(){
   var page=document.getElementById('page');
   var card=document.getElementById('add-col-card');
-  page.querySelectorAll('.obj-col').forEach(function(e){e.remove();});
+  var emptyMsg=document.getElementById('empty-msg');
+  page.querySelectorAll('.obj-col').forEach(function(e){e.remove()});
+  if(emptyMsg)emptyMsg.style.display=cols.length===0?'block':'none';
 
   cols.forEach(function(col){
     var clr=col.color||'var(--teal)';
@@ -406,6 +415,21 @@ document.getElementById('col-del').addEventListener('click',function(){
 });
 document.getElementById('col-title').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('col-ok').click();});
 document.getElementById('add-col-card').addEventListener('click',function(){openColModal(null);});
+
+function forceLoadFirestore(){
+  if(!objDoc){alert('Non connecté');return;}
+  objDoc.get().then(function(s){
+    console.log('Firestore data:', s.exists, s.data());
+    if(s.exists&&s.data().cols&&s.data().cols.length>0){
+      cols=s.data().cols;
+      try{localStorage.setItem('mylife_obj_v1',JSON.stringify(cols));}catch(e){}
+      render();
+      alert('✅ '+cols.length+' colonnes récupérées !');
+    }else{
+      alert('Firestore ne contient pas de colonnes. Crée une nouvelle colonne avec ＋');
+    }
+  }).catch(function(e){alert('Erreur: '+e.message);});
+}
 var noteTimer=null;
 var noteEl=document.getElementById('note-area');
 if(noteEl){noteEl.addEventListener('input',function(){
