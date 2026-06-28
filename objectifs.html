@@ -165,9 +165,15 @@ auth.onAuthStateChanged(function(user){
   if(user){
     objDoc=db.collection('users').doc(user.uid).collection('modules').doc('objectifs');
     objDoc.get().then(function(s){
-      if(s.exists&&s.data().cols)cols=s.data().cols;
-      if(s.exists&&s.data().note)document.getElementById('note-area').value=s.data().note;
-      else{try{var d=localStorage.getItem('mylife_obj_v1');if(d)cols=JSON.parse(d);}catch(e){}}
+      if(s.exists&&s.data().cols&&s.data().cols.length>0){
+        cols=s.data().cols;
+      }else{
+        try{var d=localStorage.getItem('mylife_obj_v1');if(d)cols=JSON.parse(d);}catch(e){}
+      }
+      if(s.exists&&s.data().note){
+        var na=document.getElementById('note-area');
+        if(na)na.value=s.data().note;
+      }
       render();
     }).catch(function(){try{var d=localStorage.getItem('mylife_obj_v1');if(d)cols=JSON.parse(d);}catch(e){}render();});
   }else{try{var d=localStorage.getItem('mylife_obj_v1');if(d)cols=JSON.parse(d);}catch(e){}render();}
