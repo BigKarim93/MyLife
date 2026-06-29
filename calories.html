@@ -393,7 +393,10 @@ auth.onAuthStateChanged(function(user){
     calDoc.get().then(function(s){
       if(s.exists){
         var d=s.data();
-        if(d.journal)journal=d.journal;
+        // Journal : prendre Firestore seulement si localStorage vide
+        var lsJournal={};try{var _lj=localStorage.getItem('mylife_cal_journal');if(_lj)lsJournal=JSON.parse(_lj);}catch(e){}
+        if(Object.keys(lsJournal).length>0)journal=lsJournal;
+        else if(d.journal)journal=d.journal;
         if(d.settings)settings=d.settings;
         if(d.savedMeals)savedMeals=d.savedMeals;
         // customFoods : prendre le plus long entre localStorage et Firestore
@@ -408,6 +411,10 @@ auth.onAuthStateChanged(function(user){
 });
 
 function saveAll(){
+  // localStorage immédiat
+  try{localStorage.setItem('mylife_cal_journal',JSON.stringify(journal));}catch(e){}
+  try{localStorage.setItem('mylife_calories_custom',JSON.stringify(customFoods));}catch(e){}
+  try{localStorage.setItem('mylife_cal_settings',JSON.stringify(settings));}catch(e){}
   clearTimeout(saveTimer);
   saveTimer=setTimeout(function(){
     if(calDoc)calDoc.set({journal:journal,settings:settings,savedMeals:savedMeals,customFoods:customFoods,targets:targets}).catch(function(){});
@@ -771,8 +778,8 @@ document.getElementById('settings-ok').addEventListener('click',function(){
 
 // ===== NAV JOURS =====
 document.getElementById('btn-prev-day').addEventListener('click',function(){dayOffset--;render();});
-document.getElementById('btn-next-day').addEventListener('click',function(){if(dayOffset<0)dayOffset++;render();});
-document.getElementById('btn-next-day').disabled=dayOffset>=0;
+document.getElementById('btn-next-day').addEventListener('click',function(){if(dayOffset<0){dayOffset++;render();}});
+
 
 ['ov-food','ov-repas','ov-settings'].forEach(function(id){
   document.getElementById(id).addEventListener('click',function(e){if(e.target===e.currentTarget)closeOv(id);});
