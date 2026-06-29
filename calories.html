@@ -366,12 +366,12 @@ function getDayData(offset){
 function totalDay(offset){
   var d=getDayData(offset);
   var r={k:0,p:0,g:0,l:0};
-  d.meals.forEach(function(meal){meal.forEach(function(f){r.k+=f.k*f.qty/100;r.p+=f.p*f.qty/100;r.g+=f.g*f.qty/100;r.l+=f.l*f.qty/100;});});
+  d.meals.forEach(function(meal){meal.forEach(function(f){var rq=f.refQty||100;r.k+=f.k*f.qty/rq;r.p+=f.p*f.qty/rq;r.g+=f.g*f.qty/rq;r.l+=f.l*f.qty/rq;});});
   return r;
 }
 function mealTotal(foods){
   var r={k:0,p:0,g:0,l:0};
-  foods.forEach(function(f){r.k+=f.k*f.qty/100;r.p+=f.p*f.qty/100;r.g+=f.g*f.qty/100;r.l+=f.l*f.qty/100;});
+  foods.forEach(function(f){var rq=f.refQty||100;r.k+=f.k*f.qty/rq;r.p+=f.p*f.qty/rq;r.g+=f.g*f.qty/rq;r.l+=f.l*f.qty/rq;});
   return r;
 }
 
@@ -396,7 +396,10 @@ auth.onAuthStateChanged(function(user){
         if(d.journal)journal=d.journal;
         if(d.settings)settings=d.settings;
         if(d.savedMeals)savedMeals=d.savedMeals;
-        if(d.customFoods)customFoods=d.customFoods;
+        // customFoods : prendre le plus long entre localStorage et Firestore
+        var lsCF=[];try{var _cf=localStorage.getItem('mylife_calories_custom');if(_cf)lsCF=JSON.parse(_cf);}catch(e){}
+        if(d.customFoods&&d.customFoods.length>=lsCF.length)customFoods=d.customFoods;
+        else if(lsCF.length>0)customFoods=lsCF;
         if(d.targets)targets=d.targets;
       }else{computeTargets();}
       loadSettings();render();
@@ -480,10 +483,10 @@ function render(){
           '<span class="food-qty-unit">g</span>'+
         '</div>'+
         '<div class="food-macros">'+
-          '<span class="food-macro" style="color:var(--amber)">🔥'+Math.round(f.k*f.qty/100)+'</span>'+
-          '<span class="food-macro" style="color:var(--teal)">P'+Math.round(f.p*f.qty/100)+'g</span>'+
-          '<span class="food-macro" style="color:var(--purple)">G'+Math.round(f.g*f.qty/100)+'g</span>'+
-          '<span class="food-macro" style="color:var(--orange)">L'+Math.round(f.l*f.qty/100)+'g</span>'+
+          '<span class="food-macro" style="color:var(--amber)">🔥'+Math.round(f.k*(f.qty/(f.refQty||100)))+'</span>'+
+          '<span class="food-macro" style="color:var(--teal)">P'+Math.round(f.p*(f.qty/(f.refQty||100)))+'g</span>'+
+          '<span class="food-macro" style="color:var(--purple)">G'+Math.round(f.g*(f.qty/(f.refQty||100)))+'g</span>'+
+          '<span class="food-macro" style="color:var(--orange)">L'+Math.round(f.l*(f.qty/(f.refQty||100)))+'g</span>'+
         '</div>'+
         '<button class="food-del" data-meal="'+i+'" data-fi="'+fi+'">✕</button>'+
       '</div>';
@@ -834,8 +837,8 @@ document.getElementById('afc-ok').addEventListener('click',function(){
   var p=parseFloat(document.getElementById('afc-p').value)||0;
   var g2=parseFloat(document.getElementById('afc-g').value)||0;
   var l=parseFloat(document.getElementById('afc-l').value)||0;
-  var f=100/refQty;
-  customFoods.push({n:name,k:Math.round(k*f*10)/10,p:Math.round(p*f*10)/10,g:Math.round(g2*f*10)/10,l:Math.round(l*f*10)/10,refQty:refQty,refUnit:refUnit});
+  // Stocker les valeurs POUR refQty (pas de conversion)
+  customFoods.push({n:name,k:k,p:p,g:g2,l:l,refQty:refQty,refUnit:refUnit});
   saveAll();closeOv('ov-afc');renderFoodsPanel();
 });
 document.getElementById('afc-name').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('afc-ok').click();});
