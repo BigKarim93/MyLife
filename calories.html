@@ -346,6 +346,13 @@ var savedMeals=[]; // [{name,mealIdx,foods:[]}]
 var customFoods=[]; // aliments perso
 var saveTimer=null;
 
+// ===== CHARGEMENT LOCALSTORAGE IMMÉDIAT =====
+(function(){
+  try{var j=localStorage.getItem('mylife_cal_journal');if(j)journal=JSON.parse(j);}catch(e){}
+  try{var cf=localStorage.getItem('mylife_calories_custom');if(cf)customFoods=JSON.parse(cf);}catch(e){}
+  try{var st=localStorage.getItem('mylife_cal_settings');if(st){var s=JSON.parse(st);if(s&&s.taille)settings=s;}}catch(e){}
+})();
+
 function dateKey(offset){
   var d=new Date();d.setDate(d.getDate()+offset);
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
@@ -399,10 +406,8 @@ auth.onAuthStateChanged(function(user){
         else if(d.journal)journal=d.journal;
         if(d.settings)settings=d.settings;
         if(d.savedMeals)savedMeals=d.savedMeals;
-        // customFoods : prendre le plus long entre localStorage et Firestore
-        var lsCF=[];try{var _cf=localStorage.getItem('mylife_calories_custom');if(_cf)lsCF=JSON.parse(_cf);}catch(e){}
-        if(d.customFoods&&d.customFoods.length>=lsCF.length)customFoods=d.customFoods;
-        else if(lsCF.length>0)customFoods=lsCF;
+        // customFoods : garder localStorage si non vide
+        if(customFoods.length===0&&d.customFoods&&d.customFoods.length>0)customFoods=d.customFoods;
         if(d.targets)targets=d.targets;
       }else{computeTargets();}
       loadSettings();render();
