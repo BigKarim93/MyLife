@@ -415,8 +415,11 @@ auth.onAuthStateChanged(function(user){
         else if(d.journal)journal=d.journal;
         if(d.settings)settings=d.settings;
         if(d.savedMeals)savedMeals=d.savedMeals;
-        // customFoods : garder localStorage si non vide
-        if(customFoods.length===0&&d.customFoods&&d.customFoods.length>0)customFoods=d.customFoods;
+        // customFoods : localStorage gagne si non vide, sinon Firestore
+        if(customFoods.length===0&&d.customFoods&&d.customFoods.length>0){
+          customFoods=d.customFoods;
+          try{localStorage.setItem('mylife_calories_custom',JSON.stringify(customFoods));}catch(e){}
+        }
         if(d.targets)targets=d.targets;
       }else{computeTargets();}
       loadSettings();render();
