@@ -1740,64 +1740,72 @@ auth.onAuthStateChanged(async user=>{
 
 // ===== COMPTEUR SÉANCES =====
 (function(){
-  var manualCount = 0;
-  try { manualCount = parseInt(localStorage.getItem('mylife_counter_manual')) || 0; } catch(e) {}
-  
-  function saveCount() {
-    try { localStorage.setItem('mylife_counter_manual', manualCount); } catch(e) {}
-  }
-  
-  function updateDisplay() {
-    document.getElementById('counter-manual').textContent = manualCount;
-    // Compter les blocs "Révision" (ou autre mot-clé) dans state.events futurs
-    var keyword = (document.getElementById('counter-keyword').value || 'Révision').toLowerCase();
+
+  function countSessions(keyword) {
+    // Compte les blocs dont le titre contient le mot-clé ET dont la date/heure est PASSÉE
+    if(typeof state === 'undefined' || !state.events) return {past:0, future:0};
     var now = new Date();
-    var todayDay = now.getDay() === 0 ? 6 : now.getDay() - 1; // 0=Lundi
-    var todayTime = now.getHours() * 60 + now.getMinutes();
-    var count = 0;
-    if(typeof state !== 'undefined' && state.events) {
-      state.events.forEach(function(ev) {
-        if(!ev.title) return;
-        if(ev.title.toLowerCase().indexOf(keyword) < 0) return;
-        // Compter si le cours est dans le futur (même jour mais heure passée = passé)
-        var evDay = ev.day !== undefined ? ev.day : -1;
-        var evStart = ev.start ? (parseInt(ev.start.split(':')[0])*60 + parseInt(ev.start.split(':')[1])) : 0;
-        if(evDay > todayDay) { count++; }
-        else if(evDay === todayDay && evStart > todayTime) { count++; }
-        // Si récurrent (pas de date précise), compter toutes les occurrences semaine
-      });
-    }
-    document.getElementById('counter-auto-val').textContent = 
-      count > 0 ? count + ' bloc' + (count>1?'s':'') + ' à venir cette semaine' : 'Aucun bloc trouvé';
+    var monday = typeof mondayOf === 'function' ? mondayOf(now) : (function(){
+      var d=new Date(now);d.setHours(0,0,0,0);
+      var day=d.getDay();var diff=day===0?-6:1-day;
+      d.setDate(d.getDate()+diff);return d;
+    })();
+    var kw = keyword.toLowerCase().trim();
+    var past = 0, future = 0;
+    state.events.forEach(function(ev) {
+      if(!ev.title || ev.title.toLowerCase().indexOf(kw) < 0) return;
+      var evDay = ev.day !== undefined ? parseInt(ev.day) : -1;
+      if(evDay < 0) return;
+      // Calculer la date absolue de cet event dans la semaine courante
+      var evDate = new Date(monday);
+      evDate.setDate(monday.getDate() + evDay);
+      var parts = (ev.start||'00:00').split(':');
+      evDate.setHours(parseInt(parts[0]), parseInt(parts[1]), 0, 0);
+      if(evDate < now) past++; else future++;
+    });
+    return {past:past, future:future};
   }
-  
-  document.getElementById('counter-plus').addEventListener('click', function() {
-    manualCount++; saveCount(); updateDisplay();
+
+  function updateDisplay() {
+    var keyword = document.getElementById('counter-keyword').value || 'Révision';
+    var counts = countSessions(keyword);
+    // Compteur = séances passées automatiquement
+    document.getElementById('counter-manual').textContent = counts.past;
+    // Info à venir
+    var infoEl = document.getElementById('counter-auto-val');
+    if(counts.past === 0 && counts.future === 0) {
+      infoEl.textContent = 'Aucun bloc "' + keyword + '" trouvé';
+    } else {
+      infoEl.innerHTML = '<span style="color:var(--accent)">' + counts.past + '</span> passée' + (counts.past>1?'s':'') +
+        ' · <span style="color:var(--chalk-dim)">' + counts.future + '</span> à venir';
+    }
+  }
+
+  document.getElementById('counter-keyword').addEventListener('input', function(){
+    try{localStorage.setItem('mylife_counter_kw', this.value);}catch(e){}
+    updateDisplay();
   });
-  document.getElementById('counter-minus').addEventListener('click', function() {
-    if(manualCount > 0) manualCount--; saveCount(); updateDisplay();
-  });
-  document.getElementById('counter-reset').addEventListener('click', function() {
-    if(confirm('Remettre le compteur à 0 ?')) { manualCount = 0; saveCount(); updateDisplay(); }
-  });
-  document.getElementById('counter-keyword').addEventListener('input', updateDisplay);
-  
+  // Charger le mot-clé sauvegardé
+  try{
+    var kw = localStorage.getItem('mylife_counter_kw');
+    if(kw) document.getElementById('counter-keyword').value = kw;
+  }catch(e){}
+
+  // Supprimer les boutons +/- puisque le compteur est automatique
+  document.getElementById('counter-plus').style.display = 'none';
+  document.getElementById('counter-minus').style.display = 'none';
+  document.getElementById('counter-reset').style.display = 'none';
+
   var collapsed = false;
   document.getElementById('counter-toggle').addEventListener('click', function() {
     collapsed = !collapsed;
     document.getElementById('counter-panel').classList.toggle('collapsed', collapsed);
     this.textContent = collapsed ? '▼ Développer' : '▲ Réduire';
   });
-  
-  // Mettre à jour après chargement du planning
-  setTimeout(updateDisplay, 2000);
-  // Aussi après chaque render du planning
-  var origUpdate = window.renderWeek || function(){};
-  if(typeof renderWeek !== 'undefined') {
-    var _origRW = renderWeek;
-    renderWeek = function() { _origRW.apply(this, arguments); updateDisplay(); };
-  }
-  
+
+  // Mettre à jour toutes les minutes + au chargement
+  setTimeout(updateDisplay, 1500);
+  setInterval(updateDisplay, 60000);
   updateDisplay();
 })();
 
@@ -1808,17 +1816,16 @@ auth.onAuthStateChanged(async user=>{
   <h3>📊 Séances</h3>
   <div class="counter-body">
     <div class="counter-row">
-      <span class="counter-label">Compteur manuel</span>
-      <span class="counter-val" id="counter-manual">0</span>
-    </div>
-    <div class="counter-btns">
-      <button class="counter-btn" id="counter-minus">−</button>
-      <button class="counter-btn" id="counter-plus">＋</button>
-      <button class="counter-btn" id="counter-reset" title="Remettre à zéro" style="font-size:.7rem;padding:4px 7px;">✕</button>
+      <span class="counter-label">Séances effectuées</span>
+      <span class="counter-val" id="counter-manual">—</span>
     </div>
     <div class="counter-auto" id="counter-auto-info">
-      <div>Révisions à venir sur l'EDT :</div>
-      <strong id="counter-auto-val">—</strong>
+      <div id="counter-auto-val" style="font-size:.78rem;margin-top:4px;">Chargement...</div>
+    </div>
+    <div style="display:none">
+      <button id="counter-plus"></button>
+      <button id="counter-minus"></button>
+      <button id="counter-reset"></button>
     </div>
     <div style="margin-top:10px;font-size:.72rem;color:var(--chalk-dim)">
       <div>Catégorie à compter :</div>
