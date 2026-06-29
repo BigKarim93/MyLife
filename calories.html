@@ -336,7 +336,16 @@ var FOODS_DB = [];
 var MEAL_NAMES = ['🌅 Matin','☀️ Midi','🌤️ Après-midi','🌙 Soir'];
 
 // ===== STATE =====
-var dayOffset=0, currentMealIdx=1;
+var dayOffset=0;
+// Repas actif selon l'heure : <11h=Matin, 11-14h=Midi, 14-18h=Après-midi, 18h+=Soir
+function getMealByHour(){
+  var h=new Date().getHours();
+  if(h<11)return 0;   // Matin
+  if(h<14)return 1;   // Midi
+  if(h<18)return 2;   // Après-midi
+  return 3;           // Soir
+}
+var currentMealIdx=getMealByHour();
 var settings={taille:178,age:35,activite:1.375,objectif:-500};
 var targets={kcal:2232,prot:175,gluc:250,lip:74};
 var poids=97.5;
@@ -544,6 +553,28 @@ function render(){
   // Drag food-row
   var dragRow=null;
   meals.querySelectorAll('.food-row').forEach(function(el){
+    // Edit custom food
+    var editBtn=el.querySelector('.chip-edit-btn');
+    if(editBtn){
+      editBtn.addEventListener('click',function(e){
+        e.stopPropagation();
+        var idx2=parseInt(editBtn.dataset.editfood);
+        var f=customFoods[idx2];
+        if(!f)return;
+        document.getElementById('afc-name').value=f.n;
+        document.getElementById('afc-qty').value=f.refQty||100;
+        document.getElementById('afc-unit').value=f.refUnit||'g';
+        document.getElementById('afc-k').value=f.k;
+        document.getElementById('afc-p').value=f.p;
+        document.getElementById('afc-g').value=f.g||0;
+        document.getElementById('afc-l').value=f.l;
+        // Passer en mode édition
+        document.getElementById('afc-ok').dataset.editidx=idx2;
+        document.getElementById('afc-ok').textContent='Enregistrer';
+        document.getElementById('ov-afc').classList.add('op');
+        setTimeout(function(){document.getElementById('afc-name').focus();},100);
+      });
+    }
     el.addEventListener('dragstart',function(e){
       dragRow={mi:parseInt(el.dataset.meal),fi:parseInt(el.dataset.fi)};
       e.stopPropagation();
@@ -599,6 +630,28 @@ function render(){
   // Drag food-row entre repas
   var dragRow=null;
   meals.querySelectorAll('.food-row').forEach(function(el){
+    // Edit custom food
+    var editBtn=el.querySelector('.chip-edit-btn');
+    if(editBtn){
+      editBtn.addEventListener('click',function(e){
+        e.stopPropagation();
+        var idx2=parseInt(editBtn.dataset.editfood);
+        var f=customFoods[idx2];
+        if(!f)return;
+        document.getElementById('afc-name').value=f.n;
+        document.getElementById('afc-qty').value=f.refQty||100;
+        document.getElementById('afc-unit').value=f.refUnit||'g';
+        document.getElementById('afc-k').value=f.k;
+        document.getElementById('afc-p').value=f.p;
+        document.getElementById('afc-g').value=f.g||0;
+        document.getElementById('afc-l').value=f.l;
+        // Passer en mode édition
+        document.getElementById('afc-ok').dataset.editidx=idx2;
+        document.getElementById('afc-ok').textContent='Enregistrer';
+        document.getElementById('ov-afc').classList.add('op');
+        setTimeout(function(){document.getElementById('afc-name').focus();},100);
+      });
+    }
     el.addEventListener('dragstart',function(e){
       dragRow={mi:parseInt(el.dataset.meal),fi:parseInt(el.dataset.fi)};
       setTimeout(function(){el.classList.add('dragging');},0);
@@ -817,6 +870,28 @@ function renderFoodsPanel(){
       setTimeout(function(){el.style.background='';},400);
     });
 
+    // Edit custom food
+    var editBtn=el.querySelector('.chip-edit-btn');
+    if(editBtn){
+      editBtn.addEventListener('click',function(e){
+        e.stopPropagation();
+        var idx2=parseInt(editBtn.dataset.editfood);
+        var f=customFoods[idx2];
+        if(!f)return;
+        document.getElementById('afc-name').value=f.n;
+        document.getElementById('afc-qty').value=f.refQty||100;
+        document.getElementById('afc-unit').value=f.refUnit||'g';
+        document.getElementById('afc-k').value=f.k;
+        document.getElementById('afc-p').value=f.p;
+        document.getElementById('afc-g').value=f.g||0;
+        document.getElementById('afc-l').value=f.l;
+        // Passer en mode édition
+        document.getElementById('afc-ok').dataset.editidx=idx2;
+        document.getElementById('afc-ok').textContent='Enregistrer';
+        document.getElementById('ov-afc').classList.add('op');
+        setTimeout(function(){document.getElementById('afc-name').focus();},100);
+      });
+    }
     el.addEventListener('dragstart',function(e){
       dragFood=food;
       setTimeout(function(){el.classList.add('dragging');trash.style.display='block';},0);
@@ -838,6 +913,8 @@ document.getElementById('btn-add-food-custom').addEventListener('click',function
   document.getElementById('afc-qty').value='100';
   document.getElementById('afc-unit').value='g';
   ['afc-k','afc-p','afc-g','afc-l'].forEach(function(id){document.getElementById(id).value='0';});
+  delete document.getElementById('afc-ok').dataset.editidx;
+  document.getElementById('afc-ok').textContent='Ajouter à la base';
   document.getElementById('ov-afc').classList.add('op');
   setTimeout(function(){document.getElementById('afc-name').focus();},100);
 });
@@ -850,7 +927,15 @@ document.getElementById('afc-ok').addEventListener('click',function(){
   var g2=parseFloat(document.getElementById('afc-g').value)||0;
   var l=parseFloat(document.getElementById('afc-l').value)||0;
   // Stocker les valeurs POUR refQty (pas de conversion)
-  customFoods.push({n:name,k:k,p:p,g:g2,l:l,refQty:refQty,refUnit:refUnit});
+  var editIdx=document.getElementById('afc-ok').dataset.editidx;
+  if(editIdx!==undefined&&editIdx!==''){
+    var idx3=parseInt(editIdx);
+    customFoods[idx3]={n:name,k:k,p:p,g:g2,l:l,refQty:refQty,refUnit:refUnit};
+  }else{
+    customFoods.push({n:name,k:k,p:p,g:g2,l:l,refQty:refQty,refUnit:refUnit});
+  }
+  delete document.getElementById('afc-ok').dataset.editidx;
+  document.getElementById('afc-ok').textContent='Ajouter à la base';
   saveAll();closeOv('ov-afc');renderFoodsPanel();
 });
 document.getElementById('afc-name').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('afc-ok').click();});
