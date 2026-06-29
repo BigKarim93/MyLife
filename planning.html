@@ -264,6 +264,29 @@
     .topbar h1{font-size:1.2rem;}
     .topbar-date{order:3;width:100%;}
   }
+
+/* ===== COMPTEUR SÉANCES ===== */
+.counter-panel{
+  position:fixed;right:16px;top:80px;z-index:40;
+  width:220px;background:var(--bg2);border:1px solid var(--line-strong);
+  border-radius:var(--radius);padding:14px;box-shadow:0 4px 24px rgba(0,0,0,.4);
+}
+.counter-panel h3{font-family:'Kalam',cursive;font-size:1rem;color:var(--accent);margin-bottom:12px;}
+.counter-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.counter-label{font-size:.8rem;color:var(--chalk-dim);}
+.counter-val{font-size:1.4rem;font-weight:700;color:var(--chalk);}
+.counter-btns{display:flex;gap:6px;}
+.counter-btn{background:var(--bg3);border:1px solid var(--line-strong);color:var(--chalk);
+  border-radius:6px;padding:4px 10px;font-size:1rem;cursor:pointer;transition:.15s;}
+.counter-btn:hover{border-color:var(--accent);color:var(--accent);}
+.counter-auto{font-size:.72rem;color:var(--chalk-dim);margin-top:6px;padding-top:8px;border-top:1px solid var(--line);}
+.counter-auto strong{color:var(--accent);}
+.counter-toggle{background:none;border:1px solid var(--line-strong);color:var(--chalk-dim);
+  border-radius:6px;padding:3px 8px;font-size:.7rem;cursor:pointer;margin-top:8px;width:100%;transition:.15s;}
+.counter-toggle:hover{border-color:var(--accent);color:var(--accent);}
+.counter-panel.collapsed .counter-body{display:none;}
+.counter-panel.collapsed{padding-bottom:10px;}
+
 </style>
 </head>
 <body>
@@ -1714,6 +1737,98 @@ auth.onAuthStateChanged(async user=>{
   startApp();
 });
 
+
+// ===== COMPTEUR SÉANCES =====
+(function(){
+  var manualCount = 0;
+  try { manualCount = parseInt(localStorage.getItem('mylife_counter_manual')) || 0; } catch(e) {}
+  
+  function saveCount() {
+    try { localStorage.setItem('mylife_counter_manual', manualCount); } catch(e) {}
+  }
+  
+  function updateDisplay() {
+    document.getElementById('counter-manual').textContent = manualCount;
+    // Compter les blocs "Révision" (ou autre mot-clé) dans state.events futurs
+    var keyword = (document.getElementById('counter-keyword').value || 'Révision').toLowerCase();
+    var now = new Date();
+    var todayDay = now.getDay() === 0 ? 6 : now.getDay() - 1; // 0=Lundi
+    var todayTime = now.getHours() * 60 + now.getMinutes();
+    var count = 0;
+    if(typeof state !== 'undefined' && state.events) {
+      state.events.forEach(function(ev) {
+        if(!ev.title) return;
+        if(ev.title.toLowerCase().indexOf(keyword) < 0) return;
+        // Compter si le cours est dans le futur (même jour mais heure passée = passé)
+        var evDay = ev.day !== undefined ? ev.day : -1;
+        var evStart = ev.start ? (parseInt(ev.start.split(':')[0])*60 + parseInt(ev.start.split(':')[1])) : 0;
+        if(evDay > todayDay) { count++; }
+        else if(evDay === todayDay && evStart > todayTime) { count++; }
+        // Si récurrent (pas de date précise), compter toutes les occurrences semaine
+      });
+    }
+    document.getElementById('counter-auto-val').textContent = 
+      count > 0 ? count + ' bloc' + (count>1?'s':'') + ' à venir cette semaine' : 'Aucun bloc trouvé';
+  }
+  
+  document.getElementById('counter-plus').addEventListener('click', function() {
+    manualCount++; saveCount(); updateDisplay();
+  });
+  document.getElementById('counter-minus').addEventListener('click', function() {
+    if(manualCount > 0) manualCount--; saveCount(); updateDisplay();
+  });
+  document.getElementById('counter-reset').addEventListener('click', function() {
+    if(confirm('Remettre le compteur à 0 ?')) { manualCount = 0; saveCount(); updateDisplay(); }
+  });
+  document.getElementById('counter-keyword').addEventListener('input', updateDisplay);
+  
+  var collapsed = false;
+  document.getElementById('counter-toggle').addEventListener('click', function() {
+    collapsed = !collapsed;
+    document.getElementById('counter-panel').classList.toggle('collapsed', collapsed);
+    this.textContent = collapsed ? '▼ Développer' : '▲ Réduire';
+  });
+  
+  // Mettre à jour après chargement du planning
+  setTimeout(updateDisplay, 2000);
+  // Aussi après chaque render du planning
+  var origUpdate = window.renderWeek || function(){};
+  if(typeof renderWeek !== 'undefined') {
+    var _origRW = renderWeek;
+    renderWeek = function() { _origRW.apply(this, arguments); updateDisplay(); };
+  }
+  
+  updateDisplay();
+})();
+
 </script>
+
+<!-- ===== COMPTEUR SÉANCES ===== -->
+<div class="counter-panel" id="counter-panel">
+  <h3>📊 Séances</h3>
+  <div class="counter-body">
+    <div class="counter-row">
+      <span class="counter-label">Compteur manuel</span>
+      <span class="counter-val" id="counter-manual">0</span>
+    </div>
+    <div class="counter-btns">
+      <button class="counter-btn" id="counter-minus">−</button>
+      <button class="counter-btn" id="counter-plus">＋</button>
+      <button class="counter-btn" id="counter-reset" title="Remettre à zéro" style="font-size:.7rem;padding:4px 7px;">✕</button>
+    </div>
+    <div class="counter-auto" id="counter-auto-info">
+      <div>Révisions à venir sur l'EDT :</div>
+      <strong id="counter-auto-val">—</strong>
+    </div>
+    <div style="margin-top:10px;font-size:.72rem;color:var(--chalk-dim)">
+      <div>Catégorie à compter :</div>
+      <input id="counter-keyword" type="text" value="Révision" 
+        style="margin-top:4px;width:100%;background:var(--bg);border:1px solid var(--line-strong);
+        color:var(--chalk);border-radius:6px;padding:5px 8px;font-size:.78rem;font-family:inherit;">
+    </div>
+  </div>
+  <button class="counter-toggle" id="counter-toggle">▲ Réduire</button>
+</div>
+
 </body>
 </html>
