@@ -264,29 +264,6 @@
     .topbar h1{font-size:1.2rem;}
     .topbar-date{order:3;width:100%;}
   }
-
-/* ===== COMPTEUR SÉANCES ===== */
-.counter-panel{
-  position:fixed;right:16px;top:80px;z-index:40;
-  width:220px;background:var(--bg2);border:1px solid var(--line-strong);
-  border-radius:var(--radius);padding:14px;box-shadow:0 4px 24px rgba(0,0,0,.4);
-}
-.counter-panel h3{font-family:'Kalam',cursive;font-size:1rem;color:var(--accent);margin-bottom:12px;}
-.counter-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-.counter-label{font-size:.8rem;color:var(--chalk-dim);}
-.counter-val{font-size:1.4rem;font-weight:700;color:var(--chalk);}
-.counter-btns{display:flex;gap:6px;}
-.counter-btn{background:var(--bg3);border:1px solid var(--line-strong);color:var(--chalk);
-  border-radius:6px;padding:4px 10px;font-size:1rem;cursor:pointer;transition:.15s;}
-.counter-btn:hover{border-color:var(--accent);color:var(--accent);}
-.counter-auto{font-size:.72rem;color:var(--chalk-dim);margin-top:6px;padding-top:8px;border-top:1px solid var(--line);}
-.counter-auto strong{color:var(--accent);}
-.counter-toggle{background:none;border:1px solid var(--line-strong);color:var(--chalk-dim);
-  border-radius:6px;padding:3px 8px;font-size:.7rem;cursor:pointer;margin-top:8px;width:100%;transition:.15s;}
-.counter-toggle:hover{border-color:var(--accent);color:var(--accent);}
-.counter-panel.collapsed .counter-body{display:none;}
-.counter-panel.collapsed{padding-bottom:10px;}
-
 </style>
 </head>
 <body>
@@ -1737,105 +1714,6 @@ auth.onAuthStateChanged(async user=>{
   startApp();
 });
 
-
-// ===== COMPTEUR SÉANCES =====
-(function(){
-
-  function countSessions(keyword) {
-    // Compte les blocs dont le titre contient le mot-clé ET dont la date/heure est PASSÉE
-    if(typeof state === 'undefined' || !state.events) return {past:0, future:0};
-    var now = new Date();
-    var monday = typeof mondayOf === 'function' ? mondayOf(now) : (function(){
-      var d=new Date(now);d.setHours(0,0,0,0);
-      var day=d.getDay();var diff=day===0?-6:1-day;
-      d.setDate(d.getDate()+diff);return d;
-    })();
-    var kw = keyword.toLowerCase().trim();
-    var past = 0, future = 0;
-    state.events.forEach(function(ev) {
-      if(!ev.title || ev.title.toLowerCase().indexOf(kw) < 0) return;
-      var evDay = ev.day !== undefined ? parseInt(ev.day) : -1;
-      if(evDay < 0) return;
-      // Calculer la date absolue de cet event dans la semaine courante
-      var evDate = new Date(monday);
-      evDate.setDate(monday.getDate() + evDay);
-      var parts = (ev.start||'00:00').split(':');
-      evDate.setHours(parseInt(parts[0]), parseInt(parts[1]), 0, 0);
-      if(evDate < now) past++; else future++;
-    });
-    return {past:past, future:future};
-  }
-
-  function updateDisplay() {
-    var keyword = document.getElementById('counter-keyword').value || 'Révision';
-    var counts = countSessions(keyword);
-    // Compteur = séances passées automatiquement
-    document.getElementById('counter-manual').textContent = counts.past;
-    // Info à venir
-    var infoEl = document.getElementById('counter-auto-val');
-    if(counts.past === 0 && counts.future === 0) {
-      infoEl.textContent = 'Aucun bloc "' + keyword + '" trouvé';
-    } else {
-      infoEl.innerHTML = '<span style="color:var(--accent)">' + counts.past + '</span> passée' + (counts.past>1?'s':'') +
-        ' · <span style="color:var(--chalk-dim)">' + counts.future + '</span> à venir';
-    }
-  }
-
-  document.getElementById('counter-keyword').addEventListener('input', function(){
-    try{localStorage.setItem('mylife_counter_kw', this.value);}catch(e){}
-    updateDisplay();
-  });
-  // Charger le mot-clé sauvegardé
-  try{
-    var kw = localStorage.getItem('mylife_counter_kw');
-    if(kw) document.getElementById('counter-keyword').value = kw;
-  }catch(e){}
-
-  // Supprimer les boutons +/- puisque le compteur est automatique
-  document.getElementById('counter-plus').style.display = 'none';
-  document.getElementById('counter-minus').style.display = 'none';
-  document.getElementById('counter-reset').style.display = 'none';
-
-  var collapsed = false;
-  document.getElementById('counter-toggle').addEventListener('click', function() {
-    collapsed = !collapsed;
-    document.getElementById('counter-panel').classList.toggle('collapsed', collapsed);
-    this.textContent = collapsed ? '▼ Développer' : '▲ Réduire';
-  });
-
-  // Mettre à jour toutes les minutes + au chargement
-  setTimeout(updateDisplay, 1500);
-  setInterval(updateDisplay, 60000);
-  updateDisplay();
-})();
-
 </script>
-
-<!-- ===== COMPTEUR SÉANCES ===== -->
-<div class="counter-panel" id="counter-panel">
-  <h3>📊 Séances</h3>
-  <div class="counter-body">
-    <div class="counter-row">
-      <span class="counter-label">Séances effectuées</span>
-      <span class="counter-val" id="counter-manual">—</span>
-    </div>
-    <div class="counter-auto" id="counter-auto-info">
-      <div id="counter-auto-val" style="font-size:.78rem;margin-top:4px;">Chargement...</div>
-    </div>
-    <div style="display:none">
-      <button id="counter-plus"></button>
-      <button id="counter-minus"></button>
-      <button id="counter-reset"></button>
-    </div>
-    <div style="margin-top:10px;font-size:.72rem;color:var(--chalk-dim)">
-      <div>Catégorie à compter :</div>
-      <input id="counter-keyword" type="text" value="Révision" 
-        style="margin-top:4px;width:100%;background:var(--bg);border:1px solid var(--line-strong);
-        color:var(--chalk);border-radius:6px;padding:5px 8px;font-size:.78rem;font-family:inherit;">
-    </div>
-  </div>
-  <button class="counter-toggle" id="counter-toggle">▲ Réduire</button>
-</div>
-
 </body>
 </html>
