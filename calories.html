@@ -630,8 +630,8 @@ function render(){
         day.meals[tmi].push(food);
         saveAll();render();dragRow=null;
       } else if(dragFood){
-        var dqd=(dragFood.refUnit&&dragFood.refUnit!=='g'&&dragFood.refUnit!=='ml')?(dragFood.refQty||1):100;
-        day.meals[tmi].push({n:dragFood.n,k:dragFood.k,p:dragFood.p,g:dragFood.g,l:dragFood.l,qty:dqd,refQty:dragFood.refQty,refUnit:dragFood.refUnit});
+        var dqd=dragFood.refQty||100;
+        day.meals[tmi].push({n:dragFood.n,k:dragFood.k,p:dragFood.p,g:dragFood.g,l:dragFood.l,qty:dqd,refQty:dragFood.refQty||100,refUnit:dragFood.refUnit||'g'});
         saveAll();render();renderFoodsPanel(document.getElementById('quick-search').value);
         dragFood=null;
       }
@@ -797,8 +797,8 @@ function renderFoodsPanel(){
     // Clic → ajoute au repas actif (déjeuner par défaut)
     el.addEventListener('click',function(){
       var day=getDayData(dayOffset);
-      var dq=(food.refUnit&&food.refUnit!=='g'&&food.refUnit!=='ml')?(food.refQty||1):100;
-      day.meals[currentMealIdx].push({n:food.n,k:food.k,p:food.p,g:food.g,l:food.l,qty:dq,refQty:food.refQty,refUnit:food.refUnit});
+      var dq=food.refQty||100;
+      day.meals[currentMealIdx].push({n:food.n,k:food.k,p:food.p,g:food.g,l:food.l,qty:dq,refQty:food.refQty||100,refUnit:food.refUnit||'g'});
       saveAll();render();renderFoodsPanel();
       // Flash feedback
       el.style.background='rgba(45,212,191,.2)';
