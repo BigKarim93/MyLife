@@ -1104,6 +1104,11 @@ function buildSelect(el, options, valFn, labelFn) {
   if (options.some(o=>valFn(o)===prev)) el.value = prev;
 }
 
+function getCurrentYM() {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+}
+
 function refreshAllPeriodSelects() {
   const txs = getAllTx();
   const months = getMonths(txs);
@@ -1111,6 +1116,13 @@ function refreshAllPeriodSelects() {
   buildSelect(document.getElementById('dash-year-sel'), years, y=>y, y=>y);
   buildSelect(document.getElementById('comp-year-sel'), years, y=>y, y=>y);
   buildSelect(document.getElementById('month-sel'), months, m=>m, m=>{const[y,mo]=m.split('-');return MONTH_FULL[+mo-1]+' '+y;});
+  // Forcer le mois courant si aucune sélection ou mois invalide
+  const sel = document.getElementById('month-sel');
+  if(sel && (!sel.value || !months.includes(sel.value))) {
+    const ym = getCurrentYM();
+    if(months.includes(ym)) sel.value = ym;
+    else if(months.length) sel.value = months[0];
+  }
   buildSelect(document.getElementById('year-sel'), years, y=>y, y=>y);
   buildSelect(document.getElementById('tx-month-sel'), [{v:'all',l:'Tous les mois'},...months.map(m=>{const[y,mo]=m.split('-');return{v:m,l:MONTH_FULL[+mo-1]+' '+y};})], o=>o.v||o, o=>o.l||o);
   const catPeriod = document.getElementById('cat-period-sel');
@@ -2858,29 +2870,58 @@ try{var _bc=localStorage.getItem('mylife_bubble_colors');if(_bc)bubbleColors=JSO
 
 function bubblePickColor(e, catId) {
   e.stopPropagation();
-  // Créer un input color temporaire
-  var inp = document.createElement('input');
-  inp.type = 'color';
-  // Couleur actuelle de la catégorie
+  // Supprimer ancienne modale
+  var old = document.getElementById('bubble-color-modal');
+  if(old) old.remove();
   var cat = CATEGORIES.find(function(c){return c.id===catId;});
-  inp.value = bubbleColors[catId] || (cat ? cat.color : '#4ade80');
-  inp.style.position = 'fixed';
-  inp.style.top = '-9999px';
-  document.body.appendChild(inp);
-  inp.click();
-  inp.addEventListener('change', function() {
-    bubbleColors[catId] = inp.value;
+  var currentColor = bubbleColors[catId] || (cat ? cat.color : '#4ade80');
+  var palette = ['#f87171', '#fb923c', '#fbbf24', '#4ade80', '#2dd4bf', '#60a5fa', '#a78bfa', '#f472b6', '#e879f9', '#34d399', '#185FA5', '#1D9E75', '#993C1D', '#5B4DE0', '#B45309', '#0F766E', '#7C3AED', '#BE123C', '#1D4ED8', '#374151', '#ffffff', '#94a3b8', '#64748b', '#1e293b', '#000000'];
+  // Créer modale
+  var modal = document.createElement('div');
+  modal.id = 'bubble-color-modal';
+  modal.style.cssText = 'position:fixed;z-index:9999;background:var(--surface,#1a1d27);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:12px;box-shadow:0 8px 32px rgba(0,0,0,.5);';
+  var rect = e.target.getBoundingClientRect();
+  modal.style.left = Math.min(rect.left, window.innerWidth-180) + 'px';
+  modal.style.top = (rect.bottom + 6) + 'px';
+  modal.innerHTML = '<div style="font-size:.72rem;color:#9198c0;margin-bottom:8px;font-weight:600;">Couleur de la bulle</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(5,24px);gap:5px;">' +
+    palette.map(function(c) {
+      var sel = c===currentColor ? '2px solid #fff' : '2px solid transparent';
+      return '<div style="width:24px;height:24px;border-radius:50%;background:'+c+';cursor:pointer;border:'+sel+';transition:.15s;" data-color="'+c+'" title="'+c+'"></div>';
+    }).join('') +
+    '</div>' +
+    '<div style="margin-top:10px;display:flex;gap:6px;">' +
+    '<button style="flex:1;background:rgba(248,113,113,.15);border:1px solid #f87171;color:#f87171;border-radius:6px;padding:4px;font-size:.72rem;cursor:pointer;" id="bcm-reset">↺ Défaut</button>' +
+    '</div>';
+  document.body.appendChild(modal);
+  // Events couleurs
+  modal.querySelectorAll('[data-color]').forEach(function(dot) {
+    dot.addEventListener('click', function(ev) {
+      ev.stopPropagation();
+      bubbleColors[catId] = dot.dataset.color;
+      try{localStorage.setItem('mylife_bubble_colors', JSON.stringify(bubbleColors));}catch(ex){}
+      modal.remove();
+      var txs = getAllTx();
+      var ymVal = document.getElementById('month-sel') && document.getElementById('month-sel').value;
+      if(ymVal) renderBubbles(txForMonth(txs, ymVal)); else renderMonthly();
+    });
+  });
+  document.getElementById('bcm-reset').addEventListener('click', function(ev) {
+    ev.stopPropagation();
+    delete bubbleColors[catId];
     try{localStorage.setItem('mylife_bubble_colors', JSON.stringify(bubbleColors));}catch(ex){}
-    document.body.removeChild(inp);
-    // Re-render
-    const txs = getAllTx();
-    const ymVal = document.getElementById('month-sel') && document.getElementById('month-sel').value;
-    if(ymVal) renderBubbles(txForMonth(txs, ymVal));
-    else renderMonthly();
+    modal.remove();
+    var txs = getAllTx();
+    var ymVal = document.getElementById('month-sel') && document.getElementById('month-sel').value;
+    if(ymVal) renderBubbles(txForMonth(txs, ymVal)); else renderMonthly();
   });
-  inp.addEventListener('cancel', function() {
-    document.body.removeChild(inp);
-  });
+  // Fermer si clic ailleurs
+  setTimeout(function() {
+    document.addEventListener('click', function handler() {
+      modal.remove();
+      document.removeEventListener('click', handler);
+    });
+  }, 50);
 }
 
 </script>
