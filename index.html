@@ -1077,6 +1077,21 @@ auth.onAuthStateChanged(async user=>{
   initNewWidgets();
 });
 
+// Timeout de secours : si après 8s le loading est toujours visible, forcer l'affichage
+setTimeout(function(){
+  var ls=$('ls');
+  if(ls && !ls.classList.contains('hi')){
+    console.warn('Timeout auth MyLife — forçage affichage');
+    ls.classList.add('hi');
+    if($('page'))$('page').classList.remove('hi');
+    // Afficher avec données par défaut
+    try{renderMods();}catch(e){}
+    try{renderTasks();}catch(e){}
+    try{renderSport();}catch(e){}
+    try{renderRoutine();}catch(e){}
+  }
+}, 8000);
+
 /* AUTH */
 let authMode='login';
 $('btn-gg').addEventListener('click',async()=>{clearAE();try{await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());}catch(e){showAE(e.message);}});
