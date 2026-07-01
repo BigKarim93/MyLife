@@ -1714,6 +1714,20 @@ auth.onAuthStateChanged(async user=>{
   startApp();
 });
 
+// Timeout de secours : si après 6s le loading est toujours visible, forcer le chargement local
+setTimeout(function(){
+  var ls = document.getElementById('loading-screen');
+  if(ls && !ls.classList.contains('hidden')){
+    console.warn('Timeout auth — chargement local forcé');
+    try{
+      state = normalizeState(readLocalCache());
+      startApp();
+    }catch(e){
+      document.getElementById('loading-text').textContent = 'Erreur de connexion. Recharge la page.';
+    }
+  }
+}, 6000);
+
 </script>
 </body>
 </html>
