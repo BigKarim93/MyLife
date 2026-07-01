@@ -197,6 +197,8 @@ input, select, textarea { font-family: inherit; }
 .bubble .b-emoji { font-size: 26px; line-height: 1; margin-bottom: 3px; }
 .bubble .b-label { font-size: 10px; font-weight: 600; text-align: center; line-height: 1.2; max-width: 78px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .bubble .b-amount { font-size: 11px; font-weight: 700; font-family: 'DM Mono', monospace; margin-top: 2px; }
+.bubble-color-btn { position:absolute; top:3px; right:3px; width:14px; height:14px; border-radius:50%; border:1.5px solid rgba(255,255,255,.6); cursor:pointer; font-size:0; opacity:0; transition:opacity .15s; z-index:2; }
+.bubble:hover .bubble-color-btn { opacity:1; }
 
 /* ── COMPARAISON ── */
 .comp-wrap { overflow-x: auto; }
@@ -1564,8 +1566,9 @@ function renderBubbles(mtxs) {
     return '<div class="bubble" draggable="true" data-idx="' + idx + '" data-catid="' + catId + '" ' +
       'style="background:' + cat.bg + ';border:2px solid ' + cat.color + '40;cursor:grab" ' +
       'onclick="filterBubble(\'' + catId + '\')" ' +
-      'ondragstart="bubbleDragStart(event)" ondragover="bubbleDragOver(event)" ondrop="bubbleDrop(event)" ondragleave="bubbleDragLeave(event)" ondblclick="bubblePickColor(event,\'' + catId + '\')" ' +
+      'ondragstart="bubbleDragStart(event)" ondragover="bubbleDragOver(event)" ondrop="bubbleDrop(event)" ondragleave="bubbleDragLeave(event)" ' +
       'title="' + cat.label + '">' +
+      '<span class="bubble-color-btn" style="background:' + (bubbleColors[catId]||cat.color) + '" onclick="event.stopPropagation();bubblePickColor(event,\'' + catId + '\')" title="Changer la couleur"></span>' +
       '<span class="b-emoji">' + (cat.emoji || '📦') + '</span>' +
       '<span class="b-label" style="color:' + (bubbleColors[catId]||cat.color) + '">' + cat.label + '</span>' +
       '<span class="b-amount" style="color:' + (bubbleColors[catId]||cat.color) + '">-' + fmtAbs(total) + '</span>' +
