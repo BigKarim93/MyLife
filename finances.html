@@ -1564,7 +1564,7 @@ function renderBubbles(mtxs) {
     const cat = catById(catId);
     const total = totals[catId];
     return '<div class="bubble" draggable="true" data-idx="' + idx + '" data-catid="' + catId + '" ' +
-      'style="background:' + cat.bg + ';border:2px solid ' + cat.color + '40;cursor:grab" ' +
+      'style="background:' + (bubbleColors[catId] ? bubbleColors[catId]+'18' : cat.bg) + ';border:2px solid ' + (bubbleColors[catId]||cat.color) + '60;cursor:grab" ' +
       'onclick="filterBubble(\'' + catId + '\')" ' +
       'ondragstart="bubbleDragStart(event)" ondragover="bubbleDragOver(event)" ondrop="bubbleDrop(event)" ondragleave="bubbleDragLeave(event)" ' +
       'title="' + cat.label + '">' +
