@@ -222,6 +222,17 @@ input, select, textarea { font-family: inherit; }
 /* ── TWO COL LAYOUT ── */
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
 @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } .app { grid-template-columns: 1fr; } .sidebar { height: auto; position: static; } }
+
+/* ── NOTE COMPARAISON ── */
+.comp-layout { display: flex; gap: 16px; align-items: flex-start; }
+.comp-main { flex: 1; min-width: 0; }
+.comp-note-col { width: 240px; flex-shrink: 0; position: sticky; top: 20px; }
+.comp-note-inner { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; }
+.comp-note-header { padding: 10px 14px; background: var(--surface2); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+.comp-note-title { font-size: .9rem; font-weight: 700; color: var(--green); flex: 1; }
+.comp-note-saved { font-size: .7rem; color: var(--text2); }
+.comp-note-area { background: transparent; border: none; color: var(--text); font-size: .82rem; line-height: 1.6; padding: 12px 14px; resize: none; font-family: inherit; outline: none; min-height: 300px; width: 100%; }
+
 </style>
 </head>
 <body>
@@ -451,8 +462,21 @@ input, select, textarea { font-family: inherit; }
         </div>
       </div>
       <p style="font-size:13px;color:var(--text2);margin-bottom:1.5rem">Chaque colonne = une catégorie. Chaque bulle = un mois. Plus la bulle est grande, plus tu as dépensé.</p>
-      <div id="comp-grid"></div>
-      <div class="comp-tooltip" id="comp-tooltip"></div>
+      <div class="comp-layout">
+        <div class="comp-main">
+          <div id="comp-grid"></div>
+          <div class="comp-tooltip" id="comp-tooltip"></div>
+        </div>
+        <div class="comp-note-col">
+          <div class="comp-note-inner">
+            <div class="comp-note-header">
+              <span class="comp-note-title">📝 Notes</span>
+              <span class="comp-note-saved" id="comp-note-saved"></span>
+            </div>
+            <textarea class="comp-note-area" id="comp-note-area" placeholder="Notes sur tes dépenses, objectifs, observations..."></textarea>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- TRANSACTIONS -->
@@ -2929,6 +2953,26 @@ function bubblePickColor(e, catId) {
     });
   }, 50);
 }
+
+
+// ===== NOTE COMPARAISON =====
+(function(){
+  var noteEl = document.getElementById('comp-note-area');
+  var savedEl = document.getElementById('comp-note-saved');
+  if(!noteEl) return;
+  // Charger
+  try{ var n=localStorage.getItem('mylife_comp_note'); if(n) noteEl.value=n; }catch(e){}
+  // Sauvegarder
+  var noteTimer = null;
+  noteEl.addEventListener('input', function(){
+    try{localStorage.setItem('mylife_comp_note', noteEl.value);}catch(e){}
+    clearTimeout(noteTimer);
+    if(savedEl) savedEl.textContent = '';
+    noteTimer = setTimeout(function(){
+      if(savedEl){ savedEl.textContent='✓ Sauvegardé'; setTimeout(function(){savedEl.textContent='';},1500); }
+    }, 1000);
+  });
+})();
 
 </script>
 </body>
