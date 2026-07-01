@@ -1521,7 +1521,8 @@ function renderMonthly() {
 // ════════════════════════════════════════════════
 // BUDGET CHECKLIST
 // ════════════════════════════════════════════════
-let bubbleOrder = null; // ordre personnalisé des bulles
+let bubbleOrder = null;
+try{var _bo=localStorage.getItem('mylife_bubble_order');if(_bo)bubbleOrder=JSON.parse(_bo);}catch(e){}
 
 function renderBubbles(mtxs) {
   const el = document.getElementById('month-bubbles');
@@ -1587,6 +1588,7 @@ function bubbleDrop(e) {
   const moved = bubbleOrder.splice(_bubbleDragIdx, 1)[0];
   bubbleOrder.splice(targetIdx, 0, moved);
   _bubbleDragIdx = null;
+  try{localStorage.setItem('mylife_bubble_order',JSON.stringify(bubbleOrder));}catch(e){}
   // Re-render bulles uniquement
   const txs = getAllTx();
   const ymVal = document.getElementById('month-sel')?.value;
