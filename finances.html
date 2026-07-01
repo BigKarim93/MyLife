@@ -202,7 +202,9 @@ input, select, textarea { font-family: inherit; }
 
 /* ── COMPARAISON ── */
 .comp-wrap { overflow-x: auto; }
-.comp-tbl { border-collapse: collapse; font-size: 12px; }
+.comp-tbl th { white-space: nowrap; font-size: 11px; padding: 4px 6px; }
+.comp-tbl td { font-size: 11px; padding: 4px 6px; }
+.comp-tbl { border-collapse: collapse; font-size: 11px; table-layout: auto; }
 .comp-tbl th, .comp-tbl td { padding: 5px 8px; border: 1px solid var(--border); text-align: right; white-space: nowrap; }
 .comp-tbl th { background: var(--surface2); font-weight: 600; text-align: center; position: sticky; top: 0; }
 .comp-tbl td:first-child { text-align: left; font-weight: 600; color: var(--text2); background: var(--surface); position: sticky; left: 0; }
@@ -576,25 +578,25 @@ const CATEGORIES = [
   { id:'logement',     label:'Logement',      emoji:'🏠', color:'#185FA5', bg:'#E6F1FB' },
   { id:'courses',      label:'Courses',        emoji:'🛒', color:'#1D9E75', bg:'#E1F5EE' },
   { id:'viandes',      label:'Viandes',        emoji:'🥩', color:'#993C1D', bg:'#FAECE7' },
-  { id:'fastfood',     label:'Fast Food',      emoji:'🍔', color:'#E24B4A', bg:'#FCEBEB' },
+  { id:'fastfood',     label:'Fast Food', short:'Fast F.',      emoji:'🍔', color:'#E24B4A', bg:'#FCEBEB' },
   { id:'transport',    label:'Transport',      emoji:'🚗', color:'#BA7517', bg:'#FAEEDA' },
   { id:'sante',        label:'Santé',          emoji:'💊', color:'#D4537E', bg:'#FBEAF0' },
   { id:'loisirs',      label:'Loisirs',        emoji:'🎮', color:'#534AB7', bg:'#EEEDFE' },
-  { id:'abonnements',  label:'Abonnements',    emoji:'📱', color:'#0F6E56', bg:'#E1F5EE' },
-  { id:'shopping',     label:'Shopping',       emoji:'🛍️', color:'#D85A30', bg:'#FAECE7' },
+  { id:'abonnements',  label:'Abonnements', short:'Abo',    emoji:'📱', color:'#0F6E56', bg:'#E1F5EE' },
+  { id:'shopping',     label:'Shopping', short:'Shop',       emoji:'🛍️', color:'#D85A30', bg:'#FAECE7' },
   { id:'voyages',      label:'Voyages',        emoji:'✈️', color:'#639922', bg:'#EAF3DE' },
   { id:'salaire',      label:'Salaire',        emoji:'💼', color:'#1D9E75', bg:'#E1F5EE' },
-  { id:'loyers_recus', label:'Loyers reçus',   emoji:'🏘️', color:'#185FA5', bg:'#E6F1FB' },
-  { id:'revenus',      label:'Autres revenus', emoji:'💰', color:'#0F6E56', bg:'#E1F5EE' },
+  { id:'loyers_recus', label:'Loyers reçus', short:'Loyers',   emoji:'🏘️', color:'#185FA5', bg:'#E6F1FB' },
+  { id:'revenus',      label:'Autres revenus', short:'Revenus', emoji:'💰', color:'#0F6E56', bg:'#E1F5EE' },
   { id:'epargne',      label:'Épargne',        emoji:'💲', color:'#3C3489', bg:'#EEEDFE' },
   { id:'virements',    label:'Virements',      emoji:'📤', color:'#185FA5', bg:'#E6F1FB' },
   { id:'vir_maman',    label:'Maman',          emoji:'👩', color:'#D4537E', bg:'#FBEAF0' },
-  { id:'vir_pdln',     label:'Charges PDLN',   emoji:'🏢', color:'#6B6860', bg:'#F0EEE9' },
+  { id:'vir_pdln',     label:'Charges PDLN', short:'PDLN',   emoji:'🏢', color:'#6B6860', bg:'#F0EEE9' },
   { id:'impots',       label:'Impôts',         emoji:'🏛️', color:'#6B6860', bg:'#F0EEE9' },
-  { id:'retrait',      label:'Retrait cash',   emoji:'💵', color:'#6B6860', bg:'#F0EEE9' },
-  { id:'epargne_coffre',label:'Épargne coffre',  emoji:'💲', color:'#3C3489', bg:'#EEEDFE' },
-  { id:'epargne_tfi',  label:'Épargne TFI',    emoji:'💲', color:'#6B6860', bg:'#F0EEE9' },
-  { id:'salle_sport',  label:'Salle de sport', emoji:'💪', color:'#534AB7', bg:'#EEEDFE' },
+  { id:'retrait',      label:'Retrait cash', short:'Cash',   emoji:'💵', color:'#6B6860', bg:'#F0EEE9' },
+  { id:'epargne_coffre',label:'Épargne coffre', short:'Coffre',  emoji:'💲', color:'#3C3489', bg:'#EEEDFE' },
+  { id:'epargne_tfi',  label:'Épargne TFI', short:'TFI',    emoji:'💲', color:'#6B6860', bg:'#F0EEE9' },
+  { id:'salle_sport',  label:'Salle de sport', short:'Sport', emoji:'💪', color:'#534AB7', bg:'#EEEDFE' },
   { id:'sorties',      label:'Sorties',        emoji:'🎉', color:'#D4537E', bg:'#FBEAF0' },
   { id:'dons',         label:'Dons',           emoji:'🤲', color:'#0F6E56', bg:'#E1F5EE' },
   { id:'assurance',    label:'Assurance',      emoji:'🛡️', color:'#6B6860', bg:'#F0EEE9' },
@@ -2573,7 +2575,7 @@ function renderComparaison() {
     html += '<th class="comp-col-hdr" draggable="true" data-ci="' + ci + '" data-catid="' + catId + '" ' +
       'ondragstart="compDragStart(event)" ondragover="compDragOver(event)" ondrop="compDrop(event)" ondragleave="compDragLeave(event)" ' +
       'style="color:' + cat.color + '">' +
-      (cat.emoji||'') + ' ' + cat.label + '</th>';
+      (cat.emoji||'') + ' ' + (cat.short||cat.label) + '</th>';
   });
   html += '</tr></thead><tbody>';
 
