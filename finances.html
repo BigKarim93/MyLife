@@ -1108,6 +1108,7 @@ function getCurrentYM() {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
 }
+let _firstLoad = true;
 
 function refreshAllPeriodSelects() {
   const txs = getAllTx();
@@ -1116,12 +1117,15 @@ function refreshAllPeriodSelects() {
   buildSelect(document.getElementById('dash-year-sel'), years, y=>y, y=>y);
   buildSelect(document.getElementById('comp-year-sel'), years, y=>y, y=>y);
   buildSelect(document.getElementById('month-sel'), months, m=>m, m=>{const[y,mo]=m.split('-');return MONTH_FULL[+mo-1]+' '+y;});
-  // Forcer le mois courant si aucune sélection ou mois invalide
+  // Forcer le mois courant au premier chargement OU si valeur invalide
   const sel = document.getElementById('month-sel');
-  if(sel && (!sel.value || !months.includes(sel.value))) {
+  if(sel) {
     const ym = getCurrentYM();
-    if(months.includes(ym)) sel.value = ym;
-    else if(months.length) sel.value = months[0];
+    if(_firstLoad || !months.includes(sel.value)) {
+      if(months.includes(ym)) sel.value = ym;
+      else if(months.length) sel.value = months[0];
+      _firstLoad = false;
+    }
   }
   buildSelect(document.getElementById('year-sel'), years, y=>y, y=>y);
   buildSelect(document.getElementById('tx-month-sel'), [{v:'all',l:'Tous les mois'},...months.map(m=>{const[y,mo]=m.split('-');return{v:m,l:MONTH_FULL[+mo-1]+' '+y};})], o=>o.v||o, o=>o.l||o);
