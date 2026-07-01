@@ -2499,6 +2499,7 @@ function toggleGroup(grpId, header) {
 // COMPARAISON MENSUELLE
 // ════════════════════════════════════════════════
 let compCatOrder = null;
+try{var _cco=localStorage.getItem('mylife_comp_order');if(_cco)compCatOrder=JSON.parse(_cco);}catch(e){}
 
 function renderComparaison() {
   const txs = getAllTx();
@@ -2663,6 +2664,7 @@ function compDrop(e) {
   const moved = compCatOrder.splice(_dragCi, 1)[0];
   compCatOrder.splice(targetCi, 0, moved);
   _dragCi = null;
+  try{localStorage.setItem('mylife_comp_order',JSON.stringify(compCatOrder));}catch(e){}
   renderComparaison();
 }
 
