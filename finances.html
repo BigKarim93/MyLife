@@ -1073,7 +1073,14 @@ function fmt(n) { return (n<0?'-':'+')+Math.abs(n).toLocaleString('fr-FR',{minim
 function fmtAbs(n) { return Math.abs(n).toLocaleString('fr-FR',{minimumFractionDigits:0,maximumFractionDigits:0})+' €'; }
 function getYears(txs) { return [...new Set(txs.map(t=>new Date(t.date).getFullYear()))].sort((a,b)=>b-a); }
 function getMonths(txs) {
-  return [...new Set(txs.map(t=>{const d=new Date(t.date);return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`}))].sort().reverse();
+  const fromTxs = new Set(txs.map(t=>{const d=new Date(t.date);return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`}));
+  // Ajouter mois courant + 3 mois à venir
+  const now = new Date();
+  for(let i = -1; i <= 3; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+    fromTxs.add(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);
+  }
+  return [...fromTxs].sort().reverse();
 }
 function txForYear(txs, y) { return txs.filter(t=>new Date(t.date).getFullYear()==+y); }
 function txForMonth(txs, ym) {
@@ -1557,11 +1564,11 @@ function renderBubbles(mtxs) {
     return '<div class="bubble" draggable="true" data-idx="' + idx + '" data-catid="' + catId + '" ' +
       'style="background:' + cat.bg + ';border:2px solid ' + cat.color + '40;cursor:grab" ' +
       'onclick="filterBubble(\'' + catId + '\')" ' +
-      'ondragstart="bubbleDragStart(event)" ondragover="bubbleDragOver(event)" ondrop="bubbleDrop(event)" ondragleave="bubbleDragLeave(event)" ' +
+      'ondragstart="bubbleDragStart(event)" ondragover="bubbleDragOver(event)" ondrop="bubbleDrop(event)" ondragleave="bubbleDragLeave(event)" ondblclick="bubblePickColor(event,\'' + catId + '\')" ' +
       'title="' + cat.label + '">' +
       '<span class="b-emoji">' + (cat.emoji || '📦') + '</span>' +
-      '<span class="b-label" style="color:' + cat.color + '">' + cat.label + '</span>' +
-      '<span class="b-amount" style="color:' + cat.color + '">-' + fmtAbs(total) + '</span>' +
+      '<span class="b-label" style="color:' + (bubbleColors[catId]||cat.color) + '">' + cat.label + '</span>' +
+      '<span class="b-amount" style="color:' + (bubbleColors[catId]||cat.color) + '">-' + fmtAbs(total) + '</span>' +
     '</div>';
   }).join('');
 }
@@ -2841,6 +2848,38 @@ function applySpecialRules(tx) {
     showPage('monthly');
   } catch(e) { console.warn('Render error:', e); }
 })();
+
+// ===== COULEURS BULLES CUSTOM =====
+let bubbleColors = {};
+try{var _bc=localStorage.getItem('mylife_bubble_colors');if(_bc)bubbleColors=JSON.parse(_bc);}catch(e){}
+
+function bubblePickColor(e, catId) {
+  e.stopPropagation();
+  // Créer un input color temporaire
+  var inp = document.createElement('input');
+  inp.type = 'color';
+  // Couleur actuelle de la catégorie
+  var cat = CATEGORIES.find(function(c){return c.id===catId;});
+  inp.value = bubbleColors[catId] || (cat ? cat.color : '#4ade80');
+  inp.style.position = 'fixed';
+  inp.style.top = '-9999px';
+  document.body.appendChild(inp);
+  inp.click();
+  inp.addEventListener('change', function() {
+    bubbleColors[catId] = inp.value;
+    try{localStorage.setItem('mylife_bubble_colors', JSON.stringify(bubbleColors));}catch(ex){}
+    document.body.removeChild(inp);
+    // Re-render
+    const txs = getAllTx();
+    const ymVal = document.getElementById('month-sel') && document.getElementById('month-sel').value;
+    if(ymVal) renderBubbles(txForMonth(txs, ymVal));
+    else renderMonthly();
+  });
+  inp.addEventListener('cancel', function() {
+    document.body.removeChild(inp);
+  });
+}
+
 </script>
 </body>
 </html>
