@@ -1584,7 +1584,7 @@ function renderBubbles(mtxs) {
     totals[t.category] = (totals[t.category] || 0) + Math.abs(t.amount);
   });
 
-  const excluded = new Set(['revenus','salaire','loyers_recus','epargne','epargne_coffre','epargne_tfi','virements']);
+  const excluded = new Set(['revenus','salaire','loyers_recus','epargne','epargne_tfi','virements']);
   const defaultOrder = Object.entries(totals)
     .filter(([id]) => !excluded.has(id))
     .sort((a, b) => b[1] - a[1])
@@ -2544,7 +2544,7 @@ function renderComparaison() {
   }
   if (!allMonths.length) { el.innerHTML = '<p style="color:var(--text3);font-size:13px">Aucune dépense pour cette année.</p>'; return; }
 
-  const excluded = new Set(['revenus','salaire','loyers_recus','epargne','epargne_coffre','epargne_tfi','virements']);
+  const excluded = new Set(['revenus','salaire','loyers_recus','epargne','epargne_tfi','virements']);
 
   // Totaux [catId][ym]
   const data = {};
