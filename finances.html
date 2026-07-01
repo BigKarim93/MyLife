@@ -528,6 +528,7 @@ input, select, textarea { font-family: inherit; }
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
+<input type="file" id="fileInput" accept=".csv,.ofx,.qif,.xlsx,.xls" style="position:fixed;top:-9999px;left:-9999px;opacity:0">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
@@ -2839,6 +2840,5 @@ function applySpecialRules(tx) {
   } catch(e) { console.warn('Render error:', e); }
 })();
 </script>
-<input type="file" id="fileInput" accept=".csv,.ofx,.qif,.xlsx,.xls" style="position:fixed;top:-9999px;left:-9999px;opacity:0">
 </body>
 </html>
