@@ -128,6 +128,7 @@ body.edit-mode .item-actions{display:flex;}
 <div class="tb">
   <h1>🛒 Courses</h1>
   <div class="spacer"></div>
+  <button class="btn sm" id="btn-sync-cloud">☁️ Sync</button>
   <button class="btn sm" id="btn-edit-mode">✏️ Modifier</button>
   <button class="btn sm" id="btn-tout-cocher">✅ Tout décocher</button>
   <button class="btn sm" id="btn-add-item">＋ Article</button>
@@ -726,6 +727,22 @@ document.getElementById('mc-reset').addEventListener('click', () => {
 
 // Init
 load(); render();
+
+document.getElementById('btn-sync-cloud').addEventListener('click', function() {
+  var btn = this;
+  btn.textContent = '⏳...'; btn.disabled = true;
+  var ts = Date.now() + 99999;
+  coursesDoc.set({ items: items, liste: [...liste], done: [], savedAt: ts })
+    .then(function() {
+      try { localStorage.setItem('mylife_courses_ts', String(ts)); } catch(e) {}
+      btn.textContent = '✅ OK'; btn.disabled = false;
+      setTimeout(function() { btn.textContent = '☁️ Sync'; }, 2500);
+    })
+    .catch(function(e) {
+      btn.textContent = '❌'; btn.disabled = false;
+      setTimeout(function() { btn.textContent = '☁️ Sync'; }, 2500);
+    });
+});
 </script>
 
 <!-- MODE COURSES MOBILE -->
