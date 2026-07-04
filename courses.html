@@ -117,11 +117,6 @@ body.edit-mode .item-actions{display:flex;}
 .mc-empty p{font-size:.9rem;margin-top:8px;}
 .mc-progress{font-size:.78rem;color:var(--dim);}
 .mc-progress strong{color:var(--green);}
-
-.emoji-grid { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; max-height: 120px; overflow-y: auto; }
-.emoji-btn { font-size: 1.3rem; cursor: pointer; padding: 3px; border-radius: 6px; border: 2px solid transparent; transition: .15s; background: var(--surface2); }
-.emoji-btn:hover, .emoji-btn.selected { border-color: var(--accent); background: var(--surface); }
-
 </style>
 <script src="firebase-config.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -133,7 +128,6 @@ body.edit-mode .item-actions{display:flex;}
 <div class="tb">
   <h1>🛒 Courses</h1>
   <div class="spacer"></div>
-  <button class="btn sm" id="btn-sync-cloud" title="Forcer sauvegarde vers le cloud">☁️ Sync</button>
   <button class="btn sm" id="btn-edit-mode">✏️ Modifier</button>
   <button class="btn sm" id="btn-tout-cocher">✅ Tout décocher</button>
   <button class="btn sm" id="btn-add-item">＋ Article</button>
@@ -191,13 +185,6 @@ body.edit-mode .item-actions{display:flex;}
 <div class="ov" id="ov-edit">
   <div class="modal">
     <h3>✏️ Modifier l'article</h3>
-    <div class="fld"><label>Emoji (optionnel)</label>
-      <div class="emoji-grid" id="edit-emoji-grid"></div>
-      <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
-        <span id="edit-emoji-selected" style="font-size:1.5rem;min-width:30px;text-align:center"></span>
-        <button class="btn sm" id="edit-emoji-clear" style="font-size:.72rem;padding:3px 8px;">✕ Aucun</button>
-      </div>
-    </div>
     <div class="fld"><label>Nom</label><input type="text" id="edit-nom" maxlength="60"></div>
     <div class="fld"><label>Rayon</label>
       <select id="edit-rayon">
@@ -238,31 +225,34 @@ auth.onAuthStateChanged(user => {
 });
 
 async function loadFromFirestore() {
-  // Afficher localStorage immédiatement (rapidité)
-  load();
-  render();
   try {
     const snap = await coursesDoc.get();
     if (snap.exists) {
       const data = snap.data();
       const fsTs = data.savedAt || 0;
       const lsTs = parseInt(localStorage.getItem('mylife_courses_ts') || '0');
-      // Firestore gagne s'il est plus récent
-      if (fsTs > lsTs && data.items && data.items.length > 0) {
-        items = data.items;
+      if (lsTs >= fsTs && lsTs > 0) {
+        // localStorage plus récent → le garder
+        load();
+      } else {
+        // Firestore plus récent ou premier chargement
+        if (data.items && data.items.length > 0) {
+          items = data.items;
+          try { localStorage.setItem(STORE, JSON.stringify(items)); } catch(e) {}
+          try { localStorage.setItem('mylife_courses_ts', String(fsTs)); } catch(e) {}
+        } else { load(); }
         liste = new Set(data.liste || []);
-        try { localStorage.setItem(STORE, JSON.stringify(items)); } catch(e) {}
         try { localStorage.setItem(LIST_STORE, JSON.stringify([...liste])); } catch(e) {}
-        try { localStorage.setItem('mylife_courses_ts', String(fsTs)); } catch(e) {}
-        render();
       }
       if (data.done) {
         try { localStorage.setItem('mylife_courses_done', JSON.stringify(data.done)); } catch(e) {}
       }
     } else {
+      load();
       await coursesDoc.set({ items, liste: [...liste], savedAt: Date.now() });
     }
-  } catch(e) { /* localStorage déjà chargé */ }
+  } catch(e) { load(); }
+  render();
   updateStats();
 }
 
@@ -614,50 +604,13 @@ document.getElementById('ov-add').addEventListener('click', e => {
 
 // Modal modifier article
 let editingId = null;
-const FOOD_EMOJIS = ['🍎', '🍊', '🍋', '🍇', '🍓', '🍑', '🍒', '🍍', '🥭', '🍌', '🍉', '🫐', '🥝', '🥦', '🥕', '🧅', '🧄', '🥔', '🍅', '🥑', '🫑', '🌽', '🥒', '🍆', '🧇', '🥚', '🧀', '🥛', '🍗', '🥩', '🐟', '🍤', '🦐', '🥓', '🌭', '🍞', '🥐', '🥖', '🧆', '🫙', '🥫', '🍝', '🍜', '🍚', '🧴', '🧹', '🧺', '🧻', '🧼', '🪥', '🛒', '📦'];
-let selectedEmoji = '';
-
 function openEditModal(it) {
   editingId = it.id;
-  // Séparer emoji du nom — chercher si commence par un emoji connu
-  const nomStr = it.nom || '';
-  selectedEmoji = '';
-  let nomSansEmoji = nomStr;
-  for(var ei=0; ei<FOOD_EMOJIS.length; ei++){
-    if(nomStr.startsWith(FOOD_EMOJIS[ei]+' ')){
-      selectedEmoji = FOOD_EMOJIS[ei];
-      nomSansEmoji = nomStr.slice(FOOD_EMOJIS[ei].length+1);
-      break;
-    } else if(nomStr.startsWith(FOOD_EMOJIS[ei])){
-      selectedEmoji = FOOD_EMOJIS[ei];
-      nomSansEmoji = nomStr.slice(FOOD_EMOJIS[ei].length);
-      break;
-    }
-  }
-  document.getElementById('edit-nom').value = nomSansEmoji;
-  // Rendre la grille emoji
-  const grid = document.getElementById('edit-emoji-grid');
-  grid.innerHTML = FOOD_EMOJIS.map(e =>
-    '<span class="emoji-btn' + (e===selectedEmoji?' selected':'') + '" data-e="'+e+'">'+e+'</span>'
-  ).join('');
-  grid.querySelectorAll('.emoji-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-      selectedEmoji = btn.dataset.e;
-      grid.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-      document.getElementById('edit-emoji-selected').textContent = selectedEmoji;
-    });
-  });
-  document.getElementById('edit-emoji-selected').textContent = selectedEmoji;
+  document.getElementById('edit-nom').value = it.nom;
   document.getElementById('edit-rayon').value = it.rayon;
   document.getElementById('ov-edit').classList.add('op');
   setTimeout(() => document.getElementById('edit-nom').focus(), 50);
 }
-document.getElementById('edit-emoji-clear').addEventListener('click', function() {
-  selectedEmoji = '';
-  document.getElementById('edit-emoji-selected').textContent = '';
-  document.getElementById('edit-emoji-grid').querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected'));
-});
 document.getElementById('edit-cancel').addEventListener('click', () => {
   document.getElementById('ov-edit').classList.remove('op');
 });
@@ -666,8 +619,7 @@ document.getElementById('edit-save').addEventListener('click', () => {
   const rayon = document.getElementById('edit-rayon').value;
   if (!nom) return;
   const it = items.find(x => x.id === editingId);
-  const fullNom = selectedEmoji ? selectedEmoji + ' ' + nom : nom;
-  if (it) { it.nom = fullNom; it.rayon = rayon; }
+  if (it) { it.nom = nom; it.rayon = rayon; }
   save(); render();
   document.getElementById('ov-edit').classList.remove('op');
 });
@@ -774,50 +726,6 @@ document.getElementById('mc-reset').addEventListener('click', () => {
 
 // Init
 load(); render();
-
-// Bouton sync forcé
-document.getElementById('btn-sync-cloud').addEventListener('click', function() {
-  var btn = this;
-  btn.textContent = '⏳...';
-  btn.disabled = true;
-  var ts = Date.now() + 99999;
-  coursesDoc.set({ items: items, liste: [...liste], done: [], savedAt: ts })
-    .then(function() {
-      try { localStorage.setItem('mylife_courses_ts', String(ts)); } catch(e) {}
-      btn.textContent = '✅ Sync OK';
-      btn.disabled = false;
-      setTimeout(function() { btn.textContent = '☁️ Sync'; }, 2500);
-    })
-    .catch(function(e) {
-      btn.textContent = '❌ ' + e.code;
-      btn.disabled = false;
-      setTimeout(function() { btn.textContent = '☁️ Sync'; }, 3000);
-    });
-});
-  } else {
-    // coursesDoc pas encore prêt — attendre 2s et réessayer
-    setTimeout(function() {
-      if(coursesDoc) {
-        var ts2 = Date.now() + 10000;
-        var done2 = [];
-        try { done2 = JSON.parse(localStorage.getItem('mylife_courses_done') || '[]'); } catch(e) {}
-        coursesDoc.set({ items: items, liste: [...liste], done: done2, savedAt: ts2 })
-          .then(function() {
-            localStorage.setItem('mylife_courses_ts', String(ts2));
-            btn.textContent = '✅ Sync OK';
-            btn.disabled = false;
-            setTimeout(function() { btn.textContent = '☁️ Sync'; }, 2500);
-          })
-          .catch(function() { btn.textContent = '❌ Erreur'; btn.disabled = false; });
-      } else {
-        btn.textContent = '❌ Non connecté';
-        btn.disabled = false;
-        setTimeout(function() { btn.textContent = '☁️ Sync'; }, 2500);
-      }
-    }, 2000);
-  }
-});
-
 </script>
 
 <!-- MODE COURSES MOBILE -->
