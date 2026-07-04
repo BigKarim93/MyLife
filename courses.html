@@ -225,23 +225,33 @@ auth.onAuthStateChanged(user => {
 });
 
 async function loadFromFirestore() {
+  // Charger localStorage EN PREMIER (source de vérité locale)
+  load();
+  const lsItems = items.slice(); // copie locale
   try {
     const snap = await coursesDoc.get();
     if (snap.exists) {
       const data = snap.data();
-      items = (data.items && data.items.length > 0) ? data.items : BASE_ITEMS.map(x => Object.assign({}, x));
-      liste = new Set(data.liste || []);
-      // Charger aussi les articles rayés en mode courses
+      // localStorage gagne si non vide, sinon Firestore
+      if (lsItems.length > 0) {
+        items = lsItems; // garder localStorage
+      } else if (data.items && data.items.length > 0) {
+        items = data.items;
+        // Sauvegarder dans localStorage pour la prochaine fois
+        try { localStorage.setItem(STORE, JSON.stringify(items)); } catch(e) {}
+      }
+      // Liste courses : fusionner localStorage + Firestore
+      const lsList = new Set(JSON.parse(localStorage.getItem(LIST_STORE) || '[]'));
+      liste = lsList.size > 0 ? lsList : new Set(data.liste || []);
       if (data.done) {
         try { localStorage.setItem('mylife_courses_done', JSON.stringify(data.done)); } catch(e) {}
       }
     } else {
-      // Première fois — récupérer ce qui est dans localStorage
-      load();
+      // Première fois — sauvegarder localStorage dans Firestore
       await coursesDoc.set({ items, liste: [...liste] });
     }
   } catch(e) {
-    load();
+    // Firestore indisponible — localStorage déjà chargé
   }
   render();
   updateStats();
