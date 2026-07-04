@@ -783,27 +783,20 @@ document.getElementById('btn-sync-cloud').addEventListener('click', function() {
   var btn = this;
   btn.textContent = '⏳...';
   btn.disabled = true;
-  // Mettre à jour le timestamp localStorage pour forcer la victoire
-  try { localStorage.setItem('mylife_courses_ts', String(Date.now() + 10000)); } catch(e) {}
-  // Sauvegarder via save() qui gère tout
-  save();
-  // Si coursesDoc disponible, forcer aussi un write immédiat
-  if(coursesDoc) {
-    var ts = Date.now() + 10000;
-    var done = [];
-    try { done = JSON.parse(localStorage.getItem('mylife_courses_done') || '[]'); } catch(e) {}
-    coursesDoc.set({ items: items, liste: [...liste], done: done, savedAt: ts })
-      .then(function() {
-        localStorage.setItem('mylife_courses_ts', String(ts));
-        btn.textContent = '✅ Sync OK';
-        btn.disabled = false;
-        setTimeout(function() { btn.textContent = '☁️ Sync'; }, 2500);
-      })
-      .catch(function(e) {
-        btn.textContent = '❌ Erreur';
-        btn.disabled = false;
-        setTimeout(function() { btn.textContent = '☁️ Sync'; }, 2500);
-      });
+  var ts = Date.now() + 99999;
+  coursesDoc.set({ items: items, liste: [...liste], done: [], savedAt: ts })
+    .then(function() {
+      try { localStorage.setItem('mylife_courses_ts', String(ts)); } catch(e) {}
+      btn.textContent = '✅ Sync OK';
+      btn.disabled = false;
+      setTimeout(function() { btn.textContent = '☁️ Sync'; }, 2500);
+    })
+    .catch(function(e) {
+      btn.textContent = '❌ ' + e.code;
+      btn.disabled = false;
+      setTimeout(function() { btn.textContent = '☁️ Sync'; }, 3000);
+    });
+});
   } else {
     // coursesDoc pas encore prêt — attendre 2s et réessayer
     setTimeout(function() {
