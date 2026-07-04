@@ -238,34 +238,31 @@ auth.onAuthStateChanged(user => {
 });
 
 async function loadFromFirestore() {
+  // Afficher localStorage immédiatement (rapidité)
+  load();
+  render();
   try {
     const snap = await coursesDoc.get();
     if (snap.exists) {
       const data = snap.data();
       const fsTs = data.savedAt || 0;
       const lsTs = parseInt(localStorage.getItem('mylife_courses_ts') || '0');
-      if (lsTs >= fsTs && lsTs > 0) {
-        // localStorage plus récent → le garder
-        load();
-      } else {
-        // Firestore plus récent ou premier chargement
-        if (data.items && data.items.length > 0) {
-          items = data.items;
-          try { localStorage.setItem(STORE, JSON.stringify(items)); } catch(e) {}
-          try { localStorage.setItem('mylife_courses_ts', String(fsTs)); } catch(e) {}
-        } else { load(); }
+      // Firestore gagne s'il est plus récent
+      if (fsTs > lsTs && data.items && data.items.length > 0) {
+        items = data.items;
         liste = new Set(data.liste || []);
+        try { localStorage.setItem(STORE, JSON.stringify(items)); } catch(e) {}
         try { localStorage.setItem(LIST_STORE, JSON.stringify([...liste])); } catch(e) {}
+        try { localStorage.setItem('mylife_courses_ts', String(fsTs)); } catch(e) {}
+        render();
       }
       if (data.done) {
         try { localStorage.setItem('mylife_courses_done', JSON.stringify(data.done)); } catch(e) {}
       }
     } else {
-      load();
       await coursesDoc.set({ items, liste: [...liste], savedAt: Date.now() });
     }
-  } catch(e) { load(); }
-  render();
+  } catch(e) { /* localStorage déjà chargé */ }
   updateStats();
 }
 
