@@ -117,6 +117,11 @@ body.edit-mode .item-actions{display:flex;}
 .mc-empty p{font-size:.9rem;margin-top:8px;}
 .mc-progress{font-size:.78rem;color:var(--dim);}
 .mc-progress strong{color:var(--green);}
+
+.emoji-grid { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; max-height: 120px; overflow-y: auto; }
+.emoji-btn { font-size: 1.3rem; cursor: pointer; padding: 3px; border-radius: 6px; border: 2px solid transparent; transition: .15s; background: var(--surface2); }
+.emoji-btn:hover, .emoji-btn.selected { border-color: var(--accent); background: var(--surface); }
+
 </style>
 <script src="firebase-config.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -185,6 +190,13 @@ body.edit-mode .item-actions{display:flex;}
 <div class="ov" id="ov-edit">
   <div class="modal">
     <h3>✏️ Modifier l'article</h3>
+    <div class="fld"><label>Emoji (optionnel)</label>
+      <div class="emoji-grid" id="edit-emoji-grid"></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+        <span id="edit-emoji-selected" style="font-size:1.5rem;min-width:30px;text-align:center"></span>
+        <button class="btn sm" id="edit-emoji-clear" style="font-size:.72rem;padding:3px 8px;">✕ Aucun</button>
+      </div>
+    </div>
     <div class="fld"><label>Nom</label><input type="text" id="edit-nom" maxlength="60"></div>
     <div class="fld"><label>Rayon</label>
       <select id="edit-rayon">
@@ -604,13 +616,44 @@ document.getElementById('ov-add').addEventListener('click', e => {
 
 // Modal modifier article
 let editingId = null;
+const FOOD_EMOJIS = ['🍎', '🍊', '🍋', '🍇', '🍓', '🍑', '🍒', '🍍', '🥭', '🍌', '🍉', '🫐', '🥝', '🥦', '🥕', '🧅', '🧄', '🥔', '🍅', '🥑', '🫑', '🌽', '🥒', '🍆', '🧇', '🥚', '🧀', '🥛', '🍗', '🥩', '🐟', '🍤', '🦐', '🥓', '🌭', '🍞', '🥐', '🥖', '🧆', '🫙', '🥫', '🍝', '🍜', '🍚', '🧴', '🧹', '🧺', '🧻', '🧼', '🪥', '🛒', '📦'];
+let selectedEmoji = '';
+
 function openEditModal(it) {
   editingId = it.id;
-  document.getElementById('edit-nom').value = it.nom;
+  // Séparer emoji du nom
+  const nomStr = it.nom || '';
+  const emojiMatch = nomStr.match(/^(\p{Emoji_Presentation}|\p{Extended_Pictographic}|[\u{1F300}-\u{1FAFF}]|[\u{2600}-\u{27BF}])\s*/u);
+  if(emojiMatch) {
+    selectedEmoji = emojiMatch[0].trim();
+    document.getElementById('edit-nom').value = nomStr.slice(emojiMatch[0].length);
+  } else {
+    selectedEmoji = '';
+    document.getElementById('edit-nom').value = nomStr;
+  }
+  // Rendre la grille emoji
+  const grid = document.getElementById('edit-emoji-grid');
+  grid.innerHTML = FOOD_EMOJIS.map(e =>
+    '<span class="emoji-btn' + (e===selectedEmoji?' selected':'') + '" data-e="'+e+'">'+e+'</span>'
+  ).join('');
+  grid.querySelectorAll('.emoji-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      selectedEmoji = btn.dataset.e;
+      grid.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById('edit-emoji-selected').textContent = selectedEmoji;
+    });
+  });
+  document.getElementById('edit-emoji-selected').textContent = selectedEmoji;
   document.getElementById('edit-rayon').value = it.rayon;
   document.getElementById('ov-edit').classList.add('op');
   setTimeout(() => document.getElementById('edit-nom').focus(), 50);
 }
+document.getElementById('edit-emoji-clear').addEventListener('click', function() {
+  selectedEmoji = '';
+  document.getElementById('edit-emoji-selected').textContent = '';
+  document.getElementById('edit-emoji-grid').querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected'));
+});
 document.getElementById('edit-cancel').addEventListener('click', () => {
   document.getElementById('ov-edit').classList.remove('op');
 });
@@ -619,7 +662,8 @@ document.getElementById('edit-save').addEventListener('click', () => {
   const rayon = document.getElementById('edit-rayon').value;
   if (!nom) return;
   const it = items.find(x => x.id === editingId);
-  if (it) { it.nom = nom; it.rayon = rayon; }
+  const fullNom = selectedEmoji ? selectedEmoji + ' ' + nom : nom;
+  if (it) { it.nom = fullNom; it.rayon = rayon; }
   save(); render();
   document.getElementById('ov-edit').classList.remove('op');
 });
