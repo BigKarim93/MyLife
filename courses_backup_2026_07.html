@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Courses Lidl</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@700&family=Work+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#16261e;--bg2:#1f3a2c;--bg3:#274a37;--line:rgba(238,241,234,.09);--line2:rgba(238,241,234,.18);--chalk:#f1efe4;--dim:#aebcb1;--accent:#f2c14e;--green:#4ade80;--red:#f87171;--r:10px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Work Sans',sans-serif;background:var(--bg);color:var(--chalk);min-height:100vh;}
+h1,h2{font-family:'Kalam',cursive;}
+input,button{font-family:inherit;}
+
+/* TOPBAR */
+.tb{position:sticky;top:0;z-index:50;background:linear-gradient(var(--bg2),rgba(31,58,44,.95));border-bottom:2px solid var(--line2);padding:10px 16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;backdrop-filter:blur(4px);}
+.tb h1{font-size:1.15rem;color:var(--accent);}
+.spacer{flex:1;}
+.btn{background:var(--bg3);border:1px solid var(--line2);color:var(--chalk);padding:6px 12px;border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;text-decoration:none;}
+.btn:hover{border-color:var(--accent);}
+.btn.prim{background:var(--accent);color:#21321f;border-color:var(--accent);}
+.btn.sm{padding:4px 9px;font-size:.75rem;}
+.btn.danger{background:#5a2b2b;border-color:#7a3a3a;}
+
+/* STATS */
+.stats{display:flex;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap;align-items:center;}
+.stat{font-size:.78rem;color:var(--dim);}
+.stat strong{color:var(--chalk);font-size:.9rem;}
+.stat.green strong{color:var(--green);}
+
+/* SEARCH */
+.search-bar{padding:10px 16px 0;}
+.search-bar input{width:100%;background:var(--bg2);border:1px solid var(--line2);color:var(--chalk);border-radius:8px;padding:8px 14px;font-size:.85rem;}
+.search-bar input:focus{outline:none;border-color:var(--accent);}
+.search-bar input::placeholder{color:var(--dim);}
+
+/* RAYONS */
+.rayons{padding:12px 16px 80px;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;align-items:start;}
+.rayon{background:var(--bg2);border:1px solid var(--line2);border-radius:10px;overflow:hidden;}
+.rayon-header{display:flex;align-items:center;gap:6px;padding:7px 10px;background:var(--bg3);border-bottom:1px solid var(--line2);cursor:default;}
+.rayon-ico{font-size:1rem;}
+.rayon-nom{font-family:'Kalam',cursive;font-size:.85rem;flex:1;}
+.rayon-count{font-size:.65rem;color:var(--dim);background:var(--bg);padding:1px 6px;border-radius:10px;}
+.rayon-count.has-items{background:rgba(242,193,78,.2);color:var(--accent);}
+.rayon-chevron{display:none;}
+
+/* ITEMS — liste verticale dans chaque colonne */
+.items-list{display:flex;flex-direction:column;}
+.item{display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid var(--line);cursor:pointer;transition:.15s;user-select:none;}
+.item:last-child{border-bottom:none;}
+.item:hover{background:var(--bg3);}
+.item.in-list{background:rgba(74,222,128,.08);}
+.item-check{width:15px;height:15px;border-radius:4px;border:2px solid var(--line2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:.15s;}
+.item.in-list .item-check{background:var(--green);border-color:var(--green);}
+.item.in-list .item-check::after{content:'✓';font-size:.55rem;color:#0f1117;font-weight:700;}
+.item-name{font-size:.78rem;flex:1;}
+.item.in-list .item-name{color:var(--green);font-weight:600;}
+.item-actions{display:none;gap:3px;align-items:center;flex-shrink:0;}
+.item:hover .item-actions{display:flex;}
+.item-btn{font-size:.65rem;color:var(--dim);cursor:pointer;padding:2px 5px;border-radius:4px;border:1px solid transparent;background:transparent;line-height:1;}
+.item-btn:hover{border-color:var(--line2);color:var(--chalk);}
+.item-btn.del:hover{border-color:var(--red);color:var(--red);}
+.item-btn.drag-handle{cursor:grab;font-size:.75rem;}
+.item.dragging{opacity:.4;}
+.item.drag-over{border-top:2px solid var(--accent);}
+body.edit-mode .item-actions{display:flex;}
+
+/* FLOATING LIST */
+.float-btn{position:fixed;bottom:20px;right:20px;z-index:100;}
+.float-btn button{background:var(--accent);color:#21321f;border:none;border-radius:50px;padding:12px 20px;font-size:.9rem;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.4);display:flex;align-items:center;gap:8px;transition:.15s;}
+.float-btn button:hover{transform:scale(1.05);}
+.badge{background:#21321f;color:var(--accent);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;}
+
+/* PANEL MA LISTE */
+.panel{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:2px solid var(--line2);border-radius:16px 16px 0 0;z-index:200;transform:translateY(100%);transition:.3s cubic-bezier(.4,0,.2,1);max-height:80vh;display:flex;flex-direction:column;}
+.panel.open{transform:translateY(0);}
+.panel-header{padding:14px 16px 10px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line);flex-shrink:0;}
+.panel-header h2{flex:1;font-size:1rem;color:var(--accent);}
+.panel-body{overflow-y:auto;flex:1;padding:10px 16px 20px;}
+.panel-rayon{margin-bottom:12px;}
+.panel-rayon-title{font-size:.7rem;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;padding:0 2px;}
+.panel-item{display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--bg3);border-radius:6px;margin-bottom:3px;}
+.panel-item-name{font-size:.82rem;flex:1;}
+.panel-item-remove{font-size:.75rem;color:var(--dim);cursor:pointer;padding:2px 6px;border-radius:4px;border:1px solid transparent;}
+.panel-item-remove:hover{border-color:var(--red);color:var(--red);}
+.panel-empty{text-align:center;padding:30px;color:var(--dim);font-size:.85rem;}
+
+/* MODAL ADD */
+.ov{position:fixed;inset:0;background:rgba(10,16,12,.75);display:none;align-items:center;justify-content:center;z-index:300;padding:14px;}
+.ov.op{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--line2);border-radius:var(--r);padding:20px;width:100%;max-width:380px;}
+.modal h3{color:var(--accent);margin-bottom:12px;}
+.fld{margin-bottom:10px;display:flex;flex-direction:column;gap:4px;}
+.fld label{font-size:.75rem;color:var(--dim);font-weight:600;}
+.fld input,.fld select{background:var(--bg);border:1px solid var(--line2);color:var(--chalk);border-radius:7px;padding:8px 10px;font-size:.85rem;width:100%;}
+.fld input:focus,.fld select:focus{outline:none;border-color:var(--accent);}
+.modal-act{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;}
+
+/* MODE COURSES MOBILE */
+.mode-courses{position:fixed;inset:0;background:var(--bg);z-index:500;display:none;flex-direction:column;}
+.mode-courses.active{display:flex;}
+.mc-header{background:var(--bg2);border-bottom:2px solid var(--line2);padding:14px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;z-index:600;position:relative;}
+.mc-header h2{font-family:'Kalam',cursive;font-size:1.3rem;color:var(--accent);flex:1;}
+.mc-body{padding:10px 12px 40px;overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch;}
+.mc-rayon{margin-bottom:20px;}
+.mc-rayon-title{font-family:'Kalam',cursive;font-size:1rem;color:var(--accent);padding:6px 4px;border-bottom:1px solid var(--line2);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+.mc-item{display:flex;align-items:center;gap:12px;padding:12px 10px;border-bottom:1px solid var(--line);cursor:pointer;transition:.15s;-webkit-tap-highlight-color:transparent;}
+.mc-item:active{background:var(--bg3);}
+.mc-item.done{opacity:.45;}
+.mc-check{width:26px;height:26px;border-radius:7px;border:2px solid var(--line2);flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.mc-item.done .mc-check{background:var(--green);border-color:var(--green);}
+.mc-item.done .mc-check::after{content:'✓';font-size:.85rem;color:#0f1117;font-weight:700;}
+.mc-name{font-size:1.05rem;font-weight:600;flex:1;}
+.mc-item.done .mc-name{text-decoration:line-through;color:var(--dim);}
+.mc-empty{text-align:center;padding:60px 20px;color:var(--dim);}
+.mc-empty p{font-size:.9rem;margin-top:8px;}
+.mc-progress{font-size:.78rem;color:var(--dim);}
+.mc-progress strong{color:var(--green);}
+</style>
+<script src="firebase-config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<div class="tb">
+  <h1>🛒 Courses</h1>
+  <div class="spacer"></div>
+  <button class="btn sm" id="btn-edit-mode">✏️ Modifier</button>
+  <button class="btn sm" id="btn-tout-cocher">✅ Tout décocher</button>
+  <button class="btn sm" id="btn-add-item">＋ Article</button>
+  <button class="btn prim" id="btn-mode-courses">🛒 Faire mes courses</button>
+  <a href="index.html" class="btn sm">🏠</a>
+</div>
+
+<div class="stats">
+  <div class="stat green"><strong id="stat-liste">0</strong> dans ma liste</div>
+  <div class="stat"><strong id="stat-total">0</strong> articles au total</div>
+</div>
+
+<div class="search-bar">
+  <input type="text" id="search" placeholder="🔍 Rechercher un article…">
+</div>
+
+<div class="rayons" id="rayons"></div>
+
+<div class="float-btn">
+  <button id="btn-panel">🛒 Ma liste <div class="badge" id="badge">0</div></button>
+</div>
+<button id="btn-exit-courses" style="display:none;position:fixed;bottom:20px;left:20px;z-index:9999;background:#5a2b2b;color:#fff;border:none;border-radius:50px;padding:12px 20px;font-size:.9rem;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.5);">✕ Quitter les courses</button>
+
+<!-- PANEL MA LISTE -->
+<div class="panel" id="panel">
+  <div class="panel-header">
+    <h2>🛒 Ma liste de courses</h2>
+    <button class="btn sm danger" id="btn-vider">🗑️ Vider</button>
+    <button class="btn sm" id="btn-close-panel">✕</button>
+  </div>
+  <div class="panel-body" id="panel-body"></div>
+</div>
+
+<!-- MODAL AJOUTER ARTICLE -->
+<div class="ov" id="ov-add">
+  <div class="modal">
+    <h3>➕ Nouvel article</h3>
+    <div class="fld"><label>Nom</label><input type="text" id="add-nom" placeholder="ex: Lait de coco" maxlength="60"></div>
+    <div class="fld"><label>Rayon</label>
+      <select id="add-rayon">
+        <option>Fruits</option><option>Légumes</option><option>Produits frais</option>
+        <option>Épicerie 1</option><option>Épicerie 2</option>
+        <option>Produits d'entretien</option><option>Yaourt - Congelée</option>
+        <option>Bir Market</option><option>Carrefour</option>
+      </select>
+    </div>
+    <div class="modal-act">
+      <button class="btn" id="add-cancel">Annuler</button>
+      <button class="btn prim" id="add-save">Ajouter</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL MODIFIER ARTICLE -->
+<div class="ov" id="ov-edit">
+  <div class="modal">
+    <h3>✏️ Modifier l'article</h3>
+    <div class="fld"><label>Nom</label><input type="text" id="edit-nom" maxlength="60"></div>
+    <div class="fld"><label>Rayon</label>
+      <select id="edit-rayon">
+        <option>Fruits</option><option>Légumes</option><option>Produits frais</option>
+        <option>Épicerie 1</option><option>Épicerie 2</option>
+        <option>Produits d'entretien</option><option>Yaourt - Congelée</option>
+        <option>Bir Market</option><option>Carrefour</option>
+      </select>
+    </div>
+    <div class="modal-act">
+      <button class="btn" id="edit-cancel">Annuler</button>
+      <button class="btn prim" id="edit-save">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORE = 'mylife_courses_v3';
+const LIST_STORE = 'mylife_courses_list_v3';
+
+// Firebase
+firebase.initializeApp(window.FIREBASE_CONFIG);
+const auth = firebase.auth();
+const db = firebase.firestore();
+let coursesDoc = null;
+let currentUser = null;
+
+// Auth
+auth.onAuthStateChanged(user => {
+  if (user) {
+    currentUser = user;
+    coursesDoc = db.collection('users').doc(user.uid).collection('modules').doc('courses');
+    loadFromFirestore();
+  } else {
+    // Pas connecté — utiliser localStorage
+    load(); render();
+  }
+});
+
+async function loadFromFirestore() {
+  try {
+    const snap = await coursesDoc.get();
+    if (snap.exists) {
+      const data = snap.data();
+      const fsTs = data.savedAt || 0;
+      const lsTs = parseInt(localStorage.getItem('mylife_courses_ts') || '0');
+      if (lsTs >= fsTs && lsTs > 0) {
+        // localStorage plus récent → le garder
+        load();
+      } else {
+        // Firestore plus récent ou premier chargement
+        if (data.items && data.items.length > 0) {
+          items = data.items;
+          try { localStorage.setItem(STORE, JSON.stringify(items)); } catch(e) {}
+          try { localStorage.setItem('mylife_courses_ts', String(fsTs)); } catch(e) {}
+        } else { load(); }
+        liste = new Set(data.liste || []);
+        try { localStorage.setItem(LIST_STORE, JSON.stringify([...liste])); } catch(e) {}
+      }
+      if (data.done) {
+        try { localStorage.setItem('mylife_courses_done', JSON.stringify(data.done)); } catch(e) {}
+      }
+    } else {
+      load();
+      await coursesDoc.set({ items, liste: [...liste], savedAt: Date.now() });
+    }
+  } catch(e) { load(); }
+  render();
+  updateStats();
+}
+
+let saveTimer = null;
+function save() {
+  // localStorage backup
+  try { localStorage.setItem(STORE, JSON.stringify(items)); } catch(e) {}
+  try { localStorage.setItem(LIST_STORE, JSON.stringify([...liste])); } catch(e) {}
+  try { localStorage.setItem('mylife_courses_ts', String(Date.now())); } catch(e) {}
+  // Firestore
+  if (!coursesDoc) return;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    const done = [];
+    try { const d = localStorage.getItem('mylife_courses_done'); if(d) done.push(...JSON.parse(d)); } catch(e) {}
+    coursesDoc.set({ items, liste: [...liste], done, savedAt: Date.now() }).catch(() => {});
+  }, 800);
+}
+
+// ===== BASE DE DONNÉES INITIALE =====
+const BASE_ITEMS = [
+  // Fruits
+  {id:'f1',nom:'🍊 Orange',rayon:'Fruits'},{id:'f2',nom:'Amandes',rayon:'Fruits'},
+  {id:'f3',nom:'🍍 Ananas',rayon:'Fruits'},{id:'f4',nom:'🍌 Banane',rayon:'Fruits'},
+  {id:'f5',nom:'Bretzel',rayon:'Fruits'},{id:'f6',nom:'Dattes',rayon:'Fruits'},
+  {id:'f7',nom:'🍇 Fruits',rayon:'Fruits'},{id:'f8',nom:'Miel',rayon:'Fruits'},
+  {id:'f9',nom:'Noix',rayon:'Fruits'},{id:'f10',nom:'Pistaches',rayon:'Fruits'},
+  {id:'f11',nom:'🍐 Poire',rayon:'Fruits'},{id:'f12',nom:'🍎 Pomme',rayon:'Fruits'},
+  {id:'f13',nom:'Pruneaux',rayon:'Fruits'},{id:'f14',nom:'🍇 Raisin',rayon:'Fruits'},
+  // Légumes
+  {id:'l1',nom:'🧅 Oignon',rayon:'Légumes'},{id:'l2',nom:'Pain de mie maman',rayon:'Légumes'},
+  {id:'l3',nom:'🥔 Pomme de Terre',rayon:'Légumes'},{id:'l4',nom:'🍅 Tomates cerises',rayon:'Légumes'},
+  // Produits frais
+  {id:'pf1',nom:'Bâtonnet de crabe',rayon:'Produits frais'},{id:'pf2',nom:'🥕 Carotte râpée',rayon:'Produits frais'},
+  {id:'pf3',nom:'Concombre en boite',rayon:'Produits frais'},{id:'pf4',nom:'🐟 Pavé de saumon',rayon:'Produits frais'},
+  {id:'pf5',nom:'Poisson pané',rayon:'Produits frais'},{id:'pf6',nom:'Salade sachet/iceberg',rayon:'Produits frais'},
+  {id:'pf7',nom:'Taboulé',rayon:'Produits frais'},
+  // Épicerie 1
+  {id:'e1_1',nom:'Barre banane',rayon:'Épicerie 1'},{id:'e1_2',nom:'Barre de chocolat',rayon:'Épicerie 1'},
+  {id:'e1_3',nom:'Biscuit Tira',rayon:'Épicerie 1'},{id:'e1_4',nom:'Bonbon',rayon:'Épicerie 1'},
+  {id:'e1_5',nom:'☕ Café',rayon:'Épicerie 1'},{id:'e1_6',nom:'🍫 Chocolat 80%',rayon:'Épicerie 1'},
+  {id:'e1_7',nom:'CL 35%',rayon:'Épicerie 1'},{id:'e1_8',nom:'Crème liquide 12%',rayon:'Épicerie 1'},
+  {id:'e1_9',nom:'Farine',rayon:'Épicerie 1'},{id:'e1_10',nom:'Galette chocolat',rayon:'Épicerie 1'},
+  {id:'e1_11',nom:'Lait',rayon:'Épicerie 1'},{id:'e1_12',nom:'Levures',rayon:'Épicerie 1'},
+  {id:'e1_13',nom:'Maïzena',rayon:'Épicerie 1'},{id:'e1_14',nom:'Noix de coco',rayon:'Épicerie 1'},
+  {id:'e1_15',nom:'🥚 Oeuf',rayon:'Épicerie 1'},{id:'e1_16',nom:'Sucre',rayon:'Épicerie 1'},
+  {id:'e1_17',nom:'Sucre Vanillée',rayon:'Épicerie 1'},
+  // Épicerie 2
+  {id:'e2_1',nom:'🧄 Ail en poudre',rayon:'Épicerie 2'},{id:'e2_2',nom:'Beans',rayon:'Épicerie 2'},
+  {id:'e2_3',nom:'Boissons',rayon:'Épicerie 2'},{id:'e2_4',nom:'Concentré tomates',rayon:'Épicerie 2'},
+  {id:'e2_5',nom:'Cornichon aigre douce',rayon:'Épicerie 2'},{id:'e2_6',nom:'💧 Eau djumuha',rayon:'Épicerie 2'},
+  {id:'e2_7',nom:'Épices',rayon:'Épicerie 2'},{id:'e2_8',nom:'Lentilles',rayon:'Épicerie 2'},
+  {id:'e2_9',nom:'Maïs',rayon:'Épicerie 2'},{id:'e2_10',nom:'Olives',rayon:'Épicerie 2'},
+  {id:'e2_11',nom:'Petit pois',rayon:'Épicerie 2'},{id:'e2_12',nom:'Pois chiche',rayon:'Épicerie 2'},
+  {id:'e2_13',nom:'🫙 Poivre',rayon:'Épicerie 2'},{id:'e2_14',nom:'Purée de tomates',rayon:'Épicerie 2'},
+  {id:'e2_15',nom:'🍚 Riz',rayon:'Épicerie 2'},{id:'e2_16',nom:'Sardine',rayon:'Épicerie 2'},
+  {id:'e2_17',nom:'Sauce bbq',rayon:'Épicerie 2'},{id:'e2_18',nom:'🫙 Sel',rayon:'Épicerie 2'},
+  {id:'e2_19',nom:'Tomates concassées',rayon:'Épicerie 2'},{id:'e2_20',nom:'Vinaigrette NATURE',rayon:'Épicerie 2'},
+  {id:'e2_21',nom:'Wrap',rayon:'Épicerie 2'},
+  // Produits d'entretien
+  {id:'pe1',nom:'🦷 Dentifrice',rayon:"Produits d'entretien"},{id:'pe2',nom:'Dove gel douche',rayon:"Produits d'entretien"},
+  {id:'pe3',nom:'🧽 Éponge',rayon:"Produits d'entretien"},{id:'pe4',nom:'Mouchoir',rayon:"Produits d'entretien"},
+  {id:'pe5',nom:'Papier toilettes',rayon:"Produits d'entretien"},{id:'pe6',nom:'Sac poubelle',rayon:"Produits d'entretien"},
+  {id:'pe7',nom:'🧼 Savon',rayon:"Produits d'entretien"},{id:'pe8',nom:'Shampooing',rayon:"Produits d'entretien"},
+  {id:'pe9',nom:'Sopalin',rayon:"Produits d'entretien"},{id:'pe10',nom:'Vinaigre blanc',rayon:"Produits d'entretien"},
+  // Yaourt - Congelée
+  {id:'yc1',nom:'Beurre',rayon:'Yaourt - Congelée'},{id:'yc2',nom:'Brocolis congelé',rayon:'Yaourt - Congelée'},
+  {id:'yc3',nom:'Canette invité',rayon:'Yaourt - Congelée'},{id:'yc4',nom:'Carotte congelée',rayon:'Yaourt - Congelée'},
+  {id:'yc5',nom:'Carré fromage blanc',rayon:'Yaourt - Congelée'},{id:'yc6',nom:'Cheddar sandwich',rayon:'Yaourt - Congelée'},
+  {id:'yc7',nom:'Courgettes congelée',rayon:'Yaourt - Congelée'},{id:'yc8',nom:'Eau pétillante citron vert',rayon:'Yaourt - Congelée'},
+  {id:'yc9',nom:'Épinard congelée',rayon:'Yaourt - Congelée'},{id:'yc10',nom:'Fromage blanc 0%',rayon:'Yaourt - Congelée'},
+  {id:'yc11',nom:'Fruits congelés',rayon:'Yaourt - Congelée'},{id:'yc12',nom:'Haricot congelée',rayon:'Yaourt - Congelée'},
+  {id:'yc13',nom:'Levure fraiche',rayon:'Yaourt - Congelée'},{id:'yc14',nom:'Mascarpone tiramisu',rayon:'Yaourt - Congelée'},
+  {id:'yc15',nom:'Mister Freez',rayon:'Yaourt - Congelée'},{id:'yc16',nom:'🧀 Mozarella',rayon:'Yaourt - Congelée'},
+  {id:'yc17',nom:'🧀 Parmesan',rayon:'Yaourt - Congelée'},{id:'yc18',nom:'Pizza congelée',rayon:'Yaourt - Congelée'},
+  {id:'yc19',nom:'Poivron congelé',rayon:'Yaourt - Congelée'},{id:'yc20',nom:'Potatoes',rayon:'Yaourt - Congelée'},
+  {id:'yc21',nom:'Ratatouilles',rayon:'Yaourt - Congelée'},{id:'yc22',nom:'🥛 Yaourt protéine',rayon:'Yaourt - Congelée'},
+  // Bir Market
+  {id:'bm1',nom:'Coriandre',rayon:'Bir Market'},{id:'bm2',nom:'Mozzarella Rapée',rayon:'Bir Market'},
+  {id:'bm3',nom:'Parmesan',rayon:'Bir Market'},{id:'bm4',nom:'🍉 Pastèque',rayon:'Bir Market'},
+  {id:'bm5',nom:'Persil',rayon:'Bir Market'},{id:'bm6',nom:'Poivron',rayon:'Bir Market'},
+  {id:'bm7',nom:'Salade',rayon:'Bir Market'},{id:'bm8',nom:'Tomates',rayon:'Bir Market'},
+  {id:'bm9',nom:'Yaourt grec 0%',rayon:'Bir Market'},
+  // Carrefour
+  {id:'cf1',nom:'Arôme Pistache Vanille',rayon:'Carrefour'},{id:'cf2',nom:'Basilic',rayon:'Carrefour'},
+  {id:'cf3',nom:'Blé et lentilles',rayon:'Carrefour'},{id:'cf4',nom:'Canette Perrier/Sanpe',rayon:'Carrefour'},
+  {id:'cf5',nom:'Chocolat blanc',rayon:'Carrefour'},{id:'cf6',nom:'Coca-cola',rayon:'Carrefour'},
+  {id:'cf7',nom:'Cornichon rondelles',rayon:'Carrefour'},{id:'cf8',nom:'Farine à Pizza',rayon:'Carrefour'},
+  {id:'cf9',nom:'Farine de Pois Chiche',rayon:'Carrefour'},{id:'cf10',nom:'Gélatine AgarAgar',rayon:'Carrefour'},
+  {id:'cf11',nom:'Graine de chia',rayon:'Carrefour'},{id:'cf12',nom:'Gravottes',rayon:'Carrefour'},
+  {id:'cf13',nom:'Huile d\'olive',rayon:'Carrefour'},{id:'cf14',nom:'Lessives',rayon:'Carrefour'},
+  {id:'cf15',nom:'Pâte à pizza',rayon:'Carrefour'},{id:'cf16',nom:'Poudre Cacao',rayon:'Carrefour'},
+  {id:'cf17',nom:'Riz à Sushi',rayon:'Carrefour'},{id:'cf18',nom:'Riz cassé',rayon:'Carrefour'},
+  {id:'cf19',nom:'Sauce Algérienne',rayon:'Carrefour'},{id:'cf20',nom:'Sauce Burger',rayon:'Carrefour'},
+  {id:'cf21',nom:'Sirop 0%',rayon:'Carrefour'},{id:'cf22',nom:'Sucre 0%',rayon:'Carrefour'},
+];
+
+const RAYON_ICONS = {
+  'Fruits':'🍎','Légumes':'🥦','Produits frais':'🐟','Épicerie 1':'🍫',
+  'Épicerie 2':'🥫',"Produits d'entretien":'🧼','Yaourt - Congelée':'🧊',
+  'Bir Market':'🏪','Carrefour':'🛍️'
+};
+
+const RAYON_ORDER = ['Fruits','Légumes','Produits frais','Épicerie 1','Épicerie 2',
+                     "Produits d'entretien",'Yaourt - Congelée','Bir Market','Carrefour'];
+
+// ===== STATE =====
+let items = [];
+let liste = new Set(); // ids des articles dans la liste
+let collapsed = {};
+let searchQ = '';
+
+function load() {
+  try {
+    const d = localStorage.getItem(STORE);
+    const parsed = d ? JSON.parse(d) : null;
+    if (parsed && parsed.length > 0) {
+      items = parsed;
+    } else {
+      // Pas de données ou vide — charger la base
+      items = BASE_ITEMS.map(x => Object.assign({}, x));
+      localStorage.setItem(STORE, JSON.stringify(items));
+    }
+  } catch(e) { items = BASE_ITEMS.map(x => Object.assign({}, x)); }
+  try {
+    const l = localStorage.getItem(LIST_STORE);
+    liste = l ? new Set(JSON.parse(l)) : new Set();
+  } catch(e) { liste = new Set(); }
+}
+function save() {
+  try { localStorage.setItem(STORE, JSON.stringify(items)); } catch(e) {}
+  try { localStorage.setItem(LIST_STORE, JSON.stringify([...liste])); } catch(e) {}
+  try { localStorage.setItem('mylife_courses_ts', String(Date.now())); } catch(e) {}
+}
+
+// ===== RENDER =====
+function getFiltered() {
+  if (!searchQ) return items;
+  const q = searchQ.toLowerCase();
+  return items.filter(it => it.nom.toLowerCase().includes(q));
+}
+
+function getRayons(filtered) {
+  const map = {};
+  filtered.forEach(it => {
+    if (!map[it.rayon]) map[it.rayon] = [];
+    map[it.rayon].push(it);
+  });
+  return map;
+}
+
+function render() {
+  const filtered = getFiltered();
+  const byRayon = getRayons(filtered);
+  const container = document.getElementById('rayons');
+  let html = '';
+
+  const order = searchQ
+    ? Object.keys(byRayon)
+    : RAYON_ORDER.filter(r => byRayon[r]);
+
+  order.forEach(rayon => {
+    const its = byRayon[rayon] || [];
+    if (!its.length) return;
+    const inListCount = its.filter(it => liste.has(it.id)).length;
+    html += `<div class="rayon" data-rayon="${rayon}">`;
+    html += `<div class="rayon-header">
+      <span class="rayon-ico">${RAYON_ICONS[rayon]||'📦'}</span>
+      <span class="rayon-nom">${rayon}</span>
+      <span class="rayon-count${inListCount>0?' has-items':''}">${inListCount>0?inListCount+'/':''}${its.length}</span>
+      <span class="rayon-chevron">▾</span>
+    </div>`;
+    html += '<div class="items-list">';
+    its.forEach(it => {
+      const inList = liste.has(it.id);
+      html += `<div class="item${inList?' in-list':''}" data-id="${it.id}" draggable="true">
+        <div class="item-check"></div>
+        <span class="item-name">${it.nom}</span>
+        <div class="item-actions">
+          <button class="item-btn drag-handle" data-drag="${it.id}" title="Déplacer">⠿</button>
+          <button class="item-btn" data-edit="${it.id}" title="Modifier">✎</button>
+          <button class="item-btn del" data-del="${it.id}" title="Supprimer">✕</button>
+        </div>
+      </div>`;
+    });
+    html += '</div></div>';
+  });
+
+  container.innerHTML = html;
+  updateStats();
+
+
+
+  // Events items
+  container.querySelectorAll('.item').forEach(el => {
+    el.addEventListener('click', e => {
+      if (e.target.closest('.item-actions')) return;
+      const id = el.dataset.id;
+      if (liste.has(id)) liste.delete(id); else liste.add(id);
+      save(); render(); renderPanel();
+    });
+  });
+
+  // Boutons éditer
+  container.querySelectorAll('[data-edit]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const it = items.find(x => x.id === btn.dataset.edit);
+      if (!it) return;
+      openEditModal(it);
+    });
+  });
+
+  // Boutons supprimer
+  container.querySelectorAll('[data-del]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      if (!confirm('Supprimer "' + (items.find(x=>x.id===btn.dataset.del)||{}).nom + '" ?')) return;
+      items = items.filter(x => x.id !== btn.dataset.del);
+      liste.delete(btn.dataset.del);
+      save(); render(); renderPanel();
+    });
+  });
+
+  // Drag & drop pour réordonner
+  let dragId = null;
+  container.querySelectorAll('.item[draggable]').forEach(el => {
+    el.addEventListener('dragstart', e => {
+      dragId = el.dataset.id;
+      setTimeout(() => el.classList.add('dragging'), 0);
+    });
+    el.addEventListener('dragend', () => {
+      el.classList.remove('dragging');
+      container.querySelectorAll('.item').forEach(x => x.classList.remove('drag-over'));
+    });
+    el.addEventListener('dragover', e => {
+      e.preventDefault();
+      if (el.dataset.id !== dragId) el.classList.add('drag-over');
+    });
+    el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
+    el.addEventListener('drop', e => {
+      e.preventDefault();
+      el.classList.remove('drag-over');
+      if (!dragId || el.dataset.id === dragId) return;
+      const fi = items.findIndex(x => x.id === dragId);
+      const ti = items.findIndex(x => x.id === el.dataset.id);
+      if (fi < 0 || ti < 0) return;
+      const [moved] = items.splice(fi, 1);
+      items.splice(ti, 0, moved);
+      dragId = null;
+      save(); render();
+    });
+  });
+}
+
+function updateStats() {
+  document.getElementById('stat-liste').textContent = liste.size;
+  document.getElementById('stat-total').textContent = items.length;
+  document.getElementById('badge').textContent = liste.size;
+}
+
+function renderPanel() {
+  const body = document.getElementById('panel-body');
+  if (!liste.size) {
+    body.innerHTML = '<div class="panel-empty">Ta liste est vide.<br>Coche des articles pour les ajouter !</div>';
+    return;
+  }
+
+  // Grouper par rayon dans l'ordre du circuit
+  const byRayon = {};
+  [...liste].forEach(id => {
+    const it = items.find(x => x.id === id);
+    if (!it) return;
+    if (!byRayon[it.rayon]) byRayon[it.rayon] = [];
+    byRayon[it.rayon].push(it);
+  });
+
+  let html = '';
+  RAYON_ORDER.forEach(rayon => {
+    if (!byRayon[rayon]?.length) return;
+    html += `<div class="panel-rayon">
+      <div class="panel-rayon-title">${RAYON_ICONS[rayon]||'📦'} ${rayon}</div>`;
+    byRayon[rayon].forEach(it => {
+      html += `<div class="panel-item">
+        <span class="panel-item-name">${it.nom}</span>
+        <span class="panel-item-remove" data-remove="${it.id}">✕</span>
+      </div>`;
+    });
+    html += '</div>';
+  });
+  body.innerHTML = html;
+
+  body.querySelectorAll('[data-remove]').forEach(el => {
+    el.addEventListener('click', () => {
+      liste.delete(el.dataset.remove);
+      save(); render(); renderPanel();
+    });
+  });
+}
+
+// ===== EVENTS =====
+document.getElementById('search').addEventListener('input', e => {
+  searchQ = e.target.value.trim();
+  render();
+});
+
+document.getElementById('btn-panel').addEventListener('click', () => {
+  renderPanel();
+  document.getElementById('panel').classList.add('open');
+});
+document.getElementById('btn-close-panel').addEventListener('click', () => {
+  document.getElementById('panel').classList.remove('open');
+});
+document.getElementById('btn-vider').addEventListener('click', () => {
+  if (!confirm('Vider toute la liste ?')) return;
+  liste.clear(); save(); render(); renderPanel();
+});
+document.getElementById('btn-tout-cocher').addEventListener('click', () => {
+  if (liste.size > 0) { liste.clear(); }
+  else { items.forEach(it => liste.add(it.id)); }
+  save(); render();
+  document.getElementById('btn-tout-cocher').textContent = liste.size > 0 ? '✅ Tout décocher' : '☑️ Tout cocher';
+});
+
+// Modal ajout article
+document.getElementById('btn-add-item').addEventListener('click', () => {
+  document.getElementById('add-nom').value = '';
+  document.getElementById('ov-add').classList.add('op');
+  setTimeout(() => document.getElementById('add-nom').focus(), 50);
+});
+document.getElementById('add-cancel').addEventListener('click', () => {
+  document.getElementById('ov-add').classList.remove('op');
+});
+document.getElementById('add-save').addEventListener('click', () => {
+  const nom = document.getElementById('add-nom').value.trim();
+  const rayon = document.getElementById('add-rayon').value;
+  if (!nom) return;
+  const newItem = { id: 'custom_'+Date.now(), nom, rayon };
+  items.push(newItem);
+  save(); render();
+  document.getElementById('ov-add').classList.remove('op');
+});
+document.getElementById('add-nom').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('add-save').click();
+});
+document.getElementById('ov-add').addEventListener('click', e => {
+  if (e.target === e.currentTarget) document.getElementById('ov-add').classList.remove('op');
+});
+
+// Modal modifier article
+let editingId = null;
+function openEditModal(it) {
+  editingId = it.id;
+  document.getElementById('edit-nom').value = it.nom;
+  document.getElementById('edit-rayon').value = it.rayon;
+  document.getElementById('ov-edit').classList.add('op');
+  setTimeout(() => document.getElementById('edit-nom').focus(), 50);
+}
+document.getElementById('edit-cancel').addEventListener('click', () => {
+  document.getElementById('ov-edit').classList.remove('op');
+});
+document.getElementById('edit-save').addEventListener('click', () => {
+  const nom = document.getElementById('edit-nom').value.trim();
+  const rayon = document.getElementById('edit-rayon').value;
+  if (!nom) return;
+  const it = items.find(x => x.id === editingId);
+  if (it) { it.nom = nom; it.rayon = rayon; }
+  save(); render();
+  document.getElementById('ov-edit').classList.remove('op');
+});
+document.getElementById('ov-edit').addEventListener('click', e => {
+  if (e.target === e.currentTarget) document.getElementById('ov-edit').classList.remove('op');
+});
+document.getElementById('edit-nom').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('edit-save').click();
+});
+
+// Bouton mode édition
+let editMode = false;
+document.getElementById('btn-edit-mode').addEventListener('click', () => {
+  editMode = !editMode;
+  document.body.classList.toggle('edit-mode', editMode);
+  document.getElementById('btn-edit-mode').classList.toggle('prim', editMode);
+  document.getElementById('btn-edit-mode').textContent = editMode ? '✓ Terminer' : '✏️ Modifier';
+});
+
+// ===== MODE COURSES =====
+let mcDone = new Set(); // articles rayés pendant les courses
+
+function renderModeCourses() {
+  const body = document.getElementById('mc-body');
+  const prog = document.getElementById('mc-progress');
+
+  if (!liste.size) {
+    body.innerHTML = '<div class="mc-empty"><div style="font-size:3rem">🛒</div><p>Ta liste est vide !<br>Ajoute des articles depuis la vue principale.</p></div>';
+    prog.innerHTML = '';
+    return;
+  }
+
+  // Grouper par rayon dans l'ordre du circuit
+  const byRayon = {};
+  [...liste].forEach(id => {
+    const it = items.find(x => x.id === id);
+    if (!it) return;
+    if (!byRayon[it.rayon]) byRayon[it.rayon] = [];
+    byRayon[it.rayon].push(it);
+  });
+
+  const total = liste.size;
+  const done = mcDone.size;
+  prog.innerHTML = '<strong>' + done + '</strong> / ' + total + ' articles';
+
+  let html = '';
+  RAYON_ORDER.forEach(rayon => {
+    if (!byRayon[rayon]?.length) return;
+    html += '<div class="mc-rayon">';
+    html += '<div class="mc-rayon-title">' + (RAYON_ICONS[rayon]||'📦') + ' ' + rayon + '</div>';
+    byRayon[rayon].forEach(it => {
+      const done = mcDone.has(it.id);
+      html += '<div class="mc-item' + (done?' done':'') + '" data-mc="' + it.id + '">' +
+        '<div class="mc-check"></div>' +
+        '<span class="mc-name">' + it.nom + '</span>' +
+        '</div>';
+    });
+    html += '</div>';
+  });
+  body.innerHTML = html;
+
+  body.querySelectorAll('[data-mc]').forEach(el => {
+    el.addEventListener('click', () => {
+      const id = el.dataset.mc;
+      if (mcDone.has(id)) mcDone.delete(id); else mcDone.add(id);
+      saveMcDone();
+      renderModeCourses();
+    });
+  });
+}
+
+function openModeCourses() {
+  try {
+    const saved = localStorage.getItem('mylife_courses_done');
+    mcDone = saved ? new Set(JSON.parse(saved)) : new Set();
+  } catch(e) { mcDone = new Set(); }
+  renderModeCourses();
+  document.getElementById('mode-courses').style.display = 'flex';
+  document.getElementById('btn-exit-courses').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function saveMcDone() {
+  try { localStorage.setItem('mylife_courses_done', JSON.stringify([...mcDone])); } catch(e) {}
+  if (coursesDoc) {
+    coursesDoc.set({ items, liste: [...liste], done: [...mcDone] }).catch(() => {});
+  }
+}
+function closeModeCourses() {
+  document.getElementById('mode-courses').style.display = 'none';
+  document.getElementById('btn-exit-courses').style.display = 'none';
+  document.body.style.overflow = '';
+}
+document.getElementById('btn-mode-courses').addEventListener('click', openModeCourses);
+document.getElementById('btn-exit-courses').addEventListener('click', closeModeCourses);
+
+
+document.getElementById('mc-reset').addEventListener('click', () => {
+  if (confirm('Recommencer depuis le début ?')) {
+    mcDone.clear();
+    try { localStorage.removeItem('mylife_courses_done'); } catch(e) {}
+    renderModeCourses();
+  }
+});
+
+// Init
+load(); render();
+</script>
+
+<!-- MODE COURSES MOBILE -->
+<div class="mode-courses" id="mode-courses">
+  <div class="mc-header">
+    <h2>🛒 Mes courses</h2>
+    <span class="mc-progress" id="mc-progress"></span>
+    <button class="btn sm" id="mc-reset" title="Recommencer">↺</button>
+  </div>
+  <div class="mc-body" id="mc-body"></div>
+</div>
+</body>
+</html>
