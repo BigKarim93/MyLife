@@ -779,17 +779,52 @@ document.getElementById('mc-reset').addEventListener('click', () => {
 load(); render();
 
 // Bouton sync forcé
-document.getElementById('btn-sync-cloud').addEventListener('click', async function() {
-  if(!coursesDoc) { alert('Non connecté'); return; }
-  const ts = Date.now();
-  try {
-    const done = JSON.parse(localStorage.getItem('mylife_courses_done') || '[]');
-    await coursesDoc.set({ items, liste: [...liste], done, savedAt: ts });
-    localStorage.setItem('mylife_courses_ts', String(ts));
-    this.textContent = '✅ Sync OK';
-    setTimeout(() => { this.textContent = '☁️ Sync'; }, 2000);
-  } catch(e) {
-    alert('Erreur sync: ' + e.message);
+document.getElementById('btn-sync-cloud').addEventListener('click', function() {
+  var btn = this;
+  btn.textContent = '⏳...';
+  btn.disabled = true;
+  // Mettre à jour le timestamp localStorage pour forcer la victoire
+  try { localStorage.setItem('mylife_courses_ts', String(Date.now() + 10000)); } catch(e) {}
+  // Sauvegarder via save() qui gère tout
+  save();
+  // Si coursesDoc disponible, forcer aussi un write immédiat
+  if(coursesDoc) {
+    var ts = Date.now() + 10000;
+    var done = [];
+    try { done = JSON.parse(localStorage.getItem('mylife_courses_done') || '[]'); } catch(e) {}
+    coursesDoc.set({ items: items, liste: [...liste], done: done, savedAt: ts })
+      .then(function() {
+        localStorage.setItem('mylife_courses_ts', String(ts));
+        btn.textContent = '✅ Sync OK';
+        btn.disabled = false;
+        setTimeout(function() { btn.textContent = '☁️ Sync'; }, 2500);
+      })
+      .catch(function(e) {
+        btn.textContent = '❌ Erreur';
+        btn.disabled = false;
+        setTimeout(function() { btn.textContent = '☁️ Sync'; }, 2500);
+      });
+  } else {
+    // coursesDoc pas encore prêt — attendre 2s et réessayer
+    setTimeout(function() {
+      if(coursesDoc) {
+        var ts2 = Date.now() + 10000;
+        var done2 = [];
+        try { done2 = JSON.parse(localStorage.getItem('mylife_courses_done') || '[]'); } catch(e) {}
+        coursesDoc.set({ items: items, liste: [...liste], done: done2, savedAt: ts2 })
+          .then(function() {
+            localStorage.setItem('mylife_courses_ts', String(ts2));
+            btn.textContent = '✅ Sync OK';
+            btn.disabled = false;
+            setTimeout(function() { btn.textContent = '☁️ Sync'; }, 2500);
+          })
+          .catch(function() { btn.textContent = '❌ Erreur'; btn.disabled = false; });
+      } else {
+        btn.textContent = '❌ Non connecté';
+        btn.disabled = false;
+        setTimeout(function() { btn.textContent = '☁️ Sync'; }, 2500);
+      }
+    }, 2000);
   }
 });
 
