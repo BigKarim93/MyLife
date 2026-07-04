@@ -133,6 +133,7 @@ body.edit-mode .item-actions{display:flex;}
 <div class="tb">
   <h1>🛒 Courses</h1>
   <div class="spacer"></div>
+  <button class="btn sm" id="btn-sync-cloud" title="Forcer sauvegarde vers le cloud">☁️ Sync</button>
   <button class="btn sm" id="btn-edit-mode">✏️ Modifier</button>
   <button class="btn sm" id="btn-tout-cocher">✅ Tout décocher</button>
   <button class="btn sm" id="btn-add-item">＋ Article</button>
@@ -776,6 +777,22 @@ document.getElementById('mc-reset').addEventListener('click', () => {
 
 // Init
 load(); render();
+
+// Bouton sync forcé
+document.getElementById('btn-sync-cloud').addEventListener('click', async function() {
+  if(!coursesDoc) { alert('Non connecté'); return; }
+  const ts = Date.now();
+  try {
+    const done = JSON.parse(localStorage.getItem('mylife_courses_done') || '[]');
+    await coursesDoc.set({ items, liste: [...liste], done, savedAt: ts });
+    localStorage.setItem('mylife_courses_ts', String(ts));
+    this.textContent = '✅ Sync OK';
+    setTimeout(() => { this.textContent = '☁️ Sync'; }, 2000);
+  } catch(e) {
+    alert('Erreur sync: ' + e.message);
+  }
+});
+
 </script>
 
 <!-- MODE COURSES MOBILE -->
