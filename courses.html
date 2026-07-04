@@ -241,18 +241,11 @@ async function loadFromFirestore() {
       }
     } else {
       load();
-      await saveToFirestore();
+      save();
     }
   } catch(e) { load(); }
   render();
   updateStats();
-}
-
-async function saveToFirestore() {
-  if (!coursesDoc) return;
-  const done = [];
-  try { const d = localStorage.getItem('mylife_courses_done'); if(d) done.push(...JSON.parse(d)); } catch(e) {}
-  await coursesDoc.set({ items, liste: [...liste], done });
 }
 
 let saveTimer = null;
@@ -260,16 +253,14 @@ function save() {
   // localStorage backup
   try { localStorage.setItem(STORE, JSON.stringify(items)); } catch(e) {}
   try { localStorage.setItem(LIST_STORE, JSON.stringify([...liste])); } catch(e) {}
-  var _ts = Date.now() + 99999;
-  try { localStorage.setItem('mylife_courses_ts', String(_ts)); } catch(e) {}
+  try { localStorage.setItem('mylife_courses_ts', String(Date.now())); } catch(e) {}
   // Firestore
   if (!coursesDoc) return;
   clearTimeout(saveTimer);
-  var _savedTs = _ts;
   saveTimer = setTimeout(() => {
     const done = [];
     try { const d = localStorage.getItem('mylife_courses_done'); if(d) done.push(...JSON.parse(d)); } catch(e) {}
-    coursesDoc.set({ items, liste: [...liste], done }).catch(() => {});
+    coursesDoc.set({ items, liste: [...liste], done, savedAt: Date.now() }).catch(() => {});
   }, 800);
 }
 
@@ -386,8 +377,7 @@ function load() {
 function save() {
   try { localStorage.setItem(STORE, JSON.stringify(items)); } catch(e) {}
   try { localStorage.setItem(LIST_STORE, JSON.stringify([...liste])); } catch(e) {}
-  var _ts = Date.now() + 99999;
-  try { localStorage.setItem('mylife_courses_ts', String(_ts)); } catch(e) {}
+  try { localStorage.setItem('mylife_courses_ts', String(Date.now())); } catch(e) {}
 }
 
 // ===== RENDER =====
@@ -732,12 +722,15 @@ load(); render();
 document.getElementById('btn-sync-cloud').addEventListener('click', function() {
   var btn = this;
   btn.textContent = '⏳...'; btn.disabled = true;
-  coursesDoc.set({ items: items, liste: [...liste], done: [] })
+  if (!coursesDoc) { btn.textContent = '❌'; btn.disabled = false; return; }
+  const done = [];
+  try { const d = localStorage.getItem('mylife_courses_done'); if(d) done.push(...JSON.parse(d)); } catch(e) {}
+  coursesDoc.set({ items: items, liste: [...liste], done: done })
     .then(function() {
       btn.textContent = '✅ OK'; btn.disabled = false;
       setTimeout(function() { btn.textContent = '☁️ Sync'; }, 2500);
     })
-    .catch(function(e) {
+    .catch(function() {
       btn.textContent = '❌'; btn.disabled = false;
       setTimeout(function() { btn.textContent = '☁️ Sync'; }, 2500);
     });
