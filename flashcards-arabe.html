@@ -133,7 +133,13 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
   <div class="sidebar">
     <div class="sidebar-title">Mes cours</div>
     <div id="courses-list"></div>
-    <div class="add-course-btn" id="btn-add-course">＋ Nouveau cours</div>
+    <div style="padding:12px 16px;border-top:1px solid var(--border);">
+    <div style="font-size:.7rem;color:var(--text3);margin-bottom:6px;font-weight:700;">🔑 CLÉ API ANTHROPIC</div>
+    <input type="password" id="api-key-input" placeholder="sk-ant-api03-..." 
+      style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 8px;font-size:.72rem;font-family:monospace;outline:none;">
+    <div style="font-size:.65rem;color:var(--text3);margin-top:4px;">Stockée localement. Nécessaire pour l'import PDF.</div>
+  </div>
+  <div class="add-course-btn" id="btn-add-course">＋ Nouveau cours</div>
   </div>
 
   <!-- Content -->
@@ -233,6 +239,10 @@ let reviewFlipped = false;
 let editCardIdx = -1;
 let currentView = 'grid';
 
+// ===== API KEY =====
+let apiKey = '';
+try { apiKey = localStorage.getItem('mylife_anthropic_key') || ''; } catch(e) {}
+
 // ===== STORAGE =====
 const STORE = 'mylife_flashcards_arabe';
 function saveData() {
@@ -247,6 +257,13 @@ function loadData() {
 
 // ===== INIT =====
 loadData();
+// Pré-remplir la clé API
+const keyInput = document.getElementById('api-key-input');
+keyInput.value = apiKey;
+keyInput.addEventListener('input', function() {
+  apiKey = this.value.trim();
+  try { localStorage.setItem('mylife_anthropic_key', apiKey); } catch(e) {}
+});
 renderSidebar();
 if (Object.keys(courses).length > 0) {
   const firstId = Object.keys(courses)[0];
@@ -503,13 +520,21 @@ async function importPDF(file) {
     document.getElementById('loading-text').textContent = 'Analyse en cours...';
     document.getElementById('loading-sub').textContent = 'Extraction des mots encadrés en jaune';
 
+    // Vérifier la clé API
+    if (!apiKey) throw new Error('Clé API manquante — entre ta clé Anthropic dans la sidebar');
+
     // Appeler Claude API
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 1000,
+        max_tokens: 2000,
         messages: [{
           role: 'user',
           content: [
@@ -519,27 +544,35 @@ async function importPDF(file) {
             },
             {
               type: 'text',
-              text: `Ce PDF est une fiche de cours d'arabe. Extrais UNIQUEMENT les mots arabes qui sont encadrés dans des rectangles jaunes (surlignés ou entourés d'un cadre jaune).
-
-Pour chaque mot encadré, donne sa traduction en français.
-
-Réponds UNIQUEMENT en JSON valide, sans texte autour, sans balises markdown, exactement ce format :
-{"cards":[{"arabic":"كَلِمَة","translation":"mot en français"},...]}`
+              text: 'Ce PDF est une fiche de cours d'arabe. Extrais UNIQUEMENT les mots arabes qui sont encadrés dans des rectangles jaunes (surlignés ou entourés d'un cadre jaune visible). Pour chaque mot encadré, donne sa traduction en français. Réponds UNIQUEMENT en JSON valide sans markdown : {"cards":[{"arabic":"mot arabe","translation":"traduction"},...]}'
             }
           ]
         }]
       })
     });
 
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error('API erreur ' + response.status + ': ' + (err.error?.message || response.statusText));
+    }
+
     const data = await response.json();
+    if (!data.content) throw new Error('Réponse API invalide');
     const text = data.content.map(b => b.text || '').join('');
     
-    // Parser le JSON
-    const clean = text.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(clean);
+    // Parser le JSON — robuste
+    let parsed;
+    try {
+      const clean = text.replace(/```json|```/g, '').trim();
+      parsed = JSON.parse(clean);
+    } catch(pe) {
+      const match = text.match(/\{[\s\S]*\}/);
+      if (!match) throw new Error('Impossible de parser la réponse: ' + text.slice(0, 200));
+      parsed = JSON.parse(match[0]);
+    }
     
     if (!parsed.cards || !parsed.cards.length) {
-      throw new Error('Aucun mot encadré trouvé');
+      throw new Error('Aucun mot encadré trouvé dans le PDF');
     }
 
     // Ajouter les cartes au cours
