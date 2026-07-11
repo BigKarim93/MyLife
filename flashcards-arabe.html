@@ -202,17 +202,6 @@ function openOv(id){ document.getElementById(id).classList.add('on'); }
 function closeOv(id){ document.getElementById(id).classList.remove('on'); }
 
 
-// Injecter Cours 3 si pas encore présent
-(function(){
-  var d = fcData;
-  var alreadyHas = Object.values(d).some(function(c){return c.name==='Cours 3';});
-  if(!alreadyHas){
-    var id='fc_cours3';
-    d[id]={name:'Cours 3 — الْهِجْرَةُ',cards:[{"arabic": "شُعْبَةَ", "translation": "Section / département", "known": null}, {"arabic": "الْمُسْتَوَى الْأَوَّلُ", "translation": "Le premier niveau", "known": null}, {"arabic": "الْمَقْصَفُ", "translation": "La cafétéria", "known": null}, {"arabic": "عِمَارَةٌ", "translation": "Bâtiment / immeuble", "known": null}, {"arabic": "شَارِعٌ", "translation": "Avenue / rue", "known": null}, {"arabic": "قِطَارٌ", "translation": "Train", "known": null}, {"arabic": "أَمَرَ اللَّهُ", "translation": "Allah a ordonné", "known": null}, {"arabic": "وَلَمْ يَرَهُ أَحَدٌ", "translation": "Personne ne l'a vu", "known": null}, {"arabic": "وَهَاجَرَ", "translation": "Et il émigra", "known": null}, {"arabic": "وَصَاحِبُهُ", "translation": "Et son compagnon", "known": null}, {"arabic": "سَالِمَيْنِ", "translation": "Sains et saufs", "known": null}, {"arabic": "بِالْفَرَحِ وَالسُّرُورِ", "translation": "Avec joie et bonheur", "known": null}, {"arabic": "آخَى بَيْنَ كُلِّ", "translation": "Il fraternisa entre tous", "known": null}, {"arabic": "مُهَاجِرٍ وَأَنْصَارِي", "translation": "Émigrant et Ansar", "known": null}, {"arabic": "وَهُوَ أَوَّلُ مَسْجِدٍ", "translation": "C'est la première mosquée", "known": null}, {"arabic": "الْمَسْجِدَ النَّبَوِيَّ", "translation": "La mosquée prophétique", "known": null}, {"arabic": "عَشَرَ سَنَوَاتٍ", "translation": "Dix années", "known": null}, {"arabic": "وَيُجَاهِدُ الْكُفَّارَ", "translation": "Il combat les mécréants", "known": null}, {"arabic": "مَكَانٍ فِي الْعَالَمِ", "translation": "Endroit dans le monde", "known": null}, {"arabic": "صَلَّيْتُ تَحِيَّةَ الْمَسْجِدِ", "translation": "J'ai prié la tahiyya de la mosquée", "known": null}, {"arabic": "مُتَأَخِّرًا", "translation": "En retard", "known": null}]};
-    fcSave();
-  }
-})();
-
 // ===== INIT =====
 load();
 renderSb();
@@ -470,6 +459,17 @@ document.getElementById('pdf-file').onchange=async function(){
     alert('Erreur : '+e.message);
   }
 };
+
+// Cours 3 préchargé
+if(!Object.values(fcData).some(function(c){return c.name.indexOf('Cours 3')>=0;})){
+  fcData['fc_cours3']={name:'Cours 3 — الْهِجْرَةُ',cards:[{"arabic": "شُعْبَةَ", "translation": "Section / département", "known": null}, {"arabic": "الْمُسْتَوَى الْأَوَّلُ", "translation": "Le premier niveau", "known": null}, {"arabic": "الْمَقْصَفُ", "translation": "La cafétéria", "known": null}, {"arabic": "عِمَارَةٌ", "translation": "Bâtiment / immeuble", "known": null}, {"arabic": "شَارِعٌ", "translation": "Avenue / rue", "known": null}, {"arabic": "قِطَارٌ", "translation": "Train", "known": null}, {"arabic": "أَمَرَ اللَّهُ", "translation": "Allah a ordonné", "known": null}, {"arabic": "وَلَمْ يَرَهُ أَحَدٌ", "translation": "Personne ne l'a vu", "known": null}, {"arabic": "وَهَاجَرَ", "translation": "Et il émigra", "known": null}, {"arabic": "وَصَاحِبُهُ", "translation": "Et son compagnon", "known": null}, {"arabic": "سَالِمَيْنِ", "translation": "Sains et saufs", "known": null}, {"arabic": "بِالْفَرَحِ وَالسُّرُورِ", "translation": "Avec joie et bonheur", "known": null}, {"arabic": "آخَى بَيْنَ كُلِّ", "translation": "Il fraternisa entre tous", "known": null}, {"arabic": "مُهَاجِرٍ وَأَنْصَارِي", "translation": "Émigrant et Ansar", "known": null}, {"arabic": "وَهُوَ أَوَّلُ مَسْجِدٍ", "translation": "C'est la première mosquée", "known": null}, {"arabic": "الْمَسْجِدَ النَّبَوِيَّ", "translation": "La mosquée prophétique", "known": null}, {"arabic": "عَشَرَ سَنَوَاتٍ", "translation": "Dix années", "known": null}, {"arabic": "وَيُجَاهِدُ الْكُفَّارَ", "translation": "Il combat les mécréants", "known": null}, {"arabic": "مَكَانٍ فِي الْعَالَمِ", "translation": "Endroit dans le monde", "known": null}, {"arabic": "صَلَّيْتُ تَحِيَّةَ الْمَسْجِدِ", "translation": "J'ai prié la tahiyya de la mosquée", "known": null}, {"arabic": "مُتَأَخِّرًا", "translation": "En retard", "known": null}]};
+  fcSave();
+  renderSb();
+}
+// Sélectionner le premier cours
+var fcIds=Object.keys(fcData);
+if(fcIds.length)fcSelectCourse(fcIds[0]);
+
 </script>
 </body>
 </html>
