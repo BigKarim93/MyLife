@@ -84,6 +84,7 @@ body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',system-ui,sans-
 <div class="tb">
   <h1>🃏 Flashcards Arabe</h1>
   <button class="btn" id="btn-rv" style="display:none">▶ Réviser</button>
+  <button class="btn" id="btn-rv-failed" style="display:none">🔴 À revoir</button>
   <button class="btn teal" id="btn-all-rv">🔀 Tout mélanger</button>
   <button class="btn" id="btn-gr" style="display:none">⊞ Grille</button>
   <a href="index.html" class="btn">🏠</a>
@@ -126,7 +127,10 @@ body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',system-ui,sans-
         <button class="rv-btn ko" id="rv-ko">✗ À revoir</button>
         <button class="rv-btn ok" id="rv-ok">✓ Su</button>
       </div>
-      <button class="btn" id="rv-back">← Grille</button>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn" id="rv-back">← Grille</button>
+        <button class="btn" id="rv-toggle-dir" style="font-size:.75rem">🔄 FR→AR</button>
+      </div>
     </div>
   </div>
 </div>
@@ -237,6 +241,8 @@ function showGrid(){
   document.getElementById('gv').style.display='block';
   document.getElementById('rv').classList.remove('on');
   document.getElementById('btn-rv').style.display='inline-block';
+  var hasFailed=D[cur].cards.some(function(c){return c.known===false;});
+  document.getElementById('btn-rv-failed').style.display=hasFailed?'inline-block':'none';
   document.getElementById('btn-gr').style.display='none';
   document.getElementById('ctitle').textContent=c.name;
   var known=c.cards.filter(function(x){return x.known;}).length;
@@ -291,6 +297,8 @@ function showReview(){
   renderRv();
 }
 
+var rvDir='ar'; // 'ar' = arabe→fr, 'fr' = fr→arabe
+
 function renderRv(){
   if(rvIdx>=rvCards.length){
     document.getElementById('rv-ar').textContent='🎉';
@@ -301,10 +309,26 @@ function renderRv(){
     return;
   }
   var card=rvCards[rvIdx];
-  document.getElementById('rv-ar').textContent=card.arabic;
-  document.getElementById('rv-ar2').textContent=card.arabic;
-  document.getElementById('rv-tr').textContent=card.translation;
-  document.getElementById('rv-prog').textContent=(rvIdx+1)+'/'+rvCards.length;
+  if(rvDir==='fr'){
+    // FR→AR : montrer traduction, cacher arabe
+    document.getElementById('rv-ar').textContent=card.translation;
+    document.getElementById('rv-ar').style.fontFamily='inherit';
+    document.getElementById('rv-ar').style.fontSize='1.2rem';
+    document.getElementById('rv-ar2').textContent=card.arabic;
+    document.getElementById('rv-ar2').style.fontFamily="'Scheherazade New',serif";
+    document.getElementById('rv-ar2').style.fontSize='2.2rem';
+    document.getElementById('rv-tr').textContent=card.translation;
+  } else {
+    // AR→FR : montrer arabe, cacher traduction
+    document.getElementById('rv-ar').textContent=card.arabic;
+    document.getElementById('rv-ar').style.fontFamily="'Scheherazade New',serif";
+    document.getElementById('rv-ar').style.fontSize='2.8rem';
+    document.getElementById('rv-ar2').textContent=card.arabic;
+    document.getElementById('rv-ar2').style.fontFamily="'Scheherazade New',serif";
+    document.getElementById('rv-ar2').style.fontSize='2rem';
+    document.getElementById('rv-tr').textContent=card.translation;
+  }
+  document.getElementById('rv-prog').textContent=(rvIdx+1)+'/'+rvCards.length+(rvDir==='fr'?' · FR→AR':' · AR→FR');
   document.getElementById('rv-btns').style.display='none';
   document.getElementById('rvc').classList.remove('flip');
 }
@@ -322,6 +346,30 @@ document.getElementById('rv-ko').onclick=function(){
   if(o)o.known=false;ls_save();rvIdx++;renderRv();
 };
 document.getElementById('rv-back').onclick=function(){showGrid();};
+
+// Toggle direction AR↔FR
+document.getElementById('rv-toggle-dir').onclick=function(){
+  rvDir=rvDir==='ar'?'fr':'ar';
+  this.textContent=rvDir==='fr'?'🔄 AR→FR':'🔄 FR→AR';
+  document.getElementById('rvc').classList.remove('flip');
+  document.getElementById('rv-btns').style.display='none';
+  renderRv();
+};
+
+// Mode "À revoir" uniquement
+document.getElementById('btn-rv-failed').onclick=function(){
+  if(!cur||!D[cur])return;
+  var failed=D[cur].cards.filter(function(c){return c.known===false;});
+  if(!failed.length){alert('Aucune carte à revoir ! Bravo 🎉');return;}
+  rvCards=failed.slice().sort(function(){return Math.random()-.5;});
+  rvIdx=0;
+  document.getElementById('gv').style.display='none';
+  document.getElementById('rv').classList.add('on');
+  document.getElementById('btn-rv').style.display='none';
+  document.getElementById('btn-rv-failed').style.display='none';
+  document.getElementById('btn-gr').style.display='inline-block';
+  renderRv();
+};
 document.getElementById('btn-rv').onclick=showReview;
 document.getElementById('btn-gr').onclick=function(){showGrid();};
 
@@ -386,6 +434,12 @@ document.getElementById('btn-del-course').onclick=function(){
 // Cours 4
 if(!Object.values(D).some(function(c){return c.name.indexOf('Cours 4')>=0;})){
   D['fc_cours4']={name:'Cours 4 — الْقُرْآنُ',cards:[{"arabic": "كُرَةَ الْقَدَمِ", "translation": "Football", "known": null}, {"arabic": "الْعَشَاءَ", "translation": "Dîner", "known": null}, {"arabic": "شَرِبَ صَالِحٌ", "translation": "Salih a bu", "known": null}, {"arabic": "لَعِبَ خَالِدٌ", "translation": "Khalid a joué", "known": null}, {"arabic": "أَمْسِ", "translation": "Hier", "known": null}, {"arabic": "اِسْتَيْقَظَ مُبَكِّرًا", "translation": "Se réveiller tôt", "known": null}, {"arabic": "تَلَا الْقُرْآنَ الْكَرِيمَ", "translation": "Lire le Quran", "known": null}, {"arabic": "كَتَبَ الْوَاجِبَ الْمَنْزِلِيَّ", "translation": "Écrire les devoirs de la maison", "known": null}, {"arabic": "تَنَاوَلَ الْفُطُورَ", "translation": "Prendre le petit déjeuner", "known": null}, {"arabic": "الْمَطْعَمُ", "translation": "Restaurant", "known": null}, {"arabic": "غَسَلَ الْقَمِيصَ", "translation": "Laver sa chemise", "known": null}, {"arabic": "مَاذَا فَعَلَ", "translation": "Qu'est-ce qu'il a fait", "known": null}, {"arabic": "مَتَى", "translation": "Quand est-ce que...", "known": null}, {"arabic": "نُزُلَهُ", "translation": "Le fait de descendre", "known": null}, {"arabic": "الْأَمِينُ", "translation": "Une personne digne de confiance", "known": null}, {"arabic": "النَّبِيُّ الْأُمِّيُّ", "translation": "Le Prophète qui ne sait ni lire ni écrire", "known": null}, {"arabic": "لِيُنْذِرَ مِنْ عَذَابِ جَهَنَّمَ", "translation": "Avertir d'un châtiment douloureux de l'enfer", "known": null}, {"arabic": "وَيُبَشِّرُهُمْ بِنَعِيمِ الْجَنَّةِ", "translation": "Annoncer la bonne nouvelle d'un bon état et d'une vie heureuse au paradis", "known": null}, {"arabic": "وَفِيهِ أَخْبَارُ الْأُمَمِ السَّابِقَةِ", "translation": "Et dans le Quran des informations sur les communautés qui nous ont précédés", "known": null}, {"arabic": "وَقَصَصُ الْأَنْبِيَاءِ وَالْمُرْسَلِينَ", "translation": "Et les histoires des Prophètes et des Envoyés", "known": null}, {"arabic": "خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ", "translation": "Le meilleur parmi vous est celui qui apprend le Quran et l'enseigne", "known": null}, {"arabic": "مَنْ قَرَأَ حَرْفًا ... فَلَهُ بِهِ حَسَنَةٌ", "translation": "Celui qui lit une lettre... il aura 1 hasanat", "known": null}, {"arabic": "قَالَتِ الْجِنُّ عِنْدَمَا سَمِعَتْ", "translation": "On dit les djinns lorsqu'ils ont entendu le Quran", "known": null}, {"arabic": "إِنَّا عَجَبًا ... يَهْدِي ... الرُّشْدَ", "translation": "Certes... étonnant... guider... la bonne direction", "known": null}, {"arabic": "فَآمَنَّا بِهِ وَلَنْ نُشْرِكَ بِرَبِّنَا أَحَدًا", "translation": "On a cru et nous n'associerons jamais à notre Seigneur personne", "known": null}]};
+  ls_save();
+}
+
+// Cours 5
+if(!Object.values(D).some(function(c){return c.name.indexOf('Cours 5')>=0;})){
+  D['fc_cours5']={name:'Cours 5 — يَوْمِيَّاتِي',cards:[{"arabic": "فِي السَّاعَةِ الرَّابِعَةِ صَبَاحًا", "translation": "À 4 heures du matin", "known": null}, {"arabic": "مَاذَا تَفْعَلُ أَوَّلًا؟", "translation": "Qu'est-ce que tu fais en premier?", "known": null}, {"arabic": "أَغْتَسِلُ ثُمَّ أَنَوَّضَأُ", "translation": "Se laver, se purifier le corps, ensuite j'accomplis les ablutions", "known": null}, {"arabic": "ثُمَّ أَتْلُو الْقُرْآنَ الْكَرِيمَ", "translation": "Ensuite je récite le Quran", "known": null}, {"arabic": "أَتَنَاوَلُ الْفُطُورَ", "translation": "Prendre le petit déjeuner", "known": null}, {"arabic": "أُغَسِّلُ مَلَابِسِي", "translation": "Je lave mes habits", "known": null}, {"arabic": "أَقْرَأُ قَلِيلًا", "translation": "Je lis très peu", "known": null}, {"arabic": "أَنَامُ", "translation": "Je dors", "known": null}, {"arabic": "ثُمَّ", "translation": "Ensuite — Notion de temps et latence", "known": null}, {"arabic": "هِشَامٌ يَتَحَدَّثُ", "translation": "Hicham discute", "known": null}, {"arabic": "مُبَكِّرًا - مُتَأَخِّرًا", "translation": "Très tôt - En retard", "known": null}, {"arabic": "وَأَسْتَعِدُّ", "translation": "Se préparer", "known": null}, {"arabic": "ثُمَّ أُفْطِرُ", "translation": "Ensuite on déjeune", "known": null}, {"arabic": "أَذْهَبُ إِلَى الشُّعَبِ", "translation": "Je vais aux départements", "known": null}, {"arabic": "تَنْتَهِي الدِّرَاسَةُ", "translation": "Les cours se finissent", "known": null}, {"arabic": "كُلِّيَّةُ اللُّغَةِ الْعَرَبِيَّةِ", "translation": "L'Université de la langue arabe", "known": null}, {"arabic": "ثُمَّ أَتَغَدَّى", "translation": "Ensuite je prend le déjeuner", "known": null}, {"arabic": "وَأَسْتَرِيحُ قَلِيلًا", "translation": "Et je me repose un petit peu", "known": null}, {"arabic": "إِلَى الصَّالَةِ الرِّيَاضِيَّةِ", "translation": "À la salle de sport", "known": null}, {"arabic": "لِأَلْعَبَ كُرَةَ السَّلَّةِ", "translation": "Pour que je puisse jouer au Basketball", "known": null}, {"arabic": "قَبْلَ غُرُوبِ الشَّمْسِ", "translation": "Avant le coucher du soleil", "known": null}, {"arabic": "أَرْكَبُ حَافِلَةَ الْجَامِعَةِ", "translation": "Je prend le bus universitaire", "known": null}, {"arabic": "لِأَدَاءِ", "translation": "Pour que je puisse faire", "known": null}, {"arabic": "بَعْدَ عَوْدَتِي", "translation": "Après mon retour", "known": null}, {"arabic": "وَأَسْتَذْكِرُ دُرُوسِي", "translation": "Et je révise mes cours", "known": null}, {"arabic": "وَأَتَحَدَّثُ مَعَ زُمَلَائِي", "translation": "Et je parle avec mes camarades", "known": null}, {"arabic": "ثُمَّ أَنَامُ فِي السَّاعَةِ الْحَادِيَةَ عَشْرَةَ", "translation": "Ensuite je vais dormir à 11h du soir", "known": null}, {"arabic": "تَبْدَأُ - تَنْتَهِي", "translation": "Commencer - Finir", "known": null}, {"arabic": "قَلِيلًا - كَثِيرًا", "translation": "Un peu - Beaucoup", "known": null}, {"arabic": "أَدَاءً", "translation": "Faire quelque chose", "known": null}, {"arabic": "الرِّيَاضِيَّةُ", "translation": "Le sport", "known": null}, {"arabic": "تَفْعَلُ", "translation": "Tu fais", "known": null}, {"arabic": "أَسْتَعِدُّ", "translation": "Je me prépare", "known": null}, {"arabic": "تُفْطِرُ", "translation": "Tu prend le petit déjeuner", "known": null}, {"arabic": "فِي الْمَلْعَبِ", "translation": "Le terrain de jeux", "known": null}]};
   ls_save();
 }
 
