@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>✍️ Générateur de phrases</title>
+<link href="https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1117;--s:#1a1d27;--s2:#22263a;--bd:rgba(255,255,255,.08);--tx:#e8eaf6;--tx2:#9198c0;--tx3:#5a6080;--ac:#7c6af7;--gr:#4ade80;--rd:#f87171;--tl:#2dd4bf;--am:#fbbf24;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;}
+.tb{display:flex;align-items:center;gap:10px;padding:10px 18px;background:var(--s);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:10;}
+.tb h1{font-size:.95rem;font-weight:700;flex:1;}
+.btn{background:var(--s2);border:1px solid var(--bd);color:var(--tx);border-radius:8px;padding:7px 14px;font-size:.82rem;cursor:pointer;font-family:inherit;transition:.15s;}
+.btn:hover{border-color:var(--ac);}
+.btn.prim{background:var(--ac);border-color:var(--ac);color:#fff;}
+.btn.teal{background:rgba(45,212,191,.15);border-color:var(--tl);color:var(--tl);}
+.btn.green{background:rgba(74,222,128,.15);border-color:var(--gr);color:var(--gr);}
+
+.main{max-width:800px;margin:0 auto;padding:20px;}
+
+/* Sélecteur cours */
+.cours-sel{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
+.cours-btn{padding:8px 16px;border-radius:20px;border:1px solid var(--bd);background:var(--s2);color:var(--tx2);cursor:pointer;font-size:.82rem;transition:.15s;}
+.cours-btn:hover{border-color:var(--tl);color:var(--tl);}
+.cours-btn.active{background:rgba(45,212,191,.15);border-color:var(--tl);color:var(--tl);font-weight:700;}
+.cours-btn.multi{border-color:var(--ac);}
+.cours-btn.multi.active{background:rgba(124,106,247,.15);border-color:var(--ac);color:var(--ac);}
+
+/* Settings */
+.settings{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:16px;margin-bottom:20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+.settings label{font-size:.78rem;color:var(--tx2);}
+.nb-sel{background:var(--s2);border:1px solid var(--bd);color:var(--tx);border-radius:8px;padding:6px 10px;font-size:.82rem;font-family:inherit;cursor:pointer;}
+
+/* Phrase card */
+.phrase-card{background:var(--s);border:1px solid var(--bd);border-radius:14px;padding:20px;margin-bottom:14px;transition:.2s;}
+.phrase-card:hover{border-color:rgba(255,255,255,.12);}
+.phrase-num{font-size:.7rem;color:var(--tx3);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.phrase-tags{display:flex;gap:5px;flex-wrap:wrap;}
+.tag{background:rgba(45,212,191,.1);border:1px solid rgba(45,212,191,.2);color:var(--tl);border-radius:20px;padding:1px 8px;font-size:.65rem;}
+.phrase-fr{font-size:1.05rem;font-weight:600;color:var(--tx);margin-bottom:14px;line-height:1.5;}
+.phrase-ar-wrap{position:relative;}
+.phrase-ar{font-family:'Scheherazade New',serif;font-size:1.8rem;font-weight:700;direction:rtl;text-align:right;line-height:1.7;color:var(--tl);filter:blur(8px);transition:.3s;user-select:none;min-height:50px;}
+.phrase-ar.visible{filter:none;user-select:text;}
+.reveal-btn{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(15,17,23,.3);border-radius:8px;font-size:.82rem;color:var(--tx2);transition:.15s;}
+.reveal-btn:hover{color:var(--tx);}
+.phrase-ar.visible + .reveal-btn{display:none;}
+.phrase-actions{display:flex;gap:8px;margin-top:12px;}
+.p-btn{padding:4px 10px;border-radius:6px;font-size:.72rem;cursor:pointer;border:1px solid;background:transparent;transition:.15s;}
+.p-btn.ok{border-color:var(--gr);color:var(--gr);}
+.p-btn.ok:hover{background:rgba(74,222,128,.1);}
+.p-btn.ko{border-color:var(--rd);color:var(--rd);}
+.p-btn.ko:hover{background:rgba(248,113,113,.1);}
+.p-btn.audio{border-color:var(--am);color:var(--am);}
+.p-btn.audio:hover{background:rgba(251,191,36,.1);}
+.phrase-card.success{border-color:rgba(74,222,128,.3);background:rgba(74,222,128,.03);}
+.phrase-card.fail{border-color:rgba(248,113,113,.3);background:rgba(248,113,113,.03);}
+
+/* Stats bar */
+.stats{display:flex;gap:16px;background:var(--s);border:1px solid var(--bd);border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:.82rem;}
+.stat{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.stat-val{font-size:1.2rem;font-weight:700;}
+.stat-val.g{color:var(--gr);}
+.stat-val.r{color:var(--rd);}
+.stat-val.b{color:var(--ac);}
+
+/* Empty */
+.empty{text-align:center;padding:40px;color:var(--tx3);}
+.gen-btn-wrap{text-align:center;margin-bottom:24px;}
+</style>
+</head>
+<body>
+<div class="tb">
+  <h1>✍️ Générateur de phrases arabes</h1>
+  <a href="flashcards-arabe.html" class="btn">🃏 Flashcards</a>
+  <a href="index.html" class="btn">🏠</a>
+</div>
+
+<div class="main">
+  <!-- Sélecteur cours -->
+  <div style="margin-bottom:10px;font-size:.78rem;color:var(--tx2)">Choisir le(s) cours :</div>
+  <div class="cours-sel" id="cours-sel"></div>
+
+  <!-- Settings -->
+  <div class="settings">
+    <label>Nombre de phrases :</label>
+    <select class="nb-sel" id="nb-phrases">
+      <option value="5">5</option>
+      <option value="10" selected>10</option>
+      <option value="15">15</option>
+      <option value="20">20</option>
+    </select>
+    <label style="margin-left:8px">Difficulté :</label>
+    <select class="nb-sel" id="difficulty">
+      <option value="easy">Facile (2 mots)</option>
+      <option value="medium" selected>Moyen (3 mots)</option>
+      <option value="hard">Difficile (4+ mots)</option>
+    </select>
+    <button class="btn prim" id="btn-gen" style="margin-left:auto">🎲 Générer</button>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats" id="stats" style="display:none">
+    <div class="stat"><span class="stat-val b" id="st-total">0</span><span style="color:var(--tx3)">Total</span></div>
+    <div class="stat"><span class="stat-val g" id="st-ok">0</span><span style="color:var(--tx3)">Réussies</span></div>
+    <div class="stat"><span class="stat-val r" id="st-ko">0</span><span style="color:var(--tx3)">À revoir</span></div>
+    <div class="stat" style="margin-left:auto"><span class="stat-val" id="st-pct" style="color:var(--am)">0%</span><span style="color:var(--tx3)">Score</span></div>
+  </div>
+
+  <!-- Phrases -->
+  <div id="phrases-container">
+    <div class="empty">👆 Sélectionne un cours et clique sur Générer</div>
+  </div>
+</div>
+
+<script>
+// ===== DONNÉES =====
+const COURS = {
+  'Cours 3': {
+    name: 'Cours 3 — الْهِجْرَةُ',
+    mots: [
+      {fr:'section/département', ar:'شُعْبَةَ'},
+      {fr:'le premier niveau', ar:'الْمُسْتَوَى الْأَوَّلُ'},
+      {fr:'la cafétéria', ar:'الْمَقْصَفُ'},
+      {fr:'bâtiment', ar:'عِمَارَةٌ'},
+      {fr:'avenue/rue', ar:'شَارِعٌ'},
+      {fr:'train', ar:'قِطَارٌ'},
+      {fr:'Allah a ordonné', ar:'أَمَرَ اللَّهُ'},
+      {fr:'et il émigra', ar:'وَهَاجَرَ'},
+      {fr:'son compagnon', ar:'صَاحِبُهُ'},
+      {fr:'sains et saufs', ar:'سَالِمَيْنِ'},
+      {fr:'avec joie et bonheur', ar:'بِالْفَرَحِ وَالسُّرُورِ'},
+      {fr:'la mosquée prophétique', ar:'الْمَسْجِدَ النَّبَوِيَّ'},
+      {fr:'dix années', ar:'عَشَرَ سَنَوَاتٍ'},
+      {fr:'endroit dans le monde', ar:'مَكَانٍ فِي الْعَالَمِ'},
+      {fr:'en retard', ar:'مُتَأَخِّرًا'},
+    ]
+  },
+  'Cours 4': {
+    name: 'Cours 4 — الْقُرْآنُ',
+    mots: [
+      {fr:'football', ar:'كُرَةَ الْقَدَمِ'},
+      {fr:'hier', ar:'أَمْسِ'},
+      {fr:'se réveiller tôt', ar:'اِسْتَيْقَظَ مُبَكِّرًا'},
+      {fr:'lire le Quran', ar:'تَلَا الْقُرْآنَ الْكَرِيمَ'},
+      {fr:'prendre le petit déjeuner', ar:'تَنَاوَلَ الْفُطُورَ'},
+      {fr:'restaurant', ar:'الْمَطْعَمُ'},
+      {fr:'laver sa chemise', ar:'غَسَلَ الْقَمِيصَ'},
+      {fr:'personne digne de confiance', ar:'الْأَمِينُ'},
+      {fr:'le meilleur parmi vous', ar:'خَيْرُكُمْ'},
+      {fr:'apprend le Quran et l\'enseigne', ar:'تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ'},
+      {fr:'quand est-ce que', ar:'مَتَى'},
+      {fr:'qu\'est-ce qu\'il a fait', ar:'مَاذَا فَعَلَ'},
+    ]
+  },
+  'Cours 5': {
+    name: 'Cours 5 — يَوْمِيَّاتِي',
+    mots: [
+      {fr:'à 4 heures du matin', ar:'فِي السَّاعَةِ الرَّابِعَةِ صَبَاحًا'},
+      {fr:'se laver et faire les ablutions', ar:'أَغْتَسِلُ ثُمَّ أَتَوَضَّأُ'},
+      {fr:'je lis très peu', ar:'أَقْرَأُ قَلِيلًا'},
+      {fr:'je dors', ar:'أَنَامُ'},
+      {fr:'très tôt', ar:'مُبَكِّرًا'},
+      {fr:'se préparer', ar:'أَسْتَعِدُّ'},
+      {fr:'les cours se finissent', ar:'تَنْتَهِي الدِّرَاسَةُ'},
+      {fr:'je prend le déjeuner', ar:'ثُمَّ أَتَغَدَّى'},
+      {fr:'à la salle de sport', ar:'إِلَى الصَّالَةِ الرِّيَاضِيَّةِ'},
+      {fr:'avant le coucher du soleil', ar:'قَبْلَ غُرُوبِ الشَّمْسِ'},
+      {fr:'je prend le bus universitaire', ar:'أَرْكَبُ حَافِلَةَ الْجَامِعَةِ'},
+      {fr:'après mon retour', ar:'بَعْدَ عَوْدَتِي'},
+      {fr:'je révise mes cours', ar:'أَسْتَذْكِرُ دُرُوسِي'},
+      {fr:'un peu - beaucoup', ar:'قَلِيلًا - كَثِيرًا'},
+      {fr:'le terrain de jeux', ar:'فِي الْمَلْعَبِ'},
+    ]
+  }
+};
+
+// Modèles de phrases avec connecteurs courants
+const TEMPLATES = {
+  easy: [
+    (m1,m2) => ({
+      fr: `Je vais à ${m1.fr} et je vois ${m2.fr}.`,
+      ar: `أَذْهَبُ إِلَى ${m1.ar} وَأَرَى ${m2.ar}.`
+    }),
+    (m1,m2) => ({
+      fr: `${m1.fr.charAt(0).toUpperCase()+m1.fr.slice(1)} est proche de ${m2.fr}.`,
+      ar: `${m1.ar} قَرِيبٌ مِنَ ${m2.ar}.`
+    }),
+    (m1,m2) => ({
+      fr: `J'aime ${m1.fr} mais je préfère ${m2.fr}.`,
+      ar: `أُحِبُّ ${m1.ar} لَكِنِّي أُفَضِّلُ ${m2.ar}.`
+    }),
+    (m1,m2) => ({
+      fr: `Il y a ${m1.fr} et aussi ${m2.fr} ici.`,
+      ar: `هُنَاكَ ${m1.ar} وَأَيْضًا ${m2.ar} هُنَا.`
+    }),
+  ],
+  medium: [
+    (m1,m2,m3) => ({
+      fr: `Hier, j'ai vu ${m1.fr}, ensuite je suis allé à ${m2.fr} avec ${m3.fr}.`,
+      ar: `أَمْسِ رَأَيْتُ ${m1.ar}، ثُمَّ ذَهَبْتُ إِلَى ${m2.ar} مَعَ ${m3.ar}.`
+    }),
+    (m1,m2,m3) => ({
+      fr: `Après ${m1.fr}, il faut penser à ${m2.fr} et à ${m3.fr}.`,
+      ar: `بَعْدَ ${m1.ar}، يَجِبُ التَّفْكِيرُ فِي ${m2.ar} وَفِي ${m3.ar}.`
+    }),
+    (m1,m2,m3) => ({
+      fr: `J'aime ${m1.fr} parce que c'est proche de ${m2.fr} et de ${m3.fr}.`,
+      ar: `أُحِبُّ ${m1.ar} لِأَنَّهُ قَرِيبٌ مِنَ ${m2.ar} وَمِنَ ${m3.ar}.`
+    }),
+    (m1,m2,m3) => ({
+      fr: `D'abord ${m1.fr}, puis ${m2.fr}, enfin ${m3.fr}.`,
+      ar: `أَوَّلًا ${m1.ar}، ثُمَّ ${m2.ar}، أَخِيرًا ${m3.ar}.`
+    }),
+    (m1,m2,m3) => ({
+      fr: `Chaque matin, je commence par ${m1.fr}, puis ${m2.fr} avant ${m3.fr}.`,
+      ar: `كُلَّ صَبَاحٍ أَبْدَأُ بِـ${m1.ar}، ثُمَّ ${m2.ar} قَبْلَ ${m3.ar}.`
+    }),
+  ],
+  hard: [
+    (m1,m2,m3,m4) => ({
+      fr: `Hier matin, j'ai fait ${m1.fr} et ${m2.fr}, puis je suis allé à ${m3.fr} avant de finir par ${m4.fr}.`,
+      ar: `أَمْسِ صَبَاحًا فَعَلْتُ ${m1.ar} وَ${m2.ar}، ثُمَّ ذَهَبْتُ إِلَى ${m3.ar} قَبْلَ أَنْ أَنْتَهِيَ بِـ${m4.ar}.`
+    }),
+    (m1,m2,m3,m4) => ({
+      fr: `D'abord ${m1.fr}, ensuite ${m2.fr}, après ça ${m3.fr}, et finalement ${m4.fr}.`,
+      ar: `أَوَّلًا ${m1.ar}، ثُمَّ ${m2.ar}، بَعْدَ ذَلِكَ ${m3.ar}، وَأَخِيرًا ${m4.ar}.`
+    }),
+  ]
+};
+
+let selectedCours = [];
+let currentPhrases = [];
+let scores = {ok:0, ko:0};
+
+// Init sidebar cours
+const sel = document.getElementById('cours-sel');
+Object.keys(COURS).forEach(key => {
+  const btn = document.createElement('button');
+  btn.className = 'cours-btn';
+  btn.textContent = key;
+  btn.dataset.key = key;
+  btn.onclick = () => {
+    btn.classList.toggle('active');
+    if(btn.classList.contains('active')) selectedCours.push(key);
+    else selectedCours = selectedCours.filter(k=>k!==key);
+    // Bouton "Tout"
+    document.getElementById('btn-all-cours').classList.toggle('active', selectedCours.length===Object.keys(COURS).length);
+  };
+  sel.appendChild(btn);
+});
+// Bouton "Tout"
+const btnAll = document.createElement('button');
+btnAll.id = 'btn-all-cours';
+btnAll.className = 'cours-btn multi';
+btnAll.textContent = '🔀 Tous les cours';
+btnAll.onclick = () => {
+  const allKeys = Object.keys(COURS);
+  const allSelected = selectedCours.length === allKeys.length;
+  if(allSelected) {
+    selectedCours = [];
+    document.querySelectorAll('.cours-btn:not(.multi)').forEach(b=>b.classList.remove('active'));
+    btnAll.classList.remove('active');
+  } else {
+    selectedCours = [...allKeys];
+    document.querySelectorAll('.cours-btn:not(.multi)').forEach(b=>b.classList.add('active'));
+    btnAll.classList.add('active');
+  }
+};
+sel.appendChild(btnAll);
+
+function shuffle(arr) {
+  return arr.slice().sort(()=>Math.random()-.5);
+}
+
+function pick(arr, n) {
+  return shuffle(arr).slice(0, n);
+}
+
+// Générer les phrases
+document.getElementById('btn-gen').onclick = () => {
+  if(!selectedCours.length) { alert('Sélectionne au moins un cours !'); return; }
+  const nb = parseInt(document.getElementById('nb-phrases').value);
+  const diff = document.getElementById('difficulty').value;
+  const nMots = diff==='easy'?2:diff==='medium'?3:4;
+
+  // Récupérer tous les mots des cours sélectionnés
+  let allMots = [];
+  selectedCours.forEach(key => {
+    COURS[key].mots.forEach(m => allMots.push({...m, cours: key}));
+  });
+
+  if(allMots.length < nMots) { alert('Pas assez de mots ! Sélectionne plus de cours.'); return; }
+
+  const templates = TEMPLATES[diff];
+  currentPhrases = [];
+  scores = {ok:0, ko:0};
+
+  for(let i=0; i<nb; i++) {
+    const motsCours = pick(allMots, nMots);
+    const tpl = templates[Math.floor(Math.random()*templates.length)];
+    try {
+      const phrase = tpl(...motsCours);
+      currentPhrases.push({...phrase, mots: motsCours, status: null});
+    } catch(e) {}
+  }
+
+  renderPhrases();
+  updateStats();
+  document.getElementById('stats').style.display='flex';
+};
+
+function renderPhrases() {
+  const container = document.getElementById('phrases-container');
+  container.innerHTML = '';
+  currentPhrases.forEach((p, i) => {
+    const card = document.createElement('div');
+    card.className = 'phrase-card' + (p.status==='ok'?' success':p.status==='ko'?' fail':'');
+    card.innerHTML = `
+      <div class="phrase-num">
+        <span>Phrase ${i+1}</span>
+        <div class="phrase-tags">${p.mots.map(m=>'<span class="tag">'+m.fr+'</span>').join('')}</div>
+      </div>
+      <div class="phrase-fr">${p.fr}</div>
+      <div class="phrase-ar-wrap">
+        <div class="phrase-ar${p.status?'  visible':''}" id="ar-${i}">${p.ar}</div>
+        ${!p.status?`<div class="reveal-btn" onclick="reveal(${i})">👁️ Voir la traduction arabe</div>`:''}
+      </div>
+      <div class="phrase-actions" id="actions-${i}" style="${p.status?'':'display:none'}">
+        <button class="p-btn audio" onclick="speak(${i})">🔊 Écouter</button>
+        <button class="p-btn ok ${p.status==='ok'?'active':''}" onclick="mark(${i},'ok')">✓ Réussi</button>
+        <button class="p-btn ko ${p.status==='ko'?'active':''}" onclick="mark(${i},'ko')">✗ À revoir</button>
+      </div>`;
+    container.appendChild(card);
+  });
+}
+
+function reveal(i) {
+  document.getElementById('ar-'+i).classList.add('visible');
+  document.getElementById('actions-'+i).style.display='flex';
+  // Supprimer le bouton reveal
+  const wrap = document.getElementById('ar-'+i).parentElement;
+  const revBtn = wrap.querySelector('.reveal-btn');
+  if(revBtn) revBtn.remove();
+}
+
+function mark(i, status) {
+  const prev = currentPhrases[i].status;
+  currentPhrases[i].status = status;
+  if(prev==='ok') scores.ok--;
+  if(prev==='ko') scores.ko--;
+  if(status==='ok') scores.ok++;
+  if(status==='ko') scores.ko++;
+  reveal(i);
+  renderPhrases();
+  updateStats();
+}
+
+function updateStats() {
+  const total = currentPhrases.length;
+  document.getElementById('st-total').textContent = total;
+  document.getElementById('st-ok').textContent = scores.ok;
+  document.getElementById('st-ko').textContent = scores.ko;
+  const rated = scores.ok + scores.ko;
+  document.getElementById('st-pct').textContent = rated>0 ? Math.round(scores.ok/rated*100)+'%' : '—';
+}
+
+// Audio Web Speech API
+function speak(i) {
+  const text = currentPhrases[i].ar;
+  if(!window.speechSynthesis) { alert('Ton navigateur ne supporte pas la synthèse vocale.'); return; }
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = 'ar-SA';
+  utt.rate = 0.85;
+  // Chercher une voix arabe
+  const voices = window.speechSynthesis.getVoices();
+  const arVoice = voices.find(v => v.lang.startsWith('ar'));
+  if(arVoice) utt.voice = arVoice;
+  window.speechSynthesis.speak(utt);
+}
+// Charger les voix
+window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+</script>
+</body>
+</html>
